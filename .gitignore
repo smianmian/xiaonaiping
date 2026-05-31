@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Xcode user/workspace state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Build output
+build/
+DerivedData/
+.build/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Local secrets and provisioning
+.env
+.env.*
+*.p12
+*.mobileprovision
+*.provisionprofile
+GoogleService-Info.plist
+
+# Logs
+*.log

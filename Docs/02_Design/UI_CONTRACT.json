@@ -1,0 +1,270 @@
+{
+  "product": "小奶瓶 / 宝宝成长记录",
+  "version": "0.1",
+  "platforms": ["iOS"],
+  "document_status": {
+    "stage": "initial_ui_contract",
+    "date": "2026-05-28",
+    "code_status": "no_xcode_project_no_swift_code_no_dependencies"
+  },
+  "confirmed_facts": [
+    "First version is iOS native only",
+    "Primary user is mother",
+    "Baby age range is 0-3 years",
+    "Current replacement behavior is WeChat recording",
+    "Visual direction should feel warm and keepsake-like",
+    "Photos may be copied into the app private container",
+    "V1 needs account-based backup and restore",
+    "V1 uploads original baby photos selected by the user",
+    "Launch regions are Hong Kong and the United States",
+    "Vaccine templates cover Mainland China and Hong Kong",
+    "Crash reporting is required in V1"
+  ],
+  "reasonable_inferences": [
+    "High-frequency actions should be reachable from Today",
+    "Forms should save minimal records and keep optional details secondary",
+    "The UI should feel like a private baby archive, not a medical dashboard"
+  ],
+  "pending_confirmation": [
+    "Exact brand color direction",
+    "Whether dark mode is a v1 acceptance requirement",
+    "Whether multiple baby profiles are required",
+    "Whether account sign-in appears during onboarding or backup setup",
+    "Which crash reporting channel is used"
+  ],
+  "excluded_from_v1": [
+    "macOS UI",
+    "family collaboration UI",
+    "community or sharing UI",
+    "subscription or commerce UI",
+    "China Mainland launch UI"
+  ],
+  "design_principles": [
+    "low cognitive load",
+    "Apple native feel",
+    "privacy-first",
+    "fast high-frequency actions",
+    "warm keepsake feeling"
+  ],
+  "navigation": {
+    "type": "tab",
+    "tabs": [
+      {
+        "id": "today",
+        "label": "今天",
+        "purpose": "Daily summary and fast logging",
+        "primary_actions": ["feeding", "sleep", "diaper", "photo"]
+      },
+      {
+        "id": "timeline",
+        "label": "时间线",
+        "purpose": "Photos and memory review",
+        "primary_actions": ["add_photo"]
+      },
+      {
+        "id": "growth",
+        "label": "成长",
+        "purpose": "Growth measurements, vaccine reminders, monthly reports",
+        "primary_actions": ["add_measurement", "add_vaccine_reminder", "view_report"]
+      },
+      {
+        "id": "settings",
+        "label": "设置",
+        "purpose": "Baby profile, account, privacy, backup, data management",
+        "primary_actions": ["edit_profile", "manage_account", "manage_backup", "delete_data"]
+      }
+    ]
+  },
+  "tokens": {
+    "color": {
+      "background": "warm_system_background",
+      "surface": "soft_card_surface",
+      "primary": "warm_milk_accent",
+      "secondary": "soft_peach_accent",
+      "success": "calm_green",
+      "warning": "soft_amber",
+      "destructive": "system_red_only_for_delete"
+    },
+    "typography": {
+      "style": "system",
+      "supports_dynamic_type": true,
+      "large_title_usage": "today_header_only",
+      "body_usage": "records_forms_empty_states"
+    },
+    "spacing": {
+      "base": 8,
+      "screen_margin": 16,
+      "section_gap": 20,
+      "control_gap": 12
+    },
+    "radius": {
+      "small": 8,
+      "medium": 12,
+      "large": 16
+    },
+    "shadow": {
+      "default": "subtle_or_none",
+      "avoid": "heavy_floating_card_effects"
+    }
+  },
+  "components": {
+    "primary_button": {
+      "min_hit_size_pt": 44,
+      "usage": "high-frequency actions",
+      "copy_rule": "must name the concrete action"
+    },
+    "summary_card": {
+      "usage": "today counts and current states",
+      "content_rule": "short, scannable, no long explanations"
+    },
+    "record_sheet": {
+      "usage": "create or edit high-frequency records",
+      "required_fields_limit": 2,
+      "optional_fields": "secondary or collapsible"
+    },
+    "empty_state": {
+      "tone": "warm and non-judgmental",
+      "must_include_next_action": true
+    },
+    "error_state": {
+      "tone": "clear and recoverable",
+      "must_preserve_user_input": true
+    }
+  },
+  "screens": [
+    {
+      "id": "onboarding",
+      "label": "首次启动",
+      "goal": "Create trust and baby profile",
+      "primary_action": "创建宝宝档案",
+      "empty_state": "No profile yet",
+      "error_state": "Invalid birth date"
+    },
+    {
+      "id": "today",
+      "label": "今天",
+      "goal": "Show today summary and fast actions",
+      "primary_action": "快速记录",
+      "empty_state": "No records today",
+      "error_state": "Local save failed"
+    },
+    {
+      "id": "feeding_editor",
+      "label": "喂养记录",
+      "goal": "Create or edit feeding record",
+      "primary_action": "保存喂养",
+      "empty_state": null,
+      "error_state": "Invalid amount"
+    },
+    {
+      "id": "sleep_editor",
+      "label": "睡眠记录",
+      "goal": "Start, end, or edit sleep",
+      "primary_action": "保存睡眠",
+      "empty_state": null,
+      "error_state": "Invalid time order"
+    },
+    {
+      "id": "diaper_editor",
+      "label": "排便记录",
+      "goal": "Create or edit diaper record",
+      "primary_action": "保存排便",
+      "empty_state": null,
+      "error_state": "Local save failed"
+    },
+    {
+      "id": "photo_timeline",
+      "label": "照片时间线",
+      "goal": "Review and add baby photos",
+      "primary_action": "添加照片",
+      "empty_state": "No photos yet",
+      "error_state": "Photo permission denied"
+    },
+    {
+      "id": "growth",
+      "label": "成长",
+      "goal": "Manage measurements, vaccine reminders, and reports",
+      "primary_action": "新增记录",
+      "empty_state": "No growth data yet",
+      "error_state": "Invalid value"
+    },
+    {
+      "id": "settings_privacy",
+      "label": "设置与隐私",
+      "goal": "Manage profile and data",
+      "primary_action": "编辑档案",
+      "empty_state": null,
+      "error_state": "Delete failed"
+    },
+    {
+      "id": "account_backup",
+      "label": "账号与备份",
+      "goal": "Sign in, show backup status, restore data, delete account",
+      "primary_action": "登录并开启备份",
+      "empty_state": "Not signed in",
+      "error_state": "Backup or restore failed"
+    }
+  ],
+  "empty_states": [
+    {
+      "id": "no_profile",
+      "message_tone": "gentle",
+      "next_action": "create_baby_profile"
+    },
+    {
+      "id": "no_records_today",
+      "message_tone": "gentle",
+      "next_action": "quick_log"
+    },
+    {
+      "id": "no_photos",
+      "message_tone": "keepsake",
+      "next_action": "add_photo"
+    },
+    {
+      "id": "insufficient_monthly_report_data",
+      "message_tone": "non_judgmental",
+      "next_action": "continue_recording"
+    }
+  ],
+  "error_states": [
+    {
+      "id": "photo_permission_denied",
+      "recovery": "show_system_settings_guidance"
+    },
+    {
+      "id": "notification_permission_denied",
+      "recovery": "allow_manual_reminders_without_push"
+    },
+    {
+      "id": "local_save_failed",
+      "recovery": "preserve_input_and_retry"
+    },
+    {
+      "id": "sync_failed",
+      "recovery": "keep_local_copy_and_retry_later"
+    },
+    {
+      "id": "photo_backup_failed",
+      "recovery": "keep_local_original_and_retry_later"
+    },
+    {
+      "id": "account_delete_failed",
+      "recovery": "preserve_request_and_retry_or_contact_support"
+    }
+  ],
+  "accessibility": {
+    "dynamic_type": true,
+    "voice_over": true,
+    "reduce_motion": true,
+    "minimum_hit_size_pt": 44
+  },
+  "privacy_ui": {
+    "must_explain_photo_access": true,
+    "must_explain_server_storage_before_upload": true,
+    "must_offer_data_delete_entry": true,
+    "must_explain_original_photo_backup": true,
+    "must_offer_account_delete_entry": true,
+    "must_not_upload_photos_without_explicit_confirmation": true
+  }
+}
