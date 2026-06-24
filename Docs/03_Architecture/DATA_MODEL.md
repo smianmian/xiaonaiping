@@ -5,7 +5,7 @@
 - 项目：小奶瓶 / 宝宝成长记录
 - 阶段：数据模型初版
 - 日期：2026-05-28
-- 实现状态：未实现；本文只定义模型和约束
+- 实现状态：本地模型和云端 JSON 备份最小实现已接入；本文继续作为模型和约束基线
 
 ## 已确认事实
 
@@ -14,7 +14,7 @@
 3. 第一版需要账号。
 4. 第一版需要备份恢复。
 5. 服务器需要存储宝宝照片原图。
-6. 首发地区为香港和美国。
+6. 首发地区改为中国大陆，香港第二批。
 7. 照片可以复制进 App 私有空间。
 8. 数据包含儿童、照片、健康/成长、疫苗、家庭记录，均属于高敏感数据。
 9. 疫苗提醒模板覆盖国内 + 香港。
@@ -109,6 +109,20 @@
 | durationMinutes | Int? | 否 | 母乳或喂养时长 |
 | note | String? | 否 | 备注 |
 
+### FeedingReminder
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---:|---|
+| id | UUID/String | 是 | 提醒 ID |
+| babyId | UUID/String | 是 | 所属宝宝 |
+| remindAt | Date | 是 | 用户手动设置的下一次喝奶提醒时间 |
+| title | String | 是 | 默认“喝奶提醒” |
+| note | String? | 否 | 备注，第一版默认不展示 |
+| createdAt | Date | 是 | 创建时间 |
+| updatedAt | Date | 是 | 更新时间 |
+
+规则：第一版只保存一个本机喝奶闹钟，不上传服务器，不根据月龄、上一顿时间或奶量自动推算喂养间隔；换宝宝档案、删除本地数据或恢复云端备份时清除旧提醒。
+
 ### SleepRecord
 
 | 字段 | 类型 | 必填 | 说明 |
@@ -161,20 +175,21 @@
 
 规则：第一版需要上传用户主动加入 App 的照片原图；不得扫描或自动上传系统相册。
 
-### VaccineReminder
+### VaccineRecord
 
 | 字段 | 类型 | 必填 | 说明 |
 |---|---|---:|---|
-| id | UUID/String | 是 | 提醒 ID |
+| id | UUID/String | 是 | 接种记录 ID |
 | babyId | UUID/String | 是 | 所属宝宝 |
 | title | String | 是 | 疫苗或事项名称 |
-| dueAt | Date | 是 | 提醒日期 |
-| completedAt | Date? | 否 | 完成时间 |
+| dueAt | Date | 是 | 计划接种日期 |
+| status | Enum | 是 | pending / booked / administered |
+| administeredAt | Date? | 否 | 实际接种日期 |
 | note | String? | 否 | 备注 |
 | source | Enum | 是 | manual / template |
 | region | Enum? | 否 | mainlandChina / hongKong，用于模板来源 |
 
-规则：模板覆盖国内 + 香港；模板只生成可编辑提醒，不提供医疗建议。
+规则：模板覆盖国内 + 香港；模板只生成可编辑的计划记录，不提供医疗建议。旧版 `completed` 状态读取时迁移为 `administered`。
 
 ### VaccineTemplate
 
@@ -207,12 +222,13 @@
 ## 关系定义
 
 1. BabyProfile 1 - N FeedingRecord。
-2. BabyProfile 1 - N SleepRecord。
-3. BabyProfile 1 - N DiaperRecord。
-4. BabyProfile 1 - N GrowthMeasurement。
-5. BabyProfile 1 - N BabyPhoto。
-6. BabyProfile 1 - N VaccineReminder。
-7. MonthlyReport 由 BabyProfile 及当月记录聚合生成。
+2. BabyProfile 1 - 0/1 FeedingReminder，本地下一次喝奶提醒。
+3. BabyProfile 1 - N SleepRecord。
+4. BabyProfile 1 - N DiaperRecord。
+5. BabyProfile 1 - N GrowthMeasurement。
+6. BabyProfile 1 - N BabyPhoto。
+7. BabyProfile 1 - N VaccineReminder。
+8. MonthlyReport 由 BabyProfile 及当月记录聚合生成。
 
 ## 删除策略
 

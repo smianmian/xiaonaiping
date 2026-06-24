@@ -4,7 +4,7 @@
   "platforms": ["iOS"],
   "document_status": {
     "stage": "initial_ui_contract",
-    "date": "2026-05-28",
+    "date": "2026-06-18",
     "code_status": "no_xcode_project_no_swift_code_no_dependencies"
   },
   "confirmed_facts": [
@@ -16,7 +16,7 @@
     "Photos may be copied into the app private container",
     "V1 needs account-based backup and restore",
     "V1 uploads original baby photos selected by the user",
-    "Launch regions are Hong Kong and the United States",
+    "First submission targets Hong Kong; installed app features are not location-gated",
     "Vaccine templates cover Mainland China and Hong Kong",
     "Crash reporting is required in V1"
   ],
@@ -37,7 +37,7 @@
     "family collaboration UI",
     "community or sharing UI",
     "subscription or commerce UI",
-    "China Mainland launch UI"
+    "China Mainland App Store launch UI"
   ],
   "design_principles": [
     "low cognitive load",
@@ -64,8 +64,8 @@
       {
         "id": "growth",
         "label": "成长",
-        "purpose": "Growth measurements, vaccine reminders, monthly reports",
-        "primary_actions": ["add_measurement", "add_vaccine_reminder", "view_report"]
+        "purpose": "Growth measurements, baby vaccine book, monthly reports",
+        "primary_actions": ["add_measurement", "open_vaccine_book", "view_report"]
       },
       {
         "id": "settings",
@@ -151,10 +151,10 @@
     {
       "id": "feeding_editor",
       "label": "喂养记录",
-      "goal": "Create or edit feeding record",
-      "primary_action": "保存喂养",
+      "goal": "Create or edit feeding record, and set one manual feeding reminder",
+      "primary_action": "保存喂养 / 保存闹钟",
       "empty_state": null,
-      "error_state": "Invalid amount"
+      "error_state": "Invalid amount / Invalid reminder time / Notification denied"
     },
     {
       "id": "sleep_editor",
@@ -183,10 +183,18 @@
     {
       "id": "growth",
       "label": "成长",
-      "goal": "Manage measurements, vaccine reminders, and reports",
+      "goal": "Manage measurements, baby vaccine book, and reports",
       "primary_action": "新增记录",
       "empty_state": "No growth data yet",
       "error_state": "Invalid value"
+    },
+    {
+      "id": "vaccine_book",
+      "label": "宝宝疫苗本",
+      "goal": "Manage planned and actual vaccinations on an age timeline",
+      "primary_action": "新增接种记录",
+      "empty_state": "No vaccination records yet",
+      "error_state": "Notification permission denied"
     },
     {
       "id": "settings_privacy",
@@ -199,9 +207,9 @@
     {
       "id": "account_backup",
       "label": "账号与备份",
-      "goal": "Sign in, show backup status, restore data, delete account",
-      "primary_action": "登录并开启备份",
-      "empty_state": "Not signed in",
+      "goal": "Sign in with phone, WeChat, or recovery key; show backup status, restore data, delete account",
+      "primary_action": "手机号/微信/恢复密钥登录并开启备份",
+      "empty_state": "Not signed in or cloud service not configured",
       "error_state": "Backup or restore failed"
     }
   ],

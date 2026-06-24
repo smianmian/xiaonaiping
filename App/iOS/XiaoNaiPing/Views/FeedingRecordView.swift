@@ -5,17 +5,20 @@ struct FeedingRecordView: View {
     @State private var isEditorPresented = false
     @State private var editingRecord: FeedingRecord?
     @State private var deleteCandidate: FeedingRecord?
+    @State private var isStatsPresented = false
+    @State private var reminderDate = Date().addingTimeInterval(2 * 60 * 60)
+    @State private var notificationMessage: String?
 
     var body: some View {
-        ScreenScaffold(title: "喂养记录", trailingTitle: "统计", showBackButton: true) {
+        ScreenScaffold(title: "喂养记录", trailingTitle: "统计", showBackButton: true, trailingAction: {
+            isStatsPresented = true
+        }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    DateStripView(selected: "今天\n5/15")
-
                     WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
                         HStack(spacing: AppSpacing.medium) {
                             AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
-                                .frame(width: 82, height: 108)
+                                .frame(width: 66, height: 86)
 
                             VStack(spacing: AppSpacing.medium) {
                                 HStack(spacing: AppSpacing.small) {
@@ -23,13 +26,15 @@ struct FeedingRecordView: View {
                                     summaryMetric(title: "总奶量", value: "\(store.milkAmountML)ml")
                                 }
 
-                                summaryMetric(title: "最近一次", value: store.feedingRecords.first?.time ?? "暂无")
+                                summaryMetric(title: "最近一次", value: store.todayFeedingRecords.first?.time ?? "暂无")
                             }
                         }
                     }
 
+                    feedingReminderCard
+
                     VStack(spacing: AppSpacing.regular) {
-                        if store.feedingRecords.isEmpty {
+                        if store.todayFeedingRecords.isEmpty {
                             EmptyRecordCard(
                                 icon: AppAssets.bottleIcon,
                                 title: "今天还没有喂养记录",
@@ -38,7 +43,7 @@ struct FeedingRecordView: View {
                                 openEditor()
                             }
                         } else {
-                            ForEach(store.feedingRecords) { record in
+                            ForEach(store.todayFeedingRecords) { record in
                                 HStack(spacing: AppSpacing.small) {
                                     Button {
                                         openEditor(record)
@@ -72,8 +77,10 @@ struct FeedingRecordView: View {
                         }
                     }
 
-                    PrimaryWatercolorButton(title: "+ 记录喂养") {
-                        openEditor()
+                    if !store.todayFeedingRecords.isEmpty {
+                        PrimaryWatercolorButton(title: "+ 记录喂养") {
+                            openEditor()
+                        }
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -85,6 +92,25 @@ struct FeedingRecordView: View {
                 store.upsert(record)
             }
             .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $isStatsPresented) {
+            RecordStatsSheet(
+                title: "今日喂养统计",
+                rows: [
+                    RecordStatsRow(label: "喂养次数", value: "\(store.feedingCount)次"),
+                    RecordStatsRow(label: "总奶量", value: "\(store.milkAmountML)ml"),
+                    RecordStatsRow(label: "最近一次", value: store.todayFeedingRecords.first?.time ?? "暂无")
+                ]
+            )
+            .presentationDetents([.height(260)])
+        }
+        .onAppear(perform: syncReminderDate)
+        .alert("通知状态", isPresented: notificationAlertBinding) {
+            Button("知道了") {
+                notificationMessage = nil
+            }
+        } message: {
+            Text(notificationMessage ?? "")
         }
         .alert("删除这条喂养记录？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -101,6 +127,82 @@ struct FeedingRecordView: View {
         }
     }
 
+    private var feedingReminderCard: some View {
+        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                HStack(alignment: .top, spacing: AppSpacing.medium) {
+                    Image(systemName: "bell.badge")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(AppColors.blueInk)
+                        .frame(width: 34, height: 34)
+                        .background {
+                            Circle().fill(AppColors.milk.opacity(0.72))
+                        }
+
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text("喝奶闹钟")
+                            .font(AppTypography.cardTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text(reminderStatusText)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                DatePicker("提醒时间", selection: $reminderDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                    .font(AppTypography.readableBody)
+                    .tint(AppColors.coral)
+
+                HStack(spacing: AppSpacing.small) {
+                    PrimaryWatercolorButton(title: "保存闹钟", tint: AppColors.cream, foreground: AppColors.blueInk) {
+                        saveReminder()
+                    }
+
+                    if store.nextFeedingReminder != nil {
+                        Button {
+                            cancelReminder()
+                        } label: {
+                            Text("取消闹钟")
+                                .font(AppTypography.bodyLarge)
+                                .foregroundStyle(AppColors.coral)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background {
+                                    Capsule()
+                                        .fill(AppColors.blush.opacity(0.62))
+                                        .overlay {
+                                            Capsule().stroke(AppColors.coral.opacity(0.22), lineWidth: 1)
+                                        }
+                                }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private var reminderStatusText: String {
+        guard let reminder = store.nextFeedingReminder else {
+            return "还没有设置下一次喝奶提醒。"
+        }
+
+        return "下一次：\(BabyRecordStore.reminderDateTimeString(from: reminder.remindAt))"
+    }
+
+    private var notificationAlertBinding: Binding<Bool> {
+        Binding {
+            notificationMessage != nil
+        } set: { isPresented in
+            if !isPresented {
+                notificationMessage = nil
+            }
+        }
+    }
+
     private var deleteAlertBinding: Binding<Bool> {
         Binding {
             deleteCandidate != nil
@@ -114,6 +216,57 @@ struct FeedingRecordView: View {
     private func openEditor(_ record: FeedingRecord? = nil) {
         editingRecord = record
         isEditorPresented = true
+    }
+
+    private func saveReminder() {
+        notificationMessage = nil
+        guard reminderDate > Date() else {
+            notificationMessage = "提醒时间要晚于现在。"
+            return
+        }
+
+        let reminder = FeedingReminder(babyId: store.baby.id, remindAt: reminderDate)
+        guard store.upsert(reminder) else {
+            notificationMessage = "本地保存失败，请稍后再试。"
+            return
+        }
+
+        AppNotificationScheduler.scheduleFeedingReminder(reminder) { result in
+            notificationMessage = notificationMessage(for: result)
+        }
+    }
+
+    private func cancelReminder() {
+        notificationMessage = nil
+        guard store.cancelFeedingReminder() else {
+            notificationMessage = "本地保存失败，请稍后再试。"
+            return
+        }
+
+        AppNotificationScheduler.removeFeedingReminder()
+        reminderDate = defaultReminderDate
+        notificationMessage = "喝奶闹钟已取消。"
+    }
+
+    private func syncReminderDate() {
+        reminderDate = store.nextFeedingReminder?.remindAt ?? defaultReminderDate
+    }
+
+    private var defaultReminderDate: Date {
+        Date().addingTimeInterval(2 * 60 * 60)
+    }
+
+    private func notificationMessage(for result: NotificationScheduleResult) -> String {
+        switch result {
+        case .scheduled:
+            return "喝奶闹钟已加入 iOS 本地通知。"
+        case .removed:
+            return "提醒时间无效，未安排通知。"
+        case .denied:
+            return "通知权限未开启。喝奶时间已保留在喂养页，不会弹出系统提醒。"
+        case .failed:
+            return "通知安排失败。喝奶时间已保留在喂养页。"
+        }
     }
 
     private func summaryMetric(title: String, value: String) -> some View {
@@ -142,7 +295,7 @@ struct FeedingRecordView: View {
 
 private struct FeedingEditorSheet: View {
     let record: FeedingRecord?
-    let onSave: (FeedingRecord) -> Void
+    let onSave: (FeedingRecord) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var occurredAt: Date
@@ -154,10 +307,10 @@ private struct FeedingEditorSheet: View {
 
     private let types = ["母乳", "瓶喂", "奶粉", "辅食"]
 
-    init(record: FeedingRecord?, onSave: @escaping (FeedingRecord) -> Void) {
+    init(record: FeedingRecord?, onSave: @escaping (FeedingRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
-        _occurredAt = State(initialValue: BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
+        _occurredAt = State(initialValue: record?.occurredAt ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
         _type = State(initialValue: record?.type ?? "母乳")
         _amountText = State(initialValue: record?.amountML.map(String.init) ?? "")
         _durationText = State(initialValue: record?.durationMinutes.map(String.init) ?? "")
@@ -238,14 +391,18 @@ private struct FeedingEditorSheet: View {
             detail: "快速记录",
             icon: AppAssets.bottleIcon
         )
+        saved.occurredAt = occurredAt
         saved.time = BabyRecordStore.timeString(from: occurredAt)
         saved.type = type
         saved.amountML = amount
         saved.durationMinutes = duration
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
         saved.detail = detailText(amount: amount, duration: duration)
-        onSave(saved)
-        dismiss()
+        if onSave(saved) {
+            dismiss()
+        } else {
+            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+        }
     }
 
     private func validatedNumber(_ value: String, fieldName: String) -> Int?? {
@@ -275,6 +432,55 @@ private struct FeedingEditorSheet: View {
     }
 }
 
+struct RecordStatsRow: Identifiable {
+    let id = UUID()
+    let label: String
+    let value: String
+}
+
+struct RecordStatsSheet: View {
+    let title: String
+    let rows: [RecordStatsRow]
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: AppSpacing.regular) {
+                ForEach(rows) { row in
+                    HStack {
+                        Text(row.label)
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Spacer()
+                        Text(row.value)
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.coral)
+                    }
+                    .padding(.horizontal, AppSpacing.medium)
+                    .padding(.vertical, AppSpacing.small)
+                    .background {
+                        RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
+                            .fill(AppColors.milk.opacity(0.56))
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(AppSpacing.large)
+            .background(PaperBackgroundView())
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("完成") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
 private struct EmptyRecordCard: View {
     let icon: String
     let title: String
@@ -285,7 +491,7 @@ private struct EmptyRecordCard: View {
         WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
             VStack(spacing: AppSpacing.medium) {
                 AssetWatercolorImage(name: icon, mode: .multiply)
-                    .frame(width: 64, height: 64)
+                    .frame(width: 54, height: 54)
                 Text(title)
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
@@ -293,32 +499,5 @@ private struct EmptyRecordCard: View {
             }
             .frame(maxWidth: .infinity)
         }
-    }
-}
-
-private struct DateStripView: View {
-    let selected: String
-
-    private let days = ["一\n5/12", "二\n5/13", "三\n5/14", "今天\n5/15", "五\n5/16", "六\n5/17", "日\n5/18"]
-
-    var body: some View {
-        HStack(spacing: AppSpacing.small) {
-            ForEach(days, id: \.self) { day in
-                Text(day)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(day == selected ? AppColors.coral : AppColors.ink)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.small)
-                    .background {
-                        if day == selected {
-                            Circle()
-                                .fill(AppColors.blush.opacity(0.62))
-                                .frame(width: 72, height: 72)
-                        }
-                    }
-            }
-        }
-        .padding(.top, AppSpacing.small)
     }
 }
