@@ -1,0 +1,84 @@
+{
+  "startedAt": "2026-06-26T11:07:44+00:00",
+  "completedAt": "2026-06-26T11:07:44+00:00",
+  "containsSecrets": false,
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "privacyCurrentDate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 日期：2026-06-24"
+    },
+    "privacyCompanyEntity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 深圳市闪现生活科技有限公司"
+    },
+    "privacyMainlandFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 第一版计划先上中国大陆 App Store"
+    },
+    "privacyHongKongSecond": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 香港为第二批"
+    },
+    "privacyAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 恢复密钥、手机号和微信登录"
+    },
+    "termsCurrentDate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 日期：2026-06-24"
+    },
+    "termsCompanyEntity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 深圳市闪现生活科技有限公司"
+    },
+    "termsAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 恢复密钥、手机号验证码和微信授权登录"
+    },
+    "termsBackupOriginalPhotos": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 用户主动加入 App 的照片原图"
+    },
+    "termsDeletion": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 删除云端账号与备份"
+    },
+    "termsMedicalBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不提供诊断、治疗、预测、处方或专业疫苗建议"
+    },
+    "privacyOutdatedHongKongUsFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md has no outdated marker"
+    },
+    "privacyOutdatedMainlandExcluded": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md has no outdated marker"
+    },
+    "termsOutdatedRecoveryOnly": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md has no outdated marker"
+    },
+    "termsMissingCompanyEntityPlaceholder": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md has no outdated marker"
+    }
+  }
+}

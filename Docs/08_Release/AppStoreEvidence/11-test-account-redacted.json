@@ -1,0 +1,9 @@
+{
+  "createdAt": "2026-06-25T12:28:11+00:00",
+  "baseUrl": "https://api.mewpow.com/xiaonaiping",
+  "accountId": "9704886c-58cb-4b5d-9cb2-d97a0dfaa515",
+  "recoveryKeyStored": ".env.xnp-review-account",
+  "recoveryVerified": true,
+  "backupSeeded": true,
+  "containsSecret": false
+}

@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-06-26T08:17:38+00:00",
+  "completedAt": "2026-06-26T08:17:38+00:00",
+  "containsSecrets": false,
+  "storageBackend": "disk",
+  "dataDir": "/Users/smianmian/Downloads/小奶瓶/.xnp-data",
+  "accountId": "storage_probe_6c6c0b2886fc44519a8a154326d7ffc2",
+  "checks": {
+    "photoUploaded": true,
+    "photoDownloaded": true,
+    "photoDeleted": true,
+    "accountDeleteRemovedPhotos": true
+  },
+  "passed": true,
+  "failedChecks": []
+}

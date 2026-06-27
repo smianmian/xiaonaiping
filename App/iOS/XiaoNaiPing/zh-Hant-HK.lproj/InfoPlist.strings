@@ -1,0 +1,4 @@
+// zh-Hant-HK Info.plist localization for XiaoNaiPing.
+"CFBundleDisplayName" = "小奶瓶";
+"NSCameraUsageDescription" = "用於使用者主動拍攝並保存寶寶照片到小奶瓶。";
+"NSPhotoLibraryUsageDescription" = "用於使用者主動選擇寶寶照片並複製到小奶瓶私有空間。";

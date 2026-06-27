@@ -1,0 +1,105 @@
+{
+  "startedAt": "2026-06-26T12:26:56+00:00",
+  "completedAt": "2026-06-26T12:26:56+00:00",
+  "appPath": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+  "repoRoot": "/Users/smianmian/Downloads/小奶瓶",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "appBundleExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app"
+    },
+    "infoPlistPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/Info.plist"
+    },
+    "bundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "CFBundleIdentifier=com.mewpow.xiaonaiping"
+    },
+    "releaseApiBaseURLMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNPAPIBaseURL=https://api.mewpow.com/xiaonaiping"
+    },
+    "liveActivitiesEnabledInAppPlist": {
+      "passed": true,
+      "required": true,
+      "evidence": "NSSupportsLiveActivities=True"
+    },
+    "widgetExtensionBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/PlugIns/XiaoNaiPingWidgets.appex"
+    },
+    "widgetExtensionPointIsWidgetKit": {
+      "passed": true,
+      "required": true,
+      "evidence": "NSExtensionPointIdentifier=com.apple.widgetkit-extension"
+    },
+    "widgetBundleIncludesTodayAndLiveActivity": {
+      "passed": true,
+      "required": true,
+      "evidence": "today widget and Live Activity widget are registered"
+    },
+    "liveActivityDefinesDynamicIsland": {
+      "passed": true,
+      "required": true,
+      "evidence": "DynamicIsland and expanded regions found"
+    },
+    "appGroupEntitlementPresentForApp": {
+      "passed": true,
+      "required": true,
+      "evidence": "app entitlement application group=group.com.mewpow.xiaonaiping"
+    },
+    "appGroupEntitlementPresentForWidget": {
+      "passed": true,
+      "required": true,
+      "evidence": "widget entitlement application group=group.com.mewpow.xiaonaiping"
+    },
+    "associatedDomainEntitlementWiredForApp": {
+      "passed": true,
+      "required": true,
+      "evidence": "entitlement wired=True, project config contains applinks:api.mewpow.com=True"
+    },
+    "localNotificationSchedulerPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "local notification authorization and calendar scheduling found"
+    },
+    "remotePushNotConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "no remote push registration or aps-environment entitlement found"
+    },
+    "sharedWidgetSnapshotPayloadIsScoped": {
+      "passed": true,
+      "required": true,
+      "evidence": "shared snapshot contains only today summary fields"
+    },
+    "liveActivityPayloadIsScoped": {
+      "passed": true,
+      "required": true,
+      "evidence": "Live Activity state contains only reminder timing, baby name, and optional avatar data"
+    },
+    "widgetAndLiveActivityCopyAvoidsHealthClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "widget and Live Activity surfaces avoid medical/health/stress claim markers"
+    },
+    "localNotificationCopyAvoidsHealthClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "local notification copy avoids medical/health/stress claim markers"
+    },
+    "noHealthKitOrPressureSourceSurface": {
+      "passed": true,
+      "required": true,
+      "evidence": "no HealthKit or pressure/stress source markers found"
+    }
+  }
+}

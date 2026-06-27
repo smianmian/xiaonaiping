@@ -1,0 +1,173 @@
+{
+  "startedAt": "2026-06-26T15:55:10+00:00",
+  "completedAt": "2026-06-26T15:55:11+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "fillSheetPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260626.md"
+    },
+    "metadataPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_METADATA.md"
+    },
+    "privacyLabelPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+    },
+    "screenshotPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/SCREENSHOT_PLAN.md"
+    },
+    "blockingProofReferencesUseLatestSnapshots": {
+      "passed": true,
+      "required": true,
+      "evidence": "blocking proof references use latest snapshot filenames"
+    },
+    "externalAuthSubmissionBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials clearly separate draft login copy from pending SMS/WeChat provider and iOS bundle evidence"
+    },
+    "appNameMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "小奶瓶"
+    },
+    "bundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "com.mewpow.xiaonaiping"
+    },
+    "subtitleWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "温柔记录宝宝每一天"
+    },
+    "skuPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "SKU xiaonaiping-ios-1"
+    },
+    "primaryCategoryLifestyle": {
+      "passed": true,
+      "required": true,
+      "evidence": "primary category Lifestyle/生活"
+    },
+    "secondaryCategoryBlank": {
+      "passed": true,
+      "required": true,
+      "evidence": "second category is blank in fill sheet"
+    },
+    "metadataNoHealthFitnessCategoryAlternative": {
+      "passed": true,
+      "required": true,
+      "evidence": "metadata does not suggest Health & Fitness as an alternate category"
+    },
+    "firstReleaseMainland": {
+      "passed": true,
+      "required": true,
+      "evidence": "China mainland first"
+    },
+    "secondReleaseHongKong": {
+      "passed": true,
+      "required": true,
+      "evidence": "Hong Kong second"
+    },
+    "priceFree": {
+      "passed": true,
+      "required": true,
+      "evidence": "free V1"
+    },
+    "copyrightCompany": {
+      "passed": true,
+      "required": true,
+      "evidence": "company copyright present"
+    },
+    "publicUrlsMatch": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy/support/terms URLs match fill sheet, metadata, and privacy label"
+    },
+    "publicUrlsReachable": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy/support/terms URLs return 2xx and contain company/product markers"
+    },
+    "keywordsCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "chars=29, bytes=73, missing=[]"
+    },
+    "promotionalTextWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=31"
+    },
+    "releaseNotesCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=55, missing=[]"
+    },
+    "descriptionCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=385, missing=[]"
+    },
+    "ageRatingBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "4+ / not Kids / non-medical boundaries present"
+    },
+    "privacyLabelMatchesAppStoreDraft": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy label categories, purposes, linking, tracking, and app flags match draft"
+    },
+    "screenshotCopyComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "5 screenshot filenames and titles present"
+    },
+    "screenshotCopyAvoidsUnavailableOrMedicalClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot table avoids unavailable WeChat success claims and medical/health advice claims; screenshot boundaries are present"
+    },
+    "screenshotPlanUsesIOS265Only": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot capture plan uses iOS 26.5 simulator commands and keeps final TestFlight/signed-build screenshots separate"
+    },
+    "reviewNotesPasteTextHasBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "review paste text has Live Activity/widget/source/health boundaries"
+    },
+    "vaccineBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "vaccine copy is bounded as records/reminders and points users to doctors/local official information"
+    },
+    "liveActivityWidgetBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "Live Activity and widget copy is bounded to feeding reminder / local summary, not health advice or medical judgment"
+    },
+    "screenshotCompanionSurfaceBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot plan does not imply unverified Live Activity/widget success and keeps iOS 26.5 final proof separate"
+    },
+    "reviewAccountInstructionsRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "review account instructions point to redacted evidence and keep recovery key only in ignored local storage / App Review Information"
+    }
+  }
+}

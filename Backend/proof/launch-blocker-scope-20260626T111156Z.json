@@ -1,0 +1,96 @@
+{
+  "startedAt": "2026-06-26T11:11:59+00:00",
+  "completedAt": "2026-06-26T11:11:59+00:00",
+  "passed": true,
+  "unexpectedBlockers": {},
+  "comparisons": {
+    "productionReadiness": {
+      "actual": [
+        "appStoreManualEvidenceReady",
+        "authProvidersProofPassed",
+        "iosAppBundleProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "wechatLoginProviderConfigured"
+      ],
+      "expected": [
+        "appStoreManualEvidenceReady",
+        "authProvidersProofPassed",
+        "iosAppBundleProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "wechatLoginProviderConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    },
+    "appStoreEvidence": {
+      "actual": [
+        "companyAccount",
+        "huaweiObsPolicy",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "realDeviceRegression",
+        "signedArchive",
+        "smsProvider",
+        "testFlight",
+        "wechatOpenPlatform"
+      ],
+      "expected": [
+        "companyAccount",
+        "huaweiObsPolicy",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "realDeviceRegression",
+        "signedArchive",
+        "smsProvider",
+        "testFlight",
+        "wechatOpenPlatform"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    },
+    "authProviders": {
+      "actual": [
+        "wechatProviderConfigured"
+      ],
+      "expected": [
+        "wechatProviderConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    },
+    "iosReleaseReadiness": {
+      "actual": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "expected": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    },
+    "iosAppBundle": {
+      "actual": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "expected": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    }
+  },
+  "knownBlockerMeaning": {
+    "wechat": "WeChat Open Platform AppID/AppSecret and real wx URL Scheme are not configured.",
+    "appStoreManualEvidence": "App Store Connect screenshots, filing, signed archive, TestFlight, providers, OBS policy, and real-device regression are not archived.",
+    "notSubmissionReady": "This proof only says remaining blockers are known; it does not make the app submission-ready."
+  }
+}

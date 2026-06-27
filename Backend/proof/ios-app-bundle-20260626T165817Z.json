@@ -1,0 +1,87 @@
+{
+  "startedAt": "2026-06-26T16:58:19+00:00",
+  "completedAt": "2026-06-26T16:58:19+00:00",
+  "appPath": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+  "passed": false,
+  "failedRequiredChecks": [
+    "weChatNativeConfigPresent",
+    "weChatURLTypePresent"
+  ],
+  "checks": {
+    "appBundleExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app"
+    },
+    "infoPlistPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/Info.plist"
+    },
+    "bundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "CFBundleIdentifier=com.mewpow.xiaonaiping"
+    },
+    "releaseApiBaseURLMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNPAPIBaseURL=https://api.mewpow.com/xiaonaiping"
+    },
+    "releaseApiBaseURLUsesHTTPS": {
+      "passed": true,
+      "required": true,
+      "evidence": "https://api.mewpow.com/xiaonaiping"
+    },
+    "weChatQuerySchemesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "weixin and weixinULAPI present"
+    },
+    "weChatNativeConfigPresent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing or invalid: XNPWeChatAppID, XNPWeChatURLScheme"
+    },
+    "weChatURLTypePresent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing non-placeholder wx URL scheme in CFBundleURLTypes"
+    },
+    "debugWeChatCodeAbsent": {
+      "passed": true,
+      "required": true,
+      "evidence": "debug_wechat_ios not found in XiaoNaiPing"
+    },
+    "releaseBundleInternalDocsAbsent": {
+      "passed": true,
+      "required": true,
+      "evidence": "no README/Markdown/HTML/env files found in app bundle"
+    },
+    "releaseBundleForbiddenTextMarkersAbsent": {
+      "passed": true,
+      "required": true,
+      "evidence": "no local/debug/API-key markers found in text resources"
+    },
+    "zhHantHKLocalizationBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/zh-Hant-HK.lproj"
+    },
+    "privacyManifestBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/PrivacyInfo.xcprivacy"
+    },
+    "privacyManifestTrackingDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "tracking disabled in bundled PrivacyInfo.xcprivacy"
+    },
+    "privacyManifestCollectedTypesComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "bundled privacy manifest contains required collected data types"
+    }
+  }
+}

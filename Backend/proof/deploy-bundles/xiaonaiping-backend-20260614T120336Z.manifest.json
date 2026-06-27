@@ -1,0 +1,88 @@
+{
+  "createdAt": "2026-06-14T12:03:36+00:00",
+  "bundle": "xiaonaiping-backend-20260614T120336Z.tar.gz",
+  "containsSecrets": false,
+  "files": [
+    {
+      "path": "Backend/README.md",
+      "sizeBytes": 2946,
+      "sha256": "8044dd5b0e97e5986b6f6594d149de2e1b48c0fcb6adf441b7911127b13f0d38"
+    },
+    {
+      "path": "Backend/api/__init__.py",
+      "sizeBytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "Backend/api/server.py",
+      "sizeBytes": 20568,
+      "sha256": "5321a42c74c5a731f0090d6bc76c7c309bdcc13c7c38482cc962cfd232e8f6aa"
+    },
+    {
+      "path": "Backend/api/storage.py",
+      "sizeBytes": 6811,
+      "sha256": "c67e72076116cf760b6182ce2530637dc866fd50d6c33e30d39d7d2889432a31"
+    },
+    {
+      "path": "Backend/deploy/.env.example",
+      "sizeBytes": 591,
+      "sha256": "365291d0c48cd866fc86f45d3563dbb00c67dc3f41754617baf80fdf862ecce2"
+    },
+    {
+      "path": "Backend/deploy/huawei-obs.md",
+      "sizeBytes": 1643,
+      "sha256": "974d5a67c0ab710b3da6dceeea47da9b506001d60e486040e8bc12e7e2afaf9a"
+    },
+    {
+      "path": "Backend/deploy/nginx.conf.example",
+      "sizeBytes": 655,
+      "sha256": "f15efc57732c8d1d38bcd5b059183e7004f4ce410c5a60b4859a2359b68aa6d6"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-api.service.example",
+      "sizeBytes": 475,
+      "sha256": "df55e789a88956f2f08d3b97202ad549a7cc4305c8f11cfaf749209dadb7996e"
+    },
+    {
+      "path": "Backend/requirements-obs.txt",
+      "sizeBytes": 16,
+      "sha256": "785e0064406abc15b953ac139094134bf7bdb8527ab6a902031634f5e2f67bcb"
+    },
+    {
+      "path": "Backend/scripts/build_deploy_bundle.py",
+      "sizeBytes": 3058,
+      "sha256": "6ed497c5a156c580ca43afafc9c76783b447ad75e30b0ec2286b82942d8d79ee"
+    },
+    {
+      "path": "Backend/scripts/check_production_readiness.py",
+      "sizeBytes": 13122,
+      "sha256": "4234e15d18a54e283abfc6d30c3ccaeeb5417556bd971b97eb70b4c1f4fa88ce"
+    },
+    {
+      "path": "Backend/scripts/verify_release_flow.py",
+      "sizeBytes": 5717,
+      "sha256": "0e854775ca4d1fa5e891439efb0da2649ee7989e1a574b987fab12db253ea572"
+    },
+    {
+      "path": "Backend/scripts/verify_remote_api.py",
+      "sizeBytes": 5472,
+      "sha256": "7a0e293f59d16439027aa624aee158f4dbd01b43c6b8d70e5960d79a81e99202"
+    },
+    {
+      "path": "Backend/static/privacy.html",
+      "sizeBytes": 3295,
+      "sha256": "1361749eb02a8f0dde1a42d7eb463cba5a584b5aafb1157e121b7da7e1fcc2b7"
+    },
+    {
+      "path": "Backend/static/support.html",
+      "sizeBytes": 1276,
+      "sha256": "496ebee1a10d953adca73ee7178709bdcebb054373fe807b672a844c0ea110da"
+    },
+    {
+      "path": "Backend/static/terms.html",
+      "sizeBytes": 2344,
+      "sha256": "b13f08229f0a4e8b962bb066b4b2af72da9f7b0273f6f414acc0486378fb23ba"
+    }
+  ],
+  "bundleSha256": "e924e3fb65413cd4a9f6ec66373a1368a0f284252b9cb100f6126ca50c24233b"
+}

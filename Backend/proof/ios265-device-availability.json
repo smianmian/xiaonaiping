@@ -1,0 +1,117 @@
+{
+  "startedAt": "2026-06-26T17:03:11+00:00",
+  "completedAt": "2026-06-26T17:03:11+00:00",
+  "passed": true,
+  "requiredIOS": "26.5",
+  "failedRequiredChecks": [],
+  "eligibleIOS265PhysicalIphones": [],
+  "unavailableIOS265PhysicalIphones": [
+    {
+      "name": "蓝蓝",
+      "identifier": "EB09854A-A888-518B-930F-D4E82AA64187",
+      "model": "iPhone 16 Pro Max",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "26.5",
+      "available": false,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "iOS 26.5 device unavailable"
+    }
+  ],
+  "availableNonIOS265PhysicalIphones": [
+    {
+      "name": "面面",
+      "identifier": "F5EA7389-A0DB-5F26-8B9E-1878F15BB975",
+      "model": "iPhone 16 Plus",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "27.0",
+      "available": true,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "not iOS 26.5"
+    }
+  ],
+  "devices": [
+    {
+      "name": "16iPhone",
+      "identifier": "B25185A6-39F3-57C5-8C26-1C7340C1AA31",
+      "model": "iPhone 15 Plus",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "18.6.2",
+      "available": false,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "not iOS 26.5"
+    },
+    {
+      "name": "iPhone11PX赖",
+      "identifier": "988DE7DA-E0EA-5BBE-97E7-26EB28DBAE8C",
+      "model": "iPhone 16 Pro Max",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "26.0.1",
+      "available": false,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "not iOS 26.5"
+    },
+    {
+      "name": "iPhone爸爸",
+      "identifier": "70B746BB-4B68-58BC-877A-47688C277B02",
+      "model": "iPhone 16 Plus",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "18.6.2",
+      "available": false,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "not iOS 26.5"
+    },
+    {
+      "name": "蓝蓝",
+      "identifier": "EB09854A-A888-518B-930F-D4E82AA64187",
+      "model": "iPhone 16 Pro Max",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "26.5",
+      "available": false,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "iOS 26.5 device unavailable"
+    },
+    {
+      "name": "面面",
+      "identifier": "F5EA7389-A0DB-5F26-8B9E-1878F15BB975",
+      "model": "iPhone 16 Plus",
+      "platform": "iOS",
+      "deviceType": "iPhone",
+      "osVersion": "27.0",
+      "available": true,
+      "eligibleForLocalTesting": false,
+      "ignoredBecause": "not iOS 26.5"
+    }
+  ],
+  "checks": {
+    "deviceListReadable": {
+      "passed": true,
+      "required": true,
+      "evidence": "xcrun devicectl list devices"
+    },
+    "physicalIphonesListed": {
+      "passed": true,
+      "required": true,
+      "evidence": "5 physical iPhone device(s) listed"
+    },
+    "ios265PolicyEnforced": {
+      "passed": true,
+      "required": true,
+      "evidence": "local project testing requires iOS 26.5; non-26.5 available devices are not eligible"
+    },
+    "eligibleIOS265PhysicalIphoneAvailable": {
+      "passed": false,
+      "required": false,
+      "evidence": "no available physical iPhone on iOS 26.5"
+    }
+  },
+  "meaning": {
+    "passed": "Device availability was inspected and local iOS 26.5 policy is enforced.",
+    "notRealDeviceRegression": "This proof does not replace TestFlight or signed physical-device regression."
+  }
+}

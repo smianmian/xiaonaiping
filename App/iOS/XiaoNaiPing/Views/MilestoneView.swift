@@ -10,35 +10,13 @@ struct MilestoneView: View {
         ScreenScaffold(title: "纪念日", showBackButton: true) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                                Text("即将到来的纪念日：百天")
-                                    .font(AppTypography.bodyLarge)
-                                    .foregroundStyle(AppColors.inkGreen)
-                                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                                    Text("还剩")
-                                        .font(AppTypography.bodyLarge)
-                                    Text("\(store.hundredDaysRemaining)")
-                                        .font(AppTypography.largeNumber)
-                                        .foregroundStyle(AppColors.coral)
-                                    Text("天")
-                                        .font(AppTypography.bodyLarge)
-                                }
-                                .foregroundStyle(AppColors.inkGreen)
-                                Text("按宝宝出生第 \(store.baby.daysSinceBirth) 天计算")
-                                    .font(AppTypography.body)
-                                    .foregroundStyle(AppColors.inkGreen)
-                            }
-                            Spacer()
-                            AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
-                                .frame(width: 126, height: 110)
-                        }
-                    }
+                    nextMilestoneCard
+                    automaticMilestoneSection
+                    SectionTitleView(title: "我的纪念日")
 
                     HStack(alignment: .top, spacing: AppSpacing.medium) {
                         AssetWatercolorImage(name: AppAssets.plantTimeline, mode: .multiply)
-                            .frame(width: 55)
+                            .frame(width: 44)
                         VStack(spacing: AppSpacing.medium) {
                             if store.milestones.isEmpty {
                                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
@@ -55,7 +33,7 @@ struct MilestoneView: View {
                                         } label: {
                                             HStack(spacing: AppSpacing.medium) {
                                                 AssetWatercolorImage(name: item.icon, mode: .multiply)
-                                                    .frame(width: 58, height: 52)
+                                                    .frame(width: 46, height: 42)
                                                 Text(item.title)
                                                     .font(AppTypography.bodyLarge)
                                                     .foregroundStyle(AppColors.inkGreen)
@@ -117,6 +95,71 @@ struct MilestoneView: View {
         }
     }
 
+    private var nextMilestoneCard: some View {
+        WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
+            HStack {
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    Text(nextMilestoneTitle)
+                        .font(AppTypography.bodyLarge)
+                        .foregroundStyle(AppColors.inkGreen)
+                    HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
+                        Text(store.nextAutomaticMilestone == nil ? "成长" : "还剩")
+                            .font(AppTypography.bodyLarge)
+                        Text("\(store.nextAutomaticMilestone?.daysRemaining ?? store.baby.daysSinceBirth)")
+                            .font(AppTypography.largeNumber)
+                            .foregroundStyle(AppColors.coral)
+                        Text("天")
+                            .font(AppTypography.bodyLarge)
+                    }
+                    .foregroundStyle(AppColors.inkGreen)
+                    Text("按宝宝出生第 \(store.baby.daysSinceBirth) 天计算")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.inkGreen)
+                }
+                Spacer()
+                AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
+                    .frame(width: 100, height: 88)
+            }
+        }
+    }
+
+    private var automaticMilestoneSection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.regular) {
+            SectionTitleView(title: "自动纪念节点")
+            ForEach(store.automaticMilestones) { milestone in
+                HStack(spacing: AppSpacing.medium) {
+                    Image(systemName: milestone.isReached ? "checkmark.circle.fill" : "calendar")
+                        .foregroundStyle(milestone.isReached ? AppColors.sage : AppColors.coral)
+                        .frame(width: 28)
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text(milestone.title.localizedText)
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text(BabyRecordStore.displayDateString(from: milestone.date))
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    Spacer()
+                    Text(milestone.isReached ? "已到达".localizedText : AppLocalization.format("%d天后", milestone.daysRemaining))
+                        .font(AppTypography.caption)
+                        .foregroundStyle(milestone.isReached ? AppColors.sage : AppColors.coral)
+                }
+                .padding(.horizontal, AppSpacing.medium)
+                .padding(.vertical, AppSpacing.regular)
+                .background {
+                    CardBackground(tint: AppColors.cream, cornerRadius: AppShapes.smallRadius)
+                }
+            }
+        }
+    }
+
+    private var nextMilestoneTitle: String {
+        guard let milestone = store.nextAutomaticMilestone else {
+            return "已经走过三周岁".localizedText
+        }
+        return AppLocalization.format("即将到来：%@", milestone.title.localizedText)
+    }
+
     private var deleteAlertBinding: Binding<Bool> {
         Binding {
             deleteCandidate != nil
@@ -135,7 +178,7 @@ struct MilestoneView: View {
 
 private struct MilestoneEditorSheet: View {
     let milestone: Milestone?
-    let onSave: (Milestone) -> Void
+    let onSave: (Milestone) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
@@ -143,11 +186,11 @@ private struct MilestoneEditorSheet: View {
     @State private var note: String
     @State private var errorMessage: String?
 
-    init(milestone: Milestone?, onSave: @escaping (Milestone) -> Void) {
+    init(milestone: Milestone?, onSave: @escaping (Milestone) -> Bool) {
         self.milestone = milestone
         self.onSave = onSave
         _title = State(initialValue: milestone?.title ?? "")
-        _date = State(initialValue: Date())
+        _date = State(initialValue: milestone.flatMap { BabyRecordStore.date(fromDisplayDateString: $0.date) } ?? Date())
         _note = State(initialValue: milestone?.note ?? "")
     }
 
@@ -206,7 +249,10 @@ private struct MilestoneEditorSheet: View {
         saved.title = trimmedTitle
         saved.date = BabyRecordStore.displayDateString(from: date)
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
-        onSave(saved)
-        dismiss()
+        if onSave(saved) {
+            dismiss()
+        } else {
+            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+        }
     }
 }

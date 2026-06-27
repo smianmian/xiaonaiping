@@ -1,0 +1,27 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "JGCT3GY9CT.com.mewpow.xiaonaiping",
+        "paths": [
+          "/wechat/*",
+          "/xiaonaiping/wechat/*"
+        ],
+        "appIDs": [
+          "JGCT3GY9CT.com.mewpow.xiaonaiping"
+        ],
+        "components": [
+          {
+            "/": "/wechat/*",
+            "comment": "Dedicated XiaoNaiPing API domain WeChat login callback path."
+          },
+          {
+            "/": "/xiaonaiping/wechat/*",
+            "comment": "Current api.mewpow.com transitional path for WeChat login callback."
+          }
+        ]
+      }
+    ]
+  }
+}

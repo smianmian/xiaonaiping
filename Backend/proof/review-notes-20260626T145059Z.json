@@ -1,0 +1,214 @@
+{
+  "startedAt": "2026-06-26T14:51:01+00:00",
+  "completedAt": "2026-06-26T14:51:01+00:00",
+  "containsSecrets": false,
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "submissionPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md Review Notes section present"
+    },
+    "submissionReviewNotesFree": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 第一版免费"
+    },
+    "submissionReviewNotesNoIAP": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 无 IAP, 无内购"
+    },
+    "submissionReviewNotesNoAds": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 无广告"
+    },
+    "submissionReviewNotesNoThirdPartyAnalytics": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 无第三方分析 SDK"
+    },
+    "submissionReviewNotesNoMedicalAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 不提供医疗诊断, 不构成医疗建议"
+    },
+    "submissionReviewNotesNoMedicalDevice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 不是医疗器械, 不作为医疗器械"
+    },
+    "submissionReviewNotesLocalFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 本地优先"
+    },
+    "submissionReviewNotesAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 恢复密钥, 手机号, 微信"
+    },
+    "submissionReviewNotesPrivateBackup": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 主动备份, 私有备份"
+    },
+    "submissionReviewNotesOriginalPhotos": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 照片原图"
+    },
+    "submissionReviewNotesDeletionPath": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 资料 -> 账号与备份 -> 删除云端账号与备份"
+    },
+    "submissionReviewNotesVaccineBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 疫苗模板仅用于记录和提醒"
+    },
+    "submissionReviewNotesLiveActivityBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 灵动岛, 锁屏, Live Activity"
+    },
+    "submissionReviewNotesWidgetBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 小组件, Widget"
+    },
+    "submissionReviewNotesStatusDisplayBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 状态展示"
+    },
+    "submissionReviewNotesUserEnteredDataSource": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 用户在 App 内输入, 本机记录, 用户主动记录"
+    },
+    "submissionReviewNotesNoHealthKitOrPressure": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 不接入 HealthKit, 不提供压力评估, 无压力"
+    },
+    "submissionReviewNotesNoHealthPressureFeedingAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 不生成健康建议、压力提醒、喂养建议"
+    },
+    "submissionReviewNotesNoDebugCode": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_SUBMISSION_PACKET.md contains one of: 不得提供或依赖 debug code, 不允许使用 debug code"
+    },
+    "metadataPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md Review Notes section present"
+    },
+    "metadataReviewNotesFree": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 第一版免费"
+    },
+    "metadataReviewNotesNoIAP": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 无 IAP, 无内购"
+    },
+    "metadataReviewNotesNoAds": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 无广告"
+    },
+    "metadataReviewNotesNoThirdPartyAnalytics": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 无第三方分析 SDK"
+    },
+    "metadataReviewNotesNoMedicalAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 不提供医疗诊断, 不构成医疗建议"
+    },
+    "metadataReviewNotesNoMedicalDevice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 不是医疗器械, 不作为医疗器械"
+    },
+    "metadataReviewNotesLocalFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 本地优先"
+    },
+    "metadataReviewNotesAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 恢复密钥, 手机号, 微信"
+    },
+    "metadataReviewNotesPrivateBackup": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 主动备份, 私有备份"
+    },
+    "metadataReviewNotesOriginalPhotos": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 照片原图"
+    },
+    "metadataReviewNotesDeletionPath": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 资料 -> 账号与备份 -> 删除云端账号与备份"
+    },
+    "metadataReviewNotesVaccineBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 疫苗模板仅用于记录和提醒"
+    },
+    "metadataReviewNotesLiveActivityBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 灵动岛, 锁屏, Live Activity"
+    },
+    "metadataReviewNotesWidgetBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 小组件, Widget"
+    },
+    "metadataReviewNotesStatusDisplayBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 状态展示"
+    },
+    "metadataReviewNotesUserEnteredDataSource": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 用户在 App 内输入, 本机记录, 用户主动记录"
+    },
+    "metadataReviewNotesNoHealthKitOrPressure": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 不接入 HealthKit, 不提供压力评估, 无压力"
+    },
+    "metadataReviewNotesNoHealthPressureFeedingAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 不生成健康建议、压力提醒、喂养建议"
+    },
+    "metadataReviewNotesNoDebugCode": {
+      "passed": true,
+      "required": true,
+      "evidence": "APP_STORE_METADATA.md contains one of: 不得提供或依赖 debug code, 不允许使用 debug code"
+    },
+    "reviewNotesDoNotExposeSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "review notes do not expose recovery keys, tokens, debug codes, API keys, or complete phone numbers"
+    }
+  }
+}

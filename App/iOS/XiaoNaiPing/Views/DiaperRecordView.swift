@@ -5,29 +5,32 @@ struct DiaperRecordView: View {
     @State private var isEditorPresented = false
     @State private var editingRecord: DiaperRecord?
     @State private var deleteCandidate: DiaperRecord?
+    @State private var isStatsPresented = false
 
     var body: some View {
-        ScreenScaffold(title: "排便记录", trailingTitle: "统计", showBackButton: true) {
+        ScreenScaffold(title: "排便记录", trailingTitle: "统计", showBackButton: true, trailingAction: {
+            isStatsPresented = true
+        }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
                     AssetWatercolorImage(name: AppAssets.diaperHero, mode: .multiply)
-                        .frame(height: 150)
+                        .frame(height: 118)
 
                     WatercolorCard(tint: AppColors.grass, cornerRadius: AppShapes.largeCardRadius) {
                         HStack {
                             diaperSummary("今日便便", "\(store.poopCount)", "次", icon: AppAssets.diaperSmallIcon, color: AppColors.coral)
-                            Divider().frame(height: 92)
+                            Divider().frame(height: 72)
                             diaperSummary("小便", "\(store.peeCount)", "次", icon: AppAssets.peeDropIcon, color: AppColors.blueInk)
-                            Divider().frame(height: 92)
-                            diaperSummary("最近一次", store.diaperRecords.first?.time ?? "--", "", icon: AppAssets.quickGrowthIcon, color: AppColors.sage)
+                            Divider().frame(height: 72)
+                            diaperSummary("最近一次", store.todayDiaperRecords.first?.time ?? "--", "", icon: AppAssets.quickGrowthIcon, color: AppColors.sage)
                         }
                     }
 
                     VStack(spacing: AppSpacing.regular) {
-                        if store.diaperRecords.isEmpty {
+                        if store.todayDiaperRecords.isEmpty {
                             diaperEmptyState
                         } else {
-                            ForEach(store.diaperRecords) { record in
+                            ForEach(store.todayDiaperRecords) { record in
                                 HStack(spacing: AppSpacing.small) {
                                     Button {
                                         openEditor(record)
@@ -61,8 +64,10 @@ struct DiaperRecordView: View {
                         }
                     }
 
-                    PrimaryWatercolorButton(title: "+ 记录一次", tint: AppColors.grass, foreground: AppColors.inkGreen) {
-                        openEditor()
+                    if !store.todayDiaperRecords.isEmpty {
+                        PrimaryWatercolorButton(title: "+ 记录一次", tint: AppColors.grass, foreground: AppColors.inkGreen) {
+                            openEditor()
+                        }
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -74,6 +79,17 @@ struct DiaperRecordView: View {
                 store.upsert(record)
             }
             .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $isStatsPresented) {
+            RecordStatsSheet(
+                title: "今日排便统计",
+                rows: [
+                    RecordStatsRow(label: "大便", value: "\(store.poopCount)次"),
+                    RecordStatsRow(label: "小便", value: "\(store.peeCount)次"),
+                    RecordStatsRow(label: "最近一次", value: store.todayDiaperRecords.first?.time ?? "暂无")
+                ]
+            )
+            .presentationDetents([.height(260)])
         }
         .alert("删除这条排便记录？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -104,7 +120,7 @@ struct DiaperRecordView: View {
         WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
             VStack(spacing: AppSpacing.medium) {
                 AssetWatercolorImage(name: AppAssets.diaperIcon, mode: .multiply)
-                    .frame(width: 64, height: 64)
+                    .frame(width: 54, height: 54)
                 Text("今天还没有排便记录")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
@@ -136,7 +152,7 @@ struct DiaperRecordView: View {
                     .foregroundStyle(AppColors.ink)
             }
             AssetWatercolorImage(name: icon, mode: .multiply)
-                .frame(width: 48, height: 48)
+                .frame(width: 40, height: 40)
         }
         .frame(maxWidth: .infinity)
     }
@@ -144,7 +160,7 @@ struct DiaperRecordView: View {
 
 private struct DiaperEditorSheet: View {
     let record: DiaperRecord?
-    let onSave: (DiaperRecord) -> Void
+    let onSave: (DiaperRecord) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var occurredAt: Date
@@ -152,15 +168,16 @@ private struct DiaperEditorSheet: View {
     @State private var color: String
     @State private var texture: String
     @State private var note: String
+    @State private var errorMessage: String?
 
     private let kinds = ["大便", "小便"]
     private let colors = ["未选择", "金黄色", "黄色", "绿色", "棕色"]
     private let textures = ["未选择", "糊状", "软便", "水样", "颗粒"]
 
-    init(record: DiaperRecord?, onSave: @escaping (DiaperRecord) -> Void) {
+    init(record: DiaperRecord?, onSave: @escaping (DiaperRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
-        _occurredAt = State(initialValue: BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
+        _occurredAt = State(initialValue: record?.occurredAt ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
         _kind = State(initialValue: record?.kind ?? "大便")
         _color = State(initialValue: record?.color ?? "未选择")
         _texture = State(initialValue: record?.texture ?? "未选择")
@@ -213,6 +230,13 @@ private struct DiaperEditorSheet: View {
                         }
                     }
 
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
                     PrimaryWatercolorButton(title: "保存排便记录", tint: AppColors.grass, foreground: AppColors.inkGreen) {
                         save()
                     }
@@ -233,6 +257,7 @@ private struct DiaperEditorSheet: View {
     }
 
     private func save() {
+        errorMessage = nil
         let savedColor = color == "未选择" || kind == "小便" ? nil : color
         let savedTexture = texture == "未选择" || kind == "小便" ? nil : texture
         let title = titleText(kind: kind, color: savedColor, texture: savedTexture)
@@ -241,6 +266,7 @@ private struct DiaperEditorSheet: View {
             title: title,
             icon: kind == "小便" ? AppAssets.peeDropIcon : AppAssets.diaperIcon
         )
+        saved.occurredAt = occurredAt
         saved.time = BabyRecordStore.timeString(from: occurredAt)
         saved.title = title
         saved.kind = kind
@@ -248,8 +274,11 @@ private struct DiaperEditorSheet: View {
         saved.texture = savedTexture
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
         saved.icon = kind == "小便" ? AppAssets.peeDropIcon : AppAssets.diaperIcon
-        onSave(saved)
-        dismiss()
+        if onSave(saved) {
+            dismiss()
+        } else {
+            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+        }
     }
 
     private func titleText(kind: String, color: String?, texture: String?) -> String {

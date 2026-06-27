@@ -1,0 +1,26 @@
+{
+  "startedAt": "2026-06-26T12:13:25+00:00",
+  "completedAt": "2026-06-26T12:13:27+00:00",
+  "apiBaseUrl": "https://api.mewpow.com/xiaonaiping",
+  "checks": {
+    "healthz": true,
+    "privacyPage": true,
+    "termsPage": true,
+    "supportPage": true,
+    "accountCreated": true,
+    "backupUploaded": true,
+    "backupRestored": true,
+    "photoUploaded": true,
+    "photoListed": true,
+    "photoDownloaded": true,
+    "analyticsEventAccepted": true,
+    "recoveryKeyWorks": true,
+    "accountDeleteRemovedBackup": true,
+    "accountDeleteRemovedPhoto": true,
+    "accountDeleteRemovedAnalytics": true,
+    "tokenRejectedAfterDelete": true
+  },
+  "deletedAt": "2026-06-26T12:13:26+00:00",
+  "passed": true,
+  "failedChecks": []
+}

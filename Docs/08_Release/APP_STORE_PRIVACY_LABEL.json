@@ -1,0 +1,102 @@
+{
+  "app": {
+    "name": "小奶瓶",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "version": "1.0",
+    "firstReleaseRegions": ["China mainland"],
+    "targetsChildrenDirectly": false,
+    "containsThirdPartyAdvertising": false,
+    "containsThirdPartyAnalytics": false,
+    "usesTracking": false
+  },
+  "privacyPolicyUrl": "https://api.mewpow.com/xiaonaiping/privacy",
+  "supportUrl": "https://api.mewpow.com/xiaonaiping/support",
+  "dataCategories": [
+    {
+      "category": "Identifiers",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["App Functionality"],
+      "projectData": ["account id", "session token", "WeChat openid/unionid hash when WeChat login is enabled"],
+      "notes": "Used only for account login, backup, restore, and deletion."
+    },
+    {
+      "category": "Contact Info",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["App Functionality"],
+      "projectData": ["phone number for SMS verification"],
+      "notes": "Required for phone login; production SMS provider and region must be finalized before submission."
+    },
+    {
+      "category": "User Content",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["App Functionality"],
+      "projectData": ["baby profile", "notes", "feeding records", "sleep records", "diaper records", "growth records", "vaccine reminders", "photo metadata"],
+      "notes": "Uploaded only for account backup and restore."
+    },
+    {
+      "category": "Photos or Videos",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["App Functionality"],
+      "projectData": ["original photos added by the user to the app"],
+      "notes": "Private account backup only; no public sharing in V1."
+    },
+    {
+      "category": "Health and Fitness",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["App Functionality"],
+      "projectData": ["feeding", "sleep", "growth", "vaccine reminder records"],
+      "notes": "User-entered baby care records only. No HealthKit, sensors, hospital records, stress detection, medical interpretation, health advice, pressure reminders, feeding advice, or medical diagnosis. Live Activity and widgets are status display only."
+    },
+    {
+      "category": "Diagnostics",
+      "collected": true,
+      "linkedToUser": false,
+      "usedForTracking": false,
+      "purposes": ["App Functionality", "Analytics"],
+      "projectData": ["Apple crash reports", "device and OS diagnostics"],
+      "notes": "Final App Store Connect settings and crash payload redaction still need production verification."
+    },
+    {
+      "category": "Usage Data",
+      "collected": true,
+      "linkedToUser": true,
+      "usedForTracking": false,
+      "purposes": ["Analytics"],
+      "projectData": ["first-party product interaction events such as login, account creation, backup completion, restore completion, record type, reminder type"],
+      "notes": "Stored only on the first-party backend with HMAC account hash and whitelisted enum properties; no baby content, photos, photo keys, phone numbers, WeChat identifiers, location, advertising ID, or device fingerprint."
+    }
+  ],
+  "notCollected": [
+    "Location",
+    "Contacts",
+    "Search History",
+    "Browsing History",
+    "Purchases",
+    "Financial Info",
+    "Sensitive Info for tracking",
+    "Advertising Data"
+  ],
+  "blockingEvidenceBeforeSubmit": [
+    "Current public URLs use the /xiaonaiping path on api.mewpow.com until a dedicated XiaoNaiPing API subdomain is configured.",
+    "Set App Store Connect availability to China mainland only for the first batch after filing and compliance evidence are complete.",
+    "Keep Hong Kong as the second launch batch with zh-Hant-HK resources.",
+    "Run Backend/scripts/verify_auth_providers.py and keep Backend/proof/auth-providers.json passed before submission.",
+    "Run Backend/scripts/check_diagnostics_redaction.py and keep Backend/proof/diagnostics-redaction.json passed before submission.",
+    "Run Backend/scripts/check_public_pages.py and keep Backend/proof/public-pages.json passed before submission.",
+    "Run Backend/scripts/check_review_notes.py and keep Backend/proof/review-notes.json passed before submission.",
+    "Run Backend/scripts/check_legal_drafts.py and keep Backend/proof/legal-drafts.json passed before submission.",
+    "Run Backend/scripts/check_universal_links.py and keep Backend/proof/universal-links.json passed before submission.",
+    "Run Backend/scripts/check_production_readiness.py without --allow-incomplete.",
+    "Attach App Store Connect privacy label screenshot or export to the release proof pack."
+  ]
+}

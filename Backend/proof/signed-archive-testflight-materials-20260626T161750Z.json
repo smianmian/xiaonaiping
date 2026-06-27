@@ -1,0 +1,73 @@
+{
+  "startedAt": "2026-06-26T16:18:05+00:00",
+  "completedAt": "2026-06-26T16:18:05+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "submissionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md"
+    },
+    "bundleVerificationPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/IOS_RELEASE_BUNDLE_VERIFICATION.md"
+    },
+    "chinaRunbookPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md"
+    },
+    "evidenceReadmePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/README.md"
+    },
+    "captureGuidePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md"
+    },
+    "signingArchiveStatusDocumentsCurrentBlocker": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission packet documents archive command and current signing blocker"
+    },
+    "postArchiveBundleVerificationRequired": {
+      "passed": true,
+      "required": true,
+      "evidence": "post-archive flow requires iOS 26.5 bundle proof and exported .app scanning"
+    },
+    "signedArchiveAndTestFlightEvidenceFilenamesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "05-signed-archive and 06-testflight evidence filenames are documented"
+    },
+    "signedArchiveAndTestFlightEvidenceRedactionCovered": {
+      "passed": true,
+      "required": true,
+      "evidence": "capture guide covers archive/TestFlight status fields and redaction boundaries"
+    },
+    "testFlightEvidenceBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials keep TestFlight/signed-device screenshots and regression evidence separate from local simulator proof"
+    },
+    "preSubmitCommandsIncludeArchiveTestFlightGate": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission packet pre-submit commands include archive/TestFlight material, bundle, client, regression, and evidence gates"
+    },
+    "doesNotPretendArchiveOrTestFlightCompleteBeforeEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials do not claim signed archive/TestFlight is complete before archived evidence"
+    },
+    "archiveTestFlightMaterialsAvoidStaleRuntimeClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "archive/TestFlight materials avoid stale iOS 18 or iOS 27 evidence claims"
+    }
+  }
+}

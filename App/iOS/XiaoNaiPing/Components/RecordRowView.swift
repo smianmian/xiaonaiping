@@ -10,24 +10,24 @@ struct RecordRowView: View {
     var body: some View {
         HStack(spacing: AppSpacing.medium) {
             AssetWatercolorImage(name: icon, mode: .multiply)
-                .frame(width: 42, height: 42)
+                .frame(width: 36, height: 36)
             Text(time)
                 .font(AppTypography.bodyLarge)
                 .foregroundStyle(AppColors.inkGreen)
                 .frame(width: 76, alignment: .leading)
-            Text(title)
+            Text(title.localizedText)
                 .font(AppTypography.body)
                 .foregroundStyle(AppColors.ink)
             Spacer(minLength: AppSpacing.small)
-            Text(detail)
+            Text(detail.localizedText)
                 .font(AppTypography.body)
                 .foregroundStyle(AppColors.ink)
                 .multilineTextAlignment(.trailing)
         }
         .padding(.horizontal, AppSpacing.medium)
-        .padding(.vertical, 13)
+        .padding(.vertical, 11)
         .background {
-            CardBackground(tint: tint, cornerRadius: 22)
+            CardBackground(tint: tint, cornerRadius: 20)
         }
     }
 }

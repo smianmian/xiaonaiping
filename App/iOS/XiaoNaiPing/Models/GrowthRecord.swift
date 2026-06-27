@@ -1,6 +1,6 @@
 import Foundation
 
-struct GrowthRecord: Identifiable, Equatable {
+struct GrowthRecord: Identifiable, Equatable, Codable {
     var id = UUID()
     var month: String
     var weight: Double

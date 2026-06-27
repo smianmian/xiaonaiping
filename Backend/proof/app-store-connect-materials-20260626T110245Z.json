@@ -1,0 +1,118 @@
+{
+  "startedAt": "2026-06-26T11:02:47+00:00",
+  "completedAt": "2026-06-26T11:02:47+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "fillSheetPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260626.md"
+    },
+    "metadataPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_METADATA.md"
+    },
+    "privacyLabelPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+    },
+    "appNameMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "小奶瓶"
+    },
+    "bundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "com.mewpow.xiaonaiping"
+    },
+    "subtitleWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "温柔记录宝宝每一天"
+    },
+    "skuPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "SKU xiaonaiping-ios-1"
+    },
+    "primaryCategoryLifestyle": {
+      "passed": true,
+      "required": true,
+      "evidence": "primary category Lifestyle/生活"
+    },
+    "secondaryCategoryBlank": {
+      "passed": true,
+      "required": true,
+      "evidence": "second category is blank in fill sheet"
+    },
+    "metadataNoHealthFitnessCategoryAlternative": {
+      "passed": true,
+      "required": true,
+      "evidence": "metadata does not suggest Health & Fitness as an alternate category"
+    },
+    "firstReleaseMainland": {
+      "passed": true,
+      "required": true,
+      "evidence": "China mainland first"
+    },
+    "secondReleaseHongKong": {
+      "passed": true,
+      "required": true,
+      "evidence": "Hong Kong second"
+    },
+    "priceFree": {
+      "passed": true,
+      "required": true,
+      "evidence": "free V1"
+    },
+    "copyrightCompany": {
+      "passed": true,
+      "required": true,
+      "evidence": "company copyright present"
+    },
+    "publicUrlsMatch": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy/support/terms URLs match fill sheet, metadata, and privacy label"
+    },
+    "keywordsCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=29, missing=[]"
+    },
+    "promotionalTextWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=31"
+    },
+    "descriptionCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=385, missing=[]"
+    },
+    "ageRatingBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "4+ / not Kids / non-medical boundaries present"
+    },
+    "privacyLabelMatchesAppStoreDraft": {
+      "passed": true,
+      "required": true,
+      "evidence": "missingCategories=[], badTracking=[]"
+    },
+    "screenshotCopyComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "5 screenshot filenames and titles present"
+    },
+    "reviewNotesPasteTextHasBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "review paste text has Live Activity/widget/source/health boundaries"
+    }
+  }
+}

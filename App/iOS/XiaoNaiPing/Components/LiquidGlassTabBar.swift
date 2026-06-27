@@ -1,10 +1,10 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
-    case home = "首页"
-    case album = "相册"
+    case home = "今天"
+    case growth = "成长"
     case record = "记录"
-    case profile = "我的"
+    case profile = "设置"
 
     var id: String { rawValue }
 
@@ -12,12 +12,25 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .home:
             AppAssets.tabHomeDrawing
-        case .album:
-            AppAssets.tabAlbumDrawing
+        case .growth:
+            AppAssets.quickGrowthIcon
         case .record:
             AppAssets.tabRecordDrawing
         case .profile:
             AppAssets.tabProfileDrawing
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .home:
+            "house"
+        case .growth:
+            "chart.line.uptrend.xyaxis"
+        case .record:
+            "square.and.pencil"
+        case .profile:
+            "person"
         }
     }
 }
@@ -32,23 +45,19 @@ struct LiquidGlassTabBar: View {
                 tabButton(tab)
             }
         }
-        .padding(8)
-        .frame(height: 84)
+        .padding(6)
+        .frame(height: 72)
         .background {
             Capsule()
                 .fill(AppColors.milk.opacity(0.72))
-                .background {
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                }
                 .overlay {
                     Capsule()
                         .stroke(.white.opacity(0.72), lineWidth: 1.5)
                 }
-                .shadow(color: .brown.opacity(0.14), radius: 18, y: 8)
+                .shadow(color: .brown.opacity(0.07), radius: 6, y: 3)
         }
-        .padding(.horizontal, 18)
-        .padding(.bottom, 14)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 10)
     }
 
     private func tabButton(_ tab: AppTab) -> some View {
@@ -59,15 +68,15 @@ struct LiquidGlassTabBar: View {
         } label: {
             VStack(spacing: 3) {
                 AssetWatercolorImage(name: tab.iconAsset, mode: .multiply)
-                    .frame(width: tab == .profile ? 40 : 37, height: 34)
+                    .frame(width: tab == .profile ? 34 : 31, height: 29)
                     .opacity(isSelected ? 1 : 0.78)
 
-                Text(tab.rawValue)
+                Text(tab.rawValue.localizedText)
                     .font(AppTypography.tab)
                     .foregroundStyle(isSelected ? AppColors.coral : AppColors.tabMuted)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 66)
+            .frame(height: 56)
             .background {
                 if isSelected {
                     Capsule()
@@ -78,7 +87,7 @@ struct LiquidGlassTabBar: View {
                         }
                 }
             }
-            .offset(y: isSelected && tab == .record ? -5 : 0)
+            .offset(y: isSelected && tab == .record ? -3 : 0)
         }
         .buttonStyle(.plain)
     }

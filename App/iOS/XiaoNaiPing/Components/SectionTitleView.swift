@@ -5,14 +5,13 @@ struct SectionTitleView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-            Text(title)
+            Text(title.localizedText)
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(AppColors.inkGreen)
             Capsule()
                 .fill(AppColors.blushDeep.opacity(0.55))
-                .frame(width: 58, height: 3)
+                .frame(width: 48, height: 3)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
-

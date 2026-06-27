@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-06-26T14:36:45+00:00",
+  "completedAt": "2026-06-26T14:36:45+00:00",
+  "containsSecrets": false,
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "iosNoThirdPartyCrashOrAnalyticsSDK": {
+      "passed": true,
+      "required": true,
+      "evidence": "no third-party crash/analytics SDK markers found"
+    },
+    "iosNoClientLoggingCalls": {
+      "passed": true,
+      "required": true,
+      "evidence": "no Swift print/debug/logger calls found"
+    },
+    "privacyManifestDiagnosticsDeclared": {
+      "passed": true,
+      "required": true,
+      "evidence": "PrivacyInfo.xcprivacy declares crash and performance diagnostics"
+    },
+    "backendPhotoLogPathRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "Backend HTTP logs redact /v1/photos/{photoId} paths"
+    }
+  }
+}

@@ -8,8 +8,6 @@ struct AssetWatercolorImage: View {
         Image(name)
             .resizable()
             .scaledToFit()
-            .blendMode(mode)
             .allowsHitTesting(false)
     }
 }
-

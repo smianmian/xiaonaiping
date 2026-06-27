@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小奶瓶数据后台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2328;
+      background: #f6f8fa;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      border-bottom: 1px solid #d8dee4;
+      background: #fff;
+    }
+    h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    form {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    input {
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid #b8c0c7;
+      border-radius: 6px;
+      font: inherit;
+      background: #fff;
+    }
+    button {
+      min-width: 96px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 6px;
+      background: #166534;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .65; cursor: default; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    #status {
+      min-height: 24px;
+      color: #57606a;
+      word-break: keep-all;
+      margin-bottom: 16px;
+    }
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+      color: #57606a;
+      font-size: 13px;
+    }
+    .meta div {
+      padding: 10px 12px;
+      border: 1px solid #d8dee4;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      min-height: 96px;
+      padding: 16px;
+      border: 1px solid #d8dee4;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .metric span {
+      display: block;
+      color: #57606a;
+      font-size: 13px;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    section.panel {
+      border: 1px solid #d8dee4;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    h2 {
+      margin: 0;
+      padding: 12px 14px;
+      border-bottom: 1px solid #d8dee4;
+      font-size: 15px;
+      background: #f6f8fa;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #d8dee4;
+      text-align: left;
+      font-size: 14px;
+    }
+    tr:last-child td { border-bottom: 0; }
+    th { color: #57606a; font-weight: 600; }
+    .empty { color: #57606a; }
+    @media (max-width: 620px) {
+      header { align-items: flex-start; flex-direction: column; }
+      main { padding: 16px; }
+      form { grid-template-columns: 1fr; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>小奶瓶数据后台</h1>
+  </header>
+  <main>
+    <form id="login">
+      <input class="sr-only" name="username" type="text" autocomplete="username" value="xiaonaiping-admin" tabindex="-1">
+      <input id="token" type="password" autocomplete="current-password" placeholder="管理员令牌" required>
+      <button id="submit" type="submit">读取</button>
+    </form>
+    <div id="status">仅显示聚合运营和运维数据，不提供宝宝照片、备注、成长记录内容查询。</div>
+    <section id="content" hidden>
+      <div class="meta" id="meta"></div>
+      <div id="metrics" class="grid"></div>
+      <div class="panels">
+        <section class="panel">
+          <h2>登录方式</h2>
+          <table id="providers">
+            <thead><tr><th>方式</th><th>标识数</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section class="panel">
+          <h2>删除审计</h2>
+          <table id="deletions">
+            <tbody></tbody>
+          </table>
+        </section>
+        <section class="panel">
+          <h2>合规埋点</h2>
+          <table id="analytics">
+            <thead><tr><th>事件</th><th>7天次数</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const metricLabels = [
+      ["totalAccounts", "总账号"],
+      ["activeAccounts", "活跃账号"],
+      ["deletedAccounts", "已删除账号"],
+      ["newAccountsLast24h", "24小时新增"],
+      ["newAccountsLast7d", "7天新增"],
+      ["accountsWithBackup", "有云备份账号"],
+      ["backupBytes", "备份总字节"],
+      ["photoObjects", "照片对象"],
+      ["photoBytes", "照片总字节"],
+      ["pendingPhoneCodes", "待验证短信码"]
+    ];
+    const analyticsMetricLabels = [
+      ["eventsLast24h", "24小时埋点"],
+      ["eventsLast7d", "7天埋点"],
+      ["actorsLast24h", "24小时行为账号"],
+      ["actorsLast7d", "7天行为账号"]
+    ];
+
+    const value = (data, key) => data[key] ?? 0;
+    const formatNumber = (input) => Number(input || 0).toLocaleString("zh-CN");
+    const formatTime = (input) => input || "暂无";
+
+    document.querySelector("#login").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const status = document.querySelector("#status");
+      const button = document.querySelector("#submit");
+      const token = document.querySelector("#token").value;
+      button.disabled = true;
+      status.textContent = "读取中...";
+      try {
+        const response = await fetch("/internal/metrics", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        document.querySelector("#content").hidden = false;
+        document.querySelector("#meta").innerHTML = [
+          `更新时间：${formatTime(data.generatedAt)}`,
+          `数据库：${data.databaseBackend}`,
+          `对象存储：${data.storageBackend}`,
+          `埋点留存：${formatNumber((data.analytics || {}).retentionDays)} 天`,
+          `最近备份：${formatTime(data.latestBackupAt)}`,
+          `最近照片：${formatTime(data.latestPhotoAt)}`
+        ].map((item) => `<div>${item}</div>`).join("");
+
+        const analytics = data.analytics || {};
+        document.querySelector("#metrics").innerHTML = [
+          ...metricLabels.map(([key, label]) =>
+            `<div class="metric"><span>${label}</span><strong>${formatNumber(value(data, key))}</strong></div>`
+          ),
+          ...analyticsMetricLabels.map(([key, label]) =>
+            `<div class="metric"><span>${label}</span><strong>${formatNumber(value(analytics, key))}</strong></div>`
+          )
+        ].join("");
+
+        const providers = Object.entries(data.authIdentities || {});
+        document.querySelector("#providers tbody").innerHTML = providers.length
+          ? providers.map(([provider, count]) => `<tr><td>${provider}</td><td>${formatNumber(count)}</td></tr>`).join("")
+          : `<tr><td class="empty" colspan="2">暂无登录标识</td></tr>`;
+
+        const deletionAudit = data.deletionAudit || {};
+        document.querySelector("#deletions tbody").innerHTML = [
+          ["删除账号数", formatNumber(deletionAudit.deletedAccounts)],
+          ["删除照片对象", formatNumber(deletionAudit.deletedPhotoObjects)],
+          ["最近删除时间", formatTime(deletionAudit.latestDeletedAt)]
+        ].map(([label, text]) => `<tr><th>${label}</th><td>${text}</td></tr>`).join("");
+
+        const topEvents = analytics.topEventsLast7d || [];
+        document.querySelector("#analytics tbody").innerHTML = topEvents.length
+          ? topEvents.map((event) => `<tr><td>${event.eventName}</td><td>${formatNumber(event.count)}</td></tr>`).join("")
+          : `<tr><td class="empty" colspan="2">暂无事件</td></tr>`;
+
+        status.textContent = "读取成功";
+      } catch (error) {
+        status.textContent = `读取失败：${error.message}`;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

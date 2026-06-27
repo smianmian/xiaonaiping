@@ -1,0 +1,112 @@
+{
+  "verifiedAt": "2026-06-25T08:04:12+00:00",
+  "target": "huawei_baota",
+  "containsSecrets": false,
+  "source": {
+    "envFile": "/srv/xiaonaiping/private/xiaonaiping-api.env",
+    "processEnvIncluded": false
+  },
+  "remotePaths": {
+    "deployRoot": "/srv/xiaonaiping",
+    "current": "/srv/xiaonaiping/current",
+    "privateEnv": "/srv/xiaonaiping/private/xiaonaiping-api.env",
+    "dataDir": "/srv/xiaonaiping/data"
+  },
+  "privateEnvStatus": {
+    "verifiedAt": "2026-06-25T08:04:12+00:00",
+    "doesNotExposeValues": true,
+    "set": [
+      "HUAWEI_OBS_ACCESS_KEY_ID",
+      "HUAWEI_OBS_BUCKET",
+      "HUAWEI_OBS_ENDPOINT",
+      "HUAWEI_OBS_PREFIX",
+      "HUAWEI_OBS_SECRET_ACCESS_KEY",
+      "XNP_ADMIN_TOKEN",
+      "XNP_AUTH_DEBUG_MODE",
+      "XNP_DATABASE_BACKEND",
+      "XNP_DATA_DIR",
+      "XNP_DEPLOYMENT_TARGET",
+      "XNP_HOST",
+      "XNP_MYSQL_DATABASE",
+      "XNP_MYSQL_HOST",
+      "XNP_MYSQL_PASSWORD",
+      "XNP_MYSQL_PORT",
+      "XNP_MYSQL_USER",
+      "XNP_PORT",
+      "XNP_SECRET_KEY",
+      "XNP_SMS_PROVIDER",
+      "XNP_SMS_SECRET",
+      "XNP_SMS_TEMPLATE_ID",
+      "XNP_SMS_WEBHOOK_URL",
+      "XNP_STORAGE_BACKEND"
+    ],
+    "empty": [
+      "HUAWEI_OBS_SECURITY_TOKEN",
+      "XNP_MYSQL_SSL_CA",
+      "XNP_WECHAT_APP_ID",
+      "XNP_WECHAT_APP_SECRET"
+    ],
+    "placeholder": [],
+    "secretValuesRedacted": [
+      "HUAWEI_OBS_ACCESS_KEY_ID",
+      "HUAWEI_OBS_SECRET_ACCESS_KEY",
+      "HUAWEI_OBS_SECURITY_TOKEN",
+      "XNP_ADMIN_TOKEN",
+      "XNP_MYSQL_PASSWORD",
+      "XNP_SECRET_KEY",
+      "XNP_SMS_SECRET",
+      "XNP_WECHAT_APP_SECRET"
+    ]
+  },
+  "isolation": {
+    "linuxUser": "xiaonaiping",
+    "systemdService": "xiaonaiping-api.service",
+    "mysqlDatabase": "xiaonaiping_prod",
+    "mysqlUser": "xiaonaiping_app",
+    "reusedEmotionAppDatabase": false,
+    "reusedEmotionAppService": false,
+    "reusedEmotionAppDirectory": false,
+    "sharedNamespaceMarkersFound": false
+  },
+  "runtime": {
+    "pythonVenv": "/srv/xiaonaiping/current/Backend/.venv",
+    "serviceActive": true,
+    "bindAddress": "127.0.0.1",
+    "port": 8787,
+    "databaseBackend": "mysql",
+    "storageBackend": "huawei_obs"
+  },
+  "publicEnvValues": {
+    "HUAWEI_OBS_PREFIX": "xiaonaiping",
+    "XNP_AUTH_DEBUG_MODE": "0",
+    "XNP_DATABASE_BACKEND": "mysql",
+    "XNP_DEPLOYMENT_TARGET": "huawei_baota",
+    "XNP_MYSQL_DATABASE": "xiaonaiping_prod",
+    "XNP_MYSQL_USER": "xiaonaiping_app",
+    "XNP_SMS_PROVIDER": "webhook",
+    "XNP_STORAGE_BACKEND": "huawei_obs"
+  },
+  "providerChecks": {
+    "authDebugModeDisabled": true,
+    "storageBackendIsHuaweiOBS": true,
+    "obsBucketHasXiaoNaiPingNamespace": true,
+    "obsPrefixHasXiaoNaiPingNamespace": true,
+    "smsProviderIsWebhook": true,
+    "smsWebhookURLConfigured": true,
+    "wechatAppIDConfigured": false,
+    "wechatAppSecretConfigured": false
+  },
+  "publicRoute": {
+    "baseUrl": "https://api.mewpow.com/xiaonaiping",
+    "dedicatedSubdomainConfigured": false,
+    "usesIsolatedBackendService": true,
+    "publicInternalPathsBlocked": true,
+    "blockedPaths": [
+      "/xiaonaiping/internal",
+      "/xiaonaiping/internal/"
+    ]
+  },
+  "remainingProductionBlockers": [
+    "WeChat Open Platform AppID/AppSecret are not fully configured"
+  ]
+}

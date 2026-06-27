@@ -1,0 +1,20 @@
+[Unit]
+Description=XiaoNaiPing Aliyun SMS Webhook Adapter
+After=network.target
+
+[Service]
+Type=simple
+User=xiaonaiping
+Group=xiaonaiping
+WorkingDirectory=/srv/xiaonaiping/current/Backend/sms/aliyun-webhook-adapter
+EnvironmentFile=/srv/xiaonaiping/private/xiaonaiping-aliyun-sms-adapter.env
+ExecStart=/usr/local/bin/node /srv/xiaonaiping/current/Backend/sms/aliyun-webhook-adapter/server.js
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

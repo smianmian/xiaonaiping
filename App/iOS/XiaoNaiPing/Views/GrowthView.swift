@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct GrowthView: View {
+    var onOpenMonthlyReport: (() -> Void)?
+    var onOpenVaccineBook: (() -> Void)?
+
     @EnvironmentObject private var store: BabyRecordStore
     @State private var selectedMetric = "体重"
     @State private var isEditorPresented = false
@@ -13,35 +16,43 @@ struct GrowthView: View {
         }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
-                        .padding(.horizontal, 42)
+                    if store.growthRecords.isEmpty {
+                        growthEmptyState
+                    } else {
+                        SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
+                            .padding(.horizontal, 28)
 
-                    GrowthChartView(records: store.growthRecords, metric: selectedMetric)
-                        .frame(height: 360)
+                        GrowthChartView(records: store.growthRecords, metric: selectedMetric)
+                            .frame(height: 292)
 
-                    HStack(spacing: AppSpacing.regular) {
-                        metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
-                        metricCard(title: "身高", value: formatted(store.latestGrowthRecord?.height), unit: "cm", icon: "shield.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
-                        metricCard(title: "头围", value: formatted(store.latestGrowthRecord?.head), unit: "cm", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
-                    }
+                        HStack(spacing: AppSpacing.regular) {
+                            metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
+                            metricCard(title: "身高", value: formatted(store.latestGrowthRecord?.height), unit: "cm", icon: "shield.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
+                            metricCard(title: "头围", value: formatted(store.latestGrowthRecord?.head), unit: "cm", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
+                        }
 
-                    WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.smallRadius, padding: AppSpacing.medium) {
-                        HStack {
-                            AssetWatercolorImage(name: AppAssets.teddyHero, mode: .multiply)
-                                .frame(width: 42, height: 38)
-                            Text("最近一次记录：\(store.latestGrowthRecord?.measuredAt.isEmpty == false ? store.latestGrowthRecord?.measuredAt ?? "暂无" : "暂无")")
-                                .font(AppTypography.body)
-                                .foregroundStyle(AppColors.inkGreen)
-                            Spacer()
+                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.smallRadius, padding: AppSpacing.medium) {
+                            HStack {
+                                AssetWatercolorImage(name: AppAssets.teddyHero, mode: .multiply)
+                                    .frame(width: 36, height: 32)
+                                Text("最近一次记录：\(store.latestGrowthRecord?.measuredAt ?? "")")
+                                    .font(AppTypography.body)
+                                    .foregroundStyle(AppColors.inkGreen)
+                                Spacer()
+                            }
                         }
                     }
 
+                    vaccineBookEntry
                     MonthlyReportCard(report: store.monthlyReport)
+                    if let onOpenMonthlyReport {
+                        PrimaryWatercolorButton(title: "查看完整月报", tint: AppColors.blush, foreground: AppColors.coral) {
+                            onOpenMonthlyReport()
+                        }
+                    }
 
-                    VStack(spacing: AppSpacing.regular) {
-                        if store.growthRecords.isEmpty {
-                            growthEmptyState
-                        } else {
+                    if !store.growthRecords.isEmpty {
+                        VStack(spacing: AppSpacing.regular) {
                             ForEach(store.growthRecords.reversed()) { record in
                                 HStack(spacing: AppSpacing.small) {
                                     Button {
@@ -68,10 +79,10 @@ struct GrowthView: View {
                                 }
                             }
                         }
-                    }
 
-                    PrimaryWatercolorButton(title: "+ 添加记录") {
-                        openEditor()
+                        PrimaryWatercolorButton(title: "+ 添加记录") {
+                            openEditor()
+                        }
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -113,7 +124,7 @@ struct GrowthView: View {
         WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
             VStack(spacing: AppSpacing.medium) {
                 AssetWatercolorImage(name: AppAssets.quickGrowthIcon, mode: .multiply)
-                    .frame(width: 64, height: 64)
+                    .frame(width: 54, height: 54)
                 Text("还没有身高体重记录")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
@@ -125,18 +136,134 @@ struct GrowthView: View {
         }
     }
 
+    @ViewBuilder
+    private var vaccineBookEntry: some View {
+        if let onOpenVaccineBook {
+            Button {
+                onOpenVaccineBook()
+            } label: {
+                vaccineBookCard
+            }
+            .buttonStyle(.plain)
+        } else {
+            NavigationLink {
+                VaccineView()
+            } label: {
+                vaccineBookCard
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var vaccineBookCard: some View {
+        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                HStack(alignment: .top, spacing: AppSpacing.medium) {
+                    AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
+                        .frame(width: 54, height: 54)
+
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text("宝宝疫苗本")
+                            .font(AppTypography.sectionTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text(vaccineBookSubtitle)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                HStack(spacing: AppSpacing.regular) {
+                    vaccineBookStat(
+                        title: "已接种",
+                        value: "\(administeredVaccineCount)",
+                        tint: AppColors.grass,
+                        color: AppColors.inkGreen
+                    )
+                    vaccineBookStat(
+                        title: "待接种",
+                        value: "\(pendingVaccineCount)",
+                        tint: AppColors.cream,
+                        color: AppColors.coral
+                    )
+                }
+
+                HStack(spacing: AppSpacing.tiny) {
+                    Text("打开疫苗本".localizedText)
+                        .font(AppTypography.body.weight(.semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .foregroundStyle(AppColors.blueInk)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(AppLocalization.format("宝宝疫苗本，已接种 %d 针，待接种 %d 针", administeredVaccineCount, pendingVaccineCount))
+    }
+
+    private func vaccineBookStat(title: String, value: String, tint: Color, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+            Text(title.localizedText)
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.inkSoft)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(value)
+                    .font(AppTypography.largeNumber)
+                    .foregroundStyle(color)
+                Text("针".localizedText)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.ink)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.medium)
+        .background(tint.opacity(0.72), in: RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous))
+    }
+
+    private var administeredVaccineCount: Int {
+        store.vaccineRecords.filter(\.isAdministered).count
+    }
+
+    private var pendingVaccineCount: Int {
+        store.vaccineRecords.filter { !$0.isAdministered }.count
+    }
+
+    private var vaccineBookSubtitle: String {
+        guard !store.vaccineRecords.isEmpty else {
+            return "生成模板或新增记录，开始建立宝宝疫苗本。".localizedText
+        }
+
+        guard let nextVaccine = store.nextVaccine else {
+            return "当前没有待接种记录。".localizedText
+        }
+
+        return "下一针：".localizedText + nextVaccine.title.localizedText + " · " + vaccineDueText(nextVaccine)
+    }
+
+    private func vaccineDueText(_ record: VaccineRecord) -> String {
+        let unit = store.vaccineDueUnit(record)
+        if unit == "今天" {
+            return unit.localizedText
+        }
+        return store.vaccineDueValue(record) + unit.localizedText
+    }
+
     private func openEditor(_ record: GrowthRecord? = nil) {
         editingRecord = record
         isEditorPresented = true
     }
 
     private func formatted(_ value: Double?) -> String {
-        guard let value else { return "--" }
+        guard let value, value > 0 else { return "--" }
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(value)) : String(format: "%.1f", value)
     }
 
     private func metricCard(title: String, value: String, unit: String, icon: String, tint: Color, color: Color) -> some View {
-        WatercolorCard(tint: tint, cornerRadius: 24, padding: AppSpacing.medium) {
+        WatercolorCard(tint: tint, cornerRadius: 22, padding: AppSpacing.medium) {
             VStack(spacing: AppSpacing.small) {
                 Label(title, systemImage: icon)
                     .font(AppTypography.caption)
@@ -153,6 +280,115 @@ struct GrowthView: View {
             }
             .frame(maxWidth: .infinity)
         }
+    }
+}
+
+struct MonthlyReportDetailView: View {
+    @EnvironmentObject private var store: BabyRecordStore
+    @State private var selectedMonth = Date()
+
+    private var report: MonthlyReportSnapshot {
+        store.monthlyReport(for: selectedMonth)
+    }
+
+    var body: some View {
+        ScreenScaffold(title: "月度报告", showBackButton: true) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.large) {
+                    monthSwitcher
+                    MonthlyReportCard(report: report)
+                    sourceSummary
+                    if report.recordCount == 0 {
+                        emptyState
+                    }
+                }
+                .padding(.horizontal, AppSpacing.page)
+                .padding(.bottom, AppSpacing.bottomBarSpace)
+            }
+        }
+    }
+
+    private var monthSwitcher: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            HStack(spacing: AppSpacing.medium) {
+                Button {
+                    shiftMonth(-1)
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(AppColors.coral)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("上个月")
+
+                VStack(spacing: AppSpacing.tiny) {
+                    Text(report.monthTitle)
+                        .font(AppTypography.sectionTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+                    Text("只汇总真实本地记录")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+                .frame(maxWidth: .infinity)
+
+                Button {
+                    shiftMonth(1)
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(canMoveToNextMonth ? AppColors.coral : AppColors.inkSoft.opacity(0.45))
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canMoveToNextMonth)
+                .accessibilityLabel("下个月")
+            }
+        }
+    }
+
+    private var sourceSummary: some View {
+        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Text("原始记录来源")
+                    .font(AppTypography.cardTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                Text("喂养、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都来自本机记录。要修改内容，请回到对应页面编辑原始记录。")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var emptyState: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(spacing: AppSpacing.small) {
+                AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
+                    .frame(width: 54, height: 48)
+                Text("这个月记录还不多")
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.inkGreen)
+                Text("报告不会补写不存在的数据。等多记几次后，这里会慢慢长出月度回顾。")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var canMoveToNextMonth: Bool {
+        let currentMonth = Calendar.current.dateComponents([.year, .month], from: Date())
+        let selected = Calendar.current.dateComponents([.year, .month], from: selectedMonth)
+        return selected.year != currentMonth.year || selected.month != currentMonth.month
+    }
+
+    private func shiftMonth(_ value: Int) {
+        guard value < 0 || canMoveToNextMonth else { return }
+        selectedMonth = Calendar.current.date(byAdding: .month, value: value, to: selectedMonth) ?? selectedMonth
     }
 }
 
@@ -173,8 +409,8 @@ private struct GrowthChartView: View {
                     .stroke(AppColors.softStroke.opacity(0.32), style: StrokeStyle(lineWidth: 1, dash: [6, 8]))
                 }
 
-                if records.isEmpty {
-                    Text("添加记录后会在这里看到变化")
+                if values.isEmpty {
+                    Text("添加\(metric)记录后会在这里看到变化")
                         .font(AppTypography.body)
                         .foregroundStyle(AppColors.inkGreen)
                 } else {
@@ -184,7 +420,7 @@ private struct GrowthChartView: View {
                 VStack {
                     Spacer()
                     HStack {
-                        ForEach(records) { record in
+                        ForEach(plottedRecords) { record in
                             Text(record.month)
                                 .font(AppTypography.caption)
                                 .foregroundStyle(AppColors.inkGreen)
@@ -199,13 +435,21 @@ private struct GrowthChartView: View {
     }
 
     private var values: [Double] {
+        plottedRecords.map { value(for: $0) }
+    }
+
+    private var plottedRecords: [GrowthRecord] {
+        records.filter { value(for: $0) > 0 }
+    }
+
+    private func value(for record: GrowthRecord) -> Double {
         switch metric {
         case "身高":
-            records.map(\.height)
+            record.height
         case "头围":
-            records.map(\.head)
+            record.head
         default:
-            records.map(\.weight)
+            record.weight
         }
     }
 
@@ -261,7 +505,7 @@ private struct GrowthChartView: View {
             ForEach(points.indices, id: \.self) { index in
                 Circle()
                     .fill(color.opacity(0.78))
-                    .frame(width: 12, height: 12)
+                    .frame(width: 10, height: 10)
                     .position(points[index])
             }
         }
@@ -279,13 +523,13 @@ private struct MonthlyReportCard: View {
                         Text("本月成长小报")
                             .font(AppTypography.sectionTitle)
                             .foregroundStyle(AppColors.inkGreen)
-                        Text("基于当前本地记录生成")
+                        Text("\(report.monthTitle.isEmpty ? "本月" : report.monthTitle) · 基于当前本地记录生成")
                             .font(AppTypography.caption)
                             .foregroundStyle(AppColors.inkSoft)
                     }
                     Spacer()
                     AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
-                        .frame(width: 54, height: 48)
+                        .frame(width: 46, height: 40)
                 }
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.regular) {
@@ -361,25 +605,40 @@ private struct GrowthHistoryRow: View {
     var body: some View {
         HStack(spacing: AppSpacing.medium) {
             AssetWatercolorImage(name: AppAssets.quickGrowthIcon, mode: .multiply)
-                .frame(width: 42, height: 42)
+                .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                 Text(record.measuredAt.isEmpty ? record.month : record.measuredAt)
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("体重 \(display(record.weight))kg  身高 \(display(record.height))cm")
+                Text(measurementSummary)
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.ink)
             }
             Spacer()
-            Text("头围 \(display(record.head))cm")
-                .font(AppTypography.caption)
-                .foregroundStyle(AppColors.ink)
+            if let headSummary {
+                Text(headSummary)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.ink)
+            }
         }
         .padding(.horizontal, AppSpacing.medium)
-        .padding(.vertical, 13)
+        .padding(.vertical, 11)
         .background {
-            CardBackground(tint: AppColors.cream, cornerRadius: 22)
+            CardBackground(tint: AppColors.cream, cornerRadius: 20)
         }
+    }
+
+    private var measurementSummary: String {
+        let parts = [
+            record.weight > 0 ? "体重 \(display(record.weight))kg" : nil,
+            record.height > 0 ? "身高 \(display(record.height))cm" : nil
+        ].compactMap { $0 }
+
+        return parts.isEmpty ? "这次只记录了日期" : parts.joined(separator: "  ")
+    }
+
+    private var headSummary: String? {
+        record.head > 0 ? "头围 \(display(record.head))cm" : nil
     }
 
     private func display(_ value: Double) -> String {
@@ -389,7 +648,7 @@ private struct GrowthHistoryRow: View {
 
 private struct GrowthEditorSheet: View {
     let record: GrowthRecord?
-    let onSave: (GrowthRecord) -> Void
+    let onSave: (GrowthRecord) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var measuredAt: Date
@@ -399,13 +658,13 @@ private struct GrowthEditorSheet: View {
     @State private var note: String
     @State private var errorMessage: String?
 
-    init(record: GrowthRecord?, onSave: @escaping (GrowthRecord) -> Void) {
+    init(record: GrowthRecord?, onSave: @escaping (GrowthRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
-        _measuredAt = State(initialValue: Date())
-        _weightText = State(initialValue: record.map { String($0.weight) } ?? "")
-        _heightText = State(initialValue: record.map { String($0.height) } ?? "")
-        _headText = State(initialValue: record.map { String($0.head) } ?? "")
+        _measuredAt = State(initialValue: record.flatMap { BabyRecordStore.date(fromDateString: $0.measuredAt) } ?? Date())
+        _weightText = State(initialValue: Self.fieldText(for: record?.weight))
+        _heightText = State(initialValue: Self.fieldText(for: record?.height))
+        _headText = State(initialValue: Self.fieldText(for: record?.head))
         _note = State(initialValue: record?.note ?? "")
     }
 
@@ -459,6 +718,7 @@ private struct GrowthEditorSheet: View {
     }
 
     private func save() {
+        errorMessage = nil
         let weight = decimalValue(weightText)
         let height = decimalValue(heightText)
         let head = decimalValue(headText)
@@ -477,13 +737,21 @@ private struct GrowthEditorSheet: View {
             measuredAt: BabyRecordStore.dateString(from: measuredAt)
         )
         saved.month = BabyRecordStore.monthString(from: measuredAt)
-        saved.weight = weight ?? saved.weight
-        saved.height = height ?? saved.height
-        saved.head = head ?? saved.head
+        saved.weight = weight ?? 0
+        saved.height = height ?? 0
+        saved.head = head ?? 0
         saved.measuredAt = BabyRecordStore.dateString(from: measuredAt)
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
-        onSave(saved)
-        dismiss()
+        if onSave(saved) {
+            dismiss()
+        } else {
+            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+        }
+    }
+
+    private static func fieldText(for value: Double?) -> String {
+        guard let value, value > 0 else { return "" }
+        return value.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(value)) : String(format: "%.1f", value)
     }
 
     private func decimalValue(_ text: String) -> Double? {
@@ -493,7 +761,6 @@ private struct GrowthEditorSheet: View {
             errorMessage = "数值请填写大于 0 的数字，或留空。"
             return nil
         }
-        errorMessage = nil
         return value
     }
 }

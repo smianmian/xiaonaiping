@@ -37,7 +37,7 @@ enum AppNotificationScheduler {
     }
 
     static func removeFeedingReminder() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [feedingReminderIdentifier])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: feedingReminderIdentifiers)
     }
 
     static func scheduleVaccineReminder(_ record: VaccineRecord, completion: @escaping (NotificationScheduleResult) -> Void = { _ in }) {
@@ -78,24 +78,57 @@ enum AppNotificationScheduler {
     }
 
     private static func addFeedingReminder(_ reminder: FeedingReminder, completion: @escaping (NotificationScheduleResult) -> Void) {
-        let content = UNMutableNotificationContent()
-        content.title = "小奶瓶喝奶提醒".localizedText
-        content.body = "到你设置的喝奶时间了。".localizedText
-        content.sound = .default
+        let reminderDates = feedingReminderDates(for: reminder)
+        guard !reminderDates.isEmpty else {
+            removeFeedingReminder()
+            complete(.removed, completion: completion)
+            return
+        }
 
-        var components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.remindAt)
-        components.second = 0
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: feedingReminderIdentifiers)
 
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(
-            identifier: feedingReminderIdentifier,
-            content: content,
-            trigger: trigger
-        )
+        let group = DispatchGroup()
+        let lock = NSLock()
+        var didFail = false
 
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [feedingReminderIdentifier])
-        UNUserNotificationCenter.current().add(request) { error in
-            complete(error == nil ? .scheduled : .failed, completion: completion)
+        for (index, remindAt) in reminderDates.enumerated() {
+            if let prepareAt = Calendar.current.date(byAdding: .minute, value: -feedingPrepareReminderLeadMinutes, to: remindAt),
+               prepareAt > Date() {
+                let request = notificationRequest(
+                    identifier: feedingPrepareReminderIdentifier(index),
+                    date: prepareAt,
+                    title: "准备泡奶啦".localizedText,
+                    body: "5分钟后到喝奶时间，先把奶准备好。".localizedText
+                )
+                add(request, group: group) {
+                    lock.lock()
+                    didFail = true
+                    lock.unlock()
+                }
+            }
+
+            let body: String
+            if let repeatIntervalText = reminder.repeatIntervalText {
+                body = AppLocalization.format("到喝奶时间了；已按%@节奏继续提醒。", repeatIntervalText)
+            } else {
+                body = "到你设置的喝奶时间了。".localizedText
+            }
+
+            let request = notificationRequest(
+                identifier: feedingReminderIdentifier(index),
+                date: remindAt,
+                title: "小奶瓶喝奶提醒".localizedText,
+                body: body
+            )
+            add(request, group: group) {
+                lock.lock()
+                didFail = true
+                lock.unlock()
+            }
+        }
+
+        group.notify(queue: .main) {
+            completion(didFail ? .failed : .scheduled)
         }
     }
 
@@ -122,6 +155,29 @@ enum AppNotificationScheduler {
         }
     }
 
+    private static func notificationRequest(identifier: String, date: Date, title: String, body: String) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        var components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        components.second = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+    }
+
+    private static func add(_ request: UNNotificationRequest, group: DispatchGroup, onFailure: @escaping () -> Void) {
+        group.enter()
+        UNUserNotificationCenter.current().add(request) { error in
+            if error != nil {
+                onFailure()
+            }
+            group.leave()
+        }
+    }
+
     private static func complete(_ result: NotificationScheduleResult, completion: @escaping (NotificationScheduleResult) -> Void) {
         DispatchQueue.main.async {
             completion(result)
@@ -132,5 +188,38 @@ enum AppNotificationScheduler {
         "xiaonaiping.vaccine.\(record.id.uuidString)"
     }
 
-    private static let feedingReminderIdentifier = "xiaonaiping.feeding.next"
+    private static func feedingReminderDates(for reminder: FeedingReminder) -> [Date] {
+        let now = Date()
+        guard var nextDate = reminder.nextRemindAt(after: now) else { return [] }
+        let repeatIntervalMinutes = reminder.repeatIntervalMinutes ?? 0
+        var dates = [nextDate]
+
+        guard repeatIntervalMinutes > 0 else { return dates }
+
+        let interval = TimeInterval(repeatIntervalMinutes * 60)
+        while dates.count < feedingReminderScheduleLimit {
+            nextDate = nextDate.addingTimeInterval(interval)
+            dates.append(nextDate)
+        }
+
+        return dates
+    }
+
+    private static func feedingReminderIdentifier(_ index: Int) -> String {
+        "xiaonaiping.feeding.next.\(index)"
+    }
+
+    private static func feedingPrepareReminderIdentifier(_ index: Int) -> String {
+        "xiaonaiping.feeding.prepare.\(index)"
+    }
+
+    private static var feedingReminderIdentifiers: [String] {
+        [legacyFeedingReminderIdentifier] +
+            (0..<feedingReminderScheduleLimit).map(feedingReminderIdentifier) +
+            (0..<feedingReminderScheduleLimit).map(feedingPrepareReminderIdentifier)
+    }
+
+    private static let legacyFeedingReminderIdentifier = "xiaonaiping.feeding.next"
+    private static let feedingReminderScheduleLimit = 24
+    private static let feedingPrepareReminderLeadMinutes = 5
 }

@@ -1,0 +1,23 @@
+{
+  "completedAt": "2026-06-26T18:01:15Z",
+  "passed": true,
+  "simulator": {
+    "name": "iPhone 17 Pro",
+    "udid": "07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4",
+    "runtime": "iOS 26.5"
+  },
+  "app": {
+    "bundleIdentifier": "com.mewpow.xiaonaiping",
+    "bundlePath": "/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+    "apiBaseURL": "https://api.mewpow.com/xiaonaiping",
+    "dtPlatformVersion": "26.5",
+    "dtSdkName": "iphonesimulator26.5",
+    "supportsLiveActivities": true
+  },
+  "commands": {
+    "bootstatus": "xcrun simctl bootstatus 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 -b",
+    "install": "xcrun simctl install 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 /tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+    "launch": "xcrun simctl launch --terminate-running-process 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 com.mewpow.xiaonaiping"
+  },
+  "launchOutput": "com.mewpow.xiaonaiping: 9345"
+}

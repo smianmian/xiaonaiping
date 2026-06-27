@@ -1,0 +1,238 @@
+{
+  "createdAt": "2026-06-25T08:00:12+00:00",
+  "bundle": "xiaonaiping-backend-20260625T080012Z.tar.gz",
+  "containsSecrets": false,
+  "files": [
+    {
+      "path": "Backend/README.md",
+      "sizeBytes": 7971,
+      "sha256": "e06c767a32ba2417a60a601925d5e9b1753ce18950c7830808fe658fb480e2cc"
+    },
+    {
+      "path": "Backend/api/__init__.py",
+      "sizeBytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "Backend/api/database.py",
+      "sizeBytes": 9843,
+      "sha256": "84a702f06340f1e48655e51ac092a012ce86f7b961b398452e9fd3244910b296"
+    },
+    {
+      "path": "Backend/api/server.py",
+      "sizeBytes": 47806,
+      "sha256": "1d982d8c60282a4b462c004888a0eeb2e9cb98f13c9199b6d55ee58d4d4c5db4"
+    },
+    {
+      "path": "Backend/api/storage.py",
+      "sizeBytes": 6811,
+      "sha256": "c67e72076116cf760b6182ce2530637dc866fd50d6c33e30d39d7d2889432a31"
+    },
+    {
+      "path": "Backend/deploy/.env.example",
+      "sizeBytes": 828,
+      "sha256": "955b0328d06868c1dc8bb1c867b1a0be00e1a277c647e48a3909e2a09ae652c1"
+    },
+    {
+      "path": "Backend/deploy/aliyun-sms-adapter.env.example",
+      "sizeBytes": 439,
+      "sha256": "c70f26eb75413e899887b05cd3bc9af3eb6791bf8e82e8ecfba9fd2c1949cf69"
+    },
+    {
+      "path": "Backend/deploy/aliyun-sms-webhook-adapter.md",
+      "sizeBytes": 3047,
+      "sha256": "9e9db9a381573aadcfe08ae73bac194559b497b8718380e903b458053b44c01c"
+    },
+    {
+      "path": "Backend/deploy/deploy-huawei-baota.sh",
+      "sizeBytes": 6918,
+      "sha256": "b5ef56fa1cb21b4ee23c20a7e5a809da4ba217fef3a2321e8ffedb111a689f14"
+    },
+    {
+      "path": "Backend/deploy/huawei-baota-production.md",
+      "sizeBytes": 7742,
+      "sha256": "a0672415605f6733bdf5a6803b3c0442b591bba0ed345aed67d66f3d34e5976f"
+    },
+    {
+      "path": "Backend/deploy/huawei-obs.md",
+      "sizeBytes": 2772,
+      "sha256": "026ae0c458bf2c7a9c22da6fc7695b3437a5afec8013d1b8db264d61bb001cbc"
+    },
+    {
+      "path": "Backend/deploy/nginx-api-mewpow-xiaonaiping-path.conf",
+      "sizeBytes": 861,
+      "sha256": "615cafe6f30046c3bca1d6ca793b9e28feb736ff3a1fc339dc0d25ca51bd0257"
+    },
+    {
+      "path": "Backend/deploy/nginx.conf.example",
+      "sizeBytes": 1071,
+      "sha256": "113d6ec7e26e158fee9fe07561cf0e5e75d679065b631bd737dd0dfab3bfb7a5"
+    },
+    {
+      "path": "Backend/deploy/production-config.example",
+      "sizeBytes": 967,
+      "sha256": "a22ff95c631dcdad7f8220528e926ac3af7cd88d59dc3b59d78776c7f28dd7be"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-aliyun-sms-adapter.service.example",
+      "sizeBytes": 529,
+      "sha256": "ba268ca39760e67339397f950e9b96f144b857054250bf434cecd660a7f4431e"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-api.service.example",
+      "sizeBytes": 632,
+      "sha256": "e6e728e21e74dd13785051b9c6ff86d06ec1d9580d883c0d30e3ea564f7095dc"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-mysql-backup.sh",
+      "sizeBytes": 968,
+      "sha256": "5cea272e85beee4fe0cc4c0d2dc104d5ca68bd6e6c87d14bd42ea17f76ce248f"
+    },
+    {
+      "path": "Backend/requirements-obs.txt",
+      "sizeBytes": 16,
+      "sha256": "785e0064406abc15b953ac139094134bf7bdb8527ab6a902031634f5e2f67bcb"
+    },
+    {
+      "path": "Backend/requirements-production.txt",
+      "sizeBytes": 31,
+      "sha256": "a9651dccb6298dea2b59d4d92ea57c21fd1fe983e45c946a77cf23439471154d"
+    },
+    {
+      "path": "Backend/scripts/build_deploy_bundle.py",
+      "sizeBytes": 3140,
+      "sha256": "f681f82c643c9e5d4c3387feb1fb9f37aa5ff5989162a8eccb4e184dec42ce6a"
+    },
+    {
+      "path": "Backend/scripts/capture_ios_screenshots.py",
+      "sizeBytes": 2794,
+      "sha256": "96ab38e60676c27d4abc74bfa914adacd6a5db3056243fa3fef370043d0dc5a3"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_assets.py",
+      "sizeBytes": 7352,
+      "sha256": "1b97af8ba8aeec597212d004ffdb6172348c2080a9627bbb32be2890ce38931e"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_evidence.py",
+      "sizeBytes": 4335,
+      "sha256": "17c90b2a88f8929a5182ed37ab5ffab35d11359aaf5c9150f5e2bdcc857581f2"
+    },
+    {
+      "path": "Backend/scripts/check_diagnostics_redaction.py",
+      "sizeBytes": 5998,
+      "sha256": "e41290a451875e838e4e4626f7beef61823da4bd601071a98972edc714416a71"
+    },
+    {
+      "path": "Backend/scripts/check_ios_app_bundle.py",
+      "sizeBytes": 9570,
+      "sha256": "a6552074cd8a76075184a632970c6016f804390df4ef572a867f88ae110136f5"
+    },
+    {
+      "path": "Backend/scripts/check_ios_release_readiness.py",
+      "sizeBytes": 20387,
+      "sha256": "aaba2493936894a6072e0646410c4a8e4f162240200343640b5480f91309b088"
+    },
+    {
+      "path": "Backend/scripts/check_legal_drafts.py",
+      "sizeBytes": 5160,
+      "sha256": "72890e87908e6d304505fdfd0b79704544535b8e7303f04975e2686bc71347e1"
+    },
+    {
+      "path": "Backend/scripts/check_production_readiness.py",
+      "sizeBytes": 35136,
+      "sha256": "20984a552dad7a2ca0eb428dda37ac230234ad0f2ccda6d205faf45bea529e99"
+    },
+    {
+      "path": "Backend/scripts/check_public_pages.py",
+      "sizeBytes": 4557,
+      "sha256": "efca1b5f00b35b0d96700c88aef1437822e1a03801166104ac3d957aa96fe810"
+    },
+    {
+      "path": "Backend/scripts/check_review_notes.py",
+      "sizeBytes": 4796,
+      "sha256": "97dde8f50dc7f1e1a576cb80fb528571c739707be0e8347dde081c8ee7a1af39"
+    },
+    {
+      "path": "Backend/scripts/check_universal_links.py",
+      "sizeBytes": 9588,
+      "sha256": "8ca316a043e150cb3d28cf1d74063026fd90e3f0180ed86cf3abee3ce6be5188"
+    },
+    {
+      "path": "Backend/scripts/collect_deployment_proof.py",
+      "sizeBytes": 11110,
+      "sha256": "b7e3fc312cad0758eb35a556612b81491ce605ebc902ca93735a8a7d101e77a8"
+    },
+    {
+      "path": "Backend/scripts/migrate_database.py",
+      "sizeBytes": 636,
+      "sha256": "ddcf27e3077ea31d4f2ecb4216cde11e16c8cca3d275323533fce931d708fe37"
+    },
+    {
+      "path": "Backend/scripts/run_launch_readiness.sh",
+      "sizeBytes": 8283,
+      "sha256": "8f3a7b062bad3bd97c2ee30977a9468afca6512503d8ea82c933d56474dff7ee"
+    },
+    {
+      "path": "Backend/scripts/verify_auth_providers.py",
+      "sizeBytes": 12073,
+      "sha256": "140845c9df840f5661f940b0c18b70cbb220c3da9bee249b3ed825d4126327bb"
+    },
+    {
+      "path": "Backend/scripts/verify_release_flow.py",
+      "sizeBytes": 6489,
+      "sha256": "0b89edba79b6c6232295acffe28c10c667349ae4528f0cced51173c23e5793e8"
+    },
+    {
+      "path": "Backend/scripts/verify_remote_api.py",
+      "sizeBytes": 6219,
+      "sha256": "cd77851f1214f237fb843e7b418eb33e6b671ab9509ab3eebebd85dda96fc4fc"
+    },
+    {
+      "path": "Backend/scripts/verify_storage_backend.py",
+      "sizeBytes": 3384,
+      "sha256": "d284298fc998ead6f7c21c8a7fe6b552d3b6bd66c010c2b65b9e67634f537380"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/package-lock.json",
+      "sizeBytes": 5067,
+      "sha256": "2b7516b7a1d2f32fcf10916fcf322ead9a575f05697db279073ce40a949c82c0"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/package.json",
+      "sizeBytes": 356,
+      "sha256": "cc0e94e25601dc51bc62e8df43e7ed8a65565ca2022c6ef4f44ebd051d52bb42"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/server.js",
+      "sizeBytes": 6924,
+      "sha256": "09f3650ad1e1d375799c821041f2f9a7b2167978649cb4470f50163f5ee4f638"
+    },
+    {
+      "path": "Backend/static/apple-app-site-association",
+      "sizeBytes": 631,
+      "sha256": "8da7780d3a19082cd8b96af199351a3fe9a9379c962f66e1da682e8fe05c7ca4"
+    },
+    {
+      "path": "Backend/static/dashboard.html",
+      "sizeBytes": 8679,
+      "sha256": "4229e80fc0cc6a9850d24a0016825b35d6de08775b0596ec0a8a3af064cbb7f5"
+    },
+    {
+      "path": "Backend/static/privacy.html",
+      "sizeBytes": 4515,
+      "sha256": "1fdc3385e3c61c79d32f6298cffd47fe1efe211b482f4ac2718daa5f91927ea0"
+    },
+    {
+      "path": "Backend/static/support.html",
+      "sizeBytes": 1372,
+      "sha256": "83614be06e46d742c4e033a7a9b9b722e731d90443b03744a37ddef213b8af16"
+    },
+    {
+      "path": "Backend/static/terms.html",
+      "sizeBytes": 2488,
+      "sha256": "fa039b9bf42b88c1c5bd19556a41d8c8458346ce093122935aa7562410d52067"
+    }
+  ],
+  "bundleSha256": "c691d1cde91820b0efb0e8998b84c3bfd220155387ebe73d9eb2ead7ec2af410"
+}

@@ -151,7 +151,7 @@
     {
       "id": "feeding_editor",
       "label": "喂养记录",
-      "goal": "Create or edit feeding record, and set one manual feeding reminder",
+      "goal": "Create or edit feeding record, adjust the next reminder deferral, and set one manual feeding reminder",
       "primary_action": "保存喂养 / 保存闹钟",
       "empty_state": null,
       "error_state": "Invalid amount / Invalid reminder time / Notification denied"

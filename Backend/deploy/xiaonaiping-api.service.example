@@ -1,0 +1,22 @@
+[Unit]
+Description=XiaoNaiPing API
+After=network.target
+
+[Service]
+Type=simple
+User=xiaonaiping
+Group=xiaonaiping
+WorkingDirectory=/srv/xiaonaiping/current/Backend
+EnvironmentFile=/srv/xiaonaiping/private/xiaonaiping-api.env
+ExecStartPre=/srv/xiaonaiping/current/Backend/.venv/bin/python /srv/xiaonaiping/current/Backend/scripts/migrate_database.py
+ExecStart=/srv/xiaonaiping/current/Backend/.venv/bin/python /srv/xiaonaiping/current/Backend/api/server.py
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/srv/xiaonaiping/data
+
+[Install]
+WantedBy=multi-user.target

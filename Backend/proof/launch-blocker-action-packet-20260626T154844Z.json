@@ -1,0 +1,63 @@
+{
+  "startedAt": "2026-06-26T15:48:59+00:00",
+  "completedAt": "2026-06-26T15:48:59+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "actionPacket": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260626.md",
+  "launchObjectiveFailedChecks": [
+    "weChatConfigurationGreen",
+    "realDeviceRegressionEvidenceReady",
+    "appStoreManualEvidenceReady",
+    "productionReadinessGreen"
+  ],
+  "missingEvidence": [
+    "companyAccount",
+    "mainlandAvailability",
+    "mainlandFiling",
+    "privacyLabel",
+    "signedArchive",
+    "testFlight",
+    "smsProvider",
+    "wechatOpenPlatform",
+    "huaweiObsPolicy",
+    "realDeviceRegression"
+  ],
+  "checks": {
+    "actionPacketPresent": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260626.md"
+    },
+    "launchObjectiveAuditReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/launch-objective-audit-20260626T154844Z.json"
+    },
+    "appStoreEvidenceReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/app-store-evidence-20260626T154844Z.json"
+    },
+    "failedLaunchObjectiveChecksCovered": {
+      "passed": true,
+      "evidence": "all current failed launch objective checks are named"
+    },
+    "missingEvidenceFilenamesCovered": {
+      "passed": true,
+      "evidence": "all current missing App Store evidence filenames are named"
+    },
+    "ios265OnlyRuleCovered": {
+      "passed": true,
+      "evidence": "local testing is constrained to iOS 26.5 and non-evidence devices are called out"
+    },
+    "wechatExternalConfigActionsCovered": {
+      "passed": true,
+      "evidence": "WeChat AppID/AppSecret/URL Scheme/Universal Link evidence actions are explicit"
+    },
+    "rerunCommandsCovered": {
+      "passed": true,
+      "evidence": "unified gate and focused blocker commands are listed"
+    },
+    "realDeviceEvidenceBoundaryCovered": {
+      "passed": true,
+      "evidence": "real TestFlight or signed-device regression evidence boundary is explicit"
+    }
+  }
+}

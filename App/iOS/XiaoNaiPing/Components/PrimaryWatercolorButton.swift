@@ -8,11 +8,11 @@ struct PrimaryWatercolorButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            Text(title.localizedText)
                 .font(AppTypography.bodyLarge)
                 .foregroundStyle(foreground)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
+                .padding(.vertical, 13)
                 .background {
                     Capsule()
                         .fill(tint.opacity(0.70))
@@ -25,4 +25,3 @@ struct PrimaryWatercolorButton: View {
         .buttonStyle(.plain)
     }
 }
-

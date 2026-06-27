@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-06-25T08:00:55+00:00",
+  "completedAt": "2026-06-25T08:00:55+00:00",
+  "containsSecrets": false,
+  "storageBackend": "huawei_obs",
+  "dataDir": "/srv/xiaonaiping/data",
+  "accountId": "storage_probe_b863a2797ecc4cd9a58a036e62ff3f18",
+  "checks": {
+    "photoUploaded": true,
+    "photoDownloaded": true,
+    "photoDeleted": true,
+    "accountDeleteRemovedPhotos": true
+  },
+  "passed": true,
+  "failedChecks": []
+}

@@ -1,0 +1,53 @@
+{
+  "startedAt": "2026-06-26T15:40:02+00:00",
+  "completedAt": "2026-06-26T15:40:02+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "materialsDocumentPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/MAINLAND_FILING_MATERIALS.md"
+    },
+    "currentJudgmentCoversLaunchAndFilingPath": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland-first filing path and post-filing display boundary present"
+    },
+    "draftFilingFieldsComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "draft filing fields cover entity, app, URLs, cloud, storage, and auth methods"
+    },
+    "externalMaterialCollectionListComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "external company/cloud/provider material list is complete"
+    },
+    "evidenceArchiveFilenamesMatchGate": {
+      "passed": true,
+      "required": true,
+      "evidence": "evidence filenames align with AppStoreEvidence gate"
+    },
+    "postFilingCodeChangesDeferredUntilRealNumber": {
+      "passed": true,
+      "required": true,
+      "evidence": "filing number UI/page/review-note changes are explicitly deferred until real filing number"
+    },
+    "submissionSequenceKeepsFilingBeforeChinaReview": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission order keeps filing and public-security evidence before China App Store review"
+    },
+    "captureGuideCoversFilingEvidenceRedaction": {
+      "passed": true,
+      "required": true,
+      "evidence": "capture guide describes filing evidence contents and redaction boundary"
+    },
+    "doesNotPretendFilingCompleteBeforeEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials do not claim App/ICP/public-security filing is complete before archived evidence"
+    }
+  }
+}

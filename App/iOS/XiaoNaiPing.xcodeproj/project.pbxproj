@@ -3,15 +3,16 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0012DE012789FED73D28714E /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47656212072FE3DB6D875124 /* AlbumView.swift */; };
 		03C9A29BE10178FE92BAC0F7 /* GrowthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CE26483B31F89D43F85E8E /* GrowthRecord.swift */; };
+		0518D507F3458D2B58872BAD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B7CBB8D388EB582D25BE9B62 /* InfoPlist.strings */; };
 		069F7E721B44C0E9DDA64889 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32AE135F59AF8AD95D335B /* MockData.swift */; };
 		08DAD2DA8D706075D9DD5BF7 /* Baby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1952F92A4C46DF608722ABC4 /* Baby.swift */; };
-		0A3B7C9D1E2F405A6B8C9D0E /* BabyRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E6D5C4B3A291807F6E5D4C3 /* BabyRecordStore.swift */; };
+		0B4BA1A6FEB8B549EFE021CE /* XiaoNaiPingShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */; };
 		0DF1426E12EBA1396D4B189D /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C2F6EB80A7A29272675554 /* QuickRecordSheet.swift */; };
 		11616CE7292AA76173CC623F /* Milestone.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F4DE3B31644AC7C6F08771 /* Milestone.swift */; };
 		148E34DD12347FEFAD1E5FAA /* VaccineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE46A4DDE313FEAE7C8B56C /* VaccineView.swift */; };
@@ -22,37 +23,92 @@
 		2A6E1C1969123A9592A91486 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE03F876BF374BCE60D48DB /* AppColors.swift */; };
 		33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF167A08D1CF3FC993C518E /* RecordRowView.swift */; };
 		3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */; };
+		444F7D35ED303A426F471487 /* CloudBackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16200DCF402E081428AF3D21 /* CloudBackupModels.swift */; };
+		4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */; };
+		4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */; };
+		4E116448BDE0520C56179427 /* XiaoNaiPingWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		52B56A3AE44424AAE287BDA6 /* WhiteNoisePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D331A6AA53B13F186F5135C0 /* WhiteNoisePlayer.swift */; };
+		56A1DF4E181FE8D54BF0D46C /* XiaoNaiPingShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */; };
+		653349C55CE087BE7F213C50 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F6FCCFED5808C93CB273B8C /* Localizable.strings */; };
+		6D1866E7072EC8D5D8A08D98 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA5406401F6B0DCAB9B4932C /* WebKit.framework */; };
+		6DECF636037A6A62D9CC5CB0 /* CloudAccountSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A360D672497C7D6D2D126760 /* CloudAccountSessionStore.swift */; };
 		7878259A00E09EE4667A88A1 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF806768531E34A93C8CF2C /* ProfileView.swift */; };
+		79ED2B9DD8CD0DB19CA54741 /* FeedingReminderLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */; };
+		7C73FB201C1558B37019DBBA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */; };
+		7D3EC060380FC5C8477255FE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D5A60428958DC54D107046F4 /* Localizable.strings */; };
+		8A4633A910FDC65E0E839BC3 /* CloudBackupAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */; };
 		8BF2B8A04D3D083C7BDEF421 /* PaperBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */; };
 		8E3F69F227825C9677BD358C /* SleepRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F36625B424397290C39CC8B /* SleepRecordView.swift */; };
+		91B413B6A8D7B935E732BB32 /* AppNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */; };
 		9304481E399CB645C3BAE1B5 /* VaccineRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D370C60F71E5A04BFAE44E30 /* VaccineRecord.swift */; };
 		9866A0C87F4060DCEF3F110A /* FeedingRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8304016F32720F0412951B /* FeedingRecordView.swift */; };
 		9C158873ECEF575C44B22AD0 /* GrowthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FFE1DFE6C7862FD672D7BF /* GrowthView.swift */; };
+		9EF07CCD1D327D402F692212 /* XiaoNaiPingWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BB1D4C5E0DB78B11AA697E /* XiaoNaiPingWidgets.swift */; };
 		A080608FFFB5F6F123AE03EA /* WatercolorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECC716FF8EABAB5EB679136 /* WatercolorCard.swift */; };
 		A1D93A5A7C959C0CE5C1B192 /* SleepRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */; };
 		A4E39787B837B452683DE5C2 /* PrimaryWatercolorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */; };
 		BA8BA48062C09F739B42A3FA /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C6209F33E5CD70DFBB904C /* AppSpacing.swift */; };
 		BF2AF9006E03D7462BA5AF0E /* SegmentedPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9423C7088F74F67315CFFAA6 /* SegmentedPill.swift */; };
+		BFDB9200F73A506C32B15517 /* white_noise_dryer.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */; };
+		C14A3ECE673DFAC77BBDED69 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791351B6EE995D204D3BF2C /* AppLocalization.swift */; };
 		CBF66084260E232F386E1786 /* AssetWatercolorImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24CD9A96CF3973AC7CF2CC5 /* AssetWatercolorImage.swift */; };
 		CE7DB93409E9D88F14212095 /* AppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */; };
 		D01BA75DF5308E03E5A8FFAA /* FeedingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AFE2FD299FC259D24148966 /* FeedingRecord.swift */; };
 		D13C9E23B968C328BE477FF0 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CBBA794A3E7C3F88C3A59F /* AppTypography.swift */; };
+		D28A42F1D540E80540B4E4FE /* CloudBackupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165452C615AFBB2715E940B1 /* CloudBackupController.swift */; };
 		D2E940A3FCC158C0A0DDB5A6 /* MilestoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */; };
+		D383D59EABCB6D3B5E0C1222 /* BabyPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */; };
 		D879214BC4BC859B3317B1A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E9593E94E8AF2693515F35B /* Assets.xcassets */; };
+		DB060DB3B7880529CFE1888B /* WechatOpenSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 087668830CF12AAAE107173E /* WechatOpenSDK */; };
 		E66BE173F3E34BEB1596EB68 /* AppShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E8A4AA606229BA5FFF6ABE /* AppShapes.swift */; };
 		F14147067E8A3AAE04141A66 /* ScreenScaffold.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7F1E8851DB82D83B5F8459 /* ScreenScaffold.swift */; };
 		F6FCF155EC6D14D11194C62C /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DEC409D4B6FEFD1F1AB714 /* SectionTitleView.swift */; };
 		F7CF382B76F5786E6C6DABB5 /* XiaoNaiPingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CE747390DA5D850A154CF2 /* XiaoNaiPingApp.swift */; };
+		F9F5FD132F2BAD8D2DB9EC9A /* WechatOpenSDKShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */; };
 		FAC14AC055EF88F0AFC0F567 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		4E0DD6237A286938D048551B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1724BE8C448FDB748B006CE9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3E8A96CD701FE5ABE25B719F;
+			remoteInfo = XiaoNaiPingWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		668D206CFAF7274FB052918A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4E116448BDE0520C56179427 /* XiaoNaiPingWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		018B099CBFF05CCCCDA3E34A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryWatercolorButton.swift; sourceTree = "<group>"; };
+		13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingReminderLiveActivityController.swift; sourceTree = "<group>"; };
+		16200DCF402E081428AF3D21 /* CloudBackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupModels.swift; sourceTree = "<group>"; };
+		165452C615AFBB2715E940B1 /* CloudBackupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupController.swift; sourceTree = "<group>"; };
 		1952F92A4C46DF608722ABC4 /* Baby.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Baby.swift; sourceTree = "<group>"; };
+		1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = white_noise_dryer.mp3; sourceTree = "<group>"; };
 		1AFE2FD299FC259D24148966 /* FeedingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingRecord.swift; sourceTree = "<group>"; };
+		1F6FCCFED5808C93CB273B8C /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = "zh-Hant-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		20CE26483B31F89D43F85E8E /* GrowthRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthRecord.swift; sourceTree = "<group>"; };
+		27BB1D4C5E0DB78B11AA697E /* XiaoNaiPingWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiaoNaiPingWidgets.swift; sourceTree = "<group>"; };
+		2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiaoNaiPingShared.swift; sourceTree = "<group>"; };
+		327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatLoginService.swift; sourceTree = "<group>"; };
 		3CE835FDA746BD464694C365 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupAPIClient.swift; sourceTree = "<group>"; };
 		3D8304016F32720F0412951B /* FeedingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingRecordView.swift; sourceTree = "<group>"; };
 		42E8A4AA606229BA5FFF6ABE /* AppShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShapes.swift; sourceTree = "<group>"; };
 		47656212072FE3DB6D875124 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -62,32 +118,69 @@
 		5F36625B424397290C39CC8B /* SleepRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRecordView.swift; sourceTree = "<group>"; };
 		606AE8CC76D08DC19404DE5A /* DiaperRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaperRecord.swift; sourceTree = "<group>"; };
 		6CF167A08D1CF3FC993C518E /* RecordRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordRowView.swift; sourceTree = "<group>"; };
+		6D09BCDC435448AA4CE4C44C /* DebugLocal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DebugLocal.entitlements; sourceTree = "<group>"; };
 		6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperBackgroundView.swift; sourceTree = "<group>"; };
-		7E6D5C4B3A291807F6E5D4C3 /* BabyRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyRecordStore.swift; sourceTree = "<group>"; };
+		77FA32F3B517D2B9C493D0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		78EAAEEA9DBE685849A2DC74 /* XiaoNaiPing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XiaoNaiPing.entitlements; sourceTree = "<group>"; };
+		812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		81C2F6EB80A7A29272675554 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
 		85DEC409D4B6FEFD1F1AB714 /* SectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitleView.swift; sourceTree = "<group>"; };
+		8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = XiaoNaiPingWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyPhoto.swift; sourceTree = "<group>"; };
 		8E9593E94E8AF2693515F35B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9288BA6A519F0205772786E1 /* DiaperRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaperRecordView.swift; sourceTree = "<group>"; };
 		9423C7088F74F67315CFFAA6 /* SegmentedPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedPill.swift; sourceTree = "<group>"; };
+		985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WechatOpenSDKShim.swift; sourceTree = "<group>"; };
 		A0F4DE3B31644AC7C6F08771 /* Milestone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Milestone.swift; sourceTree = "<group>"; };
-		A552762657F80FF3FC6A5F14 /* XiaoNaiPing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XiaoNaiPing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotificationScheduler.swift; sourceTree = "<group>"; };
+		A360D672497C7D6D2D126760 /* CloudAccountSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudAccountSessionStore.swift; sourceTree = "<group>"; };
+		A552762657F80FF3FC6A5F14 /* XiaoNaiPing.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = XiaoNaiPing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8C6209F33E5CD70DFBB904C /* AppSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSpacing.swift; sourceTree = "<group>"; };
+		AA5406401F6B0DCAB9B4932C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		B7CBB8D388EB582D25BE9B62 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hant-HK.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		B80EFE791523D472A39871F2 /* XiaoNaiPingWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XiaoNaiPingWidgets.entitlements; sourceTree = "<group>"; };
 		BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassTabBar.swift; sourceTree = "<group>"; };
 		BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAssets.swift; sourceTree = "<group>"; };
+		C791351B6EE995D204D3BF2C /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
 		CECC716FF8EABAB5EB679136 /* WatercolorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatercolorCard.swift; sourceTree = "<group>"; };
 		D24CD9A96CF3973AC7CF2CC5 /* AssetWatercolorImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWatercolorImage.swift; sourceTree = "<group>"; };
+		D331A6AA53B13F186F5135C0 /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
 		D370C60F71E5A04BFAE44E30 /* VaccineRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineRecord.swift; sourceTree = "<group>"; };
+		D5A60428958DC54D107046F4 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = "zh-Hant-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRecord.swift; sourceTree = "<group>"; };
 		D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySummary.swift; sourceTree = "<group>"; };
 		E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneView.swift; sourceTree = "<group>"; };
 		E1CBBA794A3E7C3F88C3A59F /* AppTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypography.swift; sourceTree = "<group>"; };
+		E826BC1E85FF22072F47C1F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyRecordStore.swift; sourceTree = "<group>"; };
 		EEE46A4DDE313FEAE7C8B56C /* VaccineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineView.swift; sourceTree = "<group>"; };
 		EF7F1E8851DB82D83B5F8459 /* ScreenScaffold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenScaffold.swift; sourceTree = "<group>"; };
 		FB32AE135F59AF8AD95D335B /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
 		FBE03F876BF374BCE60D48DB /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		472D59693B1DE701EAA2EE33 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB060DB3B7880529CFE1888B /* WechatOpenSDK in Frameworks */,
+				6D1866E7072EC8D5D8A08D98 /* WebKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
+		1AB54BD56BADA3D9051A93B2 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				018B099CBFF05CCCCDA3E34A /* README.md */,
+				1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
 		1C4500990296A53ED1AE65C1 /* Mock */ = {
 			isa = PBXGroup;
 			children = (
@@ -114,26 +207,58 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		590EEE23ED6BC4B285B7389F /* XiaoNaiPingWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				77FA32F3B517D2B9C493D0DD /* Info.plist */,
+				1F6FCCFED5808C93CB273B8C /* Localizable.strings */,
+				B80EFE791523D472A39871F2 /* XiaoNaiPingWidgets.entitlements */,
+				27BB1D4C5E0DB78B11AA697E /* XiaoNaiPingWidgets.swift */,
+			);
+			path = XiaoNaiPingWidgets;
+			sourceTree = "<group>";
+		};
 		5E54CB67222D50DE6512BE6E /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				A552762657F80FF3FC6A5F14 /* XiaoNaiPing.app */,
+				8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		85FA61EA3A3E79023CEA7FAB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA5406401F6B0DCAB9B4932C /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		93326666CDD561A2840ADEAF /* XiaoNaiPingShared */ = {
+			isa = PBXGroup;
+			children = (
+				2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */,
+			);
+			path = XiaoNaiPingShared;
 			sourceTree = "<group>";
 		};
 		9C75358F88DC95E4351D3976 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */,
 				1952F92A4C46DF608722ABC4 /* Baby.swift */,
-				7E6D5C4B3A291807F6E5D4C3 /* BabyRecordStore.swift */,
+				8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */,
+				ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */,
 				D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */,
 				606AE8CC76D08DC19404DE5A /* DiaperRecord.swift */,
 				1AFE2FD299FC259D24148966 /* FeedingRecord.swift */,
+				13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */,
 				20CE26483B31F89D43F85E8E /* GrowthRecord.swift */,
 				A0F4DE3B31644AC7C6F08771 /* Milestone.swift */,
 				D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */,
 				D370C60F71E5A04BFAE44E30 /* VaccineRecord.swift */,
+				D331A6AA53B13F186F5135C0 /* WhiteNoisePlayer.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -143,6 +268,7 @@
 			children = (
 				BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */,
 				FBE03F876BF374BCE60D48DB /* AppColors.swift */,
+				C791351B6EE995D204D3BF2C /* AppLocalization.swift */,
 				42E8A4AA606229BA5FFF6ABE /* AppShapes.swift */,
 				A8C6209F33E5CD70DFBB904C /* AppSpacing.swift */,
 				E1CBBA794A3E7C3F88C3A59F /* AppTypography.swift */,
@@ -154,11 +280,19 @@
 			isa = PBXGroup;
 			children = (
 				8E9593E94E8AF2693515F35B /* Assets.xcassets */,
+				6D09BCDC435448AA4CE4C44C /* DebugLocal.entitlements */,
+				E826BC1E85FF22072F47C1F3 /* Info.plist */,
+				B7CBB8D388EB582D25BE9B62 /* InfoPlist.strings */,
+				D5A60428958DC54D107046F4 /* Localizable.strings */,
+				812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */,
+				78EAAEEA9DBE685849A2DC74 /* XiaoNaiPing.entitlements */,
 				47CE747390DA5D850A154CF2 /* XiaoNaiPingApp.swift */,
+				1AB54BD56BADA3D9051A93B2 /* Audio */,
 				FBCB2A01050823514CDDF4D5 /* Components */,
 				A930C2293CC666BCA386EABE /* DesignSystem */,
 				1C4500990296A53ED1AE65C1 /* Mock */,
 				9C75358F88DC95E4351D3976 /* Models */,
+				F8FB4382004393375A468319 /* Services */,
 				27C65207645CA78CE8494796 /* Views */,
 			);
 			path = XiaoNaiPing;
@@ -168,8 +302,24 @@
 			isa = PBXGroup;
 			children = (
 				D6DA7D85ED07F801832B9992 /* XiaoNaiPing */,
+				93326666CDD561A2840ADEAF /* XiaoNaiPingShared */,
+				590EEE23ED6BC4B285B7389F /* XiaoNaiPingWidgets */,
+				85FA61EA3A3E79023CEA7FAB /* Frameworks */,
 				5E54CB67222D50DE6512BE6E /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		F8FB4382004393375A468319 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A360D672497C7D6D2D126760 /* CloudAccountSessionStore.swift */,
+				3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */,
+				165452C615AFBB2715E940B1 /* CloudBackupController.swift */,
+				16200DCF402E081428AF3D21 /* CloudBackupModels.swift */,
+				327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */,
+				985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		FBCB2A01050823514CDDF4D5 /* Components */ = {
@@ -191,19 +341,41 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3E8A96CD701FE5ABE25B719F /* XiaoNaiPingWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 448A7E0EA25B7F000DAE0A11 /* Build configuration list for PBXNativeTarget "XiaoNaiPingWidgets" */;
+			buildPhases = (
+				7D97897A9C8D2FFAD23C3560 /* Sources */,
+				E46DFFEF9586978B5E6CD279 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XiaoNaiPingWidgets;
+			packageProductDependencies = (
+			);
+			productName = XiaoNaiPingWidgets;
+			productReference = 8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		7EE57B1AC6239DBA0CAC7249 /* XiaoNaiPing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B918238196A338D0FC69C22C /* Build configuration list for PBXNativeTarget "XiaoNaiPing" */;
 			buildPhases = (
 				AC8FB4D78A81FB82402C7254 /* Sources */,
 				B1CAF6AD4BDDE4CB6D543C93 /* Resources */,
+				472D59693B1DE701EAA2EE33 /* Frameworks */,
+				668D206CFAF7274FB052918A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EA876B7998AA956EAA1C551E /* PBXTargetDependency */,
 			);
 			name = XiaoNaiPing;
 			packageProductDependencies = (
+				087668830CF12AAAE107173E /* WechatOpenSDK */,
 			);
 			productName = XiaoNaiPing;
 			productReference = A552762657F80FF3FC6A5F14 /* XiaoNaiPing.app */;
@@ -218,25 +390,36 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					3E8A96CD701FE5ABE25B719F = {
+						DevelopmentTeam = JGCT3GY9CT;
+						ProvisioningStyle = Automatic;
+					};
 					7EE57B1AC6239DBA0CAC7249 = {
+						DevelopmentTeam = JGCT3GY9CT;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
 			buildConfigurationList = 45F422DB552D19AC0AD7299E /* Build configuration list for PBXProject "XiaoNaiPing" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				en,
+				"zh-Hans",
+				"zh-Hant-HK",
 			);
 			mainGroup = EF96888426449843D6BC6563;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				97D7DB5888151BF728217DCB /* XCRemoteSwiftPackageReference "WechatOpenSDK" */,
+			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				7EE57B1AC6239DBA0CAC7249 /* XiaoNaiPing */,
+				3E8A96CD701FE5ABE25B719F /* XiaoNaiPingWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -247,12 +430,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				D879214BC4BC859B3317B1A7 /* Assets.xcassets in Resources */,
+				0518D507F3458D2B58872BAD /* InfoPlist.strings in Resources */,
+				7D3EC060380FC5C8477255FE /* Localizable.strings in Resources */,
+				7C73FB201C1558B37019DBBA /* PrivacyInfo.xcprivacy in Resources */,
+				BFDB9200F73A506C32B15517 /* white_noise_dryer.mp3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E46DFFEF9586978B5E6CD279 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				653349C55CE087BE7F213C50 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7D97897A9C8D2FFAD23C3560 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56A1DF4E181FE8D54BF0D46C /* XiaoNaiPingShared.swift in Sources */,
+				9EF07CCD1D327D402F692212 /* XiaoNaiPingWidgets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AC8FB4D78A81FB82402C7254 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -260,17 +464,25 @@
 				0012DE012789FED73D28714E /* AlbumView.swift in Sources */,
 				CE7DB93409E9D88F14212095 /* AppAssets.swift in Sources */,
 				2A6E1C1969123A9592A91486 /* AppColors.swift in Sources */,
+				C14A3ECE673DFAC77BBDED69 /* AppLocalization.swift in Sources */,
+				91B413B6A8D7B935E732BB32 /* AppNotificationScheduler.swift in Sources */,
 				E66BE173F3E34BEB1596EB68 /* AppShapes.swift in Sources */,
 				BA8BA48062C09F739B42A3FA /* AppSpacing.swift in Sources */,
 				D13C9E23B968C328BE477FF0 /* AppTypography.swift in Sources */,
 				CBF66084260E232F386E1786 /* AssetWatercolorImage.swift in Sources */,
 				08DAD2DA8D706075D9DD5BF7 /* Baby.swift in Sources */,
-				0A3B7C9D1E2F405A6B8C9D0E /* BabyRecordStore.swift in Sources */,
+				D383D59EABCB6D3B5E0C1222 /* BabyPhoto.swift in Sources */,
+				4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */,
+				6DECF636037A6A62D9CC5CB0 /* CloudAccountSessionStore.swift in Sources */,
+				8A4633A910FDC65E0E839BC3 /* CloudBackupAPIClient.swift in Sources */,
+				D28A42F1D540E80540B4E4FE /* CloudBackupController.swift in Sources */,
+				444F7D35ED303A426F471487 /* CloudBackupModels.swift in Sources */,
 				FAC14AC055EF88F0AFC0F567 /* DailySummary.swift in Sources */,
 				194395CFEB808694D6C9A8AF /* DiaperRecord.swift in Sources */,
 				2789B2894670943DB6B8637F /* DiaperRecordView.swift in Sources */,
 				D01BA75DF5308E03E5A8FFAA /* FeedingRecord.swift in Sources */,
 				9866A0C87F4060DCEF3F110A /* FeedingRecordView.swift in Sources */,
+				79ED2B9DD8CD0DB19CA54741 /* FeedingReminderLiveActivityController.swift in Sources */,
 				03C9A29BE10178FE92BAC0F7 /* GrowthRecord.swift in Sources */,
 				9C158873ECEF575C44B22AD0 /* GrowthView.swift in Sources */,
 				1B057166B341948E60BA0B4E /* HomeView.swift in Sources */,
@@ -292,11 +504,23 @@
 				9304481E399CB645C3BAE1B5 /* VaccineRecord.swift in Sources */,
 				148E34DD12347FEFAD1E5FAA /* VaccineView.swift in Sources */,
 				A080608FFFB5F6F123AE03EA /* WatercolorCard.swift in Sources */,
+				4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */,
+				F9F5FD132F2BAD8D2DB9EC9A /* WechatOpenSDKShim.swift in Sources */,
+				52B56A3AE44424AAE287BDA6 /* WhiteNoisePlayer.swift in Sources */,
 				F7CF382B76F5786E6C6DABB5 /* XiaoNaiPingApp.swift in Sources */,
+				0B4BA1A6FEB8B549EFE021CE /* XiaoNaiPingShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EA876B7998AA956EAA1C551E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3E8A96CD701FE5ABE25B719F /* XiaoNaiPingWidgets */;
+			targetProxy = 4E0DD6237A286938D048551B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		42B65B39F9883E95D9AB3B15 /* Debug */ = {
@@ -364,6 +588,54 @@
 			};
 			name = Debug;
 		};
+		584C36096DE59705884892DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGNING_ALLOWED[sdk=iphoneos*]" = YES;
+				"CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=iphoneos*]" = YES;
+				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
+				CODE_SIGN_ENTITLEMENTS = XiaoNaiPingWidgets/XiaoNaiPingWidgets.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = XiaoNaiPingWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping.widgets;
+				PRODUCT_NAME = XiaoNaiPingWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6246850CBA6215DD4F48C33A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = XiaoNaiPingWidgets/XiaoNaiPingWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = XiaoNaiPingWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping.widgets;
+				PRODUCT_NAME = XiaoNaiPingWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		B3AB3098299F91B1BB8C2469 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -373,16 +645,14 @@
 				"CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]" = NO;
 				"CODE_SIGNING_REQUIRED[sdk=iphoneos*]" = YES;
 				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
+				CODE_SIGN_ENTITLEMENTS = XiaoNaiPing/XiaoNaiPing.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JGCT3GY9CT;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "小奶瓶";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = XiaoNaiPing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -392,6 +662,11 @@
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
+				XNP_API_BASE_URL = "";
+				XNP_ASSOCIATED_DOMAIN = "applinks:api.mewpow.com";
+				XNP_WECHAT_APP_ID = "";
+				XNP_WECHAT_UNIVERSAL_LINK = "";
+				XNP_WECHAT_URL_SCHEME = "";
 			};
 			name = Debug;
 		};
@@ -458,14 +733,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = XiaoNaiPing/XiaoNaiPing.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JGCT3GY9CT;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "小奶瓶";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = XiaoNaiPing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -475,12 +748,26 @@
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
+				XNP_API_BASE_URL = "https://api.mewpow.com/xiaonaiping";
+				XNP_ASSOCIATED_DOMAIN = "applinks:api.mewpow.com";
+				XNP_WECHAT_APP_ID = "$(XNP_WECHAT_APP_ID)";
+				XNP_WECHAT_UNIVERSAL_LINK = "https://api.mewpow.com/xiaonaiping/wechat/";
+				XNP_WECHAT_URL_SCHEME = "$(XNP_WECHAT_URL_SCHEME)";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		448A7E0EA25B7F000DAE0A11 /* Build configuration list for PBXNativeTarget "XiaoNaiPingWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				584C36096DE59705884892DE /* Debug */,
+				6246850CBA6215DD4F48C33A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		45F422DB552D19AC0AD7299E /* Build configuration list for PBXProject "XiaoNaiPing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -500,6 +787,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		97D7DB5888151BF728217DCB /* XCRemoteSwiftPackageReference "WechatOpenSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yanyin1986/WechatOpenSDK.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		087668830CF12AAAE107173E /* WechatOpenSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97D7DB5888151BF728217DCB /* XCRemoteSwiftPackageReference "WechatOpenSDK" */;
+			productName = WechatOpenSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1724BE8C448FDB748B006CE9 /* Project object */;
 }

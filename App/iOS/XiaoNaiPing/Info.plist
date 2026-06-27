@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh-Hans</string>
+	<key>CFBundleDisplayName</key>
+	<string>小奶瓶</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.mewpow.xiaonaiping.wechat</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(XNP_WECHAT_URL_SCHEME)</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>weixin</string>
+		<string>weixinULAPI</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>用于用户主动拍摄并保存宝宝照片到小奶瓶。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>用于用户主动选择宝宝照片并复制到小奶瓶私有空间。</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations~iphone</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>XNPAPIBaseURL</key>
+	<string>$(XNP_API_BASE_URL)</string>
+	<key>XNPWeChatAppID</key>
+	<string>$(XNP_WECHAT_APP_ID)</string>
+	<key>XNPWeChatURLScheme</key>
+	<string>$(XNP_WECHAT_URL_SCHEME)</string>
+	<key>XNPWeChatUniversalLink</key>
+	<string>$(XNP_WECHAT_UNIVERSAL_LINK)</string>
+</dict>
+</plist>

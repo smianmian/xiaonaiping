@@ -21,7 +21,7 @@
 
 ## 待我确认的问题
 
-1. 最低 iOS 版本和测试设备范围。
+1. 真机设备池；本机模拟器测试固定使用 iOS 26.5。
 2. 是否需要 iPad 适配。
 3. 云端数据保留周期和删除 SLA。
 4. TestFlight / App Store Connect 真实崩溃样本脱敏归档方式。
@@ -92,10 +92,29 @@
 - [ ] 云端照片删除失败重试。
 - [ ] 删除账号后云端记录和照片不可恢复。
 
+## 第一轮体验升级测试
+
+- [ ] 喂养时间可按任意分钟保存，今日摘要和喂养列表显示距上次喂养。
+- [ ] 有喂养时长时按上一顿结束时间计算间隔；无时长时回退发生时间。
+- [ ] 喝奶闹钟可选择只提醒一次或 2/2.5/3/3.5/4 小时间隔继续提醒；取消后本地通知和 Live Activity 均结束。
+- [ ] 已设置固定喝奶间隔后，新增喂养可用 5 分钟一档滚动选择顺延 0-30 分钟；下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排。
+- [ ] 睡眠进行中状态不计入今日已结束睡眠；可补录醒来时间。
+- [ ] 安静育儿模式默认开启；开启后白噪音不会误播放，关闭后可手动播放。
+- [ ] App Group 今日快照写入不影响本地保存。
+- [ ] 小组件未建档、无记录、有记录、进行中睡眠、下一次喝奶闹钟均正常展示。
+- [ ] 灵动岛/锁屏 Live Activity 显示下一次喝奶时间和固定间隔；App 回到前台后会刷新下一次提醒。
+- [ ] 灵动岛/锁屏 Live Activity 不显示医疗、健康建议、压力评估、宝宝备注、照片原图、token 或云端对象 key。
+- [ ] 小组件只读展示 App Group 今日快照，不写业务记录，不展示照片原图、备注、账号、恢复密钥、云端 token、对象 key 或备份状态。
+- [ ] 审核说明明确灵动岛/小组件数据来自用户本机记录，不接入 HealthKit、传感器、医院系统或第三方健康数据源。
+- [x] TestFlight 客户端静态预检通过：`Backend/proof/testflight-precheck.json`。
+- [x] TestFlight / 真机回归清单预检通过：`Backend/proof/testflight-regression-plan.json`。
+
 ## iOS 兼容测试
 
-- [ ] 小屏 iPhone。
-- [ ] 大屏 iPhone。
+- [ ] iOS 26.5 小屏 iPhone。
+- [x] iOS 26.5 大屏 iPhone 模拟器 Release 构建：`/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5`，设备 `iPhone 17 Pro`。
+- [x] iOS 26.5 Release Simulator / iPhoneOS 构建 proof 通过：`Backend/proof/ios-265-build.json`。
+- [x] iOS 26.5 大屏 iPhone 模拟器安装启动烟测通过：`Backend/proof/sim-launch-ios265-20260626.json`。
 - [ ] 动态字体。
 - [ ] 深色模式，若确认为 v1 要求。
 - [ ] Reduce Motion。

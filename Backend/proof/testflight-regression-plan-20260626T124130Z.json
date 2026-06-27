@@ -1,0 +1,88 @@
+{
+  "startedAt": "2026-06-26T12:41:44+00:00",
+  "completedAt": "2026-06-26T12:41:44+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "regressionPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/TEST_ACCOUNT_AND_REAL_DEVICE_REGRESSION.md"
+    },
+    "realDeviceRegressionTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/AppStoreEvidence/12-real-device-regression.template.md"
+    },
+    "realDeviceRegressionTemplateStrict": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device evidence template keeps iOS 26.5, exact TestFlight/signed-device install method, RD-01..RD-24, and review boundary requirements"
+    },
+    "reviewAccountRedactedProofPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "redacted review account proof is verified and secret-free"
+    },
+    "appReviewLoginInstructionsSafe": {
+      "passed": true,
+      "required": true,
+      "evidence": "recovery-key review login path is documented and debug/unfinished WeChat substitutes are forbidden"
+    },
+    "realDeviceEnvironmentPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device/TestFlight environment, network, region, and evidence path are present"
+    },
+    "ios265SmokeProofReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 simulator launch proof is referenced and explicitly not treated as TestFlight evidence"
+    },
+    "ios265SmokeTextMatchesProof": {
+      "passed": true,
+      "required": true,
+      "evidence": "launchOutput=com.mewpow.xiaonaiping: 92544"
+    },
+    "ios265DeviceAvailabilityProofReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 physical-device availability proof is referenced and non-26.5 devices are excluded"
+    },
+    "regressionCaseIdsComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "RD-01 through RD-24 are present"
+    },
+    "regressionCoverageComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "all required real-device regression areas are covered"
+    },
+    "externalAuthCasesMarkedPending": {
+      "passed": true,
+      "required": true,
+      "evidence": "SMS and WeChat cases are explicitly pending real providers"
+    },
+    "passCriteriaSeparateExternalAuthAndEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "pass criteria separates real-provider auth from core regression and requires evidence"
+    },
+    "realDeviceEvidenceGateSeparated": {
+      "passed": true,
+      "required": true,
+      "evidence": "plan explicitly states TestFlight/signed-device regression is still incomplete and points to 12-real-device-regression.md"
+    },
+    "reviewBoundaryCasesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Live Activity/widget/review boundary terms are present"
+    },
+    "regressionPlanDoesNotExposeSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "no recovery key assignments, tokens, debug codes, or API-key markers found"
+    }
+  }
+}

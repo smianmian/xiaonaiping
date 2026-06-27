@@ -1,0 +1,16 @@
+{
+  "name": "xiaonaiping-aliyun-sms-adapter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "XiaoNaiPing signed SMS webhook adapter for Alibaba Cloud Dysmsapi SendSms.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@alicloud/pop-core": "^1.7.13"
+  }
+}

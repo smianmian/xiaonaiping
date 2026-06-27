@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-06-27T00:38:00+08:00",
+  "status": "iOS 26.5 Debug simulator App Store screenshot candidates with screenshot seed data; not a TestFlight, signed-device, or Release build final evidence substitute",
+  "device": {
+    "name": "iPhone 17 Pro",
+    "udid": "07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4",
+    "runtime": "iOS 26.5"
+  },
+  "app": {
+    "path": "/tmp/XiaoNaiPing-DebugScreenshots-26_5/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "sdkName": "iphonesimulator26.5"
+  },
+  "buildLog": "Backend/proof/xcodebuild-debug-screenshots-ios265-20260627.log",
+  "command": "SIMCTL_CHILD_XNP_API_BASE_URL=https://api.mewpow.com/xiaonaiping python3 Backend/scripts/capture_ios_screenshots.py --device 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 --app /tmp/XiaoNaiPing-DebugScreenshots-26_5/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app --output-dir Docs/08_Release/Screenshots --tabs home record growth profile profile-backup --settle-seconds 2.5",
+  "stagingFiles": [
+    "Docs/08_Release/Screenshots/home-iphone16pro.png",
+    "Docs/08_Release/Screenshots/record-iphone16pro.png",
+    "Docs/08_Release/Screenshots/growth-iphone16pro.png",
+    "Docs/08_Release/Screenshots/profile-iphone16pro.png",
+    "Docs/08_Release/Screenshots/profile-backup-iphone16pro.png"
+  ],
+  "finalFiles": [
+    "01-home-iphone16pro.png",
+    "02-record-iphone16pro.png",
+    "03-growth-iphone16pro.png",
+    "04-profile-iphone16pro.png",
+    "05-profile-backup-iphone16pro.png"
+  ]
+}

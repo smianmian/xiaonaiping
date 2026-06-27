@@ -18,6 +18,8 @@ final class BabyRecordStore: ObservableObject {
     @Published var milestones: [Milestone] = []
     @Published var babyPhotos: [BabyPhoto] = []
     @Published var photoCount = 0
+    @Published var quietCareModeEnabled = true
+    @Published var feedingLiveActivityEnabled = true
     @Published var saveErrorMessage: String?
 
     private let fileManager = FileManager.default
@@ -30,6 +32,7 @@ final class BabyRecordStore: ObservableObject {
         }
 
         normalizeRecordsForCurrentBaby()
+        writeSharedTodaySnapshot()
     }
 
     private func applyMockData() {
@@ -74,12 +77,24 @@ final class BabyRecordStore: ObservableObject {
         todayFeedingRecords.compactMap(\.amountML).reduce(0, +)
     }
 
+    var lastFeedingRecord: FeedingRecord? {
+        todayFeedingRecords.first
+    }
+
+    var lastFeedingIntervalText: String {
+        guard let record = lastFeedingRecord else { return "暂无" }
+        return Self.elapsedText(since: Self.feedingEndDate(record), now: Date())
+    }
+
     var sleepDurationText: String {
         Self.durationText(from: totalSleepMinutes)
     }
 
     var totalSleepMinutes: Int {
-        todaySleepRecords.compactMap(\.durationMinutes).reduce(0, +)
+        todaySleepRecords
+            .filter { !$0.isOngoing }
+            .compactMap(\.durationMinutes)
+            .reduce(0, +)
     }
 
     var ongoingSleep: SleepRecord? {
@@ -112,9 +127,11 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var nextFeedingReminder: FeedingReminder? {
-        guard let feedingReminder, feedingReminder.remindAt > Date() else {
+        guard var feedingReminder,
+              let nextRemindAt = feedingReminder.nextRemindAt(after: Date()) else {
             return nil
         }
+        feedingReminder.remindAt = nextRemindAt
         return feedingReminder
     }
 
@@ -289,6 +306,34 @@ final class BabyRecordStore: ObservableObject {
 
     func clearSaveError() {
         saveErrorMessage = nil
+    }
+
+    func setQuietCareModeEnabled(_ isEnabled: Bool) {
+        quietCareModeEnabled = isEnabled
+        saveState()
+    }
+
+    func setFeedingLiveActivityEnabled(_ isEnabled: Bool) {
+        feedingLiveActivityEnabled = isEnabled
+        saveState()
+    }
+
+    func feedingIntervalText(before record: FeedingRecord) -> String {
+        let records = feedingRecords.sorted { $0.occurredAt > $1.occurredAt }
+        guard let index = records.firstIndex(where: { $0.id == record.id }),
+              records.indices.contains(index + 1) else {
+            return "首次记录".localizedText
+        }
+
+        let previous = records[index + 1]
+        let minutes = Calendar.current.dateComponents(
+            [.minute],
+            from: Self.feedingEndDate(previous),
+            to: record.occurredAt
+        ).minute ?? 0
+
+        guard minutes > 0 else { return "间隔很近".localizedText }
+        return Self.durationText(from: minutes)
     }
 
     @discardableResult
@@ -514,6 +559,33 @@ final class BabyRecordStore: ObservableObject {
         baby.daysSinceBirth = Self.daysSinceBirth(from: birthDate)
         baby.ageText = Self.ageText(from: birthDate)
         saveState()
+    }
+
+    @discardableResult
+    func updateBabyAvatar(data: Data) -> Bool {
+        let previousAvatar = baby.avatarImageData
+        guard let avatarData = sanitizedAvatarJPEGData(from: data) else {
+            saveErrorMessage = "头像保存失败，请换一张照片再试。"
+            return false
+        }
+
+        baby.avatarImageData = avatarData
+        guard saveState() else {
+            baby.avatarImageData = previousAvatar
+            return false
+        }
+        return true
+    }
+
+    @discardableResult
+    func clearBabyAvatar() -> Bool {
+        let previousAvatar = baby.avatarImageData
+        baby.avatarImageData = nil
+        guard saveState() else {
+            baby.avatarImageData = previousAvatar
+            return false
+        }
+        return true
     }
 
     func deleteBabyProfileAndLocalRecords() {
@@ -801,6 +873,12 @@ final class BabyRecordStore: ObservableObject {
         }
         if let reminder = feedingReminder {
             guard reminder.remindAt > Date() else {
+                if reminder.nextRemindAt(after: Date()) != nil {
+                    var normalized = reminder
+                    normalized.babyId = baby.id
+                    feedingReminder = normalized
+                    return
+                }
                 feedingReminder = nil
                 return
             }
@@ -828,6 +906,8 @@ final class BabyRecordStore: ObservableObject {
         vaccineRecords = state.vaccineRecords
         milestones = state.milestones
         babyPhotos = state.babyPhotos
+        quietCareModeEnabled = state.quietCareModeEnabled
+        feedingLiveActivityEnabled = state.feedingLiveActivityEnabled
         photoCount = babyPhotos.count
 
         if baby.id == Self.legacyMockBabyID {
@@ -847,7 +927,9 @@ final class BabyRecordStore: ObservableObject {
             growthRecords: growthRecords,
             vaccineRecords: vaccineRecords,
             milestones: milestones,
-            babyPhotos: babyPhotos
+            babyPhotos: babyPhotos,
+            quietCareModeEnabled: quietCareModeEnabled,
+            feedingLiveActivityEnabled: feedingLiveActivityEnabled
         )
 
         do {
@@ -855,6 +937,7 @@ final class BabyRecordStore: ObservableObject {
             try ensureApplicationSupportDirectory()
             try data.write(to: stateURL, options: [.atomic])
             try markExcludedFromBackup(stateURL)
+            writeSharedTodaySnapshot()
             saveErrorMessage = nil
             return true
         } catch {
@@ -896,6 +979,19 @@ final class BabyRecordStore: ObservableObject {
         }
 
         return sanitizedData
+    }
+
+    private func sanitizedAvatarJPEGData(from data: Data) -> Data? {
+        guard let image = UIImage(data: data) else { return nil }
+        let maxSide: CGFloat = 512
+        let longestSide = max(image.size.width, image.size.height)
+        let scale = longestSide > maxSide ? maxSide / longestSide : 1
+        let targetSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let resized = renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+        return resized.jpegData(compressionQuality: 0.84)
     }
 
     private func markExcludedFromBackup(_ url: URL) throws {
@@ -981,6 +1077,52 @@ final class BabyRecordStore: ObservableObject {
         }
 
         return AppLocalization.format("%d小时%d分", hours, remainingMinutes)
+    }
+
+    private static func feedingEndDate(_ record: FeedingRecord) -> Date {
+        guard let durationMinutes = record.durationMinutes, durationMinutes > 0,
+              let endDate = Calendar.current.date(byAdding: .minute, value: durationMinutes, to: record.occurredAt) else {
+            return record.occurredAt
+        }
+
+        return endDate
+    }
+
+    private static func elapsedText(since date: Date, now: Date) -> String {
+        let minutes = max(0, Calendar.current.dateComponents([.minute], from: date, to: now).minute ?? 0)
+        if minutes < 1 {
+            return "刚刚".localizedText
+        }
+        if minutes < 60 {
+            return AppLocalization.format("%d分钟前", minutes)
+        }
+        let hours = minutes / 60
+        let remainingMinutes = minutes % 60
+        if remainingMinutes == 0 {
+            return AppLocalization.format("%d小时前", hours)
+        }
+        return AppLocalization.format("%d小时%d分前", hours, remainingMinutes)
+    }
+
+    private func makeSharedTodaySnapshot() -> SharedTodaySnapshot {
+        SharedTodaySnapshot(
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            babyName: baby.name,
+            daysSinceBirth: baby.daysSinceBirth,
+            feedingCount: feedingCount,
+            milkAmountML: milkAmountML,
+            lastFeedingAt: lastFeedingRecord.map(Self.feedingEndDate),
+            ongoingSleepStartAt: ongoingSleep?.startAt,
+            nextFeedingReminderAt: nextFeedingReminder?.remindAt,
+            feedingReminderRepeatIntervalMinutes: nextFeedingReminder?.repeatIntervalMinutes,
+            poopCount: poopCount,
+            peeCount: peeCount,
+            generatedAt: Date()
+        )
+    }
+
+    private func writeSharedTodaySnapshot() {
+        try? XiaoNaiPingSharedStore.writeSnapshot(makeSharedTodaySnapshot())
     }
 
     static func date(fromTimeString time: String) -> Date {
@@ -1089,6 +1231,8 @@ private struct LocalAppState: Codable {
     var vaccineRecords: [VaccineRecord]
     var milestones: [Milestone]
     var babyPhotos: [BabyPhoto]
+    var quietCareModeEnabled: Bool
+    var feedingLiveActivityEnabled: Bool
 
     private enum CodingKeys: String, CodingKey {
         case hasCompletedOnboarding
@@ -1101,6 +1245,8 @@ private struct LocalAppState: Codable {
         case vaccineRecords
         case milestones
         case babyPhotos
+        case quietCareModeEnabled
+        case feedingLiveActivityEnabled
     }
 
     init(
@@ -1113,7 +1259,9 @@ private struct LocalAppState: Codable {
         growthRecords: [GrowthRecord],
         vaccineRecords: [VaccineRecord],
         milestones: [Milestone],
-        babyPhotos: [BabyPhoto]
+        babyPhotos: [BabyPhoto],
+        quietCareModeEnabled: Bool = true,
+        feedingLiveActivityEnabled: Bool = true
     ) {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
@@ -1125,6 +1273,8 @@ private struct LocalAppState: Codable {
         self.vaccineRecords = vaccineRecords
         self.milestones = milestones
         self.babyPhotos = babyPhotos
+        self.quietCareModeEnabled = quietCareModeEnabled
+        self.feedingLiveActivityEnabled = feedingLiveActivityEnabled
     }
 
     init(from decoder: Decoder) throws {
@@ -1139,6 +1289,8 @@ private struct LocalAppState: Codable {
         vaccineRecords = try container.decode([VaccineRecord].self, forKey: .vaccineRecords)
         milestones = try container.decode([Milestone].self, forKey: .milestones)
         babyPhotos = try container.decode([BabyPhoto].self, forKey: .babyPhotos)
+        quietCareModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .quietCareModeEnabled) ?? true
+        feedingLiveActivityEnabled = try container.decodeIfPresent(Bool.self, forKey: .feedingLiveActivityEnabled) ?? true
     }
 }
 

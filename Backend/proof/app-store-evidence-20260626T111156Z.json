@@ -1,0 +1,198 @@
+{
+  "startedAt": "2026-06-26T11:11:59+00:00",
+  "completedAt": "2026-06-26T11:11:59+00:00",
+  "ready": false,
+  "missingEvidence": [
+    "companyAccount",
+    "mainlandAvailability",
+    "mainlandFiling",
+    "privacyLabel",
+    "signedArchive",
+    "testFlight",
+    "smsProvider",
+    "wechatOpenPlatform",
+    "huaweiObsPolicy",
+    "realDeviceRegression"
+  ],
+  "evidenceRoot": "Docs/08_Release/AppStoreEvidence",
+  "checks": {
+    "companyAccount": {
+      "passed": false,
+      "description": "深圳市闪现生活科技有限公司 App Store Connect 主体证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/01-company-account.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "mainlandAvailability": {
+      "passed": false,
+      "description": "App Store Connect 只选择中国大陆可售地区",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/02-mainland-availability.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "mainlandFiling": {
+      "passed": false,
+      "description": "中国大陆 APP 备案或适用判断证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/03-app-filing.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "privacyLabel": {
+      "passed": false,
+      "description": "App Store Connect 隐私标签截图或导出",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/04-privacy-label.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "signedArchive": {
+      "passed": false,
+      "description": "App Store Distribution Archive 成功证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/05-signed-archive.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "testFlight": {
+      "passed": false,
+      "description": "TestFlight 构建和测试状态证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/06-testflight.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "smsProvider": {
+      "passed": false,
+      "description": "真实短信签名、模板和验证码发送成功证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/07-sms-provider.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "wechatOpenPlatform": {
+      "passed": false,
+      "description": "微信开放平台移动应用、Bundle ID、URL Scheme / Universal Link 配置证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "huaweiObsPolicy": {
+      "passed": false,
+      "description": "华为云 OBS bucket、生命周期、加密和删除验证证据",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/09-obs-policy.*"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".json",
+        ".pdf",
+        ".png"
+      ],
+      "minFiles": 1,
+      "files": []
+    },
+    "finalScreenshots": {
+      "passed": true,
+      "description": "最终 App Store 截图，不使用真实宝宝照片",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/*.png",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/*.jpg",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/*.jpeg"
+      ],
+      "allowedExtensions": [
+        ".jpeg",
+        ".jpg",
+        ".png"
+      ],
+      "minFiles": 5,
+      "files": [
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/01-home-iphone16pro.png",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/02-record-iphone16pro.png",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/03-growth-iphone16pro.png",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/04-profile-iphone16pro.png",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/05-profile-backup-iphone16pro.png"
+      ]
+    },
+    "realDeviceRegression": {
+      "passed": false,
+      "description": "TestFlight 或签名真机回归结果",
+      "patterns": [
+        "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md"
+      ],
+      "allowedExtensions": [
+        ".md"
+      ],
+      "minFiles": 1,
+      "files": []
+    }
+  }
+}
