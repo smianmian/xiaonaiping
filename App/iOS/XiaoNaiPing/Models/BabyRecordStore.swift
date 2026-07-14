@@ -2,6 +2,14 @@ import Foundation
 import Combine
 import UIKit
 
+extension Notification.Name {
+    static let babyRecordStoreDidSave = Notification.Name("babyRecordStoreDidSave")
+}
+
+private enum PhotoImportError: Error {
+    case saveFailed
+}
+
 final class BabyRecordStore: ObservableObject {
     static let mainlandVaccineRegion = "中国大陆"
     static let hongKongVaccineRegion = "香港"
@@ -352,9 +360,15 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteFeedingRecord(_ record: FeedingRecord) {
+    @discardableResult
+    func deleteFeedingRecord(_ record: FeedingRecord) -> Bool {
+        let previous = feedingRecords
         feedingRecords.removeAll { $0.id == record.id }
-        saveState()
+        guard saveState() else {
+            feedingRecords = previous
+            return false
+        }
+        return true
     }
 
     @discardableResult
@@ -398,9 +412,15 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteSleepRecord(_ record: SleepRecord) {
+    @discardableResult
+    func deleteSleepRecord(_ record: SleepRecord) -> Bool {
+        let previous = sleepRecords
         sleepRecords.removeAll { $0.id == record.id }
-        saveState()
+        guard saveState() else {
+            sleepRecords = previous
+            return false
+        }
+        return true
     }
 
     @discardableResult
@@ -466,9 +486,15 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteDiaperRecord(_ record: DiaperRecord) {
+    @discardableResult
+    func deleteDiaperRecord(_ record: DiaperRecord) -> Bool {
+        let previous = diaperRecords
         diaperRecords.removeAll { $0.id == record.id }
-        saveState()
+        guard saveState() else {
+            diaperRecords = previous
+            return false
+        }
+        return true
     }
 
     @discardableResult
@@ -486,9 +512,15 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteGrowthRecord(_ record: GrowthRecord) {
+    @discardableResult
+    func deleteGrowthRecord(_ record: GrowthRecord) -> Bool {
+        let previous = growthRecords
         growthRecords.removeAll { $0.id == record.id }
-        saveState()
+        guard saveState() else {
+            growthRecords = previous
+            return false
+        }
+        return true
     }
 
     @discardableResult
@@ -511,13 +543,21 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteVaccineRecord(_ record: VaccineRecord) {
+    @discardableResult
+    func deleteVaccineRecord(_ record: VaccineRecord) -> Bool {
+        let previous = vaccineRecords
         vaccineRecords.removeAll { $0.id == record.id }
-        saveState()
+        guard saveState() else {
+            vaccineRecords = previous
+            return false
+        }
+        return true
     }
 
-    func toggleVaccineCompleted(_ record: VaccineRecord) {
-        guard let index = vaccineRecords.firstIndex(where: { $0.id == record.id }) else { return }
+    @discardableResult
+    func toggleVaccineCompleted(_ record: VaccineRecord) -> Bool {
+        guard let index = vaccineRecords.firstIndex(where: { $0.id == record.id }) else { return false }
+        let previous = vaccineRecords
         if vaccineRecords[index].isAdministered {
             vaccineRecords[index].status = VaccineRecord.pendingStatus
             vaccineRecords[index].tintName = "orange"
@@ -529,7 +569,11 @@ final class BabyRecordStore: ObservableObject {
             vaccineRecords[index].icon = AppAssets.cameraIcon
             vaccineRecords[index].administeredAt = Date()
         }
-        saveState()
+        guard saveState() else {
+            vaccineRecords = previous
+            return false
+        }
+        return true
     }
 
     @discardableResult
@@ -547,9 +591,15 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    func deleteMilestone(_ milestone: Milestone) {
+    @discardableResult
+    func deleteMilestone(_ milestone: Milestone) -> Bool {
+        let previous = milestones
         milestones.removeAll { $0.id == milestone.id }
-        saveState()
+        guard saveState() else {
+            milestones = previous
+            return false
+        }
+        return true
     }
 
     func updateBaby(name: String, birthDate: Date, sex: String) {
@@ -651,9 +701,13 @@ final class BabyRecordStore: ObservableObject {
         }
 
         guard !newRecords.isEmpty else { return [] }
+        let previous = vaccineRecords
         vaccineRecords.append(contentsOf: newRecords)
         vaccineRecords.sort { ($0.dueDays ?? Int.max) < ($1.dueDays ?? Int.max) }
-        saveState()
+        guard saveState() else {
+            vaccineRecords = previous
+            return []
+        }
         return newRecords
     }
 
@@ -680,9 +734,15 @@ final class BabyRecordStore: ObservableObject {
             localFileName: fileName,
             source: source
         )
+        let previous = babyPhotos
         babyPhotos.insert(photo, at: 0)
         photoCount = babyPhotos.count
-        saveState()
+        guard saveState() else {
+            babyPhotos = previous
+            photoCount = previous.count
+            try? fileManager.removeItem(at: destinationURL)
+            throw PhotoImportError.saveFailed
+        }
     }
 
     func updatePhoto(_ photo: BabyPhoto, capturedAt: Date, note: String) {
@@ -692,11 +752,18 @@ final class BabyRecordStore: ObservableObject {
         saveState()
     }
 
-    func deletePhoto(_ photo: BabyPhoto) {
-        try? fileManager.removeItem(at: photoURL(for: photo))
+    @discardableResult
+    func deletePhoto(_ photo: BabyPhoto) -> Bool {
+        let previous = babyPhotos
         babyPhotos.removeAll { $0.id == photo.id }
         photoCount = babyPhotos.count
-        saveState()
+        guard saveState() else {
+            babyPhotos = previous
+            photoCount = previous.count
+            return false
+        }
+        try? fileManager.removeItem(at: photoURL(for: photo))
+        return true
     }
 
     func photoURL(for photo: BabyPhoto) -> URL {
@@ -939,6 +1006,7 @@ final class BabyRecordStore: ObservableObject {
             try markExcludedFromBackup(stateURL)
             writeSharedTodaySnapshot()
             saveErrorMessage = nil
+            NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
             return true
         } catch {
             saveErrorMessage = "本地保存失败，请检查设备存储空间后重试。"

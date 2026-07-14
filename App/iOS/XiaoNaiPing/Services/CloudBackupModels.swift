@@ -3,7 +3,6 @@ import Foundation
 struct CloudAccountSession: Codable, Equatable {
     var accountId: String
     var sessionToken: String
-    var recoveryKey: String?
     var createdAt: String?
     var authProvider: String?
 }
@@ -69,7 +68,6 @@ struct CloudServerError: Decodable {
 enum CloudBackupError: LocalizedError {
     case missingBaseURL
     case missingSession
-    case missingRecoveryKey
     case invalidPhoneNumber
     case invalidVerificationCode
     case invalidResponse
@@ -80,9 +78,7 @@ enum CloudBackupError: LocalizedError {
         case .missingBaseURL:
             return "云端服务尚未配置。"
         case .missingSession:
-            return "请先创建账号并完成一次备份。"
-        case .missingRecoveryKey:
-            return "请输入恢复密钥。"
+            return "请先登录账号。"
         case .invalidPhoneNumber:
             return "手机号格式不正确。请使用以 + 开头的 E.164 格式，例如 +8613800138000。"
         case .invalidVerificationCode:

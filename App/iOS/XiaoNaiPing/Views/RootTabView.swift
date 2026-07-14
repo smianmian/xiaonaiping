@@ -36,7 +36,9 @@ struct RootTabView: View {
 
     var body: some View {
         ZStack {
-            if store.hasCompletedOnboarding {
+            if shouldShowLaunchLogin {
+                LaunchLoginView(cloudBackup: cloudBackup, store: store)
+            } else if store.hasCompletedOnboarding {
                 tabContent
             } else {
                 OnboardingView { name, birthDate, sex in
@@ -51,7 +53,13 @@ struct RootTabView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 syncFeedingReminderLiveActivity()
+                Task {
+                    await cloudBackup.syncIfNeeded(store: store)
+                }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
+            cloudBackup.scheduleAutomaticSync(store: store)
         }
         .alert("本地保存失败", isPresented: saveErrorAlertBinding) {
             Button("知道了") {
@@ -60,6 +68,24 @@ struct RootTabView: View {
         } message: {
             Text(store.saveErrorMessage ?? "请稍后再试。")
         }
+    }
+
+    private var shouldShowLaunchLogin: Bool {
+        guard !cloudBackup.hasSession else {
+            return false
+        }
+
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-XNPScreenshotData")
+            || arguments.contains("-XNPScreenshotTab")
+            || arguments.contains("-XNPScreenshotBackupSheet") {
+            return false
+        }
+        return cloudBackup.isServiceConfigured
+        #else
+        return true
+        #endif
     }
 
     private var tabContent: some View {
@@ -231,6 +257,240 @@ struct RootTabView: View {
         }
     }
 #endif
+}
+
+private struct LaunchLoginView: View {
+    private enum PhoneLoginField {
+        case phoneNumber
+        case verificationCode
+    }
+
+    @ObservedObject var cloudBackup: CloudBackupController
+    @ObservedObject var store: BabyRecordStore
+
+    @State private var phoneNumber = "+86"
+    @State private var phoneCode = ""
+    @State private var isPhoneCodeRequested = false
+    @FocusState private var focusedPhoneLoginField: PhoneLoginField?
+
+    var body: some View {
+        ScreenScaffold {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.roomy) {
+                    hero
+
+                    if cloudBackup.isServiceConfigured {
+                        phoneLoginCard
+                        if shouldShowStatusLine {
+                            statusLine
+                        }
+
+                        if cloudBackup.isWeChatLoginConfigured {
+                            weChatLoginButton
+                        }
+                    } else {
+                        serviceUnavailableCard
+                    }
+                }
+                .padding(.horizontal, AppSpacing.page)
+                .padding(.top, AppSpacing.large)
+                .padding(.bottom, AppSpacing.xlarge)
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("完成") {
+                        focusedPhoneLoginField = nil
+                    }
+                }
+            }
+        }
+    }
+
+    private var hero: some View {
+        VStack(spacing: AppSpacing.small) {
+            AssetWatercolorImage(name: AppAssets.homeBottleHero, mode: .multiply)
+                .frame(width: 72, height: 94)
+
+            VStack(spacing: AppSpacing.tiny) {
+                Text("登录小奶瓶")
+                    .font(AppTypography.title)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .multilineTextAlignment(.center)
+                Text("登录后可备份宝宝的每一次成长记录。")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var phoneLoginCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Label("手机号登录", systemImage: "iphone")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+
+                TextField("手机号", text: $phoneNumber)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.phonePad)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($focusedPhoneLoginField, equals: .phoneNumber)
+                    .onChange(of: phoneNumber) { _, _ in
+                        guard isPhoneCodeRequested else { return }
+                        isPhoneCodeRequested = false
+                        phoneCode = ""
+                    }
+
+                if let phoneValidationMessage {
+                    Text(phoneValidationMessage)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.coral)
+                }
+
+                Button("获取验证码") {
+                    focusedPhoneLoginField = nil
+                    isPhoneCodeRequested = true
+                    Task {
+                        await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
+                    }
+                }
+                .font(AppTypography.bodyLarge)
+                .foregroundStyle(AppColors.coral)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .overlay {
+                    Capsule()
+                        .stroke(AppColors.coral.opacity(0.35), lineWidth: 1)
+                }
+                .buttonStyle(.plain)
+                .disabled(cloudBackup.isWorking || !canRequestPhoneCode)
+
+                if isPhoneCodeRequested {
+                    TextField("6 位验证码", text: $phoneCode)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(.roundedBorder)
+                        .focused($focusedPhoneLoginField, equals: .verificationCode)
+                        .onChange(of: phoneCode) { _, code in
+                            if CloudBackupController.validateSmsCode(code) {
+                                focusedPhoneLoginField = nil
+                            }
+                        }
+
+                    if let codeValidationMessage {
+                        Text(codeValidationMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                    }
+
+                    PrimaryWatercolorButton(title: "手机号登录", tint: AppColors.blush, foreground: AppColors.coral) {
+                        focusedPhoneLoginField = nil
+                        Task {
+                            await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
+                        }
+                    }
+                    .disabled(cloudBackup.isWorking || !canVerifyPhoneCode)
+                    .opacity(cloudBackup.isWorking || !canVerifyPhoneCode ? 0.55 : 1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var statusLine: some View {
+        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
+            Image(systemName: cloudBackup.isWorking ? "arrow.triangle.2.circlepath" : "info.circle")
+                .foregroundStyle(AppColors.blueInk)
+            Text("\(cloudBackup.statusTitle.localizedText)：\(cloudBackup.statusDetail.localizedText)")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.inkSoft)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var shouldShowStatusLine: Bool {
+        cloudBackup.isWorking || cloudBackup.statusTitle != "未开启"
+    }
+
+    private var weChatLoginButton: some View {
+        Button {
+            Task {
+                await cloudBackup.loginWithWeChat(store: store)
+            }
+        } label: {
+            Label("微信登录", systemImage: "message")
+                .font(AppTypography.body)
+                .foregroundStyle(AppColors.inkGreen)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .overlay {
+                    Capsule()
+                        .stroke(AppColors.sage.opacity(0.42), lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .disabled(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured)
+        .opacity(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured ? 0.55 : 1)
+        .accessibilityHint(weChatLoginDetail)
+    }
+
+    private var serviceUnavailableCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Label("账号服务暂未配置", systemImage: "icloud.slash")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                Text("需要配置正式 API、短信验证码和微信开放平台后才能登录。")
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var weChatLoginDetail: String {
+        if cloudBackup.isNativeWeChatLoginAvailable {
+            return "微信开放平台已配置；授权后会连接到小奶瓶私有账号。".localizedText
+        }
+        return "微信登录未启用：请先完成微信 OpenSDK、AppID、URL Scheme、Universal Link 和服务端凭证配置。".localizedText
+    }
+
+    private var normalizedPhoneNumber: String {
+        phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var normalizedPhoneCode: String {
+        phoneCode.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canRequestPhoneCode: Bool {
+        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && !cloudBackup.isWorking
+    }
+
+    private var canVerifyPhoneCode: Bool {
+        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && CloudBackupController.validateSmsCode(normalizedPhoneCode)
+        && !cloudBackup.isWorking
+    }
+
+    private var phoneValidationMessage: String? {
+        if normalizedPhoneNumber.isEmpty || normalizedPhoneNumber == "+86" {
+            return nil
+        }
+        return CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头。"
+    }
+
+    private var codeValidationMessage: String? {
+        if normalizedPhoneCode.isEmpty {
+            return nil
+        }
+        return CloudBackupController.validateSmsCode(normalizedPhoneCode) ? nil : "验证码格式不正确，需 6 位数字。"
+    }
 }
 
 private struct RecordHomeView: View {

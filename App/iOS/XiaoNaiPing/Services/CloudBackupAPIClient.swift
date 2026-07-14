@@ -81,17 +81,6 @@ final class CloudBackupAPIClient {
         self.urlSession = urlSession
     }
 
-    func createAccount() async throws -> CloudAccountSession {
-        let data = try await request(path: "/v1/accounts", method: "POST", body: Data())
-        return try decode(CloudAccountSession.self, from: data)
-    }
-
-    func recoverSession(recoveryKey: String) async throws -> CloudAccountSession {
-        let body = try JSONEncoder().encode(["recoveryKey": recoveryKey])
-        let data = try await request(path: "/v1/sessions/recover", method: "POST", body: body)
-        return try decode(CloudAccountSession.self, from: data)
-    }
-
     func requestPhoneCode(phoneNumber: String) async throws -> PhoneCodeResponse {
         let body = try JSONEncoder().encode(["phoneNumber": phoneNumber])
         let data = try await request(path: "/v1/auth/phone/request-code", method: "POST", body: body)

@@ -88,13 +88,6 @@ struct ProfileView: View {
             DataStatusSheet(kind: .privacy, cloudBackup: cloudBackup)
                 .presentationDetents([.medium, .large])
         }
-        .alert("保存恢复密钥", isPresented: recoveryKeyNoticeBinding) {
-            Button("我已保存") {
-                cloudBackup.clearRecoveryKeyNotice()
-            }
-        } message: {
-            Text("这是换手机恢复账号的唯一凭证：\(cloudBackup.recoveryKeyToShow ?? "")。请保存到安全位置；小奶瓶不会再次明文显示。")
-        }
         .alert("清空本地记录？", isPresented: $isLocalDeletePresented) {
             Button("清空", role: .destructive) {
                 store.clearLocalDemoRecords()
@@ -361,17 +354,6 @@ struct ProfileView: View {
         case .failed(let message):
             liveActivityMessage = "灵动岛测试暂时没有显示。".localizedText + message.localizedText
         }
-    }
-
-    private var recoveryKeyNoticeBinding: Binding<Bool> {
-        Binding(
-            get: { cloudBackup.recoveryKeyToShow != nil },
-            set: { isPresented in
-                if !isPresented {
-                    cloudBackup.clearRecoveryKeyNotice()
-                }
-            }
-        )
     }
 
     private var avatarErrorBinding: Binding<Bool> {
@@ -732,14 +714,21 @@ private enum DataStatusKind {
 }
 
 private struct DataStatusSheet: View {
+    private enum PhoneLoginField {
+        case phoneNumber
+        case verificationCode
+    }
+
     let kind: DataStatusKind
     @ObservedObject var cloudBackup: CloudBackupController
     @EnvironmentObject private var store: BabyRecordStore
     @Environment(\.dismiss) private var dismiss
     @State private var isCloudDeletePresented = false
-    @State private var phoneNumber = ""
+    @State private var isSignOutPresented = false
+    @State private var phoneNumber = "+86"
     @State private var phoneCode = ""
-    @State private var recoveryKey = ""
+    @State private var isPhoneCodeRequested = false
+    @FocusState private var focusedPhoneLoginField: PhoneLoginField?
 
     var body: some View {
         NavigationStack {
@@ -771,12 +760,26 @@ private struct DataStatusSheet: View {
             } message: {
                 Text("会删除账号、云端记录备份和云端照片原图。本机资料保留，可另行清空。")
             }
+            .alert("退出当前账号？", isPresented: $isSignOutPresented) {
+                Button("退出", role: .destructive) {
+                    cloudBackup.signOut()
+                }
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("只会移除此设备上的登录会话，本机记录不会删除。")
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("关闭") {
                         dismiss()
                     }
                     .foregroundStyle(AppColors.coral)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("完成") {
+                        focusedPhoneLoginField = nil
+                    }
                 }
             }
         }
@@ -799,12 +802,15 @@ private struct DataStatusSheet: View {
 
     private var backupContent: some View {
         VStack(spacing: AppSpacing.regular) {
-            statusRow(icon: "person.crop.circle", title: "账号", value: cloudBackup.accountSummary, detail: "支持恢复密钥、手机号和微信登录；云端只保存必要账号标识。")
-            phoneLoginSection
-            weChatLoginSection
-            recoveryKeySection
-            statusRow(icon: "photo.on.rectangle", title: "照片原图云备份", value: "私有对象", detail: "仅上传用户主动加入小奶瓶的照片原图，不返回公开长期 URL。")
-            statusRow(icon: "arrow.clockwise.icloud", title: "恢复", value: "同一账号", detail: "用本机 Keychain 中的会话恢复记录；换机时使用恢复密钥重新登录。")
+            statusRow(icon: "person.crop.circle", title: "账号", value: cloudBackup.accountSummary, detail: "使用手机号或微信登录；云端只保存必要账号标识。")
+            if !cloudBackup.hasSession {
+                phoneLoginSection
+                if cloudBackup.isWeChatLoginConfigured {
+                    weChatLoginSection
+                }
+            }
+            statusRow(icon: "photo.on.rectangle", title: "照片原图云备份", value: "自动同步", detail: "登录后会自动上传小奶瓶中的照片原图，不返回公开长期 URL。")
+            statusRow(icon: "arrow.clockwise.icloud", title: "换机恢复", value: "同一账号", detail: "在新手机用同一个手机号或微信登录后，会自动恢复服务器中的资料。")
             statusRow(icon: "trash", title: "云端删除", value: "App 内可用", detail: "删除账号会删除云端备份、照片对象和账号记录，本机资料保留。")
             actionButtons
         }
@@ -824,35 +830,62 @@ private struct DataStatusSheet: View {
                     .textInputAutocapitalization(.never)
                     .keyboardType(.phonePad)
                     .textFieldStyle(.roundedBorder)
+                    .focused($focusedPhoneLoginField, equals: .phoneNumber)
+                    .onChange(of: phoneNumber) { _, _ in
+                        guard isPhoneCodeRequested else { return }
+                        isPhoneCodeRequested = false
+                        phoneCode = ""
+                    }
                 if let phoneValidationMessage {
                     Text(phoneValidationMessage)
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.coral)
                 }
-                HStack(spacing: AppSpacing.small) {
-                    TextField("6 位验证码", text: $phoneCode)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(.roundedBorder)
-                    Button("获取") {
-                        Task {
-                            await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
-                        }
-                    }
-                    .disabled(cloudBackup.isWorking || !canRequestPhoneCode)
-                }
-                if let codeValidationMessage {
-                    Text(codeValidationMessage)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.coral)
-                }
-                Button("手机号登录") {
+                Button("获取验证码") {
+                    focusedPhoneLoginField = nil
+                    isPhoneCodeRequested = true
                     Task {
-                        await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode)
+                        await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
                     }
                 }
                 .font(AppTypography.bodyLarge)
                 .foregroundStyle(AppColors.coral)
-                .disabled(cloudBackup.isWorking || !canVerifyPhoneCode)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .overlay {
+                    Capsule()
+                        .stroke(AppColors.coral.opacity(0.35), lineWidth: 1)
+                }
+                .buttonStyle(.plain)
+                .disabled(cloudBackup.isWorking || !canRequestPhoneCode)
+
+                if isPhoneCodeRequested {
+                    TextField("6 位验证码", text: $phoneCode)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(.roundedBorder)
+                        .focused($focusedPhoneLoginField, equals: .verificationCode)
+                        .onChange(of: phoneCode) { _, code in
+                            if CloudBackupController.validateSmsCode(code) {
+                                focusedPhoneLoginField = nil
+                            }
+                        }
+
+                    if let codeValidationMessage {
+                        Text(codeValidationMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                    }
+
+                    Button("手机号登录") {
+                        focusedPhoneLoginField = nil
+                        Task {
+                            await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
+                        }
+                    }
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.coral)
+                    .disabled(cloudBackup.isWorking || !canVerifyPhoneCode)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -878,7 +911,7 @@ private struct DataStatusSheet: View {
     }
 
     private var phoneValidationMessage: String? {
-        if normalizedPhoneNumber.isEmpty {
+        if normalizedPhoneNumber.isEmpty || normalizedPhoneNumber == "+86" {
             return nil
         }
         return CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头，且为 E.164 数字位数。"
@@ -903,7 +936,7 @@ private struct DataStatusSheet: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Button("微信登录") {
                     Task {
-                        await cloudBackup.loginWithWeChat()
+                        await cloudBackup.loginWithWeChat(store: store)
                     }
                 }
                 .font(AppTypography.bodyLarge)
@@ -915,7 +948,7 @@ private struct DataStatusSheet: View {
     }
 
     private var weChatLoginDetail: String {
-        if cloudBackup.isNativeWeChatLoginConfigured {
+        if cloudBackup.isNativeWeChatLoginAvailable {
             return "微信开放平台已配置；登录会通过微信授权 code 换取私有备份账号。".localizedText
         }
         #if DEBUG
@@ -926,40 +959,13 @@ private struct DataStatusSheet: View {
         return "微信登录未启用：请先完成微信 OpenSDK、AppID、URL Scheme、Universal Link 和服务端凭证配置。".localizedText
     }
 
-    private var recoveryKeySection: some View {
-        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-            VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label("恢复密钥登录", systemImage: "key")
-                    .font(AppTypography.bodyLarge)
-                    .foregroundStyle(AppColors.inkGreen)
-                Text("换手机时输入之前保存的恢复密钥，重新连接同一个私有备份账号。")
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.inkSoft)
-                    .fixedSize(horizontal: false, vertical: true)
-                TextField("恢复密钥", text: $recoveryKey)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textFieldStyle(.roundedBorder)
-                Button("使用恢复密钥登录") {
-                    Task {
-                        await cloudBackup.recoverSession(recoveryKey: recoveryKey)
-                    }
-                }
-                .font(AppTypography.bodyLarge)
-                .foregroundStyle(AppColors.coral)
-                .disabled(cloudBackup.isWorking || recoveryKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
     private var serviceUnavailableCard: some View {
         WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
                 Label("云端服务尚未配置", systemImage: "icloud.slash")
                     .font(AppTypography.sectionTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("账号与备份入口已保留在 App 内；配置正式 API、短信验证码和微信开放平台后，这里会直接开放手机号、微信、恢复密钥、备份、恢复和云端删除。当前记录仍可完整保存在本机。")
+                Text("账号与备份入口已保留在 App 内；配置正式 API、短信验证码和微信开放平台后，这里会直接开放手机号、微信登录、自动同步和云端删除。当前记录仍可完整保存在本机。")
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)
@@ -970,17 +976,8 @@ private struct DataStatusSheet: View {
 
     private var actionButtons: some View {
         VStack(spacing: AppSpacing.small) {
-            PrimaryWatercolorButton(title: cloudBackup.hasSession ? "立即备份" : "创建账号并备份") {
-                Task {
-                    await cloudBackup.createAccountAndBackup(store: store)
-                }
-            }
-            .disabled(cloudBackup.isWorking)
-
-            PrimaryWatercolorButton(title: "从云端恢复", tint: AppColors.mistBlue, foreground: AppColors.inkGreen) {
-                Task {
-                    await cloudBackup.restoreLatestBackup(store: store)
-                }
+            PrimaryWatercolorButton(title: "退出当前账号", tint: AppColors.mistBlue, foreground: AppColors.inkGreen) {
+                isSignOutPresented = true
             }
             .disabled(cloudBackup.isWorking || !cloudBackup.hasSession)
 

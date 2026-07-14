@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import ipaddress
 import json
 import os
 import re
@@ -32,6 +33,11 @@ STATIC_ROUTES = {
     "/privacy": ("privacy.html", "text/html; charset=utf-8"),
     "/terms": ("terms.html", "text/html; charset=utf-8"),
     "/support": ("support.html", "text/html; charset=utf-8"),
+    "/support-assets/app-icon-108.png": ("support-assets/app-icon-108.png", "image/png"),
+    "/support-assets/operation-flow.jpg": ("support-assets/operation-flow.jpg", "image/jpeg"),
+    "/support-assets/screenshot-home.jpg": ("support-assets/screenshot-home.jpg", "image/jpeg"),
+    "/support-assets/screenshot-record.jpg": ("support-assets/screenshot-record.jpg", "image/jpeg"),
+    "/support-assets/screenshot-backup.jpg": ("support-assets/screenshot-backup.jpg", "image/jpeg"),
     "/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/.well-known/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/internal/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
@@ -147,6 +153,15 @@ def analytics_retention_days() -> int:
     if days < 1:
         return DEFAULT_ANALYTICS_RETENTION_DAYS
     return min(days, 365)
+
+
+def internal_client_allowed(client_ip: str, forwarded_for: str = "") -> bool:
+    candidate = (forwarded_for.split(",", 1)[0] if forwarded_for else client_ip).strip()
+    try:
+        address = ipaddress.ip_address(candidate)
+    except ValueError:
+        return False
+    return address.is_loopback or address.is_private
 
 
 def b64url(data: bytes) -> str:
@@ -321,7 +336,6 @@ def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str
         (provider, hashed),
     ).fetchone()
 
-    recovery_key = None
     if row is None:
         db.execute(
             "DELETE FROM account_identities WHERE provider = ? AND subject_hash = ?",
@@ -329,7 +343,6 @@ def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str
         )
         created = create_account_with_recovery(db, config)
         account_id = created["accountId"]
-        recovery_key = created["recoveryKey"]
         created_at = created["createdAt"]
         db.execute(
             "INSERT INTO account_identities(provider, subject_hash, account_id, created_at) VALUES (?, ?, ?, ?)",
@@ -345,8 +358,6 @@ def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str
         "createdAt": created_at,
         "authProvider": provider,
     }
-    if recovery_key is not None:
-        response["recoveryKey"] = recovery_key
     return response
 
 
@@ -885,6 +896,9 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         )
 
     def handle_static(self, path: str) -> None:
+        if path == "/internal/dashboard" and not self.internal_dashboard_allowed():
+            self.write_error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在。")
+            return
         file_name, content_type = STATIC_ROUTES[path]
         static_path = Path(__file__).resolve().parents[1] / "static" / file_name
         if not static_path.exists():
@@ -898,6 +912,16 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
+
+    def internal_dashboard_allowed(self) -> bool:
+        forwarded_for = self.headers.get("X-Forwarded-For", "")
+        if forwarded_for:
+            client_ip = self.client_address[0] if self.client_address else ""
+            return internal_client_allowed(client_ip, forwarded_for)
+        if self.config.auth_debug_mode:
+            return True
+        client_ip = self.client_address[0] if self.client_address else ""
+        return internal_client_allowed(client_ip)
 
     def handle_internal_metrics(self) -> None:
         if not self.config.admin_token:

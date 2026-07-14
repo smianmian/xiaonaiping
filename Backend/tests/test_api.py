@@ -42,7 +42,15 @@ class APITestCase(unittest.TestCase):
         self.server.server_close()
         self.tempdir.cleanup()
 
-    def request(self, method: str, path: str, body=None, token: str | None = None, content_type: str = "application/json"):
+    def request(
+        self,
+        method: str,
+        path: str,
+        body=None,
+        token: str | None = None,
+        content_type: str = "application/json",
+        extra_headers: dict[str, str] | None = None,
+    ):
         data = None
         headers = {}
         if body is not None:
@@ -53,6 +61,8 @@ class APITestCase(unittest.TestCase):
             headers["Content-Type"] = content_type
         if token is not None:
             headers["Authorization"] = f"Bearer {token}"
+        if extra_headers:
+            headers.update(extra_headers)
 
         request = urllib.request.Request(self.base_url + path, data=data, headers=headers, method=method)
         with urllib.request.urlopen(request, timeout=5) as response:
@@ -128,14 +138,31 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("小奶瓶数据后台".encode("utf-8"), dashboard)
 
+    def test_support_page_assets_are_public(self) -> None:
+        for path in [
+            "/support-assets/app-icon-108.png",
+            "/support-assets/operation-flow.jpg",
+            "/support-assets/screenshot-home.jpg",
+        ]:
+            status, body = self.request("GET", path)
+            self.assertEqual(status, 200)
+            self.assertGreater(len(body), 1000)
+
+    def test_internal_dashboard_blocks_public_forwarded_clients(self) -> None:
+        with self.assertRaises(urllib.error.HTTPError) as context:
+            self.request("GET", "/internal/dashboard", extra_headers={"X-Forwarded-For": "8.8.8.8"})
+        self.assertEqual(context.exception.code, 404)
+
     def test_apple_app_site_association_routes(self) -> None:
         for path in ["/apple-app-site-association", "/.well-known/apple-app-site-association"]:
             status, payload = self.request("GET", path)
             self.assertEqual(status, 200)
             self.assertIn("applinks", payload)
             details = payload["applinks"]["details"]
-            self.assertEqual(details[0]["appID"], "JGCT3GY9CT.com.mewpow.xiaonaiping")
-            self.assertIn("/xiaonaiping/wechat/*", details[0]["paths"])
+            xnp_detail = next(
+                detail for detail in details if detail["appID"] == "L2TYJNDTJK.com.mewpow.xiaonaiping"
+            )
+            self.assertIn("/xiaonaiping/wechat/*", xnp_detail["paths"])
 
     def test_internal_metrics_are_aggregated_and_admin_only(self) -> None:
         _, created = self.request("POST", "/v1/accounts")
@@ -226,7 +253,7 @@ class APITestCase(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "phone")
-        self.assertTrue(session.get("recoveryKey", "").startswith("xnp_"))
+        self.assertNotIn("recoveryKey", session)
 
         status, sent_again = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": "+85251234567"})
         self.assertEqual(status, 200)
@@ -255,7 +282,7 @@ class APITestCase(unittest.TestCase):
         status, session = self.request("POST", "/v1/auth/wechat/login", {"code": "debug_wechat_openid_1"})
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "wechat")
-        self.assertTrue(session.get("recoveryKey", "").startswith("xnp_"))
+        self.assertNotIn("recoveryKey", session)
 
         status, session_again = self.request("POST", "/v1/auth/wechat/login", {"code": "debug_wechat_openid_1"})
         self.assertEqual(status, 200)
@@ -369,6 +396,7 @@ class ProductionAuthProviderTestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "phone")
         self.assertTrue(session["accountId"])
+        self.assertNotIn("recoveryKey", session)
 
     def test_wechat_login_exchanges_code_in_production_mode(self) -> None:
         calls: list[dict[str, list[str]]] = []
@@ -403,6 +431,7 @@ class ProductionAuthProviderTestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "wechat")
         self.assertTrue(session["accountId"])
+        self.assertNotIn("recoveryKey", session)
         self.assertEqual(calls[0]["appid"], ["wx_test"])
         self.assertEqual(calls[0]["code"], ["real_code"])
 
