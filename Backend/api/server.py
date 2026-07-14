@@ -120,6 +120,8 @@ class ServerConfig:
     sms_secret: str = ""
     sms_webhook_url: str = ""
     sms_template_id: str = ""
+    app_review_phone_number: str = ""
+    app_review_phone_code: str = ""
     wechat_app_id: str = ""
     wechat_app_secret: str = ""
     wechat_access_token_url: str = DEFAULT_WECHAT_ACCESS_TOKEN_URL
@@ -320,6 +322,14 @@ def create_account_with_recovery(db: DatabaseConnection, config: ServerConfig) -
         "recoveryKey": recovery_key,
         "createdAt": created_at,
     }
+
+
+def app_review_phone_code(config: ServerConfig, phone_number: str) -> str | None:
+    review_phone_number = normalize_phone_number(config.app_review_phone_number)
+    review_code = config.app_review_phone_code.strip()
+    if review_phone_number != phone_number or not re.fullmatch(r"^[0-9]{6}$", review_code):
+        return None
+    return review_code
 
 
 def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str, subject: str) -> dict[str, Any]:
@@ -639,8 +649,9 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         if phone_number is None:
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_phone_number", "手机号必须使用 E.164 格式，例如 +85251234567。")
             return
-        code = make_phone_code()
-        if not self.config.auth_debug_mode:
+        review_code = app_review_phone_code(self.config, phone_number)
+        code = review_code or make_phone_code()
+        if not self.config.auth_debug_mode and review_code is None:
             try:
                 send_phone_code(self.config, phone_number, code)
             except AuthProviderError as error:
@@ -1200,6 +1211,8 @@ def main() -> None:
             sms_secret=os.environ.get("XNP_SMS_SECRET", ""),
             sms_webhook_url=os.environ.get("XNP_SMS_WEBHOOK_URL", ""),
             sms_template_id=os.environ.get("XNP_SMS_TEMPLATE_ID", ""),
+            app_review_phone_number=os.environ.get("XNP_APP_REVIEW_PHONE_NUMBER", ""),
+            app_review_phone_code=os.environ.get("XNP_APP_REVIEW_PHONE_CODE", ""),
             wechat_app_id=os.environ.get("XNP_WECHAT_APP_ID", ""),
             wechat_app_secret=os.environ.get("XNP_WECHAT_APP_SECRET", ""),
             wechat_access_token_url=os.environ.get("XNP_WECHAT_ACCESS_TOKEN_URL", DEFAULT_WECHAT_ACCESS_TOKEN_URL),

@@ -398,6 +398,53 @@ class ProductionAuthProviderTestCase(unittest.TestCase):
         self.assertTrue(session["accountId"])
         self.assertNotIn("recoveryKey", session)
 
+    def test_app_review_phone_login_does_not_send_sms(self) -> None:
+        calls: list[dict[str, object]] = []
+
+        class SMSWebhookHandler(BaseHTTPRequestHandler):
+            def log_message(self, format: str, *args) -> None:
+                pass
+
+            def do_POST(self) -> None:
+                calls.append({})
+                self.send_response(200)
+                self.end_headers()
+
+        sms_url = self.start_server(SMSWebhookHandler)
+        data_dir = Path(self.tempdir.name) / "app-review-phone"
+        api_url = self.start_api(
+            ServerConfig(
+                data_dir=data_dir,
+                secret_key="test-secret",
+                object_storage=DiskObjectStorage(data_dir / "objects"),
+                sms_provider="webhook",
+                sms_secret="sms-secret",
+                sms_webhook_url=sms_url,
+                app_review_phone_number="+15555550100",
+                app_review_phone_code="123456",
+            )
+        )
+
+        status, sent = self.request(
+            api_url,
+            "POST",
+            "/v1/auth/phone/request-code",
+            {"phoneNumber": "+15555550100"},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(sent, {"sent": True, "expiresInSeconds": 600})
+        self.assertEqual(calls, [])
+
+        status, session = self.request(
+            api_url,
+            "POST",
+            "/v1/auth/phone/verify",
+            {"phoneNumber": "+15555550100", "code": "123456"},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(session["authProvider"], "phone")
+        self.assertNotIn("recoveryKey", session)
+
     def test_wechat_login_exchanges_code_in_production_mode(self) -> None:
         calls: list[dict[str, list[str]]] = []
 
