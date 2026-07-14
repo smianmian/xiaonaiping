@@ -249,6 +249,21 @@ public enum WXApi {
     }
 
     @MainActor
+    public static func isWXAppInstalled() -> Bool {
+        false
+    }
+
+    @MainActor
+    public static func isWXAppSupportApi() -> Bool {
+        false
+    }
+
+    @MainActor
+    public static func isWXAppSupport() -> Bool {
+        false
+    }
+
+    @MainActor
     public static func sendReq(_ req: BaseReq, completion: ((Bool) -> Void)? = nil) {
         guard let request = req as? SendAuthReq,
               let delegate = WXApiDelegateWrapper.shared.delegate else {

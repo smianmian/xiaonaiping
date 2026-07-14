@@ -7,8 +7,8 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.0.1"
+    CURRENT_PROJECT_VERSION: "6"
     SWIFT_VERSION: "5.0"
     IPHONEOS_DEPLOYMENT_TARGET: "18.0"
 packages:
@@ -36,21 +36,41 @@ targets:
         com.apple.developer.associated-domains:
           - $(XNP_ASSOCIATED_DOMAIN)
         com.apple.security.application-groups:
-          - group.com.mewpow.xiaonaiping
+          - group.com.mewpow.xiaonaiping.shared
     resources:
       - path: XiaoNaiPing/Assets.xcassets
       - path: XiaoNaiPing/Audio/white_noise_dryer.mp3
       - path: XiaoNaiPing/PrivacyInfo.xcprivacy
+    postBuildScripts:
+      - name: Align WechatOpenSDK MinimumOSVersion
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+
+          framework_path="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WechatOpenSDK.framework"
+          framework_plist="${framework_path}/Info.plist"
+
+          if [[ ! -f "${framework_plist}" ]]; then
+            exit 0
+          fi
+
+          /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion ${IPHONEOS_DEPLOYMENT_TARGET}" "${framework_plist}" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Add :MinimumOSVersion string ${IPHONEOS_DEPLOYMENT_TARGET}" "${framework_plist}"
+
+          if [[ "${CODE_SIGNING_ALLOWED:-YES}" != "NO" && -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" ]]; then
+            /usr/bin/codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --timestamp=none "${framework_path}"
+          fi
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.mewpow.xiaonaiping
         PRODUCT_NAME: XiaoNaiPing
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: JGCT3GY9CT
+        DEVELOPMENT_TEAM: L2TYJNDTJK
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: XiaoNaiPing/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        OTHER_LDFLAGS: "$(inherited) -ObjC -lc++"
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
       configs:
@@ -68,10 +88,13 @@ targets:
           XNP_WECHAT_UNIVERSAL_LINK: ""
           XNP_ASSOCIATED_DOMAIN: "applinks:api.mewpow.com"
         Release:
+          CODE_SIGN_STYLE: Manual
           CODE_SIGN_ENTITLEMENTS: XiaoNaiPing/XiaoNaiPing.entitlements
+          PROVISIONING_PROFILE_SPECIFIER: XiaoNaiPing App Store 20260704
+          CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Distribution
           XNP_API_BASE_URL: "https://api.mewpow.com/xiaonaiping"
-          XNP_WECHAT_APP_ID: "$(XNP_WECHAT_APP_ID)"
-          XNP_WECHAT_URL_SCHEME: "$(XNP_WECHAT_URL_SCHEME)"
+          XNP_WECHAT_APP_ID: "wxe919f9e41822223c"
+          XNP_WECHAT_URL_SCHEME: "wxe919f9e41822223c"
           XNP_WECHAT_UNIVERSAL_LINK: "https://api.mewpow.com/xiaonaiping/wechat/"
           XNP_ASSOCIATED_DOMAIN: "applinks:api.mewpow.com"
   XiaoNaiPingWidgets:
@@ -84,13 +107,13 @@ targets:
       path: XiaoNaiPingWidgets/XiaoNaiPingWidgets.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.com.mewpow.xiaonaiping
+          - group.com.mewpow.xiaonaiping.shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.mewpow.xiaonaiping.widgets
         PRODUCT_NAME: XiaoNaiPingWidgets
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: JGCT3GY9CT
+        DEVELOPMENT_TEAM: L2TYJNDTJK
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: XiaoNaiPingWidgets/Info.plist
         SKIP_INSTALL: YES
@@ -102,3 +125,7 @@ targets:
           CODE_SIGNING_ALLOWED[sdk=iphoneos*]: "YES"
           CODE_SIGNING_REQUIRED[sdk=iphoneos*]: "YES"
           CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Development
+        Release:
+          CODE_SIGN_STYLE: Manual
+          PROVISIONING_PROFILE_SPECIFIER: XiaoNaiPing Widget App Store 20260704
+          CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Distribution

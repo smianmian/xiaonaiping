@@ -49,7 +49,7 @@ struct FeedingReminderActivityAttributes: ActivityAttributes {
 #endif
 
 enum XiaoNaiPingSharedStore {
-    static let appGroupIdentifier = "group.com.mewpow.xiaonaiping"
+    static let appGroupIdentifier = "group.com.mewpow.xiaonaiping.shared"
 
     static func readSnapshot() -> SharedTodaySnapshot? {
         guard let data = try? Data(contentsOf: snapshotURL()) else {

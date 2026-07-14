@@ -93,7 +93,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		018B099CBFF05CCCCDA3E34A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryWatercolorButton.swift; sourceTree = "<group>"; };
 		13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingReminderLiveActivityController.swift; sourceTree = "<group>"; };
@@ -175,7 +174,6 @@
 		1AB54BD56BADA3D9051A93B2 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				018B099CBFF05CCCCDA3E34A /* README.md */,
 				1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */,
 			);
 			path = Audio;
@@ -367,6 +365,7 @@
 				B1CAF6AD4BDDE4CB6D543C93 /* Resources */,
 				472D59693B1DE701EAA2EE33 /* Frameworks */,
 				668D206CFAF7274FB052918A /* Embed Foundation Extensions */,
+				88FFC953086B8B54D4181BAF /* Align WechatOpenSDK MinimumOSVersion */,
 			);
 			buildRules = (
 			);
@@ -391,12 +390,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					3E8A96CD701FE5ABE25B719F = {
-						DevelopmentTeam = JGCT3GY9CT;
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = L2TYJNDTJK;
 					};
 					7EE57B1AC6239DBA0CAC7249 = {
-						DevelopmentTeam = JGCT3GY9CT;
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = L2TYJNDTJK;
 					};
 				};
 			};
@@ -446,6 +443,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		88FFC953086B8B54D4181BAF /* Align WechatOpenSDK MinimumOSVersion */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Align WechatOpenSDK MinimumOSVersion";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nframework_path=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WechatOpenSDK.framework\"\nframework_plist=\"${framework_path}/Info.plist\"\n\nif [[ ! -f \"${framework_plist}\" ]]; then\n  exit 0\nfi\n\n/usr/libexec/PlistBuddy -c \"Set :MinimumOSVersion ${IPHONEOS_DEPLOYMENT_TARGET}\" \"${framework_plist}\" 2>/dev/null \\\n  || /usr/libexec/PlistBuddy -c \"Add :MinimumOSVersion string ${IPHONEOS_DEPLOYMENT_TARGET}\" \"${framework_plist}\"\n\nif [[ \"${CODE_SIGNING_ALLOWED:-YES}\" != \"NO\" && -n \"${EXPANDED_CODE_SIGN_IDENTITY:-}\" ]]; then\n  /usr/bin/codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" --timestamp=none \"${framework_path}\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7D97897A9C8D2FFAD23C3560 /* Sources */ = {
@@ -557,7 +576,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -576,7 +595,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -599,7 +618,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = XiaoNaiPingWidgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -619,8 +638,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = XiaoNaiPingWidgets/XiaoNaiPingWidgets.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = XiaoNaiPingWidgets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -630,6 +650,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping.widgets;
 				PRODUCT_NAME = XiaoNaiPingWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "XiaoNaiPing Widget App Store 20260704";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -650,13 +671,14 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = XiaoNaiPing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "$(inherited) -ObjC -lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping;
 				PRODUCT_NAME = XiaoNaiPing;
 				SDKROOT = iphoneos;
@@ -704,7 +726,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -717,7 +739,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -735,24 +757,27 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = XiaoNaiPing/XiaoNaiPing.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = XiaoNaiPing/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "$(inherited) -ObjC -lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping;
 				PRODUCT_NAME = XiaoNaiPing;
+				PROVISIONING_PROFILE_SPECIFIER = "XiaoNaiPing App Store 20260704";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				XNP_API_BASE_URL = "https://api.mewpow.com/xiaonaiping";
 				XNP_ASSOCIATED_DOMAIN = "applinks:api.mewpow.com";
-				XNP_WECHAT_APP_ID = "$(XNP_WECHAT_APP_ID)";
+				XNP_WECHAT_APP_ID = wxe919f9e41822223c;
 				XNP_WECHAT_UNIVERSAL_LINK = "https://api.mewpow.com/xiaonaiping/wechat/";
-				XNP_WECHAT_URL_SCHEME = "$(XNP_WECHAT_URL_SCHEME)";
+				XNP_WECHAT_URL_SCHEME = wxe919f9e41822223c;
 			};
 			name = Release;
 		};
