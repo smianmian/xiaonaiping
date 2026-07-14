@@ -1,7 +1,4 @@
 import Foundation
-#if canImport(UIKit)
-import UIKit
-#endif
 #if canImport(WechatOpenSDK)
 import WechatOpenSDK
 #endif
@@ -11,6 +8,7 @@ enum WeChatLoginError: LocalizedError {
     case notConfigured
     case alreadyInProgress
     case registrationFailed
+    case nativeAppUnavailable
     case sendFailed
     case cancelled
     case denied
@@ -27,8 +25,10 @@ enum WeChatLoginError: LocalizedError {
             return "已有一次微信授权正在进行，请稍后再试。"
         case .registrationFailed:
             return "微信 OpenSDK 注册失败，请检查 AppID 和 Universal Link。"
+        case .nativeAppUnavailable:
+            return "当前设备无法使用微信授权，请改用手机号登录。"
         case .sendFailed:
-            return "未能拉起微信授权，请确认设备已安装微信并完成开放平台配置。"
+            return "微信授权暂不可用，请改用手机号登录。"
         case .cancelled:
             return "已取消微信授权。"
         case .denied:
@@ -52,6 +52,24 @@ final class WeChatLoginService: NSObject {
     private var continuation: CheckedContinuation<String, Error>?
     private var expectedState: String?
 
+    var isNativeLoginAvailable: Bool {
+        guard CloudBackupConfiguration.isWeChatLoginConfigured,
+              let appID = CloudBackupConfiguration.weChatAppID,
+              let universalLink = CloudBackupConfiguration.weChatUniversalLink else {
+            return false
+        }
+
+        guard WXApi.registerApp(appID, universalLink: universalLink.absoluteString) else {
+            return false
+        }
+
+        #if canImport(WechatOpenSDK)
+        return WXApi.isWXAppInstalled() && WXApi.isWXAppSupport()
+        #else
+        return false
+        #endif
+    }
+
     func requestAuthorizationCode() async throws -> String {
         guard CloudBackupConfiguration.isWeChatLoginConfigured else {
             throw WeChatLoginError.notConfigured
@@ -67,6 +85,13 @@ final class WeChatLoginService: NSObject {
         guard WXApi.registerApp(appID, universalLink: universalLink.absoluteString) else {
             throw WeChatLoginError.registrationFailed
         }
+        #if canImport(WechatOpenSDK)
+        guard WXApi.isWXAppInstalled(), WXApi.isWXAppSupport() else {
+            throw WeChatLoginError.nativeAppUnavailable
+        }
+        #else
+        throw WeChatLoginError.nativeAppUnavailable
+        #endif
 
         let state = UUID().uuidString.replacingOccurrences(of: "-", with: "")
         expectedState = state
@@ -79,11 +104,7 @@ final class WeChatLoginService: NSObject {
                     request.scope = "snsapi_userinfo"
                     request.state = state
                     #if canImport(WechatOpenSDK)
-                    guard let viewController = Self.activeViewController() else {
-                        self.finish(.failure(WeChatLoginError.sendFailed))
-                        return
-                    }
-                    WXApi.sendAuthReq(request, viewController: viewController, delegate: self) { [weak self] sent in
+                    WXApi.send(request) { [weak self] sent in
                         guard !sent else { return }
                         Task { @MainActor in
                             self?.finish(.failure(WeChatLoginError.sendFailed))
@@ -115,29 +136,6 @@ final class WeChatLoginService: NSObject {
     func handleUniversalLink(_ userActivity: NSUserActivity) -> Bool {
         WXApi.handleOpenUniversalLink(userActivity, delegate: self)
     }
-
-    #if canImport(WechatOpenSDK)
-    private static func activeViewController() -> UIViewController? {
-        let scene = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .first { $0.activationState == .foregroundActive }
-        let root = scene?.windows.first { $0.isKeyWindow }?.rootViewController
-        return topViewController(from: root)
-    }
-
-    private static func topViewController(from viewController: UIViewController?) -> UIViewController? {
-        if let navigationController = viewController as? UINavigationController {
-            return topViewController(from: navigationController.visibleViewController)
-        }
-        if let tabBarController = viewController as? UITabBarController {
-            return topViewController(from: tabBarController.selectedViewController)
-        }
-        if let presented = viewController?.presentedViewController {
-            return topViewController(from: presented)
-        }
-        return viewController
-    }
-    #endif
 
     private func finish(_ result: Result<String, Error>) {
         guard let continuation else { return }
