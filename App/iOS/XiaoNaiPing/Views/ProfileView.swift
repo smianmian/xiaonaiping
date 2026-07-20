@@ -6,6 +6,7 @@ struct ProfileView: View {
     @EnvironmentObject private var store: BabyRecordStore
     @EnvironmentObject private var cloudBackup: CloudBackupController
     @State private var isBackupStatusPresented = false
+    @State private var isSignOutPresented = false
     @State private var isPrivacyStatusPresented = false
     @State private var isLocalDeletePresented = false
     @State private var isBabyEditorPresented = false
@@ -27,6 +28,7 @@ struct ProfileView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
                     profileHeader
+                    accountAccessCard
 
                     WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
                         VStack(spacing: 0) {
@@ -45,7 +47,7 @@ struct ProfileView: View {
                             Button {
                                 isBackupStatusPresented = true
                             } label: {
-                                ProfileMenuRow(icon: "icloud.and.arrow.up", title: "账号与备份", value: cloudBackup.serviceStatusLabel)
+                                ProfileMenuRow(icon: "icloud.and.arrow.up", title: "登录与自动同步", value: cloudBackup.serviceStatusLabel)
                             }
                             .buttonStyle(.plain)
                             Button {
@@ -95,6 +97,14 @@ struct ProfileView: View {
             Button("取消", role: .cancel) {}
         } message: {
             Text("这只会清空本机记录和 App 私有空间照片，不会连接服务器。宝宝档案会保留。")
+        }
+        .alert("退出当前账号？", isPresented: $isSignOutPresented) {
+            Button("退出", role: .destructive) {
+                cloudBackup.signOut()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("只会移除此设备上的登录会话，本机记录不会删除。")
         }
         .alert("删除宝宝档案？", isPresented: $isProfileDeletePresented) {
             Button("删除", role: .destructive) {
@@ -186,6 +196,65 @@ struct ProfileView: View {
             AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
                 .frame(width: 62, height: 38)
         }
+    }
+
+    private var accountAccessCard: some View {
+        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                Button {
+                    isBackupStatusPresented = true
+                } label: {
+                    HStack(alignment: .center, spacing: AppSpacing.medium) {
+                        Image(systemName: cloudBackup.hasSession ? "checkmark.icloud.fill" : "person.crop.circle.badge.plus")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundStyle(AppColors.coral)
+                            .frame(width: 34)
+
+                        VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                            Text(cloudBackup.hasSession ? "账号已登录，正在自动同步" : "登录并自动同步")
+                                .font(AppTypography.bodyLarge)
+                                .foregroundStyle(AppColors.inkGreen)
+                            Text(accountAccessDetail)
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.inkSoft)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer(minLength: AppSpacing.small)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(cloudBackup.hasSession ? "管理账号、同步和云端备份" : "使用手机号或微信登录")
+
+                if cloudBackup.hasSession {
+                    Divider()
+                        .overlay(AppColors.softStroke.opacity(0.40))
+
+                    Button(role: .destructive) {
+                        isSignOutPresented = true
+                    } label: {
+                        Label("退出当前账号", systemImage: "rectangle.portrait.and.arrow.right")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.coral)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(minHeight: 36)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(cloudBackup.isWorking)
+                }
+            }
+        }
+    }
+
+    private var accountAccessDetail: String {
+        if cloudBackup.hasSession {
+            return "\(cloudBackup.accountSummary) · \(cloudBackup.statusDetail)"
+        }
+        return "用手机号或微信登录，换新手机后可恢复宝宝资料和照片。"
     }
 
     private var quietCareModeRow: some View {
