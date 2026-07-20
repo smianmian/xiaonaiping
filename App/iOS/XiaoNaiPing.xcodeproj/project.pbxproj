@@ -684,11 +684,11 @@
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
-				XNP_API_BASE_URL = "";
+				XNP_API_BASE_URL = "https://api.mewpow.com/xiaonaiping";
 				XNP_ASSOCIATED_DOMAIN = "applinks:api.mewpow.com";
-				XNP_WECHAT_APP_ID = "";
-				XNP_WECHAT_UNIVERSAL_LINK = "";
-				XNP_WECHAT_URL_SCHEME = "";
+				XNP_WECHAT_APP_ID = wxe919f9e41822223c;
+				XNP_WECHAT_UNIVERSAL_LINK = "https://api.mewpow.com/xiaonaiping/wechat/";
+				XNP_WECHAT_URL_SCHEME = wxe919f9e41822223c;
 			};
 			name = Debug;
 		};

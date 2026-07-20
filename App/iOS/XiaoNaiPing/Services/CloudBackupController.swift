@@ -34,7 +34,7 @@ final class CloudBackupController: ObservableObject {
     }
 
     var isWeChatLoginConfigured: Bool {
-        isNativeWeChatLoginAvailable
+        isNativeWeChatLoginConfigured
     }
 
     var isNativeWeChatLoginConfigured: Bool {
