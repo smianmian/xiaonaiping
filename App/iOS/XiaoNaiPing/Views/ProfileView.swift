@@ -162,21 +162,19 @@ struct ProfileView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("更换宝宝头像")
 
-            VStack(alignment: .leading, spacing: AppSpacing.small) {
+            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                 Text(store.baby.name)
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
-                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                    Text("\(store.baby.daysSinceBirth)天")
-                        .font(AppTypography.largeNumber)
-                        .foregroundStyle(AppColors.coral)
-                    Text("/ \(store.baby.ageText)")
-                        .font(AppTypography.bodyLarge)
-                        .foregroundStyle(AppColors.ink)
-                }
-                Text(store.baby.sex.localizedText)
-                    .font(AppTypography.caption)
+                Text("\(store.baby.daysSinceBirth)天")
+                    .font(AppTypography.largeNumber)
+                    .foregroundStyle(AppColors.coral)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                Text(store.baby.ageText)
+                    .font(AppTypography.readableBody)
                     .foregroundStyle(AppColors.inkSoft)
+                    .lineLimit(1)
             }
 
             Spacer()
