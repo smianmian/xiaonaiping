@@ -14,10 +14,10 @@ final class CloudBackupController: ObservableObject {
     init() {
         if sessionStore.session != nil {
             statusTitle = "已登录"
-            statusDetail = "本机资料会自动同步到私有账号空间。"
+            statusDetail = "资料会自动同步到你的账号。"
         } else if !isServiceConfigured {
-            statusTitle = "服务未配置"
-            statusDetail = "云端服务尚未开放，当前记录只保存在本机。"
+            statusTitle = "同步服务暂不可用"
+            statusDetail = "请检查网络后重试自动同步。"
         }
     }
 
@@ -119,7 +119,7 @@ final class CloudBackupController: ObservableObject {
 
         isSyncing = true
         statusTitle = "正在同步"
-        statusDetail = "正在安全上传本机资料和照片。"
+        statusDetail = "正在安全上传资料和照片。"
         defer { isSyncing = false }
 
         do {
@@ -129,7 +129,7 @@ final class CloudBackupController: ObservableObject {
             statusDetail = "资料和照片已自动保存到服务器。"
         } catch {
             statusTitle = "待同步"
-            statusDetail = "本机资料已保存，联网后会自动重试。"
+            statusDetail = "联网后会自动重试同步。"
         }
     }
 
@@ -148,7 +148,7 @@ final class CloudBackupController: ObservableObject {
             return true
         } catch {
             statusTitle = "照片删除失败"
-            statusDetail = "本机照片保留，联网后可再次删除。"
+            statusDetail = "照片删除会在联网后自动重试。"
             return false
         }
     }
@@ -161,7 +161,7 @@ final class CloudBackupController: ObservableObject {
             sessionStore.clear()
             store.markCloudAccountDeletedLocally()
             statusTitle = "云端已删除"
-            statusDetail = "账号和云端资料已删除，照片原图删除数量：\(response.photoCountDeleted)。本机资料仍保留。"
+            statusDetail = "账号和同步资料已删除，照片原图删除数量：\(response.photoCountDeleted)。"
         }
     }
 
@@ -169,7 +169,7 @@ final class CloudBackupController: ObservableObject {
         scheduledSyncTask?.cancel()
         sessionStore.clear()
         statusTitle = "已退出账号"
-        statusDetail = "本机资料保留；下次用手机号或微信登录即可恢复自动同步。"
+        statusDetail = "已退出当前账号；下次登录后会恢复自动同步。"
     }
 
     static func validateE164PhoneNumber(_ phoneNumber: String) -> Bool {

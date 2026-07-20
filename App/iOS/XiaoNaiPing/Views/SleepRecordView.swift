@@ -336,7 +336,7 @@ private struct SleepEditorSheet: View {
         if onSave(saved) {
             dismiss()
         } else {
-            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+            errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
     }
 

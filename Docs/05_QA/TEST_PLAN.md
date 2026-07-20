@@ -106,6 +106,9 @@
 - [ ] 灵动岛/锁屏 Live Activity 不显示医疗、健康建议、压力评估、宝宝备注、照片原图、token 或云端对象 key。
 - [ ] 小组件只读展示 App Group 今日快照，不写业务记录，不展示照片原图、备注、账号、恢复密钥、云端 token、对象 key 或备份状态。
 - [ ] 审核说明明确灵动岛/小组件数据来自用户本机记录，不接入 HealthKit、传感器、医院系统或第三方健康数据源。
+- [ ] 灵动岛与锁屏 Live Activity 的倒计时连续递减，锁屏卡片为深色系统材质。
+- [ ] 夜间模式开启后首页、记录页、资料页与表单文字均清晰可读。
+- [ ] 喝水记录可保存、删除、重启后保留，并在账号备份恢复后保留。
 - [x] TestFlight 客户端静态预检通过：`Backend/proof/testflight-precheck.json`。
 - [x] TestFlight / 真机回归清单预检通过：`Backend/proof/testflight-regression-plan.json`。
 

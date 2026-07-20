@@ -325,7 +325,7 @@ struct FeedingRecordView: View {
             repeatIntervalMinutes: repeatIntervalMinutes
         )
         guard store.upsert(reminder) else {
-            notificationMessage = "本地保存失败，请稍后再试。"
+            notificationMessage = "保存失败，请稍后再试。"
             return
         }
 
@@ -338,7 +338,7 @@ struct FeedingRecordView: View {
     private func cancelReminder() {
         notificationMessage = nil
         guard store.cancelFeedingReminder() else {
-            notificationMessage = "本地保存失败，请稍后再试。"
+            notificationMessage = "保存失败，请稍后再试。"
             return
         }
 
@@ -362,7 +362,7 @@ struct FeedingRecordView: View {
     private func notificationMessage(for result: NotificationScheduleResult) -> String {
         switch result {
         case .scheduled:
-            return "喝奶闹钟已加入 iOS 本地通知，会提前5分钟提醒准备泡奶。"
+            return "喝奶闹钟已加入 iOS 系统通知，会提前5分钟提醒准备泡奶。"
         case .removed:
             return "提醒时间无效，未安排通知。"
         case .denied:
@@ -621,7 +621,7 @@ private struct FeedingEditorSheet: View {
         if onSave(saved, shouldShowReminderDeferral ? reminderDeferralMinutes : nil) {
             dismiss()
         } else {
-            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+            errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
     }
 

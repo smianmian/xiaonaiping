@@ -92,6 +92,41 @@ struct FeedingRecord: Identifiable, Equatable, Codable {
     }
 }
 
+struct WaterRecord: Identifiable, Equatable, Codable {
+    var id: UUID
+    var babyId: UUID
+    var occurredAt: Date
+    var amountML: Int
+    var createdAt: Date
+    var updatedAt: Date
+
+    init(
+        id: UUID = UUID(),
+        babyId: UUID = RecordCodingDefaults.babyId,
+        occurredAt: Date = Date(),
+        amountML: Int,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.babyId = babyId
+        self.occurredAt = occurredAt
+        self.amountML = amountML
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        babyId = try container.decodeIfPresent(UUID.self, forKey: .babyId) ?? RecordCodingDefaults.babyId
+        occurredAt = try container.decodeIfPresent(Date.self, forKey: .occurredAt) ?? Date()
+        amountML = try container.decodeIfPresent(Int.self, forKey: .amountML) ?? 0
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? occurredAt
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
+    }
+}
+
 struct FeedingReminder: Identifiable, Equatable, Codable {
     var id: UUID
     var babyId: UUID

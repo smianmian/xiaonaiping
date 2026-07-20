@@ -2,6 +2,7 @@ import SwiftUI
 
 enum QuickRecordAction: CaseIterable, Identifiable {
     case feeding
+    case water
     case sleep
     case diaper
     case photo
@@ -13,6 +14,7 @@ enum QuickRecordAction: CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .feeding: "喂养"
+        case .water: "喝水"
         case .sleep: "睡眠"
         case .diaper: "排便"
         case .photo: "照片"
@@ -24,6 +26,7 @@ enum QuickRecordAction: CaseIterable, Identifiable {
     var asset: String {
         switch self {
         case .feeding: AppAssets.bottleIcon
+        case .water: AppAssets.peeDropIcon
         case .sleep: AppAssets.moonIcon
         case .diaper: AppAssets.diaperIcon
         case .photo: AppAssets.cameraIcon
@@ -35,6 +38,7 @@ enum QuickRecordAction: CaseIterable, Identifiable {
     var tint: Color {
         switch self {
         case .feeding: AppColors.cream
+        case .water: AppColors.mistBlue
         case .sleep: AppColors.mistBlue
         case .diaper: AppColors.grass
         case .photo: AppColors.blush

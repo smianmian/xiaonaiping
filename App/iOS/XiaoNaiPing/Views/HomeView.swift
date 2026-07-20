@@ -146,6 +146,14 @@ struct HomeView: View {
             ) { onRoute(.feeding) }
 
             HomeStatCard(
+                icon: AppAssets.peeDropIcon,
+                title: "记喝水",
+                value: "\(store.todayWaterRecords.count)次 / \(store.waterAmountML)ml",
+                tint: AppColors.mistBlue,
+                isQuietMode: store.quietCareModeEnabled
+            ) { onRoute(.water) }
+
+            HomeStatCard(
                 icon: AppAssets.moonIcon,
                 title: "睡眠记录",
                 value: sleepCardValue,

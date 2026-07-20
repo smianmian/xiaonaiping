@@ -326,7 +326,7 @@ struct MonthlyReportDetailView: View {
                     Text(report.monthTitle)
                         .font(AppTypography.sectionTitle)
                         .foregroundStyle(AppColors.inkGreen)
-                    Text("只汇总真实本地记录")
+                    Text("汇总账号中的真实记录")
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.inkSoft)
                 }
@@ -353,7 +353,7 @@ struct MonthlyReportDetailView: View {
                 Text("原始记录来源")
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("喂养、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都来自本机记录。要修改内容，请回到对应页面编辑原始记录。")
+                Text("喂养、喝水、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都会自动同步。要修改内容，请回到对应页面编辑原始记录。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)
@@ -523,7 +523,7 @@ private struct MonthlyReportCard: View {
                         Text("本月成长小报")
                             .font(AppTypography.sectionTitle)
                             .foregroundStyle(AppColors.inkGreen)
-                        Text("\(report.monthTitle.isEmpty ? "本月" : report.monthTitle) · 基于当前本地记录生成")
+                        Text("\(report.monthTitle.isEmpty ? "本月" : report.monthTitle) · 基于当前记录生成")
                             .font(AppTypography.caption)
                             .foregroundStyle(AppColors.inkSoft)
                     }
@@ -745,7 +745,7 @@ private struct GrowthEditorSheet: View {
         if onSave(saved) {
             dismiss()
         } else {
-            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+            errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
     }
 

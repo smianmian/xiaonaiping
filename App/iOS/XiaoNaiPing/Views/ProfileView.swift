@@ -8,7 +8,6 @@ struct ProfileView: View {
     @State private var isBackupStatusPresented = false
     @State private var isSignOutPresented = false
     @State private var isPrivacyStatusPresented = false
-    @State private var isLocalDeletePresented = false
     @State private var isBabyEditorPresented = false
     @State private var isProfileDeletePresented = false
     @State private var selectedAvatarItem: PhotosPickerItem?
@@ -16,6 +15,7 @@ struct ProfileView: View {
     @State private var avatarErrorMessage: String?
     @State private var liveActivityMessage: String?
     @State private var isFeedingLiveActivityUpdating = false
+    @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
 
     init() {
         #if DEBUG
@@ -53,17 +53,12 @@ struct ProfileView: View {
                             Button {
                                 isPrivacyStatusPresented = true
                             } label: {
-                                ProfileMenuRow(icon: "shield", title: "数据与隐私", value: "本地优先")
+                                ProfileMenuRow(icon: "shield", title: "数据与隐私", value: "自动同步")
                             }
                             .buttonStyle(.plain)
                             quietCareModeRow
+                            nightModeRow
                             feedingLiveActivityRow
-                            Button {
-                                isLocalDeletePresented = true
-                            } label: {
-                                ProfileMenuRow(icon: "trash", title: "清空本地记录", value: nil)
-                            }
-                            .buttonStyle(.plain)
                             Button {
                                 isProfileDeletePresented = true
                             } label: {
@@ -90,21 +85,13 @@ struct ProfileView: View {
             DataStatusSheet(kind: .privacy, cloudBackup: cloudBackup)
                 .presentationDetents([.medium, .large])
         }
-        .alert("清空本地记录？", isPresented: $isLocalDeletePresented) {
-            Button("清空", role: .destructive) {
-                store.clearLocalDemoRecords()
-            }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("这只会清空本机记录和 App 私有空间照片，不会连接服务器。宝宝档案会保留。")
-        }
         .alert("退出当前账号？", isPresented: $isSignOutPresented) {
             Button("退出", role: .destructive) {
                 cloudBackup.signOut()
             }
             Button("取消", role: .cancel) {}
         } message: {
-            Text("只会移除此设备上的登录会话，本机记录不会删除。")
+            Text("只会移除此设备上的登录会话，不会删除账号中的记录。")
         }
         .alert("删除宝宝档案？", isPresented: $isProfileDeletePresented) {
             Button("删除", role: .destructive) {
@@ -112,7 +99,7 @@ struct ProfileView: View {
             }
             Button("取消", role: .cancel) {}
         } message: {
-            Text("会清空当前宝宝档案和所有本地记录、照片。不会连接服务器。")
+            Text("会清空当前宝宝档案、记录和照片。")
         }
         .sheet(isPresented: $isBabyEditorPresented) {
             BabyProfileEditorSheet(baby: store.baby) { name, birthDate, sex in
@@ -279,6 +266,29 @@ struct ProfileView: View {
         }
         .toggleStyle(.switch)
         .tint(AppColors.coral)
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.vertical, AppSpacing.small)
+    }
+
+    private var nightModeRow: some View {
+        Toggle(isOn: $nightModeEnabled) {
+            HStack(spacing: AppSpacing.regular) {
+                Image(systemName: "moon.stars")
+                    .font(.system(size: 19, weight: .regular))
+                    .foregroundStyle(AppColors.blueInk)
+                    .frame(width: 30)
+                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                    Text("夜间模式")
+                        .font(AppTypography.bodyLarge)
+                        .foregroundStyle(AppColors.inkGreen)
+                    Text("夜里记录时切换为柔和深色界面。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+            }
+        }
+        .toggleStyle(.switch)
+        .tint(AppColors.blueInk)
         .padding(.horizontal, AppSpacing.medium)
         .padding(.vertical, AppSpacing.small)
     }
@@ -827,7 +837,7 @@ private struct DataStatusSheet: View {
                 }
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("会删除账号、云端记录备份和云端照片原图。本机资料保留，可另行清空。")
+                Text("会删除账号、同步记录和照片原图。")
             }
             .alert("退出当前账号？", isPresented: $isSignOutPresented) {
                 Button("退出", role: .destructive) {
@@ -835,7 +845,7 @@ private struct DataStatusSheet: View {
                 }
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("只会移除此设备上的登录会话，本机记录不会删除。")
+                Text("只会移除此设备上的登录会话，不会删除账号中的记录。")
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -857,10 +867,10 @@ private struct DataStatusSheet: View {
     private var headerCard: some View {
         WatercolorCard(tint: kind == .backup ? AppColors.mistBlue : AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label((kind == .backup ? cloudBackup.statusTitle : "当前本地优先保存").localizedText, systemImage: kind == .backup ? "icloud.and.arrow.up" : "shield")
+                Label((kind == .backup ? cloudBackup.statusTitle : "账号自动同步已开启").localizedText, systemImage: kind == .backup ? "icloud.and.arrow.up" : "shield")
                     .font(AppTypography.sectionTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text(kind == .backup ? cloudBackup.statusDetail.localizedText : "宝宝昵称、生日、记录、照片、疫苗提醒都属于高敏感家庭数据。当前页面只说明本机保存和删除边界。")
+                Text(kind == .backup ? cloudBackup.statusDetail.localizedText : "宝宝昵称、生日、记录、照片、疫苗提醒都属于高敏感家庭数据，会自动同步到你的账号，并可在这里管理删除。")
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.ink)
                     .fixedSize(horizontal: false, vertical: true)
@@ -880,7 +890,7 @@ private struct DataStatusSheet: View {
             }
             statusRow(icon: "photo.on.rectangle", title: "照片原图云备份", value: "自动同步", detail: "登录后会自动上传小奶瓶中的照片原图，不返回公开长期 URL。")
             statusRow(icon: "arrow.clockwise.icloud", title: "换机恢复", value: "同一账号", detail: "在新手机用同一个手机号或微信登录后，会自动恢复服务器中的资料。")
-            statusRow(icon: "trash", title: "云端删除", value: "App 内可用", detail: "删除账号会删除云端备份、照片对象和账号记录，本机资料保留。")
+            statusRow(icon: "trash", title: "删除账号", value: "App 内可用", detail: "删除账号会删除同步记录、照片和账号信息。")
             actionButtons
         }
     }
@@ -1034,7 +1044,7 @@ private struct DataStatusSheet: View {
                 Label("云端服务尚未配置", systemImage: "icloud.slash")
                     .font(AppTypography.sectionTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("账号与备份入口已保留在 App 内；配置正式 API、短信验证码和微信开放平台后，这里会直接开放手机号、微信登录、自动同步和云端删除。当前记录仍可完整保存在本机。")
+                Text("同步服务暂不可用，请检查网络后重试。手机号、微信登录和自动同步会在服务恢复后继续可用。")
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1059,9 +1069,9 @@ private struct DataStatusSheet: View {
 
     private var privacyContent: some View {
         VStack(spacing: AppSpacing.regular) {
-            statusRow(icon: "internaldrive", title: "本地记录", value: "App 沙盒", detail: "喂养、睡眠、排便、身高体重、疫苗提醒写入本机状态文件。")
+            statusRow(icon: "icloud.and.arrow.up", title: "账号同步", value: "自动开启", detail: "喂养、喝水、睡眠、排便、成长、照片和疫苗记录会自动同步到你的账号。")
             statusRow(icon: "photo", title: "照片", value: "私有空间", detail: "从相册选择或拍照后复制到 App 私有目录。")
-            statusRow(icon: "bell", title: "通知", value: "系统权限", detail: "疫苗提醒使用 iOS 本地通知；拒绝后需要去系统设置开启。")
+            statusRow(icon: "bell", title: "通知", value: "系统权限", detail: "疫苗提醒使用 iOS 系统通知；拒绝后需要去系统设置开启。")
             statusRow(icon: "waveform.path.ecg", title: "崩溃日志", value: "Apple 原生", detail: "不得包含宝宝照片、生日、备注、对象 key 或记录明细。")
             statusRow(icon: "xmark.octagon", title: "未接入", value: "无第三方分析", detail: "第一版不接广告、社区或第三方数据分析 SDK。")
         }

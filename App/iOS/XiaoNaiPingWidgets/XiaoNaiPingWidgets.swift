@@ -236,8 +236,8 @@ struct FeedingReminderLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: FeedingReminderActivityAttributes.self) { context in
             liveActivityBody(context)
-                .activityBackgroundTint(Self.milk)
-                .activitySystemActionForegroundColor(Self.coral)
+                .activityBackgroundTint(.black.opacity(0.82))
+                .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -288,7 +288,7 @@ struct FeedingReminderLiveActivityWidget: Widget {
             VStack(alignment: .leading, spacing: 5) {
                 Text(reminderHeadline(context.state))
                     .font(.headline.weight(.semibold))
-                    .foregroundStyle(Self.ink)
+                    .foregroundStyle(.white)
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     Text(context.state.babyName)
@@ -298,14 +298,14 @@ struct FeedingReminderLiveActivityWidget: Widget {
                         .lineLimit(1)
                 }
                 .font(.caption)
-                .foregroundStyle(Self.inkSoft)
+                .foregroundStyle(.white.opacity(0.70))
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: 3) {
                 Text(context.state.nextReminderAt, style: .time)
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(Self.inkSoft)
-                compactCountdown(context.state, foreground: Self.inkGreen)
+                    .foregroundStyle(.white.opacity(0.70))
+                compactCountdown(context.state, foreground: .white)
                     .font(.title3.weight(.semibold))
             }
         }
@@ -351,13 +351,23 @@ struct FeedingReminderLiveActivityWidget: Widget {
 
     @ViewBuilder
     private func compactCountdown(_ state: FeedingReminderActivityAttributes.ContentState, foreground: Color) -> some View {
-        Text(compactStatusText(state))
-            .font(.caption2.weight(.semibold))
-            .monospacedDigit()
-            .foregroundStyle(reminderPhase(state) == .waiting ? foreground : Self.milk)
-            .lineLimit(1)
-            .minimumScaleFactor(0.78)
-            .frame(maxWidth: 42, alignment: .trailing)
+        if reminderPhase(state) == .waiting {
+            Text(state.nextReminderAt, style: .timer)
+                .font(.caption2.weight(.semibold))
+                .monospacedDigit()
+                .foregroundStyle(foreground)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .frame(maxWidth: 52, alignment: .trailing)
+        } else {
+            Text(compactStatusText(state))
+                .font(.caption2.weight(.semibold))
+                .monospacedDigit()
+                .foregroundStyle(Self.milk)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .frame(maxWidth: 52, alignment: .trailing)
+        }
     }
 
     private func repeatPill(_ state: FeedingReminderActivityAttributes.ContentState) -> some View {

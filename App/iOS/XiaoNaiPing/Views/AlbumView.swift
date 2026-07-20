@@ -222,7 +222,7 @@ struct AlbumView: View {
         if cloudBackup.hasSession {
             return "照片可随备份上传"
         }
-        return cloudBackup.isServiceConfigured ? "云备份尚未开启" : "当前仅保存在本机"
+        return cloudBackup.isServiceConfigured ? "正在等待自动同步" : "正在连接同步服务"
     }
 
     private var photoBackupDetail: String {
@@ -232,7 +232,7 @@ struct AlbumView: View {
         if cloudBackup.isServiceConfigured {
             return "开启账号与备份前，照片只保存在 App 私有空间，不会自动上传。"
         }
-        return "云端服务尚未配置；照片只保存在 App 私有空间，不会自动上传。"
+        return "照片会在联网后自动同步到你的账号。"
     }
 
     private var filteredEmptyState: some View {
@@ -364,7 +364,7 @@ struct AlbumView: View {
                     editingPhoto = nil
                 } else {
                     store.markCloudPhotoDeletePending(photo)
-                    importErrorMessage = "云端照片删除失败，本地照片已保留，请稍后重试。"
+                    importErrorMessage = "照片删除同步失败，请稍后重试。"
                 }
             }
         case .localOnly, .pending, .failed:
@@ -614,7 +614,7 @@ private extension PhotoBackupStatus {
     var title: String {
         switch self {
         case .localOnly:
-            "仅本机"
+            "等待同步"
         case .pending:
             "待备份"
         case .backedUp:
@@ -629,7 +629,7 @@ private extension PhotoBackupStatus {
     var accessibilityText: String {
         switch self {
         case .localOnly:
-            "当前仅保存在本机"
+            "联网后会自动同步"
         case .pending:
             "等待云备份"
         case .backedUp:

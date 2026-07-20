@@ -352,7 +352,7 @@ struct VaccineView: View {
     private func notificationMessage(for result: NotificationScheduleResult) -> String {
         switch result {
         case .scheduled:
-            "提醒已加入 iOS 本地通知。".localizedText
+            "提醒已加入 iOS 系统通知。".localizedText
         case .removed:
             "这条记录已接种或计划日期无效，未安排新通知。".localizedText
         case .denied:
@@ -671,7 +671,7 @@ private struct VaccineEditorSheet: View {
         if onSave(saved) {
             dismiss()
         } else {
-            errorMessage = "本地保存失败，请稍后再试。输入已保留。"
+            errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
     }
 

@@ -19,12 +19,61 @@ struct CloudBackupPayload: Codable {
     var hasCompletedOnboarding: Bool
     var baby: Baby
     var feedingRecords: [FeedingRecord]
+    var waterRecords: [WaterRecord]
     var sleepRecords: [SleepRecord]
     var diaperRecords: [DiaperRecord]
     var growthRecords: [GrowthRecord]
     var vaccineRecords: [VaccineRecord]
     var milestones: [Milestone]
     var babyPhotos: [BabyPhoto]
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, generatedAt, hasCompletedOnboarding, baby, feedingRecords, waterRecords, sleepRecords, diaperRecords, growthRecords, vaccineRecords, milestones, babyPhotos
+    }
+
+    init(
+        schemaVersion: Int,
+        generatedAt: Date,
+        hasCompletedOnboarding: Bool,
+        baby: Baby,
+        feedingRecords: [FeedingRecord],
+        waterRecords: [WaterRecord] = [],
+        sleepRecords: [SleepRecord],
+        diaperRecords: [DiaperRecord],
+        growthRecords: [GrowthRecord],
+        vaccineRecords: [VaccineRecord],
+        milestones: [Milestone],
+        babyPhotos: [BabyPhoto]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.generatedAt = generatedAt
+        self.hasCompletedOnboarding = hasCompletedOnboarding
+        self.baby = baby
+        self.feedingRecords = feedingRecords
+        self.waterRecords = waterRecords
+        self.sleepRecords = sleepRecords
+        self.diaperRecords = diaperRecords
+        self.growthRecords = growthRecords
+        self.vaccineRecords = vaccineRecords
+        self.milestones = milestones
+        self.babyPhotos = babyPhotos
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        generatedAt = try container.decode(Date.self, forKey: .generatedAt)
+        hasCompletedOnboarding = try container.decode(Bool.self, forKey: .hasCompletedOnboarding)
+        baby = try container.decode(Baby.self, forKey: .baby)
+        feedingRecords = try container.decode([FeedingRecord].self, forKey: .feedingRecords)
+        waterRecords = try container.decodeIfPresent([WaterRecord].self, forKey: .waterRecords) ?? []
+        sleepRecords = try container.decode([SleepRecord].self, forKey: .sleepRecords)
+        diaperRecords = try container.decode([DiaperRecord].self, forKey: .diaperRecords)
+        growthRecords = try container.decode([GrowthRecord].self, forKey: .growthRecords)
+        vaccineRecords = try container.decode([VaccineRecord].self, forKey: .vaccineRecords)
+        milestones = try container.decode([Milestone].self, forKey: .milestones)
+        babyPhotos = try container.decode([BabyPhoto].self, forKey: .babyPhotos)
+    }
 }
 
 struct LocalPhotoBackupAsset {
@@ -76,7 +125,7 @@ enum CloudBackupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingBaseURL:
-            return "云端服务尚未配置。"
+            return "同步服务暂不可用，请稍后重试。"
         case .missingSession:
             return "请先登录账号。"
         case .invalidPhoneNumber:

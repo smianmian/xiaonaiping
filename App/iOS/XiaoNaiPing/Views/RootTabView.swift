@@ -4,6 +4,7 @@ import UIKit
 enum AppRoute: Hashable {
     case album
     case feeding
+    case water
     case sleep
     case diaper
     case milestone
@@ -20,6 +21,7 @@ struct RootTabView: View {
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
     @State private var recordPath: [AppRoute] = []
+    @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
 
     init() {
         Self.configureTabBarAppearance()
@@ -47,6 +49,7 @@ struct RootTabView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
+        .preferredColorScheme(nightModeEnabled ? .dark : nil)
         .environmentObject(store)
         .environmentObject(cloudBackup)
         .onAppear(perform: syncFeedingReminderLiveActivity)
@@ -61,7 +64,7 @@ struct RootTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
             cloudBackup.scheduleAutomaticSync(store: store)
         }
-        .alert("本地保存失败", isPresented: saveErrorAlertBinding) {
+        .alert("保存失败", isPresented: saveErrorAlertBinding) {
             Button("知道了") {
                 store.clearSaveError()
             }
@@ -197,6 +200,8 @@ struct RootTabView: View {
             AlbumView()
         case .feeding:
             FeedingRecordView()
+        case .water:
+            WaterRecordView()
         case .sleep:
             SleepRecordView()
         case .diaper:
@@ -493,6 +498,80 @@ private struct LaunchLoginView: View {
     }
 }
 
+private struct WaterRecordView: View {
+    @EnvironmentObject private var store: BabyRecordStore
+    @State private var occurredAt = Date()
+    @State private var amountML = 60
+
+    var body: some View {
+        ScreenScaffold(title: "喝水记录", showBackButton: true) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.large) {
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
+                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                            Label("记录喝水", systemImage: "drop.fill")
+                                .font(AppTypography.sectionTitle)
+                                .foregroundStyle(AppColors.inkGreen)
+                            DatePicker("时间", selection: $occurredAt, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
+                                .tint(AppColors.blueInk)
+                            Stepper(value: $amountML, in: 10...600, step: 10) {
+                                HStack {
+                                    Text("饮水量")
+                                    Spacer()
+                                    Text("\(amountML)ml")
+                                        .foregroundStyle(AppColors.blueInk)
+                                }
+                                .font(AppTypography.bodyLarge)
+                                .foregroundStyle(AppColors.ink)
+                            }
+                            PrimaryWatercolorButton(title: "保存喝水记录", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
+                                guard store.upsert(WaterRecord(occurredAt: occurredAt, amountML: amountML)) else { return }
+                                occurredAt = Date()
+                                amountML = 60
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: AppSpacing.regular) {
+                        SectionTitleView(title: "今天喝水")
+                        if store.todayWaterRecords.isEmpty {
+                            WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+                                Text("今天还没有喝水记录。")
+                                    .font(AppTypography.body)
+                                    .foregroundStyle(AppColors.inkSoft)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        } else {
+                            ForEach(store.todayWaterRecords) { record in
+                                HStack {
+                                    Label("\(record.amountML)ml", systemImage: "drop.fill")
+                                        .font(AppTypography.bodyLarge)
+                                        .foregroundStyle(AppColors.inkGreen)
+                                    Spacer()
+                                    Text(BabyRecordStore.timeString(from: record.occurredAt))
+                                        .font(AppTypography.body)
+                                        .foregroundStyle(AppColors.inkSoft)
+                                    Button(role: .destructive) {
+                                        store.deleteWaterRecord(record)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                .padding(AppSpacing.medium)
+                                .background(AppColors.cream, in: RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous))
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, AppSpacing.page)
+                .padding(.vertical, AppSpacing.medium)
+                .padding(.bottom, AppSpacing.bottomBarSpace)
+            }
+        }
+    }
+}
+
 private struct RecordHomeView: View {
     @EnvironmentObject private var store: BabyRecordStore
 
@@ -577,6 +656,7 @@ private struct RecordHomeView: View {
         WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
             LazyVGrid(columns: columns, spacing: AppSpacing.medium) {
                 RecordSummaryMetric(title: "喂养", value: "\(store.feedingCount)次", detail: "\(store.milkAmountML)ml")
+                RecordSummaryMetric(title: "喝水", value: "\(store.todayWaterRecords.count)次", detail: "\(store.waterAmountML)ml")
                 RecordSummaryMetric(title: "睡眠", value: store.sleepDurationText, detail: store.ongoingSleep == nil ? "今日累计" : "进行中")
                 RecordSummaryMetric(title: "排便", value: "\(store.poopCount)次", detail: "小便 \(store.peeCount)次")
                 RecordSummaryMetric(title: "照片", value: "\(store.todayPhotoCount)张", detail: "今日新增")
@@ -613,7 +693,7 @@ private struct RecordHomeView: View {
     }
 
     private var todayRecordCount: Int {
-        store.feedingCount + store.todaySleepRecords.count + store.todayDiaperRecords.count + store.todayPhotoCount
+        store.feedingCount + store.todayWaterRecords.count + store.todaySleepRecords.count + store.todayDiaperRecords.count + store.todayPhotoCount
     }
 
     private var headerDetailText: String {
@@ -622,16 +702,18 @@ private struct RecordHomeView: View {
         }
 
         guard store.hasTodayRecords else {
-            return "喂养、睡眠、排便和照片都在这里。"
+            return "喂养、喝水、睡眠、排便和照片都在这里。"
         }
 
-        return "喂养 \(store.feedingCount) 次，睡眠 \(store.sleepDurationText)，排便 \(store.poopCount + store.peeCount) 次。"
+        return "喂养 \(store.feedingCount) 次，喝水 \(store.waterAmountML)ml，睡眠 \(store.sleepDurationText)。"
     }
 
     private func title(for action: QuickRecordAction) -> String {
         switch action {
         case .feeding:
             return "喂养"
+        case .water:
+            return "喝水"
         case .sleep:
             return store.ongoingSleep == nil ? "睡眠" : "结束睡眠"
         case .diaper:
@@ -649,6 +731,8 @@ private struct RecordHomeView: View {
         switch action {
         case .feeding:
             return .feeding
+        case .water:
+            return .water
         case .sleep:
             return .sleep
         case .diaper:
@@ -784,7 +868,7 @@ private struct OnboardingView: View {
                 Label("隐私提示", systemImage: "shield")
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("第一版记录先保存在本机；开启账号与备份后，会上传记录和主动加入 App 的照片原图，并可在资料页删除云端账号与备份。")
+                Text("登录后，宝宝资料、记录和主动加入 App 的照片原图会自动同步，并可在资料页管理账号与备份。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)

@@ -63,6 +63,11 @@
 | Account | 用户账号身份 | 是 | 是 | 是 |
 | BabyProfile | 宝宝档案 | 是 | 是 | 是 |
 | FeedingRecord | 喂养记录 | 是 | 是 | 是 |
+| WaterRecord | 喝水记录 | 是 | 是 | 是 |
+
+### WaterRecord
+
+字段：id、babyId、occurredAt、amountML、createdAt、updatedAt。喝水记录写入本地状态并随账号备份上传；旧备份缺少该字段时按空数组恢复。
 | SleepRecord | 睡眠记录 | 是 | 是 | 是 |
 | DiaperRecord | 排便记录 | 是 | 是 | 是 |
 | GrowthMeasurement | 身高体重记录 | 是 | 是 | 是 |

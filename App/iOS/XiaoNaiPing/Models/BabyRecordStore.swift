@@ -18,6 +18,7 @@ final class BabyRecordStore: ObservableObject {
     @Published var hasCompletedOnboarding = false
     @Published var baby = BabyRecordStore.emptyBaby
     @Published var feedingRecords: [FeedingRecord] = []
+    @Published var waterRecords: [WaterRecord] = []
     @Published var feedingReminder: FeedingReminder?
     @Published var sleepRecords: [SleepRecord] = []
     @Published var diaperRecords: [DiaperRecord] = []
@@ -85,6 +86,16 @@ final class BabyRecordStore: ObservableObject {
         todayFeedingRecords.compactMap(\.amountML).reduce(0, +)
     }
 
+    var waterAmountML: Int {
+        todayWaterRecords.map(\.amountML).reduce(0, +)
+    }
+
+    var todayWaterRecords: [WaterRecord] {
+        waterRecords
+            .filter { Calendar.current.isDateInToday($0.occurredAt) }
+            .sorted { $0.occurredAt > $1.occurredAt }
+    }
+
     var lastFeedingRecord: FeedingRecord? {
         todayFeedingRecords.first
     }
@@ -123,6 +134,7 @@ final class BabyRecordStore: ObservableObject {
 
     var hasTodayRecords: Bool {
         !todayFeedingRecords.isEmpty
+            || !todayWaterRecords.isEmpty
             || !todaySleepRecords.isEmpty
             || !todayDiaperRecords.isEmpty
             || todayPhotoCount > 0
@@ -176,6 +188,16 @@ final class BabyRecordStore: ObservableObject {
                 detail: record.isOngoing ? "从 \(record.start) 开始" : record.duration
             )
         }
+        let water = todayWaterRecords.map { record in
+            HomeRecentRecord(
+                id: "water-\(record.id.uuidString)",
+                sortDate: record.occurredAt,
+                time: Self.timeString(from: record.occurredAt),
+                icon: AppAssets.peeDropIcon,
+                title: "喝水",
+                detail: "\(record.amountML)ml"
+            )
+        }
         let diaper = todayDiaperRecords.map { record in
             HomeRecentRecord(
                 id: "diaper-\(record.id.uuidString)",
@@ -197,7 +219,7 @@ final class BabyRecordStore: ObservableObject {
             )
         }
 
-        return (feeding + sleep + diaper + photos)
+        return (feeding + water + sleep + diaper + photos)
             .sorted { $0.sortDate > $1.sortDate }
     }
 
@@ -294,7 +316,7 @@ final class BabyRecordStore: ObservableObject {
             heightDelta: Self.delta(latest?.height == 0 ? nil : latest?.height, previous?.height == 0 ? nil : previous?.height),
             milestoneCount: monthlyMilestones.count,
             vaccineOpenCount: monthlyVaccines.filter { !$0.isAdministered }.count,
-            recordCount: monthlyFeedings.count + monthlySleep.count + monthlyDiapers.count + monthlyPhotos.count + monthlyGrowth.count + monthlyMilestones.count + monthlyVaccines.count
+            recordCount: monthlyFeedings.count + waterRecords.filter { Self.isSameMonth($0.occurredAt, monthDate: monthDate) }.count + monthlySleep.count + monthlyDiapers.count + monthlyPhotos.count + monthlyGrowth.count + monthlyMilestones.count + monthlyVaccines.count
         )
     }
 
@@ -366,6 +388,35 @@ final class BabyRecordStore: ObservableObject {
         feedingRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             feedingRecords = previous
+            return false
+        }
+        return true
+    }
+
+    @discardableResult
+    func upsert(_ record: WaterRecord) -> Bool {
+        let previous = waterRecords
+        var saved = record
+        saved.babyId = baby.id
+        saved.updatedAt = Date()
+        if let index = waterRecords.firstIndex(where: { $0.id == saved.id }) {
+            waterRecords[index] = saved
+        } else {
+            waterRecords.insert(saved, at: 0)
+        }
+        guard saveState() else {
+            waterRecords = previous
+            return false
+        }
+        return true
+    }
+
+    @discardableResult
+    func deleteWaterRecord(_ record: WaterRecord) -> Bool {
+        let previous = waterRecords
+        waterRecords.removeAll { $0.id == record.id }
+        guard saveState() else {
+            waterRecords = previous
             return false
         }
         return true
@@ -662,6 +713,7 @@ final class BabyRecordStore: ObservableObject {
         AppNotificationScheduler.removeVaccineReminders(vaccineRecords)
         feedingReminder = nil
         feedingRecords.removeAll()
+        waterRecords.removeAll()
         sleepRecords.removeAll()
         diaperRecords.removeAll()
         growthRecords.removeAll()
@@ -777,6 +829,7 @@ final class BabyRecordStore: ObservableObject {
             hasCompletedOnboarding: hasCompletedOnboarding,
             baby: baby,
             feedingRecords: feedingRecords,
+            waterRecords: waterRecords,
             sleepRecords: sleepRecords,
             diaperRecords: diaperRecords,
             growthRecords: growthRecords,
@@ -797,6 +850,7 @@ final class BabyRecordStore: ObservableObject {
         baby = payload.baby
         hasCompletedOnboarding = payload.hasCompletedOnboarding
         feedingRecords = payload.feedingRecords
+        waterRecords = payload.waterRecords
         sleepRecords = payload.sleepRecords
         diaperRecords = payload.diaperRecords
         growthRecords = payload.growthRecords
@@ -842,6 +896,11 @@ final class BabyRecordStore: ObservableObject {
             var updated = record
             updated.syncStatus = .synced
             return updated
+        }
+        waterRecords = waterRecords.map { record in
+            var normalized = record
+            normalized.babyId = baby.id
+            return normalized
         }
         sleepRecords = sleepRecords.map { record in
             var updated = record
@@ -966,6 +1025,7 @@ final class BabyRecordStore: ObservableObject {
         baby = state.baby
         hasCompletedOnboarding = state.hasCompletedOnboarding
         feedingRecords = state.feedingRecords
+        waterRecords = state.waterRecords
         feedingReminder = state.feedingReminder
         sleepRecords = state.sleepRecords
         diaperRecords = state.diaperRecords
@@ -988,6 +1048,7 @@ final class BabyRecordStore: ObservableObject {
             hasCompletedOnboarding: hasCompletedOnboarding,
             baby: baby,
             feedingRecords: feedingRecords,
+            waterRecords: waterRecords,
             feedingReminder: feedingReminder,
             sleepRecords: sleepRecords,
             diaperRecords: diaperRecords,
@@ -1009,7 +1070,7 @@ final class BabyRecordStore: ObservableObject {
             NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
             return true
         } catch {
-            saveErrorMessage = "本地保存失败，请检查设备存储空间后重试。"
+            saveErrorMessage = "保存失败，请检查网络或设备存储空间后重试。"
             return false
         }
     }
@@ -1292,6 +1353,7 @@ private struct LocalAppState: Codable {
     var hasCompletedOnboarding: Bool
     var baby: Baby
     var feedingRecords: [FeedingRecord]
+    var waterRecords: [WaterRecord]
     var feedingReminder: FeedingReminder?
     var sleepRecords: [SleepRecord]
     var diaperRecords: [DiaperRecord]
@@ -1306,6 +1368,7 @@ private struct LocalAppState: Codable {
         case hasCompletedOnboarding
         case baby
         case feedingRecords
+        case waterRecords
         case feedingReminder
         case sleepRecords
         case diaperRecords
@@ -1321,6 +1384,7 @@ private struct LocalAppState: Codable {
         hasCompletedOnboarding: Bool,
         baby: Baby,
         feedingRecords: [FeedingRecord],
+        waterRecords: [WaterRecord] = [],
         feedingReminder: FeedingReminder? = nil,
         sleepRecords: [SleepRecord],
         diaperRecords: [DiaperRecord],
@@ -1334,6 +1398,7 @@ private struct LocalAppState: Codable {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
         self.feedingRecords = feedingRecords
+        self.waterRecords = waterRecords
         self.feedingReminder = feedingReminder
         self.sleepRecords = sleepRecords
         self.diaperRecords = diaperRecords
@@ -1350,6 +1415,7 @@ private struct LocalAppState: Codable {
         hasCompletedOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? false
         baby = try container.decode(Baby.self, forKey: .baby)
         feedingRecords = try container.decode([FeedingRecord].self, forKey: .feedingRecords)
+        waterRecords = try container.decodeIfPresent([WaterRecord].self, forKey: .waterRecords) ?? []
         feedingReminder = try container.decodeIfPresent(FeedingReminder.self, forKey: .feedingReminder)
         sleepRecords = try container.decode([SleepRecord].self, forKey: .sleepRecords)
         diaperRecords = try container.decode([DiaperRecord].self, forKey: .diaperRecords)
