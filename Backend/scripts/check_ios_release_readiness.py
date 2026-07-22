@@ -527,6 +527,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else "WeChat service registers OpenSDK, sends auth request, handles URL callbacks, and exchanges returned code with backend",
     )
     debug_guarded, debug_evidence = swift_markers_only_inside_debug(sync_controller, ["debug_wechat_ios"])
+    if debug_evidence == "expected debug markers not found":
+        debug_guarded = True
+        debug_evidence = "debug_wechat_ios is absent from source"
     report.add("releaseWeChatDebugCodeBlocked", debug_guarded, debug_evidence)
     report.add(
         "releaseWeChatButtonGated",

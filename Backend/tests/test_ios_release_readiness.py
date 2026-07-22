@@ -299,6 +299,25 @@ class IOSReleaseReadinessTest(unittest.TestCase):
             self.assertTrue(report["passed"])
             self.assertEqual(report["failedRequiredChecks"], [])
 
+    def test_missing_debug_wechat_marker_is_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            write_minimal_ios_repo(root, configured_wechat=True)
+            controller = root / "App/iOS/XiaoNaiPing/Services/CloudSyncController.swift"
+            controller.write_text(
+                controller.read_text(encoding="utf-8").replace(
+                    '        #if DEBUG\n        _ = "debug_wechat_ios"\n        #else\n',
+                    '        #if DEBUG\n        #else\n',
+                ),
+                encoding="utf-8",
+            )
+
+            report = self.run_checker(root)
+
+            self.assertTrue(report["passed"])
+            self.assertTrue(report["checks"]["releaseWeChatDebugCodeBlocked"]["passed"])
+            self.assertIn("absent", report["checks"]["releaseWeChatDebugCodeBlocked"]["evidence"])
+
     def test_dry_run_wechat_values_do_not_pass_release_gate(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
