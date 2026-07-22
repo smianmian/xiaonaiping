@@ -1,0 +1,93 @@
+{
+  "startedAt": "2026-06-27T12:43:03+00:00",
+  "completedAt": "2026-06-27T12:43:03+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "submissionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md"
+    },
+    "chinaRunbookPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md"
+    },
+    "evidenceReadmePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/README.md"
+    },
+    "captureGuidePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md"
+    },
+    "smsAdapterDocPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Backend/deploy/aliyun-sms-webhook-adapter.md"
+    },
+    "wechatClientConfigurationPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md"
+    },
+    "externalPlatformEvidenceHandoffPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260627.md"
+    },
+    "obsHandoffDocPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Backend/deploy/huawei-obs.md"
+    },
+    "providerEvidenceFilenamesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "07 SMS, 08 WeChat, and 09 OBS evidence filenames are documented"
+    },
+    "providerEvidenceRedactionCovered": {
+      "passed": true,
+      "required": true,
+      "evidence": "capture guide covers provider fields to keep and secrets to redact"
+    },
+    "smsProviderMaterialCoversSignatureTemplateSendAndSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "SMS material covers signature, template, send success, webhook signing, and secret redaction"
+    },
+    "wechatOpenPlatformMaterialCoversClientServerSecretBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat material covers AppID, Bundle ID, URL Scheme, Universal Link, server AppSecret, and evidence path"
+    },
+    "huaweiObsMaterialCoversBucketEncryptionLifecycleDeletion": {
+      "passed": true,
+      "required": true,
+      "evidence": "OBS material covers bucket/prefix, region, encryption, lifecycle, deletion validation, and key redaction"
+    },
+    "externalPlatformEvidenceHandoffReady": {
+      "passed": true,
+      "required": true,
+      "evidence": "external platform handoff covers WeChat, SMS, OBS, filing/privacy/App Store evidence, production proof refresh, and iOS 26.5 real-device evidence boundaries"
+    },
+    "preSubmitCommandsIncludeProviderEvidenceGate": {
+      "passed": true,
+      "required": true,
+      "evidence": "pre-submit commands include provider evidence material gate and related live provider/storage checks"
+    },
+    "providerEvidenceMaterialsDoNotExposeSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "provider evidence materials do not expose recovery keys, tokens, debug codes, API keys, full phone numbers, or literal provider secrets"
+    },
+    "doesNotPretendProviderEvidenceCompleteBeforeFiles": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials do not claim SMS/WeChat/OBS evidence is complete before archived real evidence files exist"
+    }
+  }
+}

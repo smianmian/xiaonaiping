@@ -3,94 +3,48 @@
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录
-- 阶段：App Store 合规时间线更新
-- 日期：2026-06-18
+- 阶段：App Store 合规时间线当前版
+- 日期：2026-07-04
 - 公司主体：深圳市闪现生活科技有限公司
+- 当前总闸门：`Backend/proof/production-readiness.json` 和 `Backend/proof/launch-objective-audit.json` 任一不是 `ready=true` 时，不得提交 App Store Connect 审核。
 
-## 已确认事实
+## 当前材料状态
 
-1. 第一版目标是真实可上线 iOS App。
-2. 第一版免费验证。
-3. 第一版首发地区调整为中国大陆，香港第二批。
-4. 第一版需要账号、备份恢复和照片原图云备份。
-5. 涉及儿童、照片、家庭成长记录。
-6. 疫苗模板覆盖中国大陆 + 香港，崩溃上报进入第一版并使用 Apple 原生渠道。
-7. App 内语言跟随系统，简体中文用于中国大陆，已加入繁体中文香港 `zh-Hant-HK` 资源。
+1. App Store Connect 草稿字段已经整理到 `Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json`。
+2. 字段冻结和现场粘贴顺序由 `Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260704.json` 约束。
+3. Submit for Review 前置检查由 `Docs/08_Release/APP_STORE_CONNECT_SUBMIT_REVIEW_PREFLIGHT_20260704.json` 约束。
+4. App Store submission packet 由 `Backend/proof/app-store-submission-packet.json` 证明当前材料包可机检，但不是提交许可。
 
-## 合理推断
+## D-U-N-S 到 TestFlight 时间线
 
-1. 隐私政策、用户协议和 App Privacy Label 不能等到开发完再补。
-2. 账号删除是审核阻断项。
-3. 照片原图云备份需要在 Review Notes 和隐私标签中清楚说明。
-4. 中国大陆 APP 备案、生产联网服务和 App Store Connect 大陆合规信息是第一版阻断项。
+1. D-U-N-S 交付后按 `Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md` 继续 Apple Developer Organization enrollment。
+2. 结构化动作包为 `Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json`。
+3. 完成后确认 Team ID、App Store Distribution Archive 和 TestFlight。
+4. 如果 Apple Developer 显示 Team ID 与当前工程值不一致，先同步 project、ExportOptions、AASA、微信 Universal Link 和提交材料，再 Archive / TestFlight。
 
-## 待我确认的问题
+## 隐私、年龄分级和审核信息
 
-1. Apple Developer 账号是否已准备。
-2. 隐私政策和用户协议托管方式。
-3. 中国大陆 APP 备案负责人和预计完成时间。
-4. 付费 Apple Developer 账号开通时间。
-5. Apple 原生崩溃上报脱敏验证方式。
+1. 隐私标签答案表：`Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260704.md`。
+2. 年龄分级答案表：`Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260704.md`。
+3. 审核信息：`Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md`。
+4. 这些材料只证明草稿和现场填写依据，不替代 App Store Connect 人工页面证据。
 
-## 不进入第一版的功能
+## 生产、备案和外部平台
 
-1. IAP 商品创建。
-2. 订阅审核。
-3. 付费协议依赖。
+1. 生产/隐私证据入库工作台：`Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260704.md`。
+2. APP/ICP/公安联网备案执行包：`Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260704.json`。
+3. 微信 Release 配置：`Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260704.json`。
+4. 短信实发：`Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json`。
+5. OBS proof：`Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json`。
+6. 当前生产 proof refresh status 仍为 `stableAliasSyncAllowed=false`；不能同步 stable aliases，也不能把 current proof 模板当真实证据。
 
-## T-60 天：立项合规判断
+## 真机/TestFlight
 
-- [x] 首发地区确认：中国大陆，香港第二批。
-- [x] 是否中国大陆首发确认：是。
-- [x] 是否有账号确认：是。
-- [x] 是否有后端服务器存储确认：是。
-- [x] 是否上传照片原图确认：是。
-- [ ] Apple Developer 账号状态确认。
-- [ ] 付费 Apple Developer 账号开通计划确认。
-- [ ] 深圳市闪现生活科技有限公司主体资料确认。
-- [ ] 正式域名、华为云中国大陆区域和 APP 备案接入信息确认。
-- [ ] APP 备案提交。
-- [x] 隐私政策/用户协议 URL 方案确认：生产域名下 `/privacy`、`/terms`、`/support`。
+1. 只接受 iOS 26.5。
+2. 真机采集预检：`Docs/08_Release/AppStoreEvidence/RealDevice/REAL_DEVICE_CAPTURE_PREFLIGHT_20260704.json`。
+3. 重点采集包：`Docs/08_Release/AppStoreEvidence/RealDevice/FOCUSED_CAPTURE_PACKET_20260704.json`。
+4. 模拟器、iOS 27、Debug candidate、模板截图、空白图或口头结论不能替代 iOS 26.5 TestFlight / 签名真机证据。
 
-## T-30 天：App Store Connect 准备
+## 当前提交结论
 
-- [ ] App record。
-- [ ] Bundle ID。
-- [ ] App 名称。
-- [ ] 分类和年龄分级。
-- [ ] App Privacy Label：账号、用户内容、照片/视频、成长记录。
-- [ ] App Privacy Label：Diagnostics / 崩溃上报。
-- [x] Support URL 方案：生产域名下 `/support`。
-- [x] Privacy Policy URL 方案：生产域名下 `/privacy`。
-- [x] 截图计划。
-- [x] 中国大陆简体中文元数据草案。
-- [x] App 内 `zh-Hant-HK` 资源接入。
-- [ ] 中国大陆简体中文元数据和截图最终校对。
-- [ ] 香港第二批繁中高频文案人工校对。
-- [x] Review Notes 草案。
-- [x] Demo account 或可审核登录路径：资料 -> 账号与备份 -> 创建账号并备份。
-- [x] 删除账号路径说明。
-- [x] 疫苗模板说明：中国大陆 + 香港，非医疗建议。
-
-## T-14 天：TestFlight 和审核模拟
-
-- [ ] 首次安装流程。
-- [ ] 账号登录流程。
-- [ ] 备份恢复流程。
-- [ ] 照片原图上传和恢复流程。
-- [ ] 权限拒绝流程。
-- [ ] 删除本地和云端数据流程。
-- [ ] 断网记录流程。
-- [ ] 删除账号流程。
-- [x] 代码层诊断/日志脱敏 proof：`Backend/proof/diagnostics-redaction.json`。
-- [ ] TestFlight / App Store Connect 真实崩溃样本脱敏截图或导出。
-
-## T-7 天：提交审核
-
-- [ ] 中国大陆 APP 备案和适用合规信息已通过。
-- [ ] App Store Connect 第一批只勾选中国大陆。
-- [ ] 华为云正式 API、宝塔 MySQL、私有 OBS、短信和微信登录远程验证通过。
-- [ ] Review Notes 写清楚免费验证、无医疗建议、账号备份恢复、照片原图云备份、删除路径。
-- [ ] 隐私标签与 SDK 清单一致。
-- [ ] Apple 原生崩溃上报与 SDK 清单一致。
-- [ ] 隐私政策和用户协议 URL 可访问。
+当前不得提交 App Store Connect 审核。必须先补齐 D-U-N-S 后 Apple Developer Organization enrollment、Team ID、Archive、TestFlight、微信/短信/OBS、备案、App Store 人工证据、最终截图上传 provenance、iOS 26.5 真机回归，并让 production readiness 和 launch objective audit 都变绿。

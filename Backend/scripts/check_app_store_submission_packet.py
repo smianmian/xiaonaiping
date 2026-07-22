@@ -23,6 +23,20 @@ REVIEW_BOUNDARY_MARKERS = {
     "liveActivityBoundary": ("灵动岛", "Live Activity", "下一次喝奶提醒"),
     "widgetBoundary": ("小组件", "今日摘要"),
     "statusDisplayBoundary": ("状态展示",),
+    "manualFeedingReminderDeferral": (
+        "手动顺延下一次提醒",
+        "5 分钟一档",
+        "不顺延",
+        "+5",
+        "+10",
+        "+15",
+        "+20",
+        "+25",
+        "+30 分钟",
+    ),
+    "feedingReminderDeferralCalculation": ("本顿结束时间 + 固定间隔 + 顺延分钟", "本顿发生时间"),
+    "feedingReminderDeferralPersistenceBoundary": ("顺延只改变下一次提醒时间", "不新增持久化字段"),
+    "noAutomaticFeedingInference": ("不根据奶量、月龄、传感器或健康数据自动推算喂养时间",),
     "userEnteredDataSource": ("用户在 App 内输入", "本机记录"),
     "noHealthPressureFeedingAdvice": ("不生成健康建议、压力提醒、喂养建议",),
     "noHealthKit": ("不接入 HealthKit",),
@@ -47,6 +61,8 @@ PRIVACY_SOURCE_MARKERS = (
 
 PRE_SUBMIT_COMMAND_MARKERS = (
     "run_launch_readiness.sh",
+    "--ios-simulator-log Backend/proof/xcodebuild-release-ios265-20260629-stable.log",
+    "--ios-device-log Backend/proof/xcodebuild-release-ios265-20260629-device-current.log",
     "check_ios_265_build_proof.py",
     "check_ios_app_bundle.py",
     "check_testflight_precheck.py",
@@ -96,19 +112,68 @@ RELEASE_BUNDLE_IOS265_MARKERS = (
     "`wx...` URL Scheme",
 )
 CURRENT_GATE_STATUS_MARKERS = (
-    "Backend/proof/app-store-connect-materials-20260627-current.json",
-    "Backend/proof/app-store-evidence-20260627T-current.json",
-    "Backend/proof/production-readiness-20260627T-current.json",
-    "Backend/proof/auth-providers-20260627T-current.json",
-    "Backend/proof/ios-app-bundle-20260627T-current-ios265.json",
-    "wechatProviderConfigured",
+    "Backend/proof/app-store-connect-materials.json",
+    "Backend/proof/app-store-evidence.json",
+    "Backend/proof/production-readiness.json",
+    "Backend/proof/launch-objective-audit.json",
+    "Backend/proof/testflight-regression-plan.json",
+    "Backend/proof/provider-evidence-materials.json",
+    "Backend/proof/mainland-filing-materials.json",
+    "Backend/proof/signed-archive-testflight-materials.json",
+    "Backend/proof/auth-providers.json",
+    "Backend/proof/ios-app-bundle.json",
+    "productionSecretConfigured",
+    "productionDataDirConfigured",
+    "mysqlDatabaseSelected",
+    "mysqlDatabaseEnvPresent",
+    "phoneLoginProviderConfigured",
+    "wechatLoginProviderConfigured",
+    "privateOperationsDashboardConfigured",
+    "publicInternalDashboardBlocked",
+    "xiaonaipingProductionNamespaceConfigured",
+    "testFlightRegressionPlanProofPassed",
+    "appStoreAssetsProofPassed",
+    "authProvidersProofPassed",
     "weChatNativeConfigPresent",
     "weChatURLTypePresent",
-    "appStoreManualEvidenceReady",
+    "XiaoNaiPing submit permission",
+    "not ready",
+    "iOS 26.5 real-device evidence",
+)
+CURRENT_SUBMISSION_PACKET_MARKERS = (
+    "Date: 2026-06-30",
+    "## Current 2026-06-30 Gate Status",
+    "XiaoNaiPing submit permission",
+    "Backend/proof/provider-evidence-materials.json",
+    "Backend/proof/mainland-filing-materials.json",
+    "Backend/proof/signed-archive-testflight-materials.json",
+    "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260630.md",
+    "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260630.md",
+    "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260630.md",
+    "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260630.md",
+)
+FORBIDDEN_SUBMISSION_PACKET_MARKERS = (
+    "Cross-app submission guard",
+    "cross-app-submission-readiness",
+    "check-cross-app-submit-ready",
+    "canSubmit=true",
     "canSubmit=false",
 )
+STALE_SUBMISSION_PACKET_MARKERS = (
+    "Current 2026-06-29 Gate Status",
+    "APP_STORE_EVIDENCE_CHECKLIST_20260629.md",
+    "APP_STORE_CONNECT_COPY_PASTE_20260629.md",
+    "APP_STORE_CONNECT_FILL_SHEET_20260629.md",
+    "APP_STORE_AGE_RATING_ANSWERS_20260629.md",
+    "Current 2026-06-28 Gate Status",
+    "cross-app-submission-readiness-20260628-current.json",
+    "APP_STORE_EVIDENCE_CHECKLIST_20260628.md",
+    "APP_STORE_CONNECT_COPY_PASTE_20260628.md",
+    "APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+    "APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+)
 MANUAL_EVIDENCE_CHECKLIST_MARKERS = (
-    "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260627.md",
+    "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260630.md",
     "manualEvidenceChecklist",
     "RD-01",
     "RD-24",
@@ -118,18 +183,67 @@ MANUAL_EVIDENCE_CHECKLIST_MARKERS = (
     "不生成健康建议、压力提醒、喂养建议或医疗判断",
 )
 CURRENT_RELEASE_BUNDLE_MARKERS = (
-    "Backend/proof/xcodebuild-debug-ios265-20260627.log",
-    "Backend/proof/xcodebuild-release-ios265-20260627.log",
-    "Backend/proof/ios-app-bundle-20260627T-current-ios265.json",
+    "Backend/proof/xcodebuild-release-ios265-20260629-stable.log",
+    "Backend/proof/xcodebuild-release-ios265-20260629-device-current.log",
+    "Backend/proof/ios-app-bundle.json",
     "weChatNativeConfigPresent",
     "weChatURLTypePresent",
 )
 STALE_RELEASE_BUNDLE_MARKERS = (
+    "xcodebuild-debug-ios265-20260629.log",
+    "xcodebuild-release-ios265-20260629.log",
+    "xcodebuild-debug-ios265-20260628.log",
+    "xcodebuild-release-ios265-20260628.log",
+    "xcodebuild-release-ios265-20260628-device-current.log",
+    "xcodebuild-release-ios265-20260629-sim-current.log",
     "XiaoNaiPing-BundleReuse-Release",
     "iphoneos18.5",
     "iphonesimulator18.5",
     "DTSDKName=iphoneos18.5",
     "OS=18.5",
+)
+
+AGE_RATING_ANSWERS_MARKERS = (
+    "日期：2026-06-30",
+    "set-an-app-age-rating",
+    "declare-regulated-medical-device-status",
+    "Kids Category",
+    "父母和照护者",
+    "不面向儿童直接使用",
+    "4+",
+    "App Store Connect 问卷自动计算结果为准",
+    "Age Categories and Override",
+    "Not Applicable",
+    "Made for Kids",
+    "公开 UGC",
+    "社交",
+    "聊天",
+    "无 IAP",
+    "无广告",
+    "无第三方分析 SDK",
+    "无赌博",
+    "无成人内容",
+    "Health-related records",
+    "不接入 HealthKit",
+    "传感器",
+    "医院系统",
+    "手动顺延下一次提醒",
+    "不根据奶量、月龄、传感器或健康数据自动推算喂养时间",
+    "Regulated Medical Device",
+    "No",
+    "not a medical device",
+    "does not provide diagnosis",
+    "does not provide diagnosis, prevention, monitoring, treatment",
+    "FDA",
+    "CE mark",
+    "UKCA",
+    "提交前重检项",
+)
+
+AGE_RATING_PACKET_REFERENCE_MARKERS = (
+    "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260630.md",
+    "Age Rating And Medical Device Answers",
+    "App Store Connect 问卷自动计算结果为准",
 )
 
 FORBIDDEN_SECRET_PATTERNS = {
@@ -207,14 +321,43 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     root = Path(args.repo_root).resolve()
     packet_path = root / args.packet
     packet = read_text(packet_path)
+    age_rating_answers_path = root / args.age_rating_answers
+    age_rating_answers = read_text(age_rating_answers_path)
     report = Report()
 
     report.add("submissionPacketPresent", bool(packet), str(packet_path) if packet else "missing submission packet")
-    secret_hits = forbidden_secret_hits(packet)
+    report.add(
+        "ageRatingAnswersPresent",
+        bool(age_rating_answers),
+        str(age_rating_answers_path) if age_rating_answers else "missing age rating answer sheet",
+    )
+    secret_hits = forbidden_secret_hits(packet + "\n" + age_rating_answers)
     report.add(
         "submissionPacketDoesNotExposeSecrets",
         not secret_hits,
-        "found: " + ", ".join(secret_hits) if secret_hits else "submission packet does not expose recovery keys, tokens, debug codes, API keys, or complete phone numbers",
+        "found: " + ", ".join(secret_hits) if secret_hits else "submission packet and age rating answer sheet do not expose recovery keys, tokens, debug codes, API keys, or complete phone numbers",
+    )
+    missing_current_packet_markers = [
+        marker for marker in CURRENT_SUBMISSION_PACKET_MARKERS if marker not in packet
+    ]
+    stale_packet_markers = [marker for marker in STALE_SUBMISSION_PACKET_MARKERS if marker in packet]
+    forbidden_packet_markers = [
+        marker for marker in FORBIDDEN_SUBMISSION_PACKET_MARKERS if marker in packet
+    ]
+    report.add(
+        "submissionPacketUsesCurrentDayMaterials",
+        bool(packet)
+        and not missing_current_packet_markers
+        and not stale_packet_markers
+        and not forbidden_packet_markers,
+        "missing: "
+        + ", ".join(missing_current_packet_markers)
+        + "; stale: "
+        + ", ".join(stale_packet_markers)
+        + "; forbidden: "
+        + ", ".join(forbidden_packet_markers)
+        if missing_current_packet_markers or stale_packet_markers or forbidden_packet_markers
+        else "submission packet references 2026-06-30 current App Store, evidence, age-rating, and XiaoNaiPing submit proof materials",
     )
 
     missing_urls = [url for url in OFFICIAL_APPLE_URLS.values() if url not in packet]
@@ -244,7 +387,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "App Information does not use Health & Fitness category wording",
     )
 
-    current_gate_status = extract_section(packet, "Current 2026-06-27 Gate Status")
+    current_gate_status = extract_section(packet, "Current 2026-06-30 Gate Status")
     missing_current_gate_markers = [
         marker for marker in CURRENT_GATE_STATUS_MARKERS if marker not in current_gate_status
     ]
@@ -253,7 +396,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         bool(current_gate_status) and not missing_current_gate_markers,
         "missing: " + ", ".join(missing_current_gate_markers)
         if missing_current_gate_markers
-        else "current gate status uses 2026-06-27 proof files and names active blockers",
+        else "current gate status uses 2026-06-30 current proof files and names active blockers",
     )
 
     missing_manual_checklist_markers = [
@@ -312,6 +455,26 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         if missing_age_medical_markers
         else "age rating and regulated medical device answers are explicit",
     )
+    missing_age_answer_markers = [
+        marker for marker in AGE_RATING_ANSWERS_MARKERS if marker not in age_rating_answers
+    ]
+    report.add(
+        "ageRatingAnswerSheetComplete",
+        bool(age_rating_answers) and not missing_age_answer_markers,
+        "missing: " + ", ".join(missing_age_answer_markers)
+        if missing_age_answer_markers
+        else "dedicated age rating answer sheet covers Kids, content, medical-device, data-source, and re-check boundaries",
+    )
+    missing_packet_age_references = [
+        marker for marker in AGE_RATING_PACKET_REFERENCE_MARKERS if marker not in packet
+    ]
+    report.add(
+        "ageRatingAnswerSheetReferenced",
+        not missing_packet_age_references,
+        "missing: " + ", ".join(missing_packet_age_references)
+        if missing_packet_age_references
+        else "submission packet references the dedicated age rating answer sheet",
+    )
 
     release_bundle = extract_section(packet, "Release Bundle Verification")
     missing_release_bundle_markers = [marker for marker in RELEASE_BUNDLE_IOS265_MARKERS if marker not in release_bundle]
@@ -356,6 +519,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--packet", default="Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md")
+    parser.add_argument("--age-rating-answers", default="Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260630.md")
     parser.add_argument("--output", default="Backend/proof/app-store-submission-packet.json")
     parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()

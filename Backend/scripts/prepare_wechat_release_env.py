@@ -71,6 +71,15 @@ def export_lines(values: dict[str, str]) -> str:
         "# Contains WeChat client identifiers only. Do not add AppSecret here.",
     ]
     lines.extend(f"export {key}={shlex.quote(value)}" for key, value in values.items())
+    lines.extend(
+        [
+            "",
+            "# After sourcing this file, append these build setting arguments to xcodebuild:",
+            '# XNP_WECHAT_APP_ID="$XNP_WECHAT_APP_ID"',
+            '# XNP_WECHAT_URL_SCHEME="$XNP_WECHAT_URL_SCHEME"',
+            '# XNP_WECHAT_UNIVERSAL_LINK="$XNP_WECHAT_UNIVERSAL_LINK"',
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -131,6 +140,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "containsSecrets": False,
         "failedRequiredChecks": failed,
         "envKeys": list(env_values.keys()),
+        "xcodebuildBuildSettingTemplate": [
+            'XNP_WECHAT_APP_ID="$XNP_WECHAT_APP_ID"',
+            'XNP_WECHAT_URL_SCHEME="$XNP_WECHAT_URL_SCHEME"',
+            'XNP_WECHAT_UNIVERSAL_LINK="$XNP_WECHAT_UNIVERSAL_LINK"',
+        ],
         "checks": checks,
         "envValues": env_values if args.include_values_in_json else {},
     }

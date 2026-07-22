@@ -26,14 +26,18 @@ def read_json(path: Path) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
-def collect_devicectl_json() -> tuple[dict[str, Any], str]:
+def collect_devicectl_json(timeout_seconds: float) -> tuple[dict[str, Any], str]:
     with tempfile.NamedTemporaryFile(prefix="xnp-devices-", suffix=".json", delete=True) as file:
-        completed = subprocess.run(
-            ["xcrun", "devicectl", "list", "devices", "--json-output", file.name],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
+        try:
+            completed = subprocess.run(
+                ["xcrun", "devicectl", "list", "devices", "--json-output", file.name],
+                text=True,
+                capture_output=True,
+                check=False,
+                timeout=timeout_seconds,
+            )
+        except subprocess.TimeoutExpired:
+            return {}, f"devicectl timed out after {timeout_seconds:g}s"
         if completed.returncode != 0:
             return {}, (completed.stderr or completed.stdout or "devicectl failed").strip()
         data = read_json(Path(file.name))
@@ -145,7 +149,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         collection_error = "" if data else f"missing or invalid {args.devices_json}"
     else:
         source = "xcrun devicectl list devices"
-        data, collection_error = collect_devicectl_json()
+        data, collection_error = collect_devicectl_json(args.devicectl_timeout_seconds)
 
     raw_devices = data.get("result", {}).get("devices", []) if isinstance(data.get("result"), dict) else []
     devices = [device for device in raw_devices if isinstance(device, dict)]
@@ -176,7 +180,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         },
         "eligibleIOS265PhysicalIphoneAvailable": {
             "passed": bool(eligible),
-            "required": False,
+            "required": True,
             "evidence": "eligible iOS 26.5 iPhone available"
             if eligible
             else "no available physical iPhone on iOS 26.5",
@@ -209,8 +213,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--devices-json", default="")
+    parser.add_argument("--devicectl-timeout-seconds", type=float, default=60.0)
     parser.add_argument("--required-ios", default="26.5")
     parser.add_argument("--output", default="Backend/proof/ios265-device-availability.json")
+    parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()
 
     result = build_report(args)
@@ -224,6 +230,10 @@ def main() -> None:
         print(f"iOS 26.5 device availability proof passed: {output_path}")
         return
     failed = ", ".join(result["failedRequiredChecks"])
+    if args.allow_incomplete:
+        print(f"iOS 26.5 device availability proof incomplete: {output_path}")
+        print(f"failed required checks: {failed}")
+        return
     raise SystemExit(f"iOS 26.5 device availability proof failed: {failed}")
 
 

@@ -1,0 +1,330 @@
+{
+  "artifactType": "app-store-connect-submit-review-preflight",
+  "status": "preflight-plan-not-evidence",
+  "date": "2026-07-04",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "canSubmitFromThisPacket": false,
+  "sourceFiles": {
+    "draftJson": "Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json",
+    "fieldFreezePacket": "Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260704.json",
+    "entrySessionPacket": "Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260704.json",
+    "finalEntryAudit": "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md",
+    "submissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
+    "appStoreEvidenceProof": "Backend/proof/app-store-evidence.json",
+    "productionReadinessProof": "Backend/proof/production-readiness.json",
+    "launchObjectiveAuditProof": "Backend/proof/launch-objective-audit.json",
+    "testFlightRegressionPlanProof": "Backend/proof/testflight-regression-plan.json",
+    "providerEvidenceProof": "Backend/proof/provider-evidence-materials.json",
+    "mainlandFilingMaterialsProof": "Backend/proof/mainland-filing-materials.json",
+    "signedArchiveTestFlightMaterialsProof": "Backend/proof/signed-archive-testflight-materials.json"
+  },
+  "targetPageEvidence": {
+    "submitReviewPrecheck": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png",
+    "buildTestflightLink": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+    "reviewInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-06-review-information.png",
+    "appPrivacy": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-04-app-privacy.png",
+    "ageRating": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-05-age-rating.png"
+  },
+  "mustBeGreenBeforeSubmit": [
+    {
+      "id": "appStoreEvidenceReady",
+      "proof": "Backend/proof/app-store-evidence.json",
+      "requiredState": "ready=true",
+      "redIfMissing": [
+        "companyAccount",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "ageRatingResult",
+        "signedArchive",
+        "testFlight",
+        "appleDeveloperAccountAccess",
+        "smsProvider",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa",
+        "huaweiObsPolicy",
+        "finalScreenshots",
+        "realDeviceRegression"
+      ]
+    },
+    {
+      "id": "productionReadinessGreen",
+      "proof": "Backend/proof/production-readiness.json",
+      "requiredState": "ready=true",
+      "redIfFailedRequiredChecks": [
+        "productionSecretConfigured",
+        "productionDataDirConfigured",
+        "mysqlDatabaseSelected",
+        "mysqlDatabaseEnvPresent",
+        "huaweiObsSelected",
+        "huaweiObsEnvPresent",
+        "phoneLoginProviderConfigured",
+        "wechatLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
+        "xiaonaipingProductionNamespaceConfigured",
+        "storageBackendProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
+        "authProvidersProofPassed",
+        "appStoreManualEvidenceReady"
+      ]
+    },
+    {
+      "id": "launchObjectiveAuditGreen",
+      "proof": "Backend/proof/launch-objective-audit.json",
+      "requiredState": "ready=true",
+      "redIfFailedRequiredChecks": [
+        "ios265PhysicalDeviceAvailabilityReady",
+        "weChatConfigurationGreen",
+        "appStoreAssetsReady",
+        "testFlightRegressionPlanReadyButNotEvidence",
+        "realDeviceRegressionEvidenceReady",
+        "appStoreManualEvidenceReady",
+        "productionReadinessGreen"
+      ]
+    },
+    {
+      "id": "testFlightRegressionEvidenceReady",
+      "proof": "Backend/proof/testflight-regression-plan.json",
+      "requiredState": "passed=true",
+      "redIfFailedRequiredChecks": [
+        "ios265DeviceAvailabilityProofReferenced"
+      ]
+    },
+    {
+      "id": "providerEvidenceReady",
+      "proof": "Backend/proof/provider-evidence-materials.json",
+      "requiredState": "passed=true",
+      "redIfMissingEvidence": [
+        "smsProvider live send proof",
+        "WeChat Open Platform evidence",
+        "Huawei OBS private bucket proof"
+      ]
+    },
+    {
+      "id": "signedArchiveAndTestFlightReady",
+      "proof": "Backend/proof/signed-archive-testflight-materials.json",
+      "requiredState": "passed=true",
+      "redIfMissingEvidence": [
+        "D-U-N-S delivered",
+        "Apple Developer Organization enrollment resumed",
+        "Team ID confirmed",
+        "App Store Distribution Archive",
+        "TestFlight processed build"
+      ]
+    },
+    {
+      "id": "mainlandFilingReady",
+      "proof": "Backend/proof/mainland-filing-materials.json",
+      "requiredState": "passed=true",
+      "redIfMissingEvidence": [
+        "APP 备案",
+        "ICP applicability",
+        "公安联网备案 applicability"
+      ]
+    }
+  ],
+  "submissionDependencyMatrix": [
+    {
+      "id": "appStoreEvidenceReady",
+      "proof": "Backend/proof/app-store-evidence.json",
+      "proves": [
+        "all required XiaoNaiPing App Store manual evidence files are archived and redaction-reviewed",
+        "company account, mainland availability, filing, privacy label, age rating result, signed archive, TestFlight, providers, final screenshots, and real-device evidence are indexed"
+      ],
+      "doesNotProve": [
+        "production-readiness.json ready=true",
+        "launch-objective-audit.json ready=true",
+        "ASC-08 Submit for Review can be clicked"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "productionReadinessGreen",
+      "proof": "Backend/proof/production-readiness.json",
+      "proves": [
+        "production backend, storage, auth providers, iOS release proofs, App Store assets, and manual evidence are ready together",
+        "required production checks have ready=true"
+      ],
+      "doesNotProve": [
+        "App Store Connect live pages have been filled",
+        "D-U-N-S or Apple Developer permission screenshots by itself",
+        "iOS 26.5 real-device visual evidence by itself"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "launchObjectiveAuditGreen",
+      "proof": "Backend/proof/launch-objective-audit.json",
+      "proves": [
+        "top-level XiaoNaiPing launch objective is ready across iOS 26.5, WeChat, assets, TestFlight regression, real-device evidence, App Store manual evidence, and production readiness",
+        "no known launch objective blocker remains"
+      ],
+      "doesNotProve": [
+        "App Store Connect page screenshots by itself",
+        "external platform evidence by itself"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "testFlightRegressionEvidenceReady",
+      "proof": "Backend/proof/testflight-regression-plan.json",
+      "proves": [
+        "iOS 26.5 TestFlight or signed-device regression plan and evidence gate passed",
+        "iOS 26.5 physical device availability and RD evidence references are accepted"
+      ],
+      "doesNotProve": [
+        "App Store Connect selected build screenshot",
+        "production backend readiness",
+        "WeChat Open Platform credentials",
+        "all App Store manual evidence"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "providerEvidenceReady",
+      "proof": "Backend/proof/provider-evidence-materials.json",
+      "proves": [
+        "provider evidence worksheets and templates for SMS, WeChat, OBS, production proof, and redaction are complete",
+        "provider capture gates distinguish screenshots, live proofs, and stable aliases"
+      ],
+      "doesNotProve": [
+        "real SMS live-send proof exists",
+        "real WeChat Open Platform credentials are configured",
+        "OBS policy screenshot exists",
+        "production-readiness.json ready=true"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "signedArchiveAndTestFlightReady",
+      "proof": "Backend/proof/signed-archive-testflight-materials.json",
+      "proves": [
+        "D-U-N-S post-delivery, Apple Developer organization, signing, Archive, TestFlight, permission, and evidence templates are complete as a materials gate",
+        "Archive and TestFlight execution dependencies are locally checkable"
+      ],
+      "doesNotProve": [
+        "D-U-N-S has actually been delivered",
+        "App Store Distribution archive has actually been uploaded",
+        "TestFlight build is processed",
+        "ASC-07 build is selected"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "id": "mainlandFilingReady",
+      "proof": "Backend/proof/mainland-filing-materials.json",
+      "proves": [
+        "mainland filing material plan, evidence templates, public copy consistency, and filing-value absence gates are complete",
+        "APP filing, ICP applicability, and public-security filing applicability workflow is locally checkable"
+      ],
+      "doesNotProve": [
+        "real APP filing has been approved",
+        "ICP or public-security evidence has been archived",
+        "App Store mainland availability screenshot exists",
+        "production-readiness.json ready=true"
+      ],
+      "requiredBeforeSubmit": true,
+      "initialStatus": "pending"
+    }
+  ],
+  "submitButtonDecision": {
+    "expectedBeforeAllGreen": "do-not-click-submit-for-review",
+    "requiresAsc08Evidence": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png",
+    "mustSee": [
+      "correct Organization",
+      "com.mewpow.xiaonaiping",
+      "selected TestFlight build",
+      "App Privacy complete",
+      "Age Rating result complete",
+      "Review Information complete",
+      "final iOS 26.5 screenshots uploaded",
+      "no unresolved App Store Connect validation errors"
+    ],
+    "mustNotUseAsSubstituteFor": [
+      "01-company-account.png",
+      "05-signed-archive.png",
+      "06-testflight.png",
+      "07-sms-provider.png",
+      "08-wechat-open-platform.png",
+      "09-obs-policy.png",
+      "10-final-screenshots/UPLOAD_PROVENANCE.json",
+      "12-real-device-regression.md",
+      "17-age-rating-result"
+    ]
+  },
+  "postPreflightGates": [
+    {
+      "command": "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_connect_evidence_materials.py --output Backend/proof/app-store-connect-evidence-materials.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+      "requires": "ready=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
+      "requires": "ready=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
+      "requires": "ready=true before Submit for Review"
+    }
+  ],
+  "redactionChecklist": [
+    "Apple ID 邮箱",
+    "联系电话",
+    "付款信息",
+    "税务信息",
+    "恢复密钥",
+    "验证码",
+    "完整手机号",
+    "D-U-N-S 编码完整值",
+    "AppSecret",
+    "证书私钥",
+    "token",
+    "测试员邮箱"
+  ],
+  "completionRule": "preflight-plan-not-evidence; this packet only controls the Submit for Review preflight checklist. It is not App Store Connect live evidence, not external platform evidence, and not submission permission. Submit for Review must remain blocked until app-store-evidence.json ready=true, production-readiness.json ready=true, launch-objective-audit.json ready=true, iOS 26.5 real-device regression is archived, TestFlight processed build is selected, provider-evidence-materials.json passed=true, mainland-filing-materials.json passed=true, and signed-archive-testflight-materials.json passed=true.",
+  "noSubmitBoundary": [
+    "不是 App Store Connect 人工证据",
+    "不能作为提交许可",
+    "不能替代 D-U-N-S、Archive、TestFlight、短信、微信、OBS、备案、隐私标签、最终截图或 iOS 26.5 真机回归证据",
+    "Submit for Review 只能在所有 required proof 为 true 后人工执行"
+  ]
+}

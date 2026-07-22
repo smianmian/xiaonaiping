@@ -1,0 +1,641 @@
+{
+  "status": "template-not-evidence",
+  "instructions": [
+    "Copy this file to REAL-DEVICE-CAPTURE-RESULT.json only after the iOS 26.5 live capture session.",
+    "Set status to captured-live-real-device only after every RD screenshot or recording exists in Docs/08_Release/AppStoreEvidence/RealDevice/, belongs to the same build, and has been redacted.",
+    "After capture, fill evidenceFileChecks with the final file path, file size, SHA-256, same-build confirmation, iOS 26.5 runtime confirmation, approved real-device evidence-root confirmation, and redaction review result for each RD artifact.",
+    "同一 build 身份锁：`05-signed-archive.png`、`06-testflight.png`、`AppStoreConnect/ASC-07-build-testflight-link.png`、`APP_STORE_VERSION_RELEASE_SETTINGS_20260630.md` 和 `12-real-device-regression.md` 的 App 版本和 Build 号必须一致；证据只能来自同一 TestFlight build 或 Xcode 签名真机包，不能混用不同 build；完成后复跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_testflight_regression_plan.py` 和 `check_app_store_evidence.py --allow-incomplete`。",
+    "真机结果只能作为小奶瓶自己的 iOS 26.5 证据输入；完成后必须复跑 xiaonaipingRequiredProofs 和 postCaptureXiaoNaiPingProofReruns 中列出的本项目 proof，不能用一根呆毛 / Emotion Isle / cross-app readiness 替代。",
+    "Do not treat this result file as submit permission. Submit is still blocked unless Backend/proof/app-store-evidence-20260630T-current.json ready=true, Backend/proof/production-readiness-20260630T-current.json ready=true, and Backend/proof/launch-objective-audit.json ready=true for XiaoNaiPing.",
+    "Do not fill secrets, verification codes, complete phone numbers, Apple ID email, payment data, complete D-U-N-S number, AppSecret, token, certificate private key, recovery key, SMS secret, WeChat secret, OBS AK/SK, object keys, or real baby photos."
+  ],
+  "app": "小奶瓶",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "expectedRuntime": "iOS 26.5",
+  "allowedInstallSources": ["TestFlight", "Xcode 签名真机包"],
+  "capturedAt": "",
+  "capturedBy": "佘鹏辉 / Penghui She",
+  "installSource": "",
+  "version": "",
+  "build": "",
+  "sameBuildAsSignedArchiveAndTestFlight": false,
+  "canSubmitAtCapture": false,
+  "doNotTreatAsSubmitPermission": true,
+  "redactionReviewed": false,
+  "submissionReadinessProof": "Backend/proof/launch-objective-audit.json",
+  "xiaonaipingRequiredProofs": {
+    "signedArchiveTestFlightMaterials": "Backend/proof/signed-archive-testflight-materials.json",
+    "testflightRegressionPlan": "Backend/proof/testflight-regression-plan.json",
+    "appStoreConnectMaterials": "Backend/proof/app-store-connect-materials.json",
+    "providerEvidenceMaterials": "Backend/proof/provider-evidence-materials.json",
+    "mainlandFilingMaterials": "Backend/proof/mainland-filing-materials.json",
+    "appStoreEvidence": "Backend/proof/app-store-evidence-20260630T-current.json",
+    "productionReadiness": "Backend/proof/production-readiness-20260630T-current.json",
+    "launchObjectiveAudit": "Backend/proof/launch-objective-audit.json",
+    "ios265DeviceAvailability": "Backend/proof/ios265-device-availability.json"
+  },
+  "crossAppDoesNotReplaceXiaoNaiPingProof": true,
+  "postCaptureXiaoNaiPingProofReruns": {
+    "checkSignedArchiveTestFlightMaterials": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+    "checkTestFlightRegressionPlan": "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan.json",
+    "checkAppStoreConnectMaterials": "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+    "checkProviderEvidenceMaterials": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "checkMainlandFilingMaterials": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "checkAppStoreEvidence": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+    "checkProductionReadiness": "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+    "checkLaunchObjectiveAudit": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  },
+  "captureSessionIntegrity": {
+    "sessionId": "xnp-real-device-ios265-2026-06-30",
+    "requiredRuntime": "iOS 26.5 physical iPhone only",
+    "deviceAvailabilityProof": "Backend/proof/ios265-device-availability.json",
+    "evidenceRoot": "Docs/08_Release/AppStoreEvidence/RealDevice/",
+    "sameBuildProofs": {
+      "signedArchive": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+      "testFlight": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+      "appStoreConnectBuildLink": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+      "versionReleaseSettings": "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260630.md"
+    },
+    "captureFlags": {
+      "sameBuildAcrossAllFocusedRdFiles": false,
+      "sameBuildAsSignedArchive": false,
+      "sameBuildAsTestFlight": false,
+      "runtimeIsIos265PhysicalIphone": false,
+      "notSimulator": false,
+      "notIos27OrOtherRuntime": false,
+      "allFocusedFilesUnderRealDeviceRoot": false,
+      "allFocusedFilesHaveSha256AndSize": false,
+      "allFocusedFilesRedacted": false
+    },
+    "captureGroups": {
+      "login": ["RD-10", "RD-13", "RD-14"],
+      "accountDelete": ["RD-15"],
+      "notificationPermission": ["RD-17-allowed", "RD-17-denied"],
+      "dynamicIsland": ["RD-22-compact", "RD-22-expanded"],
+      "lockScreenAndWidgets": ["RD-23-lock", "RD-23-lock-widget", "RD-23-home-widget"]
+    },
+    "groupRequirements": {
+      "login": [
+        "RD-10 uses the App Review recovery-key account without exposing the key",
+        "RD-13 requires real SMS provider live-send proof before capture",
+        "RD-14 requires WeChat Open Platform and AASA proof before capture"
+      ],
+      "accountDelete": [
+        "RD-15 must prove old token rejection",
+        "RD-15 must prove cloud JSON sync deletion",
+        "RD-15 must prove cloud photo-object deletion",
+        "RD-15 must prove local data retention boundary"
+      ],
+      "notificationPermission": [
+        "RD-17 allowed and denied paths must start from independent clean authorization states",
+        "RD-17 denied path must not pretend a reminder was created"
+      ],
+      "dynamicIsland": [
+        "RD-22 compact and expanded states must use the same fixed feeding interval",
+        "RD-22 expanded state must show the manual deferral result without health advice"
+      ],
+      "lockScreenAndWidgets": [
+        "RD-23 lock notification stack must not cover the reminder card",
+        "RD-23 lock and home widgets must avoid notes, real photos, tokens, and object keys"
+      ]
+    },
+    "stopConditions": [
+      {
+        "id": "noIos265PhysicalIphone",
+        "condition": "Backend/proof/ios265-device-availability.json does not prove an eligible iOS 26.5 physical iPhone",
+        "action": "do not start real-device capture"
+      },
+      {
+        "id": "mixedBuildEvidence",
+        "condition": "any focused RD evidence is not from the same TestFlight build or Xcode signed device build",
+        "action": "recapture the whole focused set before marking REAL-DEVICE-CAPTURE-RESULT.json complete"
+      },
+      {
+        "id": "simulatorOrIos27Evidence",
+        "condition": "any focused RD evidence comes from simulator, iOS 27, or another runtime",
+        "action": "reject the evidence for XiaoNaiPing local proof"
+      },
+      {
+        "id": "notificationResetMissing",
+        "condition": "RD-17 allowed and denied paths reuse the same notification authorization state",
+        "action": "reset notification authorization or reinstall before recapture"
+      },
+      {
+        "id": "externalProviderProofMissing",
+        "condition": "RD-13 or RD-14 is captured before SMS/WeChat/AASA provider proof is green",
+        "action": "complete provider evidence before login capture"
+      }
+    ]
+  },
+  "artifactCaptureMatrix": [
+    {
+      "artifactId": "RD-03",
+      "target": "RealDevice/RD-03-feeding-record.png",
+      "group": "feedingReminderDeferral",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "fixed feeding interval configured",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "deferral wheel shows 不顺延, +5, +10, +15, +20, +25, +30",
+        "next reminder uses end time plus fixed interval plus manual deferral, or occurredAt when duration is empty",
+        "does not infer from volume, age, sensor, health data, or medical advice",
+        "no persistent deferral field is added"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-03-feeding-record-fail.png",
+      "retestEvidence": "RealDevice/RD-03-feeding-record-retest.png"
+    },
+    {
+      "artifactId": "RD-10",
+      "target": "RealDevice/RD-10-recovery-login.png",
+      "group": "login",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        ".env.xnp-review-account redacted test account proof ready",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "recovery-key login works for the App Review account",
+        "recovery key is not visible",
+        "account and sync screen is reachable after login"
+      ],
+      "redaction": ["hide recovery key", "hide tokens", "hide complete phone number"],
+      "failureEvidence": "RealDevice/RD-10-recovery-login-fail.png",
+      "retestEvidence": "RealDevice/RD-10-recovery-login-retest.png"
+    },
+    {
+      "artifactId": "RD-13",
+      "target": "RealDevice/RD-13-phone-login.png",
+      "group": "login",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "real SMS provider live-send proof",
+        "provider evidence materials are green",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "real SMS code can be sent",
+        "real SMS code can be verified",
+        "rate limit or retry state is understandable",
+        "no debug verification code is accepted"
+      ],
+      "redaction": ["hide complete phone number", "hide verification code", "hide SMS secret"],
+      "failureEvidence": "RealDevice/RD-13-phone-login-fail.png",
+      "retestEvidence": "RealDevice/RD-13-phone-login-retest.png"
+    },
+    {
+      "artifactId": "RD-14",
+      "target": "RealDevice/RD-14-wechat-login.png",
+      "group": "login",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "WeChat Open Platform proof is green",
+        "AASA universal link proof is green",
+        "real WeChat release values are configured",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "WeChat authorization opens",
+        "authorization returns to 小奶瓶",
+        "no debug code path is used",
+        "AppSecret is not visible"
+      ],
+      "redaction": ["hide AppSecret", "hide tokens", "hide complete phone number"],
+      "failureEvidence": "RealDevice/RD-14-wechat-login-fail.png",
+      "retestEvidence": "RealDevice/RD-14-wechat-login-retest.png"
+    },
+    {
+      "artifactId": "RD-15",
+      "target": "RealDevice/RD-15-account-delete.png",
+      "group": "accountDelete",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "seeded sync proof ready",
+        "seeded photo-object proof ready",
+        "storage backend proof is green",
+        "test account exists",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "delete entry and confirmation copy are visible",
+        "old token is rejected after deletion",
+        "cloud JSON sync is deleted",
+        "cloud photo objects are deleted",
+        "local data retention boundary is visible"
+      ],
+      "redaction": ["hide recovery key", "hide complete phone number", "hide tokens", "hide object keys"],
+      "failureEvidence": "RealDevice/RD-15-account-delete-fail.png",
+      "retestEvidence": "RealDevice/RD-15-account-delete-retest.png"
+    },
+    {
+      "artifactId": "RD-17-allowed",
+      "target": "RealDevice/RD-17-notification-allowed.png",
+      "group": "notificationPermission",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "clean notification authorization state via reinstall or reset",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "first notification permission prompt is visible",
+        "Allow is tapped",
+        "next feeding reminder is pending and effective",
+        "settings status is understandable"
+      ],
+      "redaction": ["no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-17-notification-allowed-fail.png",
+      "retestEvidence": "RealDevice/RD-17-notification-allowed-retest.png"
+    },
+    {
+      "artifactId": "RD-17-denied",
+      "target": "RealDevice/RD-17-notification-denied.png",
+      "group": "notificationPermission",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "clean notification authorization state via reinstall or reset",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "first notification permission prompt is visible",
+        "Don't Allow is tapped",
+        "system settings entry is visible",
+        "does not pretend a reminder was created"
+      ],
+      "redaction": ["no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-17-notification-denied-fail.png",
+      "retestEvidence": "RealDevice/RD-17-notification-denied-retest.png"
+    },
+    {
+      "artifactId": "RD-22-compact",
+      "target": "RealDevice/RD-22-dynamic-island-compact.png",
+      "group": "dynamicIsland",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "fixed feeding interval configured",
+        "manual deferral scenario prepared",
+        "Live Activity enabled",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "compact avatar or progress ring is not clipped",
+        "compact state is not centered incorrectly in Dynamic Island",
+        "no health advice or medical claim is shown"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-22-dynamic-island-compact-fail.png",
+      "retestEvidence": "RealDevice/RD-22-dynamic-island-compact-retest.png"
+    },
+    {
+      "artifactId": "RD-22-expanded",
+      "target": "RealDevice/RD-22-dynamic-island-expanded.png",
+      "group": "dynamicIsland",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "fixed feeding interval configured",
+        "manual deferral scenario prepared",
+        "Live Activity enabled",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "next feeding time is readable",
+        "fixed interval is readable",
+        "manual deferral value from +5 through +30 or 不顺延 is readable",
+        "no health advice or medical claim is shown",
+        "no persistent deferral field is claimed"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-22-dynamic-island-expanded-fail.png",
+      "retestEvidence": "RealDevice/RD-22-dynamic-island-expanded-retest.png"
+    },
+    {
+      "artifactId": "RD-23-lock",
+      "target": "RealDevice/RD-23-lock-screen-notification-stack.png",
+      "group": "lockScreenAndWidgets",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "notification stack scenario prepared",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "notification stack does not cover the reminder card",
+        "reminder card remains readable",
+        "no private notes or object keys are visible"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-23-lock-screen-notification-stack-fail.png",
+      "retestEvidence": "RealDevice/RD-23-lock-screen-notification-stack-retest.png"
+    },
+    {
+      "artifactId": "RD-23-lock-widget",
+      "target": "RealDevice/RD-23-lock-screen-widget-summary.png",
+      "group": "lockScreenAndWidgets",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "lock screen widget configured",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "accessoryCircular is readable",
+        "accessoryRectangular is readable",
+        "accessoryInline is readable",
+        "lock screen widget is not clipped or overflowing",
+        "no notes, photos, tokens, or object keys are visible"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-23-lock-screen-widget-summary-fail.png",
+      "retestEvidence": "RealDevice/RD-23-lock-screen-widget-summary-retest.png"
+    },
+    {
+      "artifactId": "RD-23-home-widget",
+      "target": "RealDevice/RD-23-home-widget-summary.png",
+      "group": "lockScreenAndWidgets",
+      "initialStatus": "pending",
+      "sameBuildRequired": true,
+      "runtimeIsIos265Required": true,
+      "independentEvidenceFileRequired": true,
+      "requiredBeforeCapture": [
+        "home widget configured",
+        "same TestFlight or Xcode signed build prepared",
+        "iOS 26.5 physical iPhone available"
+      ],
+      "mustObserve": [
+        "today summary is readable",
+        "home widget is not clipped or overflowing",
+        "no notes, photos, tokens, or object keys are visible"
+      ],
+      "redaction": ["no real baby photos", "no private notes", "no tokens or object keys"],
+      "failureEvidence": "RealDevice/RD-23-home-widget-summary-fail.png",
+      "retestEvidence": "RealDevice/RD-23-home-widget-summary-retest.png"
+    }
+  ],
+  "evidenceFileChecks": [
+    {
+      "artifactId": "RD-03",
+      "target": "RealDevice/RD-03-feeding-record.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-10",
+      "target": "RealDevice/RD-10-recovery-login.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-13",
+      "target": "RealDevice/RD-13-phone-login.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-14",
+      "target": "RealDevice/RD-14-wechat-login.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-15",
+      "target": "RealDevice/RD-15-account-delete.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-17-allowed",
+      "target": "RealDevice/RD-17-notification-allowed.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-17-denied",
+      "target": "RealDevice/RD-17-notification-denied.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-22-compact",
+      "target": "RealDevice/RD-22-dynamic-island-compact.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-22-expanded",
+      "target": "RealDevice/RD-22-dynamic-island-expanded.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-23-lock",
+      "target": "RealDevice/RD-23-lock-screen-notification-stack.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-23-lock-widget",
+      "target": "RealDevice/RD-23-lock-screen-widget-summary.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "RD-23-home-widget",
+      "target": "RealDevice/RD-23-home-widget-summary.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameBuildAsResult": false,
+      "runtimeIsIos265": false,
+      "sourceIsRealDeviceEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "rdResults": {
+    "feedingReminderDeferral": {
+      "status": "pending",
+      "files": ["RealDevice/RD-03-feeding-record.png"],
+      "fixedIntervalConfigured": false,
+      "deferralWheelOptionsVisible": false,
+      "allowedDeferralOptionsOnly": false,
+      "nextReminderRebasedFromEndOrOccurredAt": false,
+      "doesNotInferFromVolumeAgeSensorOrHealthData": false,
+      "noPersistentFieldAdded": false
+    },
+    "login": {
+      "smsLogin": {"status": "pending", "files": ["RealDevice/RD-13-phone-login.png"], "realSmsProviderSendVerified": false},
+      "wechatLogin": {
+        "status": "pending",
+        "files": ["RealDevice/RD-14-wechat-login.png"],
+        "wechatAuthorizationOpened": false,
+        "wechatReturnedToXiaoNaiPing": false,
+        "noDebugCodePathUsed": false,
+        "appSecretNotVisible": false
+      },
+      "recoveryKeyLogin": {
+        "status": "pending",
+        "files": ["RealDevice/RD-10-recovery-login.png"],
+        "recoveryKeyLoginSucceeded": false,
+        "recoveryKeyNotVisible": false,
+        "accountSyncScreenReachable": false
+      }
+    },
+    "accountDelete": {
+      "status": "pending",
+      "files": ["RealDevice/RD-15-account-delete.png"],
+      "deleteEntryAndConfirmationVisible": false,
+      "oldTokenRejected": false,
+      "cloudJsonSyncDeleted": false,
+      "photoObjectsDeleted": false,
+      "localDataRetentionBoundaryVisible": false,
+      "appRelaunchDoesNotRestoreDeletedAccount": false,
+      "localCachedIdentityCleared": false,
+      "realBabyPhotosAbsentAfterDeletion": false
+    },
+    "notificationPermission": {
+      "status": "pending",
+      "files": ["RealDevice/RD-17-notification-allowed.png", "RealDevice/RD-17-notification-denied.png"],
+      "allowAndDenyPathsCovered": false,
+      "cleanAuthorizationStateReset": false,
+      "allowedFirstPromptVisible": false,
+      "allowedReminderPendingAndEffective": false,
+      "deniedFirstPromptVisible": false,
+      "deniedSettingsEntryVisible": false,
+      "deniedDoesNotPretendReminderCreated": false
+    },
+    "dynamicIsland": {
+      "status": "pending",
+      "files": ["RealDevice/RD-22-dynamic-island-compact.png", "RealDevice/RD-22-dynamic-island-expanded.png"],
+      "visualQA": {
+        "compactNotClipped": false,
+        "compactNotCenteredIncorrectly": false,
+        "expandedNextFeedingReadable": false,
+        "expandedFixedIntervalReadable": false,
+        "manualDeferralReadable": false,
+        "noPersistentDeferralFieldClaimed": false,
+        "noHealthAdviceOrMedicalClaim": false
+      }
+    },
+    "lockScreen": {
+      "status": "pending",
+      "files": ["RealDevice/RD-23-lock-screen-notification-stack.png", "RealDevice/RD-23-lock-screen-widget-summary.png"],
+      "visualQA": {
+        "notificationStackDoesNotCoverCard": false,
+        "reminderCardReadable": false,
+        "widgetNotClipped": false,
+        "accessoryCircularReadable": false,
+        "accessoryRectangularReadable": false,
+        "accessoryInlineReadable": false,
+        "noPrivatePhotoOrObjectKey": false
+      }
+    },
+    "homeWidget": {
+      "status": "pending",
+      "files": ["RealDevice/RD-23-home-widget-summary.png"],
+      "visualQA": {
+        "todaySummaryReadable": false,
+        "homeWidgetNotClipped": false,
+        "localTodaySummaryOnly": false,
+        "noNotesPrivatePhotoTokenOrObjectKey": false
+      }
+    }
+  },
+  "notes": "This template is not evidence. It becomes a live capture result only after status is captured-live-real-device, all RD files exist, evidenceFileChecks are filled with file size, SHA-256, same-build, iOS 26.5 runtime, approved root, and redaction results, redactionReviewed is true, visualQA fields pass, current submission readiness proof is attached, crossAppDoesNotReplaceXiaoNaiPingProof is true, xiaonaipingRequiredProofs are rerun, and postCaptureXiaoNaiPingProofReruns refresh the current XiaoNaiPing gates."
+}

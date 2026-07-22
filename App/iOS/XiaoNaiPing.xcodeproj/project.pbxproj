@@ -23,7 +23,7 @@
 		2A6E1C1969123A9592A91486 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE03F876BF374BCE60D48DB /* AppColors.swift */; };
 		33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF167A08D1CF3FC993C518E /* RecordRowView.swift */; };
 		3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */; };
-		444F7D35ED303A426F471487 /* CloudBackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16200DCF402E081428AF3D21 /* CloudBackupModels.swift */; };
+		444F7D35ED303A426F471487 /* CloudSyncModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16200DCF402E081428AF3D21 /* CloudSyncModels.swift */; };
 		4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */; };
 		4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */; };
 		4E116448BDE0520C56179427 /* XiaoNaiPingWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -36,7 +36,7 @@
 		79ED2B9DD8CD0DB19CA54741 /* FeedingReminderLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */; };
 		7C73FB201C1558B37019DBBA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */; };
 		7D3EC060380FC5C8477255FE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D5A60428958DC54D107046F4 /* Localizable.strings */; };
-		8A4633A910FDC65E0E839BC3 /* CloudBackupAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */; };
+		8A4633A910FDC65E0E839BC3 /* CloudSyncAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D806BCFB254E34295346A18 /* CloudSyncAPIClient.swift */; };
 		8BF2B8A04D3D083C7BDEF421 /* PaperBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */; };
 		8E3F69F227825C9677BD358C /* SleepRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F36625B424397290C39CC8B /* SleepRecordView.swift */; };
 		91B413B6A8D7B935E732BB32 /* AppNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */; };
@@ -55,7 +55,7 @@
 		CE7DB93409E9D88F14212095 /* AppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */; };
 		D01BA75DF5308E03E5A8FFAA /* FeedingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AFE2FD299FC259D24148966 /* FeedingRecord.swift */; };
 		D13C9E23B968C328BE477FF0 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CBBA794A3E7C3F88C3A59F /* AppTypography.swift */; };
-		D28A42F1D540E80540B4E4FE /* CloudBackupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165452C615AFBB2715E940B1 /* CloudBackupController.swift */; };
+		D28A42F1D540E80540B4E4FE /* CloudSyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165452C615AFBB2715E940B1 /* CloudSyncController.swift */; };
 		D2E940A3FCC158C0A0DDB5A6 /* MilestoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */; };
 		D383D59EABCB6D3B5E0C1222 /* BabyPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */; };
 		D879214BC4BC859B3317B1A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E9593E94E8AF2693515F35B /* Assets.xcassets */; };
@@ -96,8 +96,8 @@
 		0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryWatercolorButton.swift; sourceTree = "<group>"; };
 		13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingReminderLiveActivityController.swift; sourceTree = "<group>"; };
-		16200DCF402E081428AF3D21 /* CloudBackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupModels.swift; sourceTree = "<group>"; };
-		165452C615AFBB2715E940B1 /* CloudBackupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupController.swift; sourceTree = "<group>"; };
+		16200DCF402E081428AF3D21 /* CloudSyncModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncModels.swift; sourceTree = "<group>"; };
+		165452C615AFBB2715E940B1 /* CloudSyncController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncController.swift; sourceTree = "<group>"; };
 		1952F92A4C46DF608722ABC4 /* Baby.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Baby.swift; sourceTree = "<group>"; };
 		1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = white_noise_dryer.mp3; sourceTree = "<group>"; };
 		1AFE2FD299FC259D24148966 /* FeedingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingRecord.swift; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiaoNaiPingShared.swift; sourceTree = "<group>"; };
 		327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatLoginService.swift; sourceTree = "<group>"; };
 		3CE835FDA746BD464694C365 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
-		3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupAPIClient.swift; sourceTree = "<group>"; };
+		3D806BCFB254E34295346A18 /* CloudSyncAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncAPIClient.swift; sourceTree = "<group>"; };
 		3D8304016F32720F0412951B /* FeedingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingRecordView.swift; sourceTree = "<group>"; };
 		42E8A4AA606229BA5FFF6ABE /* AppShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShapes.swift; sourceTree = "<group>"; };
 		47656212072FE3DB6D875124 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -311,9 +311,9 @@
 			isa = PBXGroup;
 			children = (
 				A360D672497C7D6D2D126760 /* CloudAccountSessionStore.swift */,
-				3D806BCFB254E34295346A18 /* CloudBackupAPIClient.swift */,
-				165452C615AFBB2715E940B1 /* CloudBackupController.swift */,
-				16200DCF402E081428AF3D21 /* CloudBackupModels.swift */,
+				3D806BCFB254E34295346A18 /* CloudSyncAPIClient.swift */,
+				165452C615AFBB2715E940B1 /* CloudSyncController.swift */,
+				16200DCF402E081428AF3D21 /* CloudSyncModels.swift */,
 				327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */,
 				985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */,
 			);
@@ -493,9 +493,9 @@
 				D383D59EABCB6D3B5E0C1222 /* BabyPhoto.swift in Sources */,
 				4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */,
 				6DECF636037A6A62D9CC5CB0 /* CloudAccountSessionStore.swift in Sources */,
-				8A4633A910FDC65E0E839BC3 /* CloudBackupAPIClient.swift in Sources */,
-				D28A42F1D540E80540B4E4FE /* CloudBackupController.swift in Sources */,
-				444F7D35ED303A426F471487 /* CloudBackupModels.swift in Sources */,
+				8A4633A910FDC65E0E839BC3 /* CloudSyncAPIClient.swift in Sources */,
+				D28A42F1D540E80540B4E4FE /* CloudSyncController.swift in Sources */,
+				444F7D35ED303A426F471487 /* CloudSyncModels.swift in Sources */,
 				FAC14AC055EF88F0AFC0F567 /* DailySummary.swift in Sources */,
 				194395CFEB808694D6C9A8AF /* DiaperRecord.swift in Sources */,
 				2789B2894670943DB6B8637F /* DiaperRecordView.swift in Sources */,

@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-07-08T15:47:04+0800",
+  "app": "XiaoNaiPing",
+  "appStoreConnectAppId": "6787332971",
+  "platform": "iOS",
+  "version": "1.0",
+  "submittedBuild": "3",
+  "visibleSubmissionResult": "已提交 1 个项目",
+  "visibleVersionStatus": "1.0 正在等待审核",
+  "reviewSubmissionDetailsUrl": "https://appstoreconnect.apple.com/apps/6787332971/distribution/reviewsubmissions/details/5e5f6bb9-0971-438f-94f7-9b0dff851f36",
+  "reviewMessage": "审核最多可能需要 48 小时。审核完成后，你会收到电子邮件通知。",
+  "releaseMode": "manual release after approval",
+  "screenshot": "Backend/proof/app-store-connect-resubmitted-build3-20260708.png",
+  "relatedProof": [
+    "Backend/proof/app-store-connect-review-draft-ready-build3-20260708.json",
+    "Backend/proof/xcodebuild-archive-appstore-20260708-build3-app-review-fix.log",
+    "Backend/proof/xcodebuild-export-upload-appstore-20260708-build3-app-review-fix.log",
+    "Backend/proof/ios-app-bundle-app-review-resubmit-20260708-build3.json"
+  ]
+}

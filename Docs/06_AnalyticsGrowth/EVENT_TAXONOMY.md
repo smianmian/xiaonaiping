@@ -9,7 +9,7 @@
 
 ## 已确认事实
 
-1. 第一版需要真实账号、备份恢复、照片原图云备份和删除闭环。
+1. 第一版需要真实账号、同步恢复、照片原图云同步和删除闭环。
 2. 后续商业化需要知道核心路径是否跑通，但不能采集宝宝内容。
 3. 当前实现使用 `POST /v1/analytics/events` 写入自有后端，不接入第三方分析 SDK。
 4. 事件只保存 HMAC 后的账号哈希、事件名、时间和白名单属性。
@@ -23,8 +23,8 @@
 | `onboarding_completed` | 新手引导完成率 | `source`, `platform` |
 | `account_created` | 账号创建漏斗 | `authProvider`, `source`, `feature`, `platform` |
 | `login_completed` | 登录方式漏斗 | `authProvider`, `source`, `feature`, `platform` |
-| `cloud_backup_enabled` | 云备份开启率 | `source`, `feature`, `platform` |
-| `cloud_backup_completed` | 备份成功路径 | `source`, `result`, `feature`, `platform` |
+| `cloud_sync_enabled` | 云同步开启率 | `source`, `feature`, `platform` |
+| `cloud_sync_completed` | 同步成功路径 | `source`, `result`, `feature`, `platform` |
 | `cloud_restore_completed` | 恢复成功路径 | `source`, `result`, `feature`, `platform` |
 | `photo_added` | 照片功能采用率 | `recordType`, `source`, `result`, `platform` |
 | `record_created` | 记录功能采用率 | `recordType`, `source`, `result`, `platform` |
@@ -37,13 +37,13 @@
 
 | 属性 | 允许值 |
 |---|---|
-| `screen` | `home`, `record`, `profile`, `album`, `growth`, `backup`, `onboarding`, `paywall` |
-| `source` | `app_launch`, `onboarding`, `profile`, `record`, `album`, `growth`, `backup`, `restore`, `system` |
+| `screen` | `home`, `record`, `profile`, `album`, `growth`, `sync`, `onboarding`, `paywall` |
+| `source` | `app_launch`, `onboarding`, `profile`, `record`, `album`, `growth`, `sync`, `restore`, `system` |
 | `recordType` | `feeding`, `sleep`, `diaper`, `growth`, `milestone`, `vaccine`, `photo` |
 | `reminderType` | `feeding`, `vaccine` |
 | `authProvider` | `recovery_key`, `phone`, `wechat` |
 | `result` | `success`, `failure`, `cancelled` |
-| `feature` | `cloud_backup`, `cloud_restore`, `photo_backup`, `account`, `reminder`, `commercial` |
+| `feature` | `cloud_sync`, `cloud_restore`, `photo_sync`, `account`, `reminder`, `commercial` |
 | `productTier` | `free`, `premium` |
 | `platform` | `ios` |
 

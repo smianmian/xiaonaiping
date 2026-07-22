@@ -134,7 +134,7 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 deleted_at TEXT
             );
 
-            CREATE TABLE IF NOT EXISTS backups (
+            CREATE TABLE IF NOT EXISTS syncs (
                 account_id TEXT PRIMARY KEY REFERENCES accounts(account_id) ON DELETE CASCADE,
                 payload BLOB NOT NULL,
                 updated_at TEXT NOT NULL
@@ -169,7 +169,7 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 audit_id TEXT PRIMARY KEY,
                 account_id TEXT NOT NULL,
                 deleted_at TEXT NOT NULL,
-                backup_deleted INTEGER NOT NULL,
+                sync_deleted INTEGER NOT NULL,
                 photo_count INTEGER NOT NULL
             );
 
@@ -202,11 +202,11 @@ def ensure_schema(db: DatabaseConnection) -> None:
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,
         """
-        CREATE TABLE IF NOT EXISTS backups (
+        CREATE TABLE IF NOT EXISTS syncs (
             account_id CHAR(36) PRIMARY KEY,
             payload LONGBLOB NOT NULL,
             updated_at VARCHAR(40) NOT NULL,
-            CONSTRAINT fk_backups_account
+            CONSTRAINT fk_syncs_account
                 FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,
@@ -248,7 +248,7 @@ def ensure_schema(db: DatabaseConnection) -> None:
             audit_id CHAR(36) PRIMARY KEY,
             account_id CHAR(36) NOT NULL,
             deleted_at VARCHAR(40) NOT NULL,
-            backup_deleted TINYINT(1) NOT NULL,
+            sync_deleted TINYINT(1) NOT NULL,
             photo_count BIGINT NOT NULL,
             INDEX idx_deletion_audit_deleted_at (deleted_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4

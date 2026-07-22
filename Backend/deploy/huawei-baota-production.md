@@ -170,7 +170,7 @@ python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --req
 ```
 
 `collect_deployment_proof.py` must be run only on the server or a trusted machine that can read the private env. It records which secret keys are present without writing secret values to JSON. Do not paste raw private env files into chat, tickets, or git.
-`verify_auth_providers.py` does not send SMS unless explicitly run with `--send-test-sms --phone +...`; run that final carrier test only after the Aliyun SMS sign, template, RAM credentials, and adapter service are configured.
+`verify_auth_providers.py` does not send SMS unless explicitly run with `--send-test-sms --phone-env XNP_SMS_TEST_PHONE`; run that final carrier test only after the Aliyun SMS sign, template, RAM credentials, and adapter service are configured.
 
 The production readiness report must pass these isolation checks:
 

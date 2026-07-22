@@ -1,0 +1,48 @@
+{
+  "startedAt": "2026-06-27T02:43:39+00:00",
+  "completedAt": "2026-06-27T02:43:39+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "handoffDocumentPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md"
+    },
+    "handoffDocumentCoversRequiredValues": {
+      "passed": true,
+      "required": true,
+      "evidence": "document covers AppID, URL Scheme, Universal Link, server AppSecret, and evidence path"
+    },
+    "ios265ValidationCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document constrains local validation commands to iOS 26.5"
+    },
+    "proofRegenerationCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document lists focused proof regeneration commands"
+    },
+    "docDoesNotAssignAppSecret": {
+      "passed": true,
+      "required": true,
+      "evidence": "document explains AppSecret is server-only and does not show shell assignment"
+    },
+    "projectBuildSettingsWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "project.yml wires Release WeChat build settings and Associated Domain"
+    },
+    "infoPlistSlotsWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "Info.plist wires WeChat keys, URL type, and query schemes"
+    },
+    "associatedDomainsEntitlementWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "Release entitlements wire Associated Domains to XNP_ASSOCIATED_DOMAIN"
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "startedAt": "2026-07-03T23:21:56+00:00",
+  "completedAt": "2026-07-03T23:21:56+00:00",
+  "passed": false,
+  "unexpectedBlockers": {
+    "appStoreEvidence": [
+      "captureGuidance",
+      "manualEvidenceChecklist",
+      "manualEvidencePacket"
+    ]
+  },
+  "comparisons": {
+    "productionReadiness": {
+      "actual": [
+        "appStoreAssetsProofPassed",
+        "appStoreManualEvidenceReady",
+        "deploymentProofCurrent",
+        "iosAppBundleProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "storageBackendProofCurrent",
+        "testFlightRegressionPlanProofPassed"
+      ],
+      "expected": [
+        "appStoreAssetsProofPassed",
+        "appStoreManualEvidenceReady",
+        "authProvidersProofPassed",
+        "deploymentProofCurrent",
+        "huaweiObsEnvPresent",
+        "huaweiObsSelected",
+        "iosAppBundleProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "mysqlDatabaseEnvPresent",
+        "mysqlDatabaseSelected",
+        "phoneLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "productionDataDirConfigured",
+        "productionSecretConfigured",
+        "publicInternalDashboardBlocked",
+        "storageBackendProofCurrent",
+        "storageBackendProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "wechatLoginProviderConfigured",
+        "xiaonaipingProductionNamespaceConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [
+        "authProvidersProofPassed",
+        "huaweiObsEnvPresent",
+        "huaweiObsSelected",
+        "mysqlDatabaseEnvPresent",
+        "mysqlDatabaseSelected",
+        "phoneLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "productionDataDirConfigured",
+        "productionSecretConfigured",
+        "publicInternalDashboardBlocked",
+        "storageBackendProofPassed",
+        "wechatLoginProviderConfigured",
+        "xiaonaipingProductionNamespaceConfigured"
+      ],
+      "scopeClean": true
+    },
+    "appStoreEvidence": {
+      "actual": [
+        "ageRatingResult",
+        "appleDeveloperAccountAccess",
+        "captureGuidance",
+        "companyAccount",
+        "finalScreenshots",
+        "huaweiObsPolicy",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "manualEvidenceChecklist",
+        "manualEvidencePacket",
+        "privacyLabel",
+        "realDeviceRegression",
+        "signedArchive",
+        "testFlight",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa"
+      ],
+      "expected": [
+        "ageRatingResult",
+        "appleDeveloperAccountAccess",
+        "companyAccount",
+        "finalScreenshots",
+        "huaweiObsPolicy",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "realDeviceRegression",
+        "signedArchive",
+        "smsProvider",
+        "testFlight",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa"
+      ],
+      "unexpected": [
+        "captureGuidance",
+        "manualEvidenceChecklist",
+        "manualEvidencePacket"
+      ],
+      "absentExpected": [
+        "smsProvider"
+      ],
+      "scopeClean": false
+    },
+    "authProviders": {
+      "actual": [],
+      "expected": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ],
+      "scopeClean": true
+    },
+    "iosReleaseReadiness": {
+      "actual": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "expected": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    },
+    "iosAppBundle": {
+      "actual": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "expected": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "unexpected": [],
+      "absentExpected": [],
+      "scopeClean": true
+    }
+  },
+  "knownBlockerMeaning": {
+    "productionEnv": "Private production env, MySQL, OBS, dashboard, and namespace values are not proven in this local current proof.",
+    "publicInternalDashboard": "Public /internal routes must be proven blocked before submission.",
+    "proofFreshness": "Deployment and storage backend proofs must be refreshed for the current release day before submission.",
+    "testFlightRegressionPrerequisite": "The TestFlight regression plan cannot pass until iOS 26.5 physical-device availability proof is readable and current.",
+    "sms": "SMS webhook provider private env is not loaded in the current proof, and provider screenshot evidence is not archived.",
+    "wechat": "WeChat Open Platform AppID/AppSecret and real wx URL Scheme are not configured.",
+    "appStoreManualEvidence": "App Store Connect screenshots, filing, signed archive, TestFlight, providers, OBS policy, and real-device regression are not archived.",
+    "notSubmissionReady": "This proof only says remaining blockers are known; it does not make the app submission-ready."
+  }
+}

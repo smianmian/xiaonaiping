@@ -1,0 +1,167 @@
+{
+  "status": "template-not-evidence",
+  "copyTo": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/EXTERNAL-STATUS-POLL-RESULT.json",
+  "purpose": "Record a live waiting-period status poll for D&B, Apple Developer enrollment, Apple Developer email, and App Store Connect drafts without treating the poll as submit permission.",
+  "capturedAt": "",
+  "capturedBy": "佘鹏辉 / Penghui She",
+  "organization": {
+    "legalEntityName": "深圳市闪现生活科技有限公司",
+    "region": "China mainland",
+    "contact": "佘鹏辉 / Penghui She"
+  },
+  "sources": {
+    "dnbSelfServicePortal": {
+      "source": "D&B Self-Service Portal",
+      "checkedAt": "",
+      "orderStatus": "",
+      "deliveryStatus": "",
+      "redactedScreenshotPath": "",
+      "canReturnToAppleDeveloperEnrollment": false,
+      "notes": ""
+    },
+    "appleDeveloperEnrollment": {
+      "source": "Apple Developer Enrollment",
+      "checkedAt": "",
+      "pageState": "",
+      "buttonState": "",
+      "entityTypeShown": "",
+      "redactedScreenshotPath": "",
+      "canContinueOrganizationEnrollment": false,
+      "notes": ""
+    },
+    "appleDeveloperEmail": {
+      "source": "developer@email.apple.com",
+      "checkedAt": "",
+      "latestRelevantSubject": "",
+      "latestRelevantDecision": "",
+      "redactedScreenshotPath": "",
+      "canContinueEnrollmentFromEmail": false,
+      "notes": ""
+    },
+    "appStoreConnectDraft": {
+      "source": "App Store Connect",
+      "checkedAt": "",
+      "ydmDraftSaved": false,
+      "xnpDraftSaved": false,
+      "missingFields": [],
+      "redactedScreenshotPath": "",
+      "notes": ""
+    }
+  },
+  "targetEvidenceFiles": {
+    "dnbSelfServicePortal": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-dnb-self-service.png",
+    "appleDeveloperEnrollment": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-apple-developer-enrollment.png",
+    "appleDeveloperEmail": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-apple-developer-email.png",
+    "appStoreConnectDraft": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-app-store-connect-draft.png"
+  },
+  "xiaonaipingStatusGuardProofs": {
+    "signedArchiveTestFlightMaterials": "Backend/proof/signed-archive-testflight-materials.json",
+    "appStoreSubmissionPacket": "Backend/proof/app-store-submission-packet.json",
+    "appStoreConnectMaterials": "Backend/proof/app-store-connect-materials.json",
+    "appStoreEvidence": "Backend/proof/app-store-evidence.json",
+    "productionReadiness": "Backend/proof/production-readiness.json",
+    "launchObjectiveAudit": "Backend/proof/launch-objective-audit.json",
+    "testflightRegressionPlan": "Backend/proof/testflight-regression-plan.json",
+    "providerEvidenceMaterials": "Backend/proof/provider-evidence-materials.json",
+    "mainlandFilingMaterials": "Backend/proof/mainland-filing-materials.json"
+  },
+  "crossAppDoesNotReplaceXiaoNaiPingProof": true,
+  "evidenceFileChecks": [
+    {
+      "artifactId": "dnbSelfServicePortal",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-dnb-self-service.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsStatusPoll": false,
+      "sourceIsAppleDeveloperEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appleDeveloperEnrollment",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-apple-developer-enrollment.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsStatusPoll": false,
+      "sourceIsAppleDeveloperEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appleDeveloperEmail",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-apple-developer-email.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsStatusPoll": false,
+      "sourceIsAppleDeveloperEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appStoreConnectDraft",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/status-app-store-connect-draft.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsStatusPoll": false,
+      "sourceIsAppleDeveloperEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "switchCriteria": {
+    "dunsDelivered": false,
+    "appleOrganizationCanContinue": false,
+    "appleOrganizationApproved": false,
+    "paymentOrMembershipActive": false,
+    "teamIdAvailable": false
+  },
+  "boundaries": {
+    "doNotTreatAsSubmitPermission": true,
+    "canSubmitAtCapture": false,
+    "doNotReapplyDuns": true,
+    "doNotSwitchToIndividual": true,
+    "doNotRepeatOrganizationSubmissionWhenButtonDisabled": true,
+    "redactionReviewed": false,
+    "xiaonaipingSubmitPermissionProof": "Backend/proof/launch-objective-audit.json",
+    "historicalCrossAppStatusIsReferenceOnly": true
+  },
+  "mustNotStore": [
+    "complete D-U-N-S Number",
+    "Apple ID verification code",
+    "full ID number",
+    "full phone number",
+    "bank account",
+    "card number",
+    "CVV",
+    "AppSecret",
+    "token",
+    "private key",
+    "SMS verification code"
+  ],
+  "postCaptureCommands": [
+    "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+    "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+    "python3 Backend/scripts/check_app_store_connect_materials.py --expected-material-date 20260704 --output Backend/proof/app-store-connect-materials.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence.json",
+    "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "postStatusPollXiaoNaiPingProofReruns": {
+    "checkSignedArchiveTestFlightMaterials": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+    "checkAppStoreSubmissionPacket": "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+    "checkAppStoreConnectMaterials": "python3 Backend/scripts/check_app_store_connect_materials.py --expected-material-date 20260704 --output Backend/proof/app-store-connect-materials.json",
+    "checkAppStoreEvidence": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence.json",
+    "checkTestFlightRegressionPlan": "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan.json",
+    "checkProviderEvidenceMaterials": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "checkMainlandFilingMaterials": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "checkProductionReadiness": "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness.json",
+    "checkLaunchObjectiveAudit": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  },
+  "completionRule": "external-status-poll-template-not-evidence; status polling can only decide whether to wait, continue Apple Developer Organization enrollment, or switch to the post-delivery signing workflow. It cannot authorize Submit for Review and cannot replace XiaoNaiPing signed archive, TestFlight, App Store evidence, production readiness, launch objective audit, provider evidence, filing evidence, final screenshots, or iOS 26.5 real-device proof."
+}

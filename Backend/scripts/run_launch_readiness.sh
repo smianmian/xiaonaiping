@@ -18,6 +18,8 @@ Options:
   --app-path PATH             XiaoNaiPing.app for iOS bundle and TestFlight client checks
   --ios-simulator-log PATH    iOS 26.5 simulator xcodebuild log for build proof
   --ios-device-log PATH       iOS 26.5 generic device xcodebuild log for build proof
+  --sim-launch-proof PATH     iOS 26.5 simulator install/launch proof
+                              (default: latest Backend/proof/sim-launch-ios265-*.json)
   --live-check                Enable live auth-provider checks that hit production APIs
   --skip-ios-bundle            Skip iOS .app bundle check
   --help                      Show help
@@ -41,6 +43,7 @@ AUTH_PROOF_INPUT=""
 APP_PATH=""
 IOS_SIMULATOR_LOG=""
 IOS_DEVICE_LOG=""
+SIM_LAUNCH_PROOF=""
 LIVE_CHECK=0
 SKIP_IOS_BUNDLE=0
 
@@ -82,6 +85,10 @@ while [[ $# -gt 0 ]]; do
       IOS_DEVICE_LOG="$2"
       shift 2
       ;;
+    --sim-launch-proof)
+      SIM_LAUNCH_PROOF="$2"
+      shift 2
+      ;;
     --live-check)
       LIVE_CHECK=1
       shift
@@ -103,6 +110,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 cd "$REPO_ROOT"
+
+if [[ -z "$SIM_LAUNCH_PROOF" ]]; then
+  SIM_LAUNCH_PROOF="$(find Backend/proof -maxdepth 1 -name 'sim-launch-ios265-*.json' -print 2>/dev/null | sort | tail -n 1 || true)"
+fi
+if [[ -z "$SIM_LAUNCH_PROOF" ]]; then
+  SIM_LAUNCH_PROOF="Backend/proof/sim-launch-ios265-20260626.json"
+fi
 
 if [[ -n "$ENV_FILE" ]]; then
   if [[ ! -f "$ENV_FILE" ]]; then
@@ -191,8 +205,21 @@ publish_latest_proof() {
   fi
 }
 
+latest_current_proof() {
+  local prefix="$1"
+  local date_compact="$2"
+  local same_day="Backend/proof/${prefix}-${date_compact}T-current.json"
+  if [[ -f "$same_day" ]]; then
+    echo "$same_day"
+    return
+  fi
+  find Backend/proof -maxdepth 1 -name "${prefix}-*T-current.json" -print 2>/dev/null | sort | tail -n 1 || true
+}
+
 FAILED=0
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+PROOF_DATE="$(date +%Y-%m-%d)"
+PROOF_DATE_COMPACT="${PROOF_DATE//-/}"
 REMOTE_PROOF="Backend/proof/remote-api-${TIMESTAMP}.json"
 STORAGE_PROOF="Backend/proof/storage-backend-${TIMESTAMP}.json"
 AUTH_PROOF="Backend/proof/auth-providers-${TIMESTAMP}.json"
@@ -215,6 +242,8 @@ APP_STORE_ASSETS="Backend/proof/app-store-assets-${TIMESTAMP}.json"
 APP_STORE_CONNECT_MATERIALS="Backend/proof/app-store-connect-materials-${TIMESTAMP}.json"
 APP_STORE_CONNECT_EVIDENCE_MATERIALS="Backend/proof/app-store-connect-evidence-materials-${TIMESTAMP}.json"
 APP_STORE_SUBMISSION_PACKET="Backend/proof/app-store-submission-packet-${TIMESTAMP}.json"
+LAUNCH_DAY_ROLLOVER="Backend/proof/launch-day-rollover-${TIMESTAMP}.json"
+LAUNCH_OPERATOR_WORKBENCH="Backend/proof/launch-operator-workbench-${TIMESTAMP}.json"
 SIGNED_ARCHIVE_TESTFLIGHT_MATERIALS="Backend/proof/signed-archive-testflight-materials-${TIMESTAMP}.json"
 DEPLOY_PROOF="Backend/proof/huawei-baota-deploy-${TIMESTAMP}.json"
 PRODUCTION_PROOF="Backend/proof/production-readiness-${TIMESTAMP}.json"
@@ -244,9 +273,16 @@ elif [[ -n "$ENV_FILE" ]]; then
   publish_latest_proof "$DEPLOY_PROOF" "Backend/proof/huawei-baota-deploy.json"
   DEPLOY_PROOF_FOR_PROD="$DEPLOY_PROOF"
 else
-  DEPLOY_PROOF_FOR_PROD="Backend/proof/huawei-baota-deploy.json"
+  DEPLOY_PROOF_FOR_PROD="$(latest_current_proof "huawei-baota-deploy" "$PROOF_DATE_COMPACT")"
+  if [[ -n "$DEPLOY_PROOF_FOR_PROD" ]]; then
+    echo "[skip] collect deployment proof (no --env-file; using current ${DEPLOY_PROOF_FOR_PROD})"
+  else
+    DEPLOY_PROOF_FOR_PROD="Backend/proof/huawei-baota-deploy.json"
+  fi
   if [[ -f "$DEPLOY_PROOF_FOR_PROD" ]]; then
-    echo "[skip] collect deployment proof (no --env-file; using ${DEPLOY_PROOF_FOR_PROD})"
+    if [[ "$DEPLOY_PROOF_FOR_PROD" == "Backend/proof/huawei-baota-deploy.json" ]]; then
+      echo "[skip] collect deployment proof (no --env-file; using ${DEPLOY_PROOF_FOR_PROD})"
+    fi
   else
     echo "[warn] no --env-file or existing deployment proof; production readiness will fail this gate"
     FAILED=1
@@ -273,9 +309,16 @@ elif [[ -n "$ENV_FILE" ]]; then
   publish_latest_proof "$STORAGE_PROOF" "Backend/proof/storage-backend.json"
   STORAGE_PROOF_FOR_PROD="$STORAGE_PROOF"
 else
-  STORAGE_PROOF_FOR_PROD="Backend/proof/storage-backend.json"
+  STORAGE_PROOF_FOR_PROD="$(latest_current_proof "storage-backend" "$PROOF_DATE_COMPACT")"
+  if [[ -n "$STORAGE_PROOF_FOR_PROD" ]]; then
+    echo "[skip] verify storage backend (no --env-file; using current ${STORAGE_PROOF_FOR_PROD})"
+  else
+    STORAGE_PROOF_FOR_PROD="Backend/proof/storage-backend.json"
+  fi
   if [[ -f "$STORAGE_PROOF_FOR_PROD" ]]; then
-    echo "[skip] verify storage backend (no --env-file; using ${STORAGE_PROOF_FOR_PROD})"
+    if [[ "$STORAGE_PROOF_FOR_PROD" == "Backend/proof/storage-backend.json" ]]; then
+      echo "[skip] verify storage backend (no --env-file; using ${STORAGE_PROOF_FOR_PROD})"
+    fi
   else
     echo "[warn] no --env-file or existing storage proof; production readiness will fail this gate"
     FAILED=1
@@ -346,6 +389,7 @@ mark_proof_status "check mainland filing materials" "$MAINLAND_FILING_MATERIALS"
 run_or_fail "generate app store evidence proof" \
   python3 Backend/scripts/check_app_store_evidence.py \
   --allow-incomplete \
+  --date "$PROOF_DATE" \
   --output "$APP_STORE_EVIDENCE"
 publish_latest_proof "$APP_STORE_EVIDENCE" "Backend/proof/app-store-evidence.json"
 mark_proof_status "check app store evidence" "$APP_STORE_EVIDENCE" "ready"
@@ -376,8 +420,10 @@ mark_proof_status "check iOS 26.5 build proof" "$IOS_265_BUILD_PROOF" "passed"
 
 run_or_fail "check iOS 26.5 device availability" \
   python3 Backend/scripts/check_ios265_device_availability.py \
-  --output "$IOS_265_DEVICE_AVAILABILITY"
+  --output "$IOS_265_DEVICE_AVAILABILITY" \
+  --allow-incomplete
 publish_latest_proof "$IOS_265_DEVICE_AVAILABILITY" "Backend/proof/ios265-device-availability.json"
+mark_proof_status "check iOS 26.5 device availability proof" "$IOS_265_DEVICE_AVAILABILITY" "passed"
 
 if [[ $SKIP_IOS_BUNDLE -eq 0 && -n "$APP_PATH" ]]; then
   run_or_fail "generate iOS app bundle proof" \
@@ -417,11 +463,13 @@ publish_latest_proof "$APP_STORE_ASSETS" "Backend/proof/app-store-assets.json"
 
 run_or_fail "check App Store Connect materials" \
   python3 Backend/scripts/check_app_store_connect_materials.py \
+  --expected-material-date "$PROOF_DATE_COMPACT" \
   --output "$APP_STORE_CONNECT_MATERIALS"
 publish_latest_proof "$APP_STORE_CONNECT_MATERIALS" "Backend/proof/app-store-connect-materials.json"
 
 run_or_fail "check App Store Connect evidence materials" \
   python3 Backend/scripts/check_app_store_connect_evidence_materials.py \
+  --expected-material-date "$PROOF_DATE_COMPACT" \
   --output "$APP_STORE_CONNECT_EVIDENCE_MATERIALS"
 publish_latest_proof "$APP_STORE_CONNECT_EVIDENCE_MATERIALS" "Backend/proof/app-store-connect-evidence-materials.json"
 mark_proof_status "check App Store Connect evidence materials" "$APP_STORE_CONNECT_EVIDENCE_MATERIALS" "passed"
@@ -430,6 +478,18 @@ run_or_fail "check App Store submission packet" \
   python3 Backend/scripts/check_app_store_submission_packet.py \
   --output "$APP_STORE_SUBMISSION_PACKET"
 publish_latest_proof "$APP_STORE_SUBMISSION_PACKET" "Backend/proof/app-store-submission-packet.json"
+
+run_or_fail "check launch day rollover" \
+  python3 Backend/scripts/check_launch_day_rollover.py \
+  --output "$LAUNCH_DAY_ROLLOVER"
+publish_latest_proof "$LAUNCH_DAY_ROLLOVER" "Backend/proof/launch-day-rollover.json"
+mark_proof_status "check launch day rollover" "$LAUNCH_DAY_ROLLOVER" "passed"
+
+run_or_fail "check launch operator workbench" \
+  python3 Backend/scripts/check_launch_operator_workbench.py \
+  --output "$LAUNCH_OPERATOR_WORKBENCH"
+publish_latest_proof "$LAUNCH_OPERATOR_WORKBENCH" "Backend/proof/launch-operator-workbench.json"
+mark_proof_status "check launch operator workbench" "$LAUNCH_OPERATOR_WORKBENCH" "passed"
 
 run_or_fail "check signed archive and TestFlight materials" \
   python3 Backend/scripts/check_signed_archive_testflight_materials.py \
@@ -465,7 +525,7 @@ PROD_ARGS=(
   --provider-evidence-materials-proof "$PROVIDER_EVIDENCE_MATERIALS"
   --testflight-precheck-proof "$TESTFLIGHT_PRECHECK_PROOF_FOR_PROD"
   --testflight-regression-plan-proof "$TESTFLIGHT_REGRESSION_PLAN"
-  --sim-launch-proof "Backend/proof/sim-launch-ios265-20260626.json"
+  --sim-launch-proof "$SIM_LAUNCH_PROOF"
   --auth-providers-proof "$AUTH_PROOF_FOR_PROD"
   --diagnostics-redaction-proof "$DIAG_PROOF"
   --public-pages-proof "$PUBLIC_PAGES_PROOF"
@@ -476,6 +536,7 @@ PROD_ARGS=(
   --require-huawei-obs
   --require-screenshots
   --require-app-store-evidence
+  --expected-proof-date "$PROOF_DATE"
   --output "$PRODUCTION_PROOF"
   --allow-incomplete
 )
@@ -513,6 +574,8 @@ run_or_fail "generate launch objective audit proof" \
   --app-store-connect-materials "$APP_STORE_CONNECT_MATERIALS" \
   --app-store-connect-evidence-materials "$APP_STORE_CONNECT_EVIDENCE_MATERIALS" \
   --app-store-submission-packet "$APP_STORE_SUBMISSION_PACKET" \
+  --launch-day-rollover "$LAUNCH_DAY_ROLLOVER" \
+  --launch-operator-workbench "$LAUNCH_OPERATOR_WORKBENCH" \
   --mainland-filing-materials "$MAINLAND_FILING_MATERIALS" \
   --signed-archive-testflight-materials "$SIGNED_ARCHIVE_TESTFLIGHT_MATERIALS" \
   --provider-evidence-materials "$PROVIDER_EVIDENCE_MATERIALS" \
@@ -554,14 +617,18 @@ Launch readiness checks complete. Proof outputs refreshed:
   provider-evidence-materials: ${PROVIDER_EVIDENCE_MATERIALS}
   ios-release: ${IOS_RELEASE_PROOF}
   ios-265-build: ${IOS_265_BUILD_PROOF}
+  sim-launch-proof: ${SIM_LAUNCH_PROOF}
   ios265-device-availability: ${IOS_265_DEVICE_AVAILABILITY}
   app-store-connect-materials: ${APP_STORE_CONNECT_MATERIALS}
   app-store-connect-evidence-materials: ${APP_STORE_CONNECT_EVIDENCE_MATERIALS}
   app-store-submission-packet: ${APP_STORE_SUBMISSION_PACKET}
+  launch-day-rollover: ${LAUNCH_DAY_ROLLOVER}
+  launch-operator-workbench: ${LAUNCH_OPERATOR_WORKBENCH}
   testflight-precheck: ${TESTFLIGHT_PRECHECK_PROOF_FOR_PROD}
   testflight-regression-plan: ${TESTFLIGHT_REGRESSION_PLAN}
   auth-providers: ${AUTH_PROOF_FOR_PROD}
   app-store-evidence: ${APP_STORE_EVIDENCE}
+  evidence-date: ${PROOF_DATE}
   deployment: ${DEPLOY_PROOF_FOR_PROD}
   storage: ${STORAGE_PROOF_FOR_PROD}
   remote-api: ${REMOTE_PROOF}

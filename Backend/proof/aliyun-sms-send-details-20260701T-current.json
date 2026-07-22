@@ -1,0 +1,21 @@
+{
+  "artifactType": "aliyun-sms-send-details-proof",
+  "createdAt": "2026-07-01T11:22:22+00:00",
+  "containsSecrets": false,
+  "provider": "aliyun_dysmsapi",
+  "queryOk": true,
+  "sendDate": "20260701",
+  "totalCount": 1,
+  "rows": [
+    {
+      "phone": "****2065",
+      "sendStatus": 3,
+      "errCode": "DELIVERED",
+      "templateCode": "SMS_508990073",
+      "sendDate": "2026-07-01 19:21:39",
+      "receiveDate": "2026-07-01 19:21:49"
+    }
+  ],
+  "source": "Aliyun Dysmsapi QuerySendDetails via production adapter credentials; full phone and credentials not recorded",
+  "pairedLiveSendProof": "Backend/proof/auth-providers-sms-live-20260701T-current.json"
+}

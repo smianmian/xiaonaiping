@@ -6,11 +6,14 @@
 
 ## 当前阻塞
 
-- 上线目标红项仍为 `weChatConfigurationGreen`、`realDeviceRegressionEvidenceReady`、`appStoreManualEvidenceReady`、`productionReadinessGreen`。
+- 上线目标红项仍为 `weChatConfigurationGreen`、`ios265PhysicalDeviceAvailabilityReady`、`testFlightRegressionPlanReadyButNotEvidence`、`realDeviceRegressionEvidenceReady`、`appStoreManualEvidenceReady`、`productionReadinessGreen`。
+- `production-readiness.json` 当前还会检查 `deploymentProofCurrent` 和 `storageBackendProofCurrent`：提交前必须刷新当天部署 proof 和当天 OBS/存储 proof，不能继续沿用旧日期 proof。
+- `production-readiness.json` 当前还会因为 `testFlightRegressionPlanProofPassed` 变红：`ios265-device-availability.json` 必须能由 `devicectl` 读到 iOS 26.5 `physical iPhone`，否则 TestFlight 回归计划只能算“计划齐”，不能算“证据齐”。
 - 微信开放平台真实配置未齐：需要 `XNP_WECHAT_APP_ID`、`XNP_WECHAT_APP_SECRET`、iOS `XNPWeChatAppID`、`XNPWeChatURLScheme`、`CFBundleURLTypes` 和 Universal Link 一致。
 - 短信工程链路已有当前 proof：`Backend/proof/auth-provider-targeted-tests-20260627.log` 覆盖短信 webhook adapter、签名校验、auth provider 配置门禁和 debug 微信拒绝路径。
 - 短信上线仍缺人工材料：必须补短信服务商签名、模板、发送成功记录和真实实发验证截图，手机号中段打码，密钥不截图。
 - App Store 人工证据仍缺公司主体、仅 China mainland 可售、APP 备案、隐私标签、签名归档、TestFlight、短信服务商、微信开放平台、OBS 策略和 iOS 26.5 真机回归。
+- 当天部署 proof 优先使用 `XNP_DEPLOY_HOST=... Backend/deploy/deploy-huawei-baota.sh` 在服务器端刷新；该脚本会在真实私有 env 下运行 `collect_deployment_proof.py`，生成不含 secret 的证明；当天 OBS/存储 proof 使用 `verify_storage_backend.py` 生成，证明照片上传、下载、删除和账号删除清理路径仍可用。
 
 ## 不可替代边界
 
@@ -20,6 +23,9 @@
 - `XNP_SMS_PROVIDER=webhook`、`XNP_SMS_SECRET`、`XNP_SMS_WEBHOOK_URL` 只能证明服务端短信 provider 配置存在，不替代短信服务商截图和真实实发。
 - `XNP_WECHAT_APP_ID` 和 `XNP_WECHAT_APP_SECRET` 必须来自微信开放平台真实移动应用；`XNP_WECHAT_APP_SECRET` 不得写入仓库、截图或聊天。
 - iOS 27、模拟器启动日志、空截图、模板文档、debug code、placeholder `wx...` 都不能替代 iOS 26.5 TestFlight 或 Xcode 签名真机回归证据。
+- 旧日期的部署 proof 或存储 proof 不能替代 `deploymentProofCurrent` / `storageBackendProofCurrent`；当天部署 proof、当天 OBS/存储 proof 必须在提交前刷新。
+- `devicectl` 超时、无 physical iPhone、iOS 27 真机、模拟器都不能替代 `ios265-device-availability.json` 里的 iOS 26.5 真机可用性证据，也不能替代 `testFlightRegressionPlanProofPassed`。
+- `ios265PhysicalDeviceAvailabilityReady` 只有在 `ios265-device-availability.json` 证明 iOS 26.5 physical iPhone 可读且可用时才算通过。
 
 真机回归只能二选一：
 
@@ -36,6 +42,7 @@
 - `02-mainland-availability`
 - `03-app-filing`
 - `04-privacy-label`
+- `17-age-rating-result`
 - `05-signed-archive`
 - `06-testflight`
 - `07-sms-provider`
@@ -71,7 +78,8 @@ Backend/scripts/run_launch_readiness.sh \
 聚焦检查：
 
 ```bash
-python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit-20260627T-current.json
-python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260627T-current.json
-python3 Backend/scripts/check_launch_blocker_action_packet.py --allow-incomplete --output Backend/proof/launch-blocker-action-packet-20260627T-current.json
+XNP_DEPLOY_HOST=root@YOUR_SERVER Backend/deploy/deploy-huawei-baota.sh
+python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json
+python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json
+python3 Backend/scripts/check_launch_blocker_action_packet.py --allow-incomplete --output Backend/proof/launch-blocker-action-packet.json
 ```

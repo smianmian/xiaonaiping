@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-07-04T15:38:08+08:00",
+  "appStoreConnect": {
+    "appId": "6787332971",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "appName": "XiaoNaiPing",
+    "version": "1.0",
+    "build": "2"
+  },
+  "submission": {
+    "submittedForReview": true,
+    "versionStatus": "Waiting for Review",
+    "visibleStatusText": "1.0 正在等待审核",
+    "draftSubmissionCount": 0,
+    "submittedItemCount": 1,
+    "visibleSubmittedText": "已提交 1 个项目",
+    "reviewSubmissionDetailsUrl": "https://appstoreconnect.apple.com/apps/6787332971/distribution/reviewsubmissions/details/b1193315-ce3d-4508-a992-5b29876750b3",
+    "appStoreLive": false
+  },
+  "availabilityAndPricing": {
+    "price": "Free",
+    "territoryCount": 175,
+    "verifiedTerritories": [
+      {
+        "territory": "United States",
+        "visibleText": "美国 (USD)",
+        "price": "$0.00"
+      },
+      {
+        "territory": "Hong Kong",
+        "visibleText": "香港 (HKD)",
+        "price": "$0.00"
+      },
+      {
+        "territory": "China Mainland",
+        "visibleText": "中国大陆 (CNY)",
+        "price": "¥0.00"
+      }
+    ]
+  },
+  "notes": [
+    "The final Submit for Review button was clicked after user confirmation.",
+    "App Store Connect displayed Waiting for Review after submission.",
+    "This is an App Review submission, not App Store live availability."
+  ]
+}

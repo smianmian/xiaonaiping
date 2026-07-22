@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-07-03T23:53:44.712Z",
+  "page": "App Store Connect Apps / New App form",
+  "url": "https://appstoreconnect.apple.com/apps",
+  "screenshot": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/app-store-connect-new-app-form-missing-xnp-bundle-20260704.png",
+  "observedAppsText": "App list shows 一根呆毛 iOS 1.0 正在等待审核; no 小奶瓶 app visible.",
+  "newAppForm": {
+    "appNameRequired": true,
+    "primaryLocaleRequired": true,
+    "bundleIdOptionsObserved": [
+      "Yi Gen Dai Mao Widget - com.mewpow.Emotion-Isle.EmotionWidget"
+    ],
+    "xiaoNaiPingBundleIdAvailable": false,
+    "expectedXiaoNaiPingBundleId": "com.mewpow.xiaonaiping",
+    "skuPlanned": "xiaonaiping-ios-1"
+  },
+  "conclusion": "Cannot create XiaoNaiPing App Store Connect app from this form until com.mewpow.xiaonaiping is registered/available in the Apple Developer account."
+}

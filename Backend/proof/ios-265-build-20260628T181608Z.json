@@ -1,0 +1,130 @@
+{
+  "startedAt": "2026-06-28T18:16:11+00:00",
+  "completedAt": "2026-06-28T18:16:11+00:00",
+  "simulatorAppPath": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+  "deviceAppPath": "/private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "simulatorAppBundleExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app"
+    },
+    "simulatorInfoPlistPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/Info.plist"
+    },
+    "simulatorBuiltWithIOS265": {
+      "passed": true,
+      "required": true,
+      "evidence": "DTPlatformVersion=26.5, DTSDKName=iphonesimulator26.5"
+    },
+    "simulatorBundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "CFBundleIdentifier=com.mewpow.xiaonaiping"
+    },
+    "simulatorReleaseApiBaseURLMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNPAPIBaseURL=https://api.mewpow.com/xiaonaiping"
+    },
+    "simulatorLiveActivitiesEnabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "NSSupportsLiveActivities=True"
+    },
+    "simulatorPrivacyManifestBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/PrivacyInfo.xcprivacy"
+    },
+    "simulatorPrivacyManifestTrackingDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "tracking disabled and tracking domains empty"
+    },
+    "simulatorPrivacyManifestDataTypesAligned": {
+      "passed": true,
+      "required": true,
+      "evidence": "collected data types align with App Store privacy label and every entry is non-tracking"
+    },
+    "simulatorWidgetExtensionBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app/PlugIns/XiaoNaiPingWidgets.appex"
+    },
+    "deviceAppBundleExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app"
+    },
+    "deviceInfoPlistPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/Info.plist"
+    },
+    "deviceBuiltWithIOS265": {
+      "passed": true,
+      "required": true,
+      "evidence": "DTPlatformVersion=26.5, DTSDKName=iphoneos26.5"
+    },
+    "deviceBundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "CFBundleIdentifier=com.mewpow.xiaonaiping"
+    },
+    "deviceReleaseApiBaseURLMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNPAPIBaseURL=https://api.mewpow.com/xiaonaiping"
+    },
+    "deviceLiveActivitiesEnabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "NSSupportsLiveActivities=True"
+    },
+    "devicePrivacyManifestBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/PrivacyInfo.xcprivacy"
+    },
+    "devicePrivacyManifestTrackingDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "tracking disabled and tracking domains empty"
+    },
+    "devicePrivacyManifestDataTypesAligned": {
+      "passed": true,
+      "required": true,
+      "evidence": "collected data types align with App Store privacy label and every entry is non-tracking"
+    },
+    "deviceWidgetExtensionBundled": {
+      "passed": true,
+      "required": true,
+      "evidence": "/private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/PlugIns/XiaoNaiPingWidgets.appex"
+    },
+    "simulatorBuildLogSucceeded": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260629-stable.log"
+    },
+    "simulatorBuildLogIOS265Only": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260629-stable.log"
+    },
+    "deviceBuildLogSucceeded": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260629-device-current.log"
+    },
+    "deviceBuildLogIOS265Only": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260629-device-current.log"
+    }
+  }
+}

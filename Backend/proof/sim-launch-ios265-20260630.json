@@ -1,0 +1,18 @@
+{
+  "startedAt": "2026-06-29T16:50:29.063967+00:00",
+  "completedAt": "2026-06-29T16:50:29.063967+00:00",
+  "passed": true,
+  "simulator": {
+    "name": "iPhone 17 Pro",
+    "runtime": "iOS 26.5",
+    "id": "07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4"
+  },
+  "app": {
+    "bundleId": "com.mewpow.xiaonaiping",
+    "dtPlatformVersion": "26.5",
+    "dtSdkName": "iphonesimulator26.5"
+  },
+  "appPath": "/Users/smianmian/Downloads/小奶瓶/build/Run-20260630-xnp-ios265-release/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+  "launchOutput": "com.mewpow.xiaonaiping: 43802",
+  "sourceLog": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260630-stable.log"
+}

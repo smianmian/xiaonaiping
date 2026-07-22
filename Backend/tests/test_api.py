@@ -72,19 +72,19 @@ class APITestCase(unittest.TestCase):
                 return response.status, json.loads(payload.decode("utf-8"))
             return response.status, payload
 
-    def test_account_backup_photo_restore_and_delete(self) -> None:
+    def test_account_sync_photo_restore_and_delete(self) -> None:
         status, created = self.request("POST", "/v1/accounts")
         self.assertEqual(status, 201)
         token = created["sessionToken"]
 
-        backup = {"baby": {"name": "宝宝"}, "records": [{"id": "feed-1"}]}
-        status, uploaded = self.request("PUT", "/v1/backup", backup, token=token)
+        sync = {"baby": {"name": "宝宝"}, "records": [{"id": "feed-1"}]}
+        status, uploaded = self.request("PUT", "/v1/sync", sync, token=token)
         self.assertEqual(status, 200)
-        self.assertEqual(uploaded["sizeBytes"], len(json.dumps(backup).encode("utf-8")))
+        self.assertEqual(uploaded["sizeBytes"], len(json.dumps(sync).encode("utf-8")))
 
-        status, restored = self.request("GET", "/v1/backup", token=token)
+        status, restored = self.request("GET", "/v1/sync", token=token)
         self.assertEqual(status, 200)
-        self.assertEqual(restored, backup)
+        self.assertEqual(restored, sync)
 
         photo_body = b"not-a-real-jpeg-but-test-bytes"
         status, photo = self.request(
@@ -111,17 +111,17 @@ class APITestCase(unittest.TestCase):
 
         status, deleted = self.request("DELETE", "/v1/account", token=token)
         self.assertEqual(status, 200)
-        self.assertTrue(deleted["backupDeleted"])
+        self.assertTrue(deleted["syncDeleted"])
         self.assertEqual(deleted["photoCountDeleted"], 1)
 
         with self.assertRaises(urllib.error.HTTPError) as context:
-            self.request("GET", "/v1/backup", token=token)
+            self.request("GET", "/v1/sync", token=token)
         self.assertEqual(context.exception.code, 401)
 
-    def test_backup_requires_json(self) -> None:
+    def test_sync_requires_json(self) -> None:
         _, created = self.request("POST", "/v1/accounts")
         with self.assertRaises(urllib.error.HTTPError) as context:
-            self.request("PUT", "/v1/backup", b"not-json", token=created["sessionToken"])
+            self.request("PUT", "/v1/sync", b"not-json", token=created["sessionToken"])
         self.assertEqual(context.exception.code, 400)
 
     def test_public_policy_terms_and_support_pages(self) -> None:
@@ -167,7 +167,7 @@ class APITestCase(unittest.TestCase):
     def test_internal_metrics_are_aggregated_and_admin_only(self) -> None:
         _, created = self.request("POST", "/v1/accounts")
         token = created["sessionToken"]
-        self.request("PUT", "/v1/backup", {"baby": {"name": "不应出现在指标里"}}, token=token)
+        self.request("PUT", "/v1/sync", {"baby": {"name": "不应出现在指标里"}}, token=token)
         self.request(
             "PUT",
             "/v1/photos/photo_metrics",
@@ -186,8 +186,8 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(metrics["storageBackend"], "disk")
         self.assertEqual(metrics["totalAccounts"], 1)
         self.assertEqual(metrics["activeAccounts"], 1)
-        self.assertEqual(metrics["accountsWithBackup"], 1)
-        self.assertGreater(metrics["backupBytes"], 0)
+        self.assertEqual(metrics["accountsWithSync"], 1)
+        self.assertGreater(metrics["syncBytes"], 0)
         self.assertEqual(metrics["photoObjects"], 1)
         self.assertEqual(metrics["deletionAudit"]["deletedAccounts"], 0)
         self.assertNotIn("不应出现在指标里", json.dumps(metrics, ensure_ascii=False))
@@ -303,7 +303,7 @@ class APITestCase(unittest.TestCase):
             XiaoNaiPingHandler.redacted_log_path("/v1/photos/private_photo_key_123?token=secret"),
             "/v1/photos/<redacted>",
         )
-        self.assertEqual(XiaoNaiPingHandler.redacted_log_path("/v1/backup?token=secret"), "/v1/backup")
+        self.assertEqual(XiaoNaiPingHandler.redacted_log_path("/v1/sync?token=secret"), "/v1/sync")
 
 
 class ProductionAuthProviderTestCase(unittest.TestCase):

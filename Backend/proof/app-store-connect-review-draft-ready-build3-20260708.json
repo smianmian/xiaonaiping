@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-07-08T15:36:43+0800",
+  "app": "XiaoNaiPing",
+  "appStoreConnectAppId": "6787332971",
+  "platform": "iOS",
+  "version": "1.0",
+  "selectedBuild": "3",
+  "visibleVersionStatus": "1.0 可供审核",
+  "draftSubmission": {
+    "visible": true,
+    "item": "iOS App 1.0",
+    "buildLabel": "1.0 (3)",
+    "submitForReviewButtonVisible": true
+  },
+  "exportCompliance": {
+    "savedInAppStoreConnect": true,
+    "selectedAnswer": "notProprietaryOrStandardEncryption",
+    "basis": "Apple platform security, Keychain storage, HTTPS transport, and standard system/network encryption only; no custom cryptography, VPN, DRM, or end-to-end encrypted messaging."
+  },
+  "releaseMode": "manual release after approval",
+  "notes": [
+    "Previous submitted build 2 was removed from review by developer action.",
+    "Build 3 was selected for iOS App version 1.0.",
+    "The final App Store Connect Submit for Review button is visible and awaiting action-time confirmation."
+  ]
+}

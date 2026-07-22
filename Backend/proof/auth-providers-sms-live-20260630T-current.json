@@ -1,0 +1,44 @@
+{
+  "startedAt": "2026-06-29T16:41:06+00:00",
+  "completedAt": "2026-06-29T16:41:07+00:00",
+  "containsSecrets": false,
+  "apiBaseUrl": "https://api.mewpow.com/xiaonaiping",
+  "passed": false,
+  "failedRequiredChecks": [
+    "smsProviderConfigured",
+    "wechatProviderConfigured",
+    "smsLiveSendVerified"
+  ],
+  "checks": {
+    "deploymentProofReadable": {
+      "passed": true,
+      "required": true,
+      "evidence": "Backend/proof/huawei-baota-deploy-20260630T-current.json"
+    },
+    "authDebugModeDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "deployment proof reports authDebugModeDisabled=true"
+    },
+    "smsProviderConfigured": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing: XNP_SMS_PROVIDER=webhook, XNP_SMS_SECRET, XNP_SMS_WEBHOOK_URL=https:// production webhook"
+    },
+    "wechatProviderConfigured": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing valid XNP_WECHAT_APP_ID (wx + 16 hex) or XNP_WECHAT_APP_SECRET"
+    },
+    "wechatDebugLoginRejected": {
+      "passed": true,
+      "required": true,
+      "evidence": "/v1/auth/wechat/login rejected debug code with HTTP 501"
+    },
+    "smsLiveSendVerified": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing valid test phone from --phone-env XNP_SMS_TEST_PHONE in E.164 format"
+    }
+  }
+}

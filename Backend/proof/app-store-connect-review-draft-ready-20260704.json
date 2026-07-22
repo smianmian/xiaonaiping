@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-07-04T15:33:59+08:00",
+  "appStoreConnect": {
+    "appId": "6787332971",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "appName": "XiaoNaiPing",
+    "version": "1.0",
+    "build": "2"
+  },
+  "currentState": {
+    "versionStatus": "Ready for Review",
+    "draftSubmissionCount": 1,
+    "draftSubmissionItem": "iOS App 1.0 (build 2)",
+    "finalSubmitButtonVisible": true,
+    "submittedForReview": false,
+    "appStoreLive": false
+  },
+  "completedAppStoreConnectGates": {
+    "privacyQuestionnairePublished": true,
+    "ageRatingSaved": true,
+    "globalAgeRating": "4+",
+    "primaryCategory": "Lifestyle",
+    "contentRights": "Does not use third-party content",
+    "pricing": "Free",
+    "pricingTerritoryCount": 175,
+    "releaseType": "Manual",
+    "buildSelected": true,
+    "reviewContactSaved": true,
+    "demoAccountSaved": true,
+    "demoAccountPasswordRedactedFromThisProof": true,
+    "screenshotsUploaded": 5
+  },
+  "visibleFinalAction": {
+    "buttonText": "Submit for Review",
+    "requiresActionTimeConfirmation": true
+  },
+  "notes": [
+    "The App Store Connect page shows the version as ready for review and a draft submission with one item.",
+    "The final Submit for Review button is visible but was not clicked in this proof run."
+  ]
+}

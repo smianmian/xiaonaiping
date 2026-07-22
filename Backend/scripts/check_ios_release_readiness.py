@@ -320,8 +320,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     pbxproj = root / "App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj"
     info_plist = root / "App/iOS/XiaoNaiPing/Info.plist"
     profile_view = root / "App/iOS/XiaoNaiPing/Views/ProfileView.swift"
-    backup_controller = root / "App/iOS/XiaoNaiPing/Services/CloudBackupController.swift"
-    backup_client = root / "App/iOS/XiaoNaiPing/Services/CloudBackupAPIClient.swift"
+    sync_controller = root / "App/iOS/XiaoNaiPing/Services/CloudSyncController.swift"
+    sync_client = root / "App/iOS/XiaoNaiPing/Services/CloudSyncAPIClient.swift"
     wechat_service = root / "App/iOS/XiaoNaiPing/Services/WeChatLoginService.swift"
     privacy_manifest = root / "App/iOS/XiaoNaiPing/PrivacyInfo.xcprivacy"
     privacy_label = root / "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
@@ -332,8 +332,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     privacy_manifest_data = read_plist(privacy_manifest)
     privacy_label_data = read_json(privacy_label)
     pbx_text = read_text(pbxproj)
-    client_text = read_text(backup_client)
-    controller_text = read_text(backup_controller)
+    client_text = read_text(sync_client)
+    controller_text = read_text(sync_controller)
     profile_text = read_text(profile_view)
     wechat_service_text = read_text(wechat_service)
     wechat_shim_text = read_text(root / "App/iOS/XiaoNaiPing/Services/WechatOpenSDKShim.swift")
@@ -526,11 +526,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         if missing_bridge_markers
         else "WeChat service registers OpenSDK, sends auth request, handles URL callbacks, and exchanges returned code with backend",
     )
-    debug_guarded, debug_evidence = swift_markers_only_inside_debug(backup_controller, ["debug_wechat_ios"])
+    debug_guarded, debug_evidence = swift_markers_only_inside_debug(sync_controller, ["debug_wechat_ios"])
     report.add("releaseWeChatDebugCodeBlocked", debug_guarded, debug_evidence)
     report.add(
         "releaseWeChatButtonGated",
-        "!cloudBackup.isWeChatLoginConfigured" in profile_text,
+        "!cloudSync.isWeChatLoginConfigured" in profile_text,
         "Profile WeChat button is disabled until native WeChat config is present",
     )
 

@@ -1,0 +1,373 @@
+{
+  "startedAt": "2026-06-28T17:56:22+00:00",
+  "completedAt": "2026-06-28T17:56:23+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "fillSheetPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260629.md"
+    },
+    "metadataPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_METADATA.md"
+    },
+    "copyPastePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260629.md"
+    },
+    "appStoreConnectDraftJsonPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260629.json"
+    },
+    "appStoreConnectFieldFreezePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260629.json"
+    },
+    "appStoreConnectEntrySessionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260629.json"
+    },
+    "ascBackfillResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-BACKFILL-RESULT.template.json"
+    },
+    "reviewInformationPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260629.md"
+    },
+    "appReviewTestAccountPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_REVIEW_TEST_ACCOUNT_PACKET_20260629.json"
+    },
+    "privacyAnswersPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260629.md"
+    },
+    "ageRatingAnswersPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260629.md"
+    },
+    "versionReleaseSettingsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260629.md"
+    },
+    "finalEntryAuditPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260629.md"
+    },
+    "privacyLabelPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+    },
+    "screenshotPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/SCREENSHOT_PLAN.md"
+    },
+    "copyPastePacketCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "copy-paste packet covers App Store Connect fields, review notes, D-U-N-S handoff, and iOS 26.5 final evidence boundaries without secrets"
+    },
+    "copyPastePacketMatchesFillSheetDraft": {
+      "passed": true,
+      "required": true,
+      "evidence": "copy-paste packet text matches fill sheet for keywords, promotional text, description, release notes, and review notes"
+    },
+    "reviewInformationPacketCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Review Information private-field packet covers contact info, sign-in, notes, evidence, and redaction boundaries without secrets"
+    },
+    "reviewAccountRedactedEvidenceMatchesReviewInfo": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Review Information sign-in fields are backed by redacted account evidence without storing recovery keys, phone numbers, tokens, or debug credentials"
+    },
+    "reviewInformationSubmissionBlockersPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "review information packet keeps D-U-N-S, Apple Developer, Archive/TestFlight, external provider, filing, age rating, final screenshot, real-device evidence, and proof-gate blockers separate from test-account notes"
+    },
+    "appReviewTestAccountPacketReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "review information packet links the structured review-test-account packet and keeps its no-secret, no-submit boundary explicit"
+    },
+    "appReviewTestAccountPacketValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Review test-account packet locks private recovery-key handling, redacted evidence, RD-10/RD-13/RD-14/RD-15 capture targets, stop conditions, redaction checklist, post-fill gates, and no-submit boundary"
+    },
+    "privacyAnswersCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Privacy answer sheet maps privacy label JSON into App Store Connect tracking/linking/purpose answers without secrets"
+    },
+    "ageRatingAnswersCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "age rating answer sheet covers Kids, web access, public UGC, chat, purchases, ads/tracking, gambling, mature content, health records, and regulated medical-device answers without secrets"
+    },
+    "ageRatingAnswerSheetReferencedByDraft": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect draft, copy-paste packet, or metadata references the dedicated age rating / medical device answer sheet"
+    },
+    "versionReleaseSettingsCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store version/release settings cover build selection, pricing/availability, manual release, export compliance, IDFA/tracking, content rights, and evidence boundaries without secrets"
+    },
+    "finalEntryAuditCompleteAndRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "final App Store Connect entry audit maps paste fields, same-round build/version, evidence files, rerun gates, and redaction boundaries without secrets"
+    },
+    "finalEntryPageEvidenceIndexPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "final App Store Connect audit lists post-fill page evidence filenames, keep/redact fields, cross-check sources, and rerun gates without treating page screenshots as external proof substitutes"
+    },
+    "finalSubmitReviewGuardRequiresCrossAppCanSubmit": {
+      "passed": true,
+      "required": true,
+      "evidence": "final App Store Connect audit requires cross-app canSubmit=true plus ready launch, production, and evidence proofs before Submit for Review"
+    },
+    "finalFieldSourceConsistencyLockPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "final App Store Connect audit locks draft fields to source files and treats ASC screenshots only as page-fill evidence"
+    },
+    "appStoreConnectEntrySessionPacketReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "final App Store Connect audit links the entry-session packet and keeps its plan-not-evidence, no-submit boundary explicit"
+    },
+    "metadataCurrentLaunchHandoffPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "metadata draft is current and points to fill sheet, D-U-N-S, external evidence, and launch proof gates"
+    },
+    "metadataDraftDescriptionCoversCurrentReminderBehavior": {
+      "passed": true,
+      "required": true,
+      "evidence": "metadata descriptions in Simplified Chinese, Traditional Chinese, and English cover 5-minute manual feeding reminder deferral without automatic volume, age, sensor, or health-data inference"
+    },
+    "blockingProofReferencesUseLatestSnapshots": {
+      "passed": true,
+      "required": true,
+      "evidence": "blocking proof references use stable latest aliases"
+    },
+    "externalAuthSubmissionBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials clearly separate draft login copy from pending SMS/WeChat provider and iOS bundle evidence"
+    },
+    "appNameMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "小奶瓶"
+    },
+    "bundleIdentifierMatches": {
+      "passed": true,
+      "required": true,
+      "evidence": "com.mewpow.xiaonaiping"
+    },
+    "subtitleWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "温柔记录宝宝每一天"
+    },
+    "skuPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "SKU xiaonaiping-ios-1"
+    },
+    "primaryCategoryLifestyle": {
+      "passed": true,
+      "required": true,
+      "evidence": "primary category Lifestyle/生活"
+    },
+    "secondaryCategoryBlank": {
+      "passed": true,
+      "required": true,
+      "evidence": "second category is blank in fill sheet"
+    },
+    "metadataNoHealthFitnessCategoryAlternative": {
+      "passed": true,
+      "required": true,
+      "evidence": "metadata does not suggest Health & Fitness as an alternate category"
+    },
+    "firstReleaseMainland": {
+      "passed": true,
+      "required": true,
+      "evidence": "China mainland first"
+    },
+    "secondReleaseHongKong": {
+      "passed": true,
+      "required": true,
+      "evidence": "Hong Kong second"
+    },
+    "priceFree": {
+      "passed": true,
+      "required": true,
+      "evidence": "free V1"
+    },
+    "copyrightCompany": {
+      "passed": true,
+      "required": true,
+      "evidence": "company copyright present"
+    },
+    "publicUrlsMatch": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy/support/terms URLs match fill sheet, metadata, and privacy label"
+    },
+    "publicUrlsReachable": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy/support/terms URLs return 2xx and contain company/product markers"
+    },
+    "keywordsCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "chars=29, bytes=73, missing=[]"
+    },
+    "promotionalTextWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=31"
+    },
+    "releaseNotesCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=60, missing=[]"
+    },
+    "descriptionCompleteAndWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=496, missing=[]"
+    },
+    "ageRatingBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "4+ / not Kids / non-medical boundaries present"
+    },
+    "privacyLabelMatchesAppStoreDraft": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy label categories, purposes, linking, tracking, and app flags match draft"
+    },
+    "screenshotCopyComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "5 screenshot filenames and titles present"
+    },
+    "screenshotCopyAvoidsUnavailableOrMedicalClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot table avoids unavailable WeChat success claims and medical/health advice claims; screenshot boundaries are present"
+    },
+    "screenshotPlanUsesIOS265Only": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot capture plan uses iOS 26.5 simulator commands and keeps final TestFlight/signed-build screenshots separate"
+    },
+    "appStoreScreenshotUploadMatrixPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect screenshot upload matrix ties Apple screenshot specs, current iPhone 6.9 candidates, final iOS 26.5 TestFlight/signed screenshots, and ASC page evidence together"
+    },
+    "inAppCompanionCopyBounded": {
+      "passed": true,
+      "required": true,
+      "evidence": "Apple Watch mentions in app UI are bounded to system notification mirroring, not Watch App or watchOS support"
+    },
+    "reviewNotesPasteTextWithinLimit": {
+      "passed": true,
+      "required": true,
+      "evidence": "len=828"
+    },
+    "appStoreConnectDraftJsonMatchesFillSheet": {
+      "passed": true,
+      "required": true,
+      "evidence": "structured App Store Connect draft JSON matches fill sheet fields, age rating, privacy, review notes, and non-submission boundary"
+    },
+    "appStoreConnectDraftPageEvidenceMapComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "structured App Store Connect draft JSON maps ASC-01 through ASC-08 page-fill screenshots to required captures, redactions, cross-check sources, and non-substitution boundaries"
+    },
+    "appStoreConnectDraftFieldAuditMatrixComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "structured App Store Connect draft JSON locks app name, subtitle, description, keywords, category, age rating, privacy/support/terms URLs, and review notes to source files, ASC page evidence, blockers, and redaction boundaries"
+    },
+    "appStoreConnectFieldFreezePacketValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect field freeze packet locks every draft field requested for live entry to source files, ASC page evidence, redaction rules, and no-submit boundaries"
+    },
+    "appStoreConnectEntrySessionPacketValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect entry-session packet locks fill sequence, source files, ASC page evidence targets, stop conditions, redaction checklist, post-entry gates, and no-submit boundary"
+    },
+    "ascBackfillResultTemplateValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "ASC backfill result template keeps live result status pending, source documents, ASC-01..ASC-08 screenshot files, redaction/no-submit boundary, and cross-app canSubmit proof locked"
+    },
+    "appStoreConnectFieldBudgetTablesCurrent": {
+      "passed": true,
+      "required": true,
+      "evidence": "field budget tables match current draft lengths"
+    },
+    "reviewNotesPasteTextHasBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "review paste text has Live Activity/widget/source/health boundaries"
+    },
+    "vaccineBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "vaccine copy is bounded as records/reminders and points users to doctors/local official information"
+    },
+    "liveActivityWidgetBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "Live Activity and widget copy is bounded to feeding reminder / local summary, not health advice or medical judgment"
+    },
+    "feedingReminderDeferralBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "manual feeding reminder deferral is bounded to user-set schedule, not volume/month-age inference or feeding advice"
+    },
+    "screenshotCompanionSurfaceBoundarySpecific": {
+      "passed": true,
+      "required": true,
+      "evidence": "screenshot plan does not imply unverified Live Activity/widget success and keeps iOS 26.5 final proof separate"
+    },
+    "reviewAccountInstructionsRedacted": {
+      "passed": true,
+      "required": true,
+      "evidence": "review account instructions point to redacted evidence and keep recovery key only in ignored local storage / App Review Information"
+    }
+  }
+}

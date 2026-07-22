@@ -1,0 +1,111 @@
+{
+  "status": "app-privacy-published",
+  "date": "2026-07-04",
+  "observedAtUtc": "2026-07-04T07:15:02Z",
+  "observedAtLocal": "2026-07-04 15:15:02 CST",
+  "appStoreConnectAppId": "6787332971",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "version": "1.0",
+  "publishedByDisplayName": "面面 佘",
+  "privacyPolicyUrl": "https://api.mewpow.com/xiaonaiping/privacy",
+  "privacyChoicesUrl": null,
+  "publishedPageEvidenceExcerpt": "App 隐私 几秒钟前由面面 佘发布 ... 与你关联的数据 ... 使用数据 用户内容 健康与健身 联系信息 标识符 ... 不会与你关联的数据 ... 诊断",
+  "dataTypes": [
+    {
+      "appStoreConnectType": "电话号码",
+      "category": "Contact Info",
+      "purposes": [
+        "App 功能"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "健康",
+      "category": "Health and Fitness",
+      "purposes": [
+        "App 功能"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "照片或视频",
+      "category": "User Content",
+      "purposes": [
+        "App 功能"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "其他用户内容",
+      "category": "User Content",
+      "purposes": [
+        "App 功能"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "用户 ID",
+      "category": "Identifiers",
+      "purposes": [
+        "App 功能"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "产品交互",
+      "category": "Usage Data",
+      "purposes": [
+        "分析"
+      ],
+      "linkedToUser": true,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "崩溃数据",
+      "category": "Diagnostics",
+      "purposes": [
+        "App 功能",
+        "分析"
+      ],
+      "linkedToUser": false,
+      "usedForTracking": false
+    },
+    {
+      "appStoreConnectType": "性能数据",
+      "category": "Diagnostics",
+      "purposes": [
+        "App 功能",
+        "分析"
+      ],
+      "linkedToUser": false,
+      "usedForTracking": false
+    }
+  ],
+  "sourceAnswerFiles": [
+    "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260704.md",
+    "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md"
+  ],
+  "browserSessionEvidence": {
+    "privacyPagePublished": true,
+    "publishConfirmationAccepted": true,
+    "finalPrivacyPublishButtonNoLongerShown": true,
+    "secretValuesRecorded": false
+  },
+  "remainingAppStoreConnectBlockers": [
+    "Age rating questions still need to be completed in App Store Connect.",
+    "The live App Store Connect session is currently stopped at Apple ID password/2FA login for miaodl@mewpow.com.",
+    "Final Submit for Review has not been clicked and still requires action-time confirmation."
+  ],
+  "submissionState": {
+    "ageRatingCompleted": false,
+    "appPrivacyPublished": true,
+    "submittedForReview": false,
+    "liveOnAppStore": false
+  }
+}

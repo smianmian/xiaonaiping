@@ -48,7 +48,7 @@ xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configura
 
 本轮从一根呆毛发布材料复用的检查项，已固化到 `Backend/scripts/check_ios_app_bundle.py`：
 
-1. 不允许 `README`、Markdown、HTML、env、backup、`Secrets.plist` 等内部文件进入 `.app`。
+1. 不允许 `README`、Markdown、HTML、env、sync、`Secrets.plist` 等内部文件进入 `.app`。
 2. 不允许文本资源中出现 `127.0.0.1`、`localhost`、`debug_wechat_`、第三方模型 API 域名或 `sk-` API key 标记。
 3. 继续检查 Release API URL、Privacy Manifest、繁中香港资源、debug 微信码和微信原生 URL 配置。
 

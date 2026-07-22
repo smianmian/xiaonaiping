@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 
@@ -82,6 +83,8 @@ XNP_WECHAT_APP_SECRET=wechat-secret
             self.assertTrue(proof["providerChecks"]["obsBucketHasXiaoNaiPingNamespace"])
             self.assertTrue(proof["providerChecks"]["smsProviderIsWebhook"])
             self.assertTrue(proof["providerChecks"]["wechatAppIDConfigured"])
+            self.assertEqual(proof["startedAt"], proof["completedAt"])
+            self.assertIsNotNone(datetime.fromisoformat(proof["startedAt"]).tzinfo)
             self.assertEqual(proof["remainingProductionBlockers"], [])
 
     def test_placeholders_are_reported_as_blockers(self) -> None:
@@ -132,6 +135,60 @@ XNP_WECHAT_APP_SECRET=wechat-secret
             self.assertTrue(
                 any("WeChat Open Platform AppID/AppSecret" in blocker for blocker in proof["remainingProductionBlockers"])
             )
+
+    def test_sms_webhook_accepts_local_adapter(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            env_file = Path(tempdir) / "xiaonaiping-api.env"
+            write(
+                env_file,
+                """
+XNP_DATA_DIR=/srv/xiaonaiping/data
+XNP_STORAGE_BACKEND=huawei_obs
+HUAWEI_OBS_BUCKET=xiaonaiping-prod-private
+HUAWEI_OBS_PREFIX=xiaonaiping
+XNP_SMS_PROVIDER=webhook
+XNP_SMS_WEBHOOK_URL=http://127.0.0.1:8791/send
+XNP_SMS_SECRET=sms-secret
+XNP_WECHAT_APP_ID=wxa4f19c3e802b7d65
+XNP_WECHAT_APP_SECRET=wechat-secret
+""".strip(),
+            )
+
+            proof = self.run_collector(env_file)
+
+            self.assertTrue(proof["providerChecks"]["smsProviderIsWebhook"])
+            self.assertTrue(proof["providerChecks"]["smsWebhookURLConfigured"])
+            self.assertFalse(
+                any("production SMS webhook provider" in blocker for blocker in proof["remainingProductionBlockers"])
+            )
+
+    def test_sms_webhook_rejects_unapproved_urls(self) -> None:
+        for url in ["http://127.0.0.1:8788/send", "http://sms.xiaonaiping.cn/send", "https://sms.example.com/send"]:
+            with self.subTest(url=url):
+                with tempfile.TemporaryDirectory() as tempdir:
+                    env_file = Path(tempdir) / "xiaonaiping-api.env"
+                    write(
+                        env_file,
+                        f"""
+XNP_DATA_DIR=/srv/xiaonaiping/data
+XNP_STORAGE_BACKEND=huawei_obs
+HUAWEI_OBS_BUCKET=xiaonaiping-prod-private
+HUAWEI_OBS_PREFIX=xiaonaiping
+XNP_SMS_PROVIDER=webhook
+XNP_SMS_WEBHOOK_URL={url}
+XNP_SMS_SECRET=sms-secret
+XNP_WECHAT_APP_ID=wxa4f19c3e802b7d65
+XNP_WECHAT_APP_SECRET=wechat-secret
+""".strip(),
+                    )
+
+                    proof = self.run_collector(env_file)
+
+                    self.assertTrue(proof["providerChecks"]["smsProviderIsWebhook"])
+                    self.assertFalse(proof["providerChecks"]["smsWebhookURLConfigured"])
+                    self.assertTrue(
+                        any("production SMS webhook provider" in blocker for blocker in proof["remainingProductionBlockers"])
+                    )
 
     def test_missing_env_file_fails_before_writing_proof(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

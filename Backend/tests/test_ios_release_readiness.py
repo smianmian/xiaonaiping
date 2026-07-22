@@ -140,7 +140,7 @@ targets:
 		AAAA1111 /* Release */ = {{
 			isa = XCBuildConfiguration;
 			buildSettings = {{
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				INFOPLIST_FILE = XiaoNaiPingWidgets/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping.widgets;
 			}};
@@ -149,7 +149,7 @@ targets:
 		ABCD1234 /* Release */ = {{
 			isa = XCBuildConfiguration;
 			buildSettings = {{
-				DEVELOPMENT_TEAM = JGCT3GY9CT;
+				DEVELOPMENT_TEAM = L2TYJNDTJK;
 				INFOPLIST_FILE = XiaoNaiPing/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mewpow.xiaonaiping;
 			}};
@@ -170,8 +170,8 @@ targets:
     )
     write(root / "App/iOS/XiaoNaiPing/zh-Hant-HK.lproj/Localizable.strings", '"微信登录" = "微信登入";\n')
     write(root / "App/iOS/XiaoNaiPing/zh-Hant-HK.lproj/InfoPlist.strings", '"CFBundleDisplayName" = "小奶瓶";\n')
-    cloud_backup_client_config = """\
-struct CloudBackupConfiguration {
+    cloud_sync_client_config = """\
+struct CloudSyncConfiguration {
     static var isWeChatLoginConfigured: Bool {
 %s
     }
@@ -182,13 +182,13 @@ struct CloudBackupConfiguration {
         else "        return false"
     )
     write(
-        root / "App/iOS/XiaoNaiPing/Services/CloudBackupAPIClient.swift",
-        cloud_backup_client_config,
+        root / "App/iOS/XiaoNaiPing/Services/CloudSyncAPIClient.swift",
+        cloud_sync_client_config,
     )
     write(
-        root / "App/iOS/XiaoNaiPing/Services/CloudBackupController.swift",
+        root / "App/iOS/XiaoNaiPing/Services/CloudSyncController.swift",
         """
-final class CloudBackupController {
+final class CloudSyncController {
     func loginWithWeChat() async {
         #if DEBUG
         _ = "debug_wechat_ios"
@@ -248,7 +248,7 @@ final class WeChatLoginService {
         root / "App/iOS/XiaoNaiPing/Views/ProfileView.swift",
         """
 Button("微信登录") {}
-    .disabled(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured)
+    .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
 """.lstrip(),
     )
 

@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-07-04T00:05:34.263Z",
+  "page": "App Store Connect / Apps list",
+  "url": "https://appstoreconnect.apple.com/apps",
+  "observedAppsText": "App 开发者必须提供交易商状态，才能提交新 App 或 App 更新以在欧盟地区 (EU) 分发。根据《数字服务法》的要求，你必须提供交易商状态，否则你的 App 将从欧盟地区的 App Store 下架。如需了解更多信息，请联系管理员或账户持有人。进一步了解 一根呆毛 iOS 1.0 正在等待审核",
+  "xiaoNaiPingAppVisible": false,
+  "daimaoAppVisible": true,
+  "conclusion": "App Store Connect app list still does not show XiaoNaiPing; create the Apple Developer bundle IDs first, then create the App Store Connect app record before upload/submission.",
+  "screenshot": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/app-store-connect-apps-live-missing-xnp-20260704.png"
+}

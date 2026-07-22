@@ -61,15 +61,15 @@ def run_flow() -> dict[str, Any]:
             status, created = request(base_url, "POST", "/v1/accounts")
             token = created["sessionToken"]
 
-            backup = {
+            sync = {
                 "schemaVersion": 1,
                 "baby": {"name": "ReleaseFlowBaby", "birthDate": "2026-06-01"},
                 "feedingRecords": [{"id": "feeding-1", "amountML": 90}],
                 "photoIds": ["photo_release_1"],
             }
-            backup_bytes = json.dumps(backup, ensure_ascii=False).encode("utf-8")
-            status, backup_upload = request(base_url, "PUT", "/v1/backup", backup, token=token)
-            status, backup_restore = request(base_url, "GET", "/v1/backup", token=token)
+            sync_bytes = json.dumps(sync, ensure_ascii=False).encode("utf-8")
+            status, sync_upload = request(base_url, "PUT", "/v1/sync", sync, token=token)
+            status, sync_restore = request(base_url, "GET", "/v1/sync", token=token)
 
             photo_bytes = b"release-flow-photo-bytes"
             status, photo_upload = request(
@@ -95,7 +95,7 @@ def run_flow() -> dict[str, Any]:
 
             token_rejected_after_delete = False
             try:
-                request(base_url, "GET", "/v1/backup", token=token)
+                request(base_url, "GET", "/v1/sync", token=token)
             except urllib.error.HTTPError as error:
                 token_rejected_after_delete = error.code == 401
 
@@ -105,15 +105,15 @@ def run_flow() -> dict[str, Any]:
                 "apiBaseUrl": base_url,
                 "checks": {
                     "accountCreated": bool(created.get("accountId")) and created.get("recoveryKey", "").startswith("xnp_"),
-                    "backupUploaded": backup_upload.get("sizeBytes") == len(backup_bytes),
-                    "backupRestored": backup_restore == backup,
+                    "syncUploaded": sync_upload.get("sizeBytes") == len(sync_bytes),
+                    "syncRestored": sync_restore == sync,
                     "photoUploaded": photo_upload.get("photoId") == "photo_release_1",
                     "photoListed": photo_list.get("photos", [{}])[0].get("photoId") == "photo_release_1",
                     "photoDownloaded": photo_download == photo_bytes,
                     "recoveryKeyWorks": recovered.get("accountId") == created.get("accountId"),
                     "phoneLoginWorks": phone_session.get("authProvider") == "phone" and bool(phone_session.get("accountId")),
                     "wechatLoginWorks": wechat_session.get("authProvider") == "wechat" and bool(wechat_session.get("accountId")),
-                    "accountDeleteRemovedBackup": deleted.get("backupDeleted") is True,
+                    "accountDeleteRemovedSync": deleted.get("syncDeleted") is True,
                     "accountDeleteRemovedPhoto": deleted.get("photoCountDeleted") == 1,
                     "tokenRejectedAfterDelete": token_rejected_after_delete,
                 },

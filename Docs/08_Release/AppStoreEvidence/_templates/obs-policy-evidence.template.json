@@ -1,0 +1,67 @@
+{
+  "artifactType": "obs-policy-evidence-template",
+  "status": "template-only-not-evidence",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "targetEvidenceFiles": {
+    "obsPolicy": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+    "storageProof": "Backend/proof/storage-backend-20260704T-current.json"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "obsPolicy",
+      "target": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "storageProof",
+      "target": "Backend/proof/storage-backend-20260704T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "doNotRenameThisTemplateTo": [
+    "09-obs-policy.json",
+    "09-obs-policy.png",
+    "09-obs-policy.pdf"
+  ],
+  "fieldsToVerify": {
+    "provider": "Huawei Cloud OBS",
+    "bucketOrPrefix": "private bucket or XiaoNaiPing-specific prefix",
+    "region": "production OBS region",
+    "accessPolicy": "private access, no public baby photo bucket",
+    "serverSideFlow": "upload, download, delete",
+    "encryption": "enabled or documented production setting",
+    "lifecycleOrDeletionPolicy": "configured lifecycle or deletion boundary",
+    "accountDeletionResult": "account deletion clears corresponding baby photos and object data"
+  },
+  "serverProofToRefresh": [
+    "Backend/proof/storage-backend-20260704T-current.json",
+    "Backend/proof/production-readiness-20260704T-current.json"
+  ],
+  "redactionChecklist": [
+    "Hide HUAWEI_OBS_ACCESS_KEY_ID and HUAWEI_OBS_SECRET_ACCESS_KEY",
+    "Hide SecretKey and temporary signed URLs",
+    "Hide complete object keys",
+    "Hide real baby photos and private family media",
+    "Hide private server paths",
+    "Keep provider, bucket or prefix, region, private policy, encryption/lifecycle/deletion state, and storage proof summary visible"
+  ],
+  "postCaptureChecks": [
+    "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+    "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --storage-proof Backend/proof/storage-backend-20260704T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260704T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete"
+  ],
+  "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until real 09-obs-policy.png/PDF/JSON evidence exists and same-round storage/production proof proves private OBS access plus account deletion cleanup."
+}

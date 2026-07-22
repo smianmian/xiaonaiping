@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 
-DEFAULT_TABS = ["home", "record", "growth", "profile", "profile-backup"]
+DEFAULT_TABS = ["home", "record", "growth", "profile", "profile-sync"]
 
 
 def run(command: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -27,7 +27,7 @@ def boot_device(device: str) -> None:
 
 
 def capture_tab(device: str, bundle_id: str, tab: str, output_path: Path, settle_seconds: float) -> None:
-    selected_tab = "profile" if tab == "profile-backup" else tab
+    selected_tab = "profile" if tab == "profile-sync" else tab
     launch_args = [
         "xcrun",
         "simctl",
@@ -38,8 +38,8 @@ def capture_tab(device: str, bundle_id: str, tab: str, output_path: Path, settle
         "-XNPScreenshotTab",
         selected_tab,
     ]
-    if tab == "profile-backup":
-        launch_args.append("-XNPScreenshotBackupSheet")
+    if tab == "profile-sync":
+        launch_args.append("-XNPScreenshotSyncSheet")
     run(["xcrun", "simctl", "terminate", device, bundle_id], check=False)
     run(launch_args)
     time.sleep(settle_seconds)

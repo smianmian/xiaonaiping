@@ -1,0 +1,34 @@
+{
+  "capturedAt": "2026-07-04T09:53:09.880172",
+  "profilesInstalled": [
+    {
+      "download": "/Users/smianmian/Downloads/XiaoNaiPing_App_Store_20260704.mobileprovision",
+      "installed": "/Users/smianmian/Library/MobileDevice/Provisioning Profiles/fef4886e-4947-4df0-a361-d3d51bf71ab2.mobileprovision",
+      "Name": "XiaoNaiPing App Store 20260704",
+      "UUID": "fef4886e-4947-4df0-a361-d3d51bf71ab2",
+      "TeamName": "Shenzhen Flash Life Technology Co., Ltd",
+      "AppIDName": "XiaoNaiPing",
+      "application-identifier": "L2TYJNDTJK.com.mewpow.xiaonaiping",
+      "application-groups": [
+        "group.com.mewpow.xiaonaiping.shared"
+      ],
+      "ExpirationDate": "2027-07-03T14:54:46",
+      "ProvisionedDevicesCount": 0
+    },
+    {
+      "download": "/Users/smianmian/Downloads/XiaoNaiPing_Widget_App_Store_20260704.mobileprovision",
+      "installed": "/Users/smianmian/Library/MobileDevice/Provisioning Profiles/919fb262-1d45-422a-be9a-9ea57bd8bbf2.mobileprovision",
+      "Name": "XiaoNaiPing Widget App Store 20260704",
+      "UUID": "919fb262-1d45-422a-be9a-9ea57bd8bbf2",
+      "TeamName": "Shenzhen Flash Life Technology Co., Ltd",
+      "AppIDName": "XiaoNaiPingWidgets",
+      "application-identifier": "L2TYJNDTJK.com.mewpow.xiaonaiping.widgets",
+      "application-groups": [
+        "group.com.mewpow.xiaonaiping.shared"
+      ],
+      "ExpirationDate": "2027-07-03T14:54:46",
+      "ProvisionedDevicesCount": 0
+    }
+  ],
+  "passed": true
+}

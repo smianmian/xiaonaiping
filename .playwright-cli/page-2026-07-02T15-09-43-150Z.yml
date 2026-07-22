@@ -1,0 +1,330 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "喵动力Logo 喵动力MEWPOW" [ref=e5] [cursor=pointer]:
+        - /url: "#"
+        - img "喵动力Logo" [ref=e6]
+        - generic [ref=e7]: 喵动力MEWPOW
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "首页" [ref=e10] [cursor=pointer]:
+            - /url: "#hero"
+        - listitem [ref=e11]:
+          - link "产品 ▼" [ref=e12] [cursor=pointer]:
+            - /url: "#products-hardware"
+        - listitem [ref=e13]:
+          - link "关于我们" [ref=e14] [cursor=pointer]:
+            - /url: "#about"
+      - generic [ref=e15]:
+        - combobox [ref=e16] [cursor=pointer]:
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "English"
+          - option "日本語"
+        - text: ▼
+  - generic [ref=e18]:
+    - heading "感知情绪， 重塑空间。" [level=1] [ref=e19]:
+      - generic [ref=e20]: 感知情绪，
+      - generic [ref=e21]: 重塑空间。
+    - generic [ref=e22]:
+      - generic [ref=e23]: AI 感知
+      - generic [ref=e24]: 清华研发
+      - generic [ref=e25]: 米家互联
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - heading "AI智能硬件" [level=2] [ref=e29]
+      - paragraph [ref=e30]: 融合AI技术与香氛疗法的智能设备
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e34]:
+          - img "AI疗愈香薰机1" [ref=e36]
+          - img "AI疗愈香薰机2" [ref=e38]
+          - img "AI疗愈香薰机3" [ref=e40]
+        - generic [ref=e45]:
+          - heading "AI疗愈香薰机" [level=3] [ref=e46]
+          - paragraph [ref=e47]: 实时感知心率与呼吸，匹配正念香薰节奏
+          - link "敬请期待" [ref=e48] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e49]:
+        - generic [ref=e51]:
+          - img "喵动力 双喷雾加湿器1" [ref=e53]
+          - img "喵动力 双喷雾加湿器2" [ref=e55]
+          - img "喵动力 双喷雾加湿器3" [ref=e57]
+        - generic [ref=e62]:
+          - heading "喵动力 双喷雾加湿器" [level=3] [ref=e63]
+          - paragraph [ref=e64]: 双路喷雾与静音引擎，全天候维持舒润空气
+          - link "查看详情" [ref=e65] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=171827&spmref=YouPinPC.$SearchFilter$1.search_list.2.24411492&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=0
+      - generic [ref=e66]:
+        - generic [ref=e68]:
+          - img "喵动力 三合一多功能电蚊拍1" [ref=e70]
+          - img "喵动力 三合一多功能电蚊拍2" [ref=e72]
+          - img "喵动力 三合一多功能电蚊拍3" [ref=e74]
+        - generic [ref=e79]:
+          - heading "喵动力 三合一多功能电蚊拍" [level=3] [ref=e80]
+          - paragraph [ref=e81]: 台面、吊挂、手持三形态，灭蚊一步到位
+          - link "查看详情" [ref=e82] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=168106&spmref=YouPinPC.$SearchFilter$1.search_list.1.24411492&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=0
+      - generic [ref=e83]:
+        - generic [ref=e85]:
+          - img "喵动力 米家桌面航空循环扇1" [ref=e87]
+          - img "喵动力 米家桌面航空循环扇2" [ref=e89]
+          - img "喵动力 米家桌面航空循环扇3" [ref=e91]
+        - generic [ref=e96]:
+          - heading "喵动力 米家桌面航空循环扇" [level=3] [ref=e97]
+          - paragraph [ref=e98]: 航空环流风道，AI感温自动调节
+          - link "查看详情" [ref=e99] [cursor=pointer]:
+            - /url: https://m.xiaomiyoupin.com/w/spchome?_rt=weex&id=3fl0kncJ5acfGn93iiUfxA&hideNavBar=1&useWebKit=1&spmref=YouPinPC.$Detail$.0.0.25332153&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=1
+      - generic [ref=e100]:
+        - generic [ref=e102]:
+          - img "喵动力 米家桌面香薰机1" [ref=e104]
+          - img "喵动力 米家桌面香薰机2" [ref=e106]
+          - img "喵动力 米家桌面香薰机3" [ref=e108]
+        - generic [ref=e113]:
+          - heading "喵动力 米家桌面香薰机" [level=3] [ref=e114]
+          - paragraph [ref=e115]: 米家联动香薰，15秒撑起全屋气味仪式
+          - link "查看详情" [ref=e116] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+      - generic [ref=e117]:
+        - generic [ref=e119]:
+          - img "喵动力 车载钓鱼灭蚊氛围灯1" [ref=e121]
+          - img "喵动力 车载钓鱼灭蚊氛围灯2" [ref=e123]
+          - img "喵动力 车载钓鱼灭蚊氛围灯3" [ref=e125]
+        - generic [ref=e130]:
+          - heading "喵动力 车载钓鱼灭蚊氛围灯" [level=3] [ref=e131]
+          - paragraph [ref=e132]: 物理灭蚊搭配氛围灯，车居两用
+          - link "查看详情" [ref=e133] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=176523&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.2.19315875
+  - generic [ref=e135]:
+    - generic [ref=e136]:
+      - heading "情绪香薰" [level=2] [ref=e137]
+      - paragraph [ref=e138]: 基于神经科学的香氛配方，精准对应情绪需求
+      - paragraph [ref=e139]: 联合清华大学国家重点实验室研发。在呼吸之间，让情绪得到温柔安放。
+    - generic [ref=e140]:
+      - heading "核心理念" [level=3] [ref=e141]
+      - paragraph [ref=e142]: 以香薰安抚嗅觉，以音乐与正念稳定感知。让心灵在一息之间，回归宁静与平衡。
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - heading "科学基础" [level=4] [ref=e145]
+        - paragraph [ref=e146]: 嗅觉直通大脑边缘系统。特定香氛分子瞬间舒缓压力，镇静情绪。
+      - generic [ref=e147]:
+        - heading "多感官协同" [level=4] [ref=e148]
+        - paragraph [ref=e149]: 我们将嗅觉、听觉与正念意识整合。香气抚慰情绪，声音调节节律，引导彻底回归当下。
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - img "平衡放松系列 - 净安" [ref=e153]
+        - generic [ref=e154]:
+          - heading "平衡放松系列 - 净安" [level=3] [ref=e155]
+          - paragraph [ref=e156]: 优雅而克制，天山雪莲气息，唤醒清净之感
+          - link "查看详情" [ref=e157] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+      - generic [ref=e158]:
+        - img "平衡放松系列 - 落叶无声" [ref=e160]
+        - generic [ref=e161]:
+          - heading "平衡放松系列 - 落叶无声" [level=3] [ref=e162]
+          - paragraph [ref=e163]: 沉静而内敛，香樟乌木气息，带来松弛之境
+          - link "查看详情" [ref=e164] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+      - generic [ref=e165]:
+        - img "提神专注系列 - 清涧" [ref=e167]
+        - generic [ref=e168]:
+          - heading "提神专注系列 - 清涧" [level=3] [ref=e169]
+          - paragraph [ref=e170]: 沉稳而清明，柑橘气息，唤醒专注与洞察
+          - link "查看详情" [ref=e171] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+      - generic [ref=e172]:
+        - img "提神专注系列 - 清域" [ref=e174]
+        - generic [ref=e175]:
+          - heading "提神专注系列 - 清域" [level=3] [ref=e176]
+          - paragraph [ref=e177]: 纯净而专注，清木药香气息，唤醒创作清醒力
+          - link "查看详情" [ref=e178] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+      - generic [ref=e179]:
+        - img "提神专注系列 - 清至" [ref=e181]
+        - generic [ref=e182]:
+          - heading "提神专注系列 - 清至" [level=3] [ref=e183]
+          - paragraph [ref=e184]: 清透而深邃，雪松乳香气息，重塑专注之境
+          - link "查看详情" [ref=e185] [cursor=pointer]:
+            - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+  - generic [ref=e187]:
+    - generic [ref=e188]:
+      - heading "一根呆毛 App" [level=2] [ref=e189]
+      - paragraph [ref=e190]: 情绪记录与正念陪伴
+    - generic [ref=e191]:
+      - generic [ref=e192]:
+        - img "一根呆毛首页状态截图" [ref=e194]
+        - generic [ref=e195]:
+          - heading "身体状态镜子" [level=3] [ref=e196]
+          - paragraph [ref=e197]: 一根呆毛把情绪记录、睡眠、HRV、步数和练习记录汇总成温和的身体状态提示，让用户更容易看懂今天的心情和精力变化。
+          - link "了解一根呆毛" [ref=e198] [cursor=pointer]:
+            - /url: "#products-model"
+      - generic [ref=e199]:
+        - img "一根呆毛疗愈练习截图" [ref=e201]
+        - generic [ref=e202]:
+          - heading "正念练习与声音放松" [level=3] [ref=e203]
+          - paragraph [ref=e204]: 提供呼吸、冥想和声音放松练习，适合压力较高、睡前放松或需要恢复时，用几分钟完成一次低负担练习。
+          - link "了解一根呆毛" [ref=e205] [cursor=pointer]:
+            - /url: "#products-model"
+      - generic [ref=e206]:
+        - img "一根呆毛趋势页面截图" [ref=e208]
+        - generic [ref=e209]:
+          - heading "趋势与 AI 情绪陪伴" [level=3] [ref=e210]
+          - paragraph [ref=e211]: 趋势页用白话解释身体信号变化，AI 陪伴用于情绪整理和正念引导，帮助用户复盘状态；相关建议不替代医生或心理咨询师。
+          - link "了解一根呆毛" [ref=e212] [cursor=pointer]:
+            - /url: "#products-model"
+      - generic [ref=e213]:
+        - generic [ref=e214]:
+          - img "小奶瓶首页时间线截图" [ref=e215]
+          - img "小奶瓶记录页面截图" [ref=e216]
+          - img "小奶瓶账号与备份页面截图" [ref=e217]
+        - generic [ref=e218]:
+          - heading "小奶瓶宝宝成长记录 App" [level=3] [ref=e219]
+          - paragraph [ref=e220]: 面向父母和照护者的私密宝宝记录工具，支持喂养、睡眠、排便、成长和照片记录，并提供账号备份、换机恢复和云端数据删除能力。
+          - link "查看小奶瓶官网" [ref=e221] [cursor=pointer]:
+            - /url: /xiaonaiping/
+  - generic [ref=e223]:
+    - generic [ref=e224]:
+      - heading "核心技术" [level=2] [ref=e225]
+      - paragraph [ref=e226]: 从感知到重塑，科技如何读懂情绪
+    - generic [ref=e227]:
+      - generic [ref=e228]:
+        - img "AI感知技术" [ref=e229]
+        - generic [ref=e230]:
+          - heading "读懂你的，不只是表情。" [level=3] [ref=e231]
+          - paragraph [ref=e232]: 多模态生物传感技术，实时捕捉心率与情绪波动。通过微表情分析与生理信号监测，构建精准的情绪图谱。
+      - generic [ref=e233]:
+        - img "空间重塑技术" [ref=e234]
+        - generic [ref=e235]:
+          - heading "私人的情绪处方。" [level=3] [ref=e236]
+          - paragraph [ref=e237]: 自动调配光影与香氛浓度，瞬间切换空间能量场。让环境主动适应你的情绪需求，创造专属的疗愈空间。
+  - generic [ref=e239]:
+    - generic [ref=e240]:
+      - heading "一根呆毛 AI 陪伴模型" [level=2] [ref=e241]
+      - img "一根呆毛形象" [ref=e243]
+    - generic [ref=e245]:
+      - heading "一根呆毛情绪陪伴与正念引导" [level=3] [ref=e246]
+      - paragraph [ref=e247]: 一根呆毛的 AI 陪伴用于日常情绪整理、正念练习引导和温和复盘。它结合用户授权的状态记录与练习历史，给出低压力、可执行的陪伴式提示。
+      - heading "使命" [level=3] [ref=e248]
+      - paragraph [ref=e249]: 科技，为了更温和地照顾自己。它不评判、不说教，只帮助用户把身体信号和情绪变化放回日常生活里理解。
+      - paragraph [ref=e250]:
+        - button "体验一根呆毛 AI 陪伴" [ref=e251] [cursor=pointer]
+  - generic [ref=e253]:
+    - heading "关于我们" [level=2] [ref=e255]
+    - generic [ref=e256]:
+      - generic [ref=e257]:
+        - paragraph [ref=e258]: 我们是一支深耕算法、设计与神经科学的硬核团队。不只是制造设备，我们更是在重新定义科技与情感的连接方式。
+        - paragraph [ref=e259]: 核心成员来自小米生态链、南科大、港理工与清华大学。我们通过 AI 与硬件的深度融合，精准感知并疗愈情绪。
+      - img "闪现生活科技" [ref=e261]
+    - generic [ref=e262]:
+      - heading "团队成员背景与AI合作伙伴" [level=3] [ref=e263]
+      - generic [ref=e264]:
+        - generic [ref=e265]:
+          - img "米家" [ref=e267]
+          - paragraph [ref=e268]: 米家
+        - generic [ref=e269]:
+          - img "南方科技大学" [ref=e271]
+          - paragraph [ref=e272]: 南方科技大学
+        - generic [ref=e273]:
+          - img "香港理工大学" [ref=e275]
+          - paragraph [ref=e276]: 香港理工大学
+        - generic [ref=e277]:
+          - img "清华大学" [ref=e279]
+          - paragraph [ref=e280]: 清华大学
+        - generic [ref=e281]:
+          - img "ChatGPT" [ref=e283]
+          - paragraph [ref=e284]: ChatGPT
+        - generic [ref=e285]:
+          - img "Gemini" [ref=e287]
+          - paragraph [ref=e288]: Gemini
+        - generic [ref=e289]:
+          - img "Grok" [ref=e291]
+          - paragraph [ref=e292]: Grok
+  - contentinfo [ref=e293]:
+    - generic [ref=e294]:
+      - generic [ref=e295]:
+        - generic [ref=e296]:
+          - heading "产品系列" [level=3] [ref=e297]
+          - list [ref=e298]:
+            - listitem [ref=e299]:
+              - link "喵动力 双喷雾加湿器" [ref=e300] [cursor=pointer]:
+                - /url: https://www.xiaomiyoupin.com/detail?gid=171827&spmref=YouPinPC.$SearchFilter$1.search_list.2.24411492&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=0
+            - listitem [ref=e301]:
+              - link "喵动力 三合一多功能电蚊拍" [ref=e302] [cursor=pointer]:
+                - /url: https://www.xiaomiyoupin.com/detail?gid=168106&spmref=YouPinPC.$SearchFilter$1.search_list.1.24411492&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=0
+            - listitem [ref=e303]:
+              - link "喵动力 米家桌面航空循环扇" [ref=e304] [cursor=pointer]:
+                - /url: https://m.xiaomiyoupin.com/w/spchome?_rt=weex&id=3fl0kncJ5acfGn93iiUfxA&hideNavBar=1&useWebKit=1&spmref=YouPinPC.$Detail$.0.0.25332153&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=1
+            - listitem [ref=e305]:
+              - link "喵动力 米家桌面香薰机" [ref=e306] [cursor=pointer]:
+                - /url: https://www.xiaomiyoupin.com/detail?gid=178396&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.4.45244051
+            - listitem [ref=e307]:
+              - link "喵动力 车载钓鱼灭蚊氛围灯" [ref=e308] [cursor=pointer]:
+                - /url: https://www.xiaomiyoupin.com/detail?gid=176523&spmref=M_H5.$FlagShipStore$_3fl0kncJ5acfGn93iiUfxA.selection_goods-10.2.19315875
+            - listitem [ref=e309]:
+              - link "小奶瓶宝宝成长记录 App" [ref=e310] [cursor=pointer]:
+                - /url: /xiaonaiping/
+            - listitem [ref=e311]:
+              - link "更多小米生态产品" [ref=e312] [cursor=pointer]:
+                - /url: https://www.mi.com
+        - generic [ref=e313]:
+          - heading "关于我们" [level=3] [ref=e314]
+          - list [ref=e315]:
+            - listitem [ref=e316]:
+              - link "公司简介" [ref=e317] [cursor=pointer]:
+                - /url: "#about"
+        - generic [ref=e318]:
+          - heading "销售渠道" [level=3] [ref=e319]
+          - list [ref=e320]:
+            - listitem [ref=e321]:
+              - link "小米有品官方店铺" [ref=e322] [cursor=pointer]:
+                - /url: https://m.xiaomiyoupin.com/w/spchome?_rt=weex&id=3fl0kncJ5acfGn93iiUfxA&hideNavBar=1&useWebKit=1&spmref=YouPinPC.$Detail$.0.0.25332153&last_scmv2=3001.21.1:unfolda-3:twoLevelCates-4:oakbayRecall-5:BASE-6:default-7:mscoreTuner-8:Base-19:default.0.0&scmv2_num=1
+        - generic [ref=e323]:
+          - heading "联系我们" [level=3] [ref=e324]
+          - paragraph [ref=e325]:
+            - generic [ref=e326]: 📱
+            - generic [ref=e327]: WhatsApp：54296290
+          - paragraph [ref=e328]:
+            - generic [ref=e329]: ✉️
+            - generic [ref=e330]: 邮箱：miaodl@mewpow.com
+          - paragraph [ref=e331]:
+            - generic [ref=e332]: 🏢
+            - generic [ref=e333]: 公司地址：深圳市龙华区民治街道民治社区1970科技园7栋516E9
+          - paragraph [ref=e334]:
+            - generic [ref=e335]: 🏭
+            - generic [ref=e336]: 工厂地址：揭阳市榕城区凤美街道陇上村道西侧17号
+      - generic [ref=e338]:
+        - generic [ref=e339]:
+          - heading "关注我们" [level=2] [ref=e340]
+          - paragraph [ref=e341]: 连接我们的社交平台，获取最新资讯
+        - generic [ref=e342]:
+          - generic [ref=e343]:
+            - img "小红书" [ref=e345]
+            - generic [ref=e346]:
+              - heading "小红书" [level=3] [ref=e347]
+              - paragraph [ref=e348]: 发现更多生活灵感与产品体验分享
+              - link "访问官网" [ref=e349] [cursor=pointer]:
+                - /url: https://www.xiaohongshu.com/user/profile/66dc3a26000000000d02644f
+          - generic [ref=e350]:
+            - img "米家" [ref=e352]
+            - generic [ref=e353]:
+              - heading "米家" [level=3] [ref=e354]
+              - paragraph [ref=e355]: 探索更多智能生活解决方案
+              - link "访问官网" [ref=e356] [cursor=pointer]:
+                - /url: https://m.xiaomiyoupin.com/w/spchome?_rt=weex&id=3fl0kncJ5acfGn93iiUfxA&hideNavBar=1&useWebKit=1&spmref=YouPinPC.$Detail$.0.0.19749217
+          - generic [ref=e357]:
+            - img "企业微信" [ref=e359]
+            - generic [ref=e360]:
+              - heading "企业微信" [level=3] [ref=e361]
+              - paragraph [ref=e362]: 添加客服微信，获取专属服务支持
+              - link "扫码添加" [ref=e363] [cursor=pointer]:
+                - /url: "#"
+    - generic [ref=e364]:
+      - paragraph [ref=e365]: © 2025 公司简介. 保留所有权利
+      - generic [ref=e366]:
+        - link "粤ICP备2025379333号" [ref=e367] [cursor=pointer]:
+          - /url: https://beian.miit.gov.cn/
+          - generic [ref=e368]: 粤ICP备2025379333号
+        - link "备案图标 粤公网安备44030002006256号" [ref=e369] [cursor=pointer]:
+          - /url: http://www.beian.gov.cn/portal/registerSystemInfo
+          - img "备案图标" [ref=e370]
+          - generic [ref=e371]: 粤公网安备44030002006256号

@@ -1,0 +1,451 @@
+{
+  "artifactType": "mainland-filing-execution-packet",
+  "status": "execution-packet-not-evidence",
+  "date": "2026-06-30",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "company": "深圳市闪现生活科技有限公司",
+  "canSubmitFromThisPacket": false,
+  "sourceFiles": {
+    "mainlandFilingMaterials": "Docs/08_Release/MAINLAND_FILING_MATERIALS.md",
+    "chinaMainlandGapAssessment": "Docs/08_Release/CHINA_MAINLAND_LAUNCH_GAP_ASSESSMENT.md",
+    "chinaMainlandCompliance": "Docs/07_PrivacySecurity/CHINA_MAINLAND_COMPLIANCE.md",
+    "regionalLaunchStrategy": "Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md",
+    "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+    "appleDeveloperDunsHandoff": "Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md",
+    "appStoreConnectDraft": "Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260630.json",
+    "appStoreSubmissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
+    "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
+    "evidenceChecklist": "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260630.md"
+  },
+  "targetEvidenceFiles": {
+    "companyAccount": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+    "mainlandAvailability": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+    "appFilingPdf": "Docs/08_Release/AppStoreEvidence/03-app-filing.pdf",
+    "appFilingPng": "Docs/08_Release/AppStoreEvidence/03-app-filing.png",
+    "publicSecurityFiling": "Docs/08_Release/AppStoreEvidence/03b-public-security-filing.png",
+    "privacyLabel": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
+    "ageRatingResult": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png",
+    "publicUrlsRealDevice": "Docs/08_Release/AppStoreEvidence/RealDevice/RD-19-public-urls.png",
+    "mainlandFilingProof": "Backend/proof/mainland-filing-materials.json",
+    "appStoreEvidenceCurrent": "Backend/proof/app-store-evidence-20260630T-current.json",
+    "productionReadinessCurrent": "Backend/proof/production-readiness-20260630T-current.json"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "companyAccount",
+      "target": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "mainlandAvailability",
+      "target": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appFilingPdf",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appFilingPng",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "publicSecurityFiling",
+      "target": "Docs/08_Release/AppStoreEvidence/03b-public-security-filing.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "privacyLabel",
+      "target": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "ageRatingResult",
+      "target": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "publicUrlsRealDevice",
+      "target": "Docs/08_Release/AppStoreEvidence/RealDevice/RD-19-public-urls.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "mainlandFilingProof",
+      "target": "Backend/proof/mainland-filing-materials.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appStoreEvidenceCurrent",
+      "target": "Backend/proof/app-store-evidence-20260630T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "productionReadinessCurrent",
+      "target": "Backend/proof/production-readiness-20260630T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsFilingExecution": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "evidenceDependencyMatrix": [
+    {
+      "artifactId": "companyAccount",
+      "target": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+      "proves": [
+        "App Store Connect account legal entity is 深圳市闪现生活科技有限公司",
+        "company account evidence exists for China mainland filing and ASC materials"
+      ],
+      "doesNotProve": [
+        "D-U-N-S delivery",
+        "Apple Developer Team ID",
+        "App filing receipt",
+        "Submit for Review permission"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "mainlandAvailability",
+      "target": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+      "proves": [
+        "China mainland availability selection is visible in App Store Connect",
+        "mainland launch region evidence is archived for the same submission round"
+      ],
+      "doesNotProve": [
+        "APP/ICP filing completion",
+        "public-security filing",
+        "production readiness",
+        "iOS 26.5 real-device regression"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "appFilingPdf",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.pdf",
+      "proves": [
+        "filing system PDF receipt, status, filing number, or applicability result is archived",
+        "APP/ICP filing evidence can be reviewed without relying on a screenshot crop"
+      ],
+      "doesNotProve": [
+        "public-security filing",
+        "public pages were updated",
+        "App Store Connect privacy label",
+        "production readiness"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "appFilingPng",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.png",
+      "proves": [
+        "filing system screen shows App name, company, status, filing number, or applicability result",
+        "visual filing evidence is archived under the App Store evidence root"
+      ],
+      "doesNotProve": [
+        "public-security filing",
+        "legal pages contain the real filing number",
+        "App Store Connect mainland availability",
+        "production readiness"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "publicSecurityFiling",
+      "target": "Docs/08_Release/AppStoreEvidence/03b-public-security-filing.png",
+      "proves": [
+        "public-security filing submission or approval evidence is archived when applicable",
+        "post-ICP public-security filing handoff has a target evidence file"
+      ],
+      "doesNotProve": [
+        "APP/ICP filing completion",
+        "App Store Connect mainland availability",
+        "privacy label",
+        "Submit for Review permission"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "privacyLabel",
+      "target": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
+      "proves": [
+        "App Store Connect App Privacy label result is archived",
+        "privacy label is available for China mainland review materials"
+      ],
+      "doesNotProve": [
+        "privacy policy URL is reachable on device",
+        "APP/ICP filing completion",
+        "age rating result",
+        "production readiness"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "ageRatingResult",
+      "target": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png",
+      "proves": [
+        "App Store Connect age rating result is archived",
+        "age rating answer sheet has produced a visible ASC result"
+      ],
+      "doesNotProve": [
+        "privacy label",
+        "APP/ICP filing completion",
+        "final screenshot upload",
+        "review approval"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "publicUrlsRealDevice",
+      "target": "Docs/08_Release/AppStoreEvidence/RealDevice/RD-19-public-urls.png",
+      "proves": [
+        "privacy, terms, and support URLs are reachable on iOS 26.5 real device or signed-device flow",
+        "public legal URLs are not only checked from local files"
+      ],
+      "doesNotProve": [
+        "filing receipt",
+        "public pages contain a real filing number",
+        "production readiness",
+        "full real-device regression"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "mainlandFilingProof",
+      "target": "Backend/proof/mainland-filing-materials.json",
+      "proves": [
+        "mainland filing materials checker passed for the current structured packet",
+        "local filing materials include required boundaries and no placeholder filing numbers"
+      ],
+      "doesNotProve": [
+        "real APP/ICP filing receipt exists",
+        "real public-security filing exists",
+        "App Store evidence is ready",
+        "production readiness is ready"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "appStoreEvidenceCurrent",
+      "target": "Backend/proof/app-store-evidence-20260630T-current.json",
+      "proves": [
+        "same-day App Store evidence gate status is archived",
+        "missing manual evidence is visible before China mainland submission"
+      ],
+      "doesNotProve": [
+        "production readiness",
+        "launch objective audit",
+        "external platform credentials",
+        "filing receipt by itself"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "productionReadinessCurrent",
+      "target": "Backend/proof/production-readiness-20260630T-current.json",
+      "proves": [
+        "same-day production readiness gate status is archived",
+        "production blockers are visible before China mainland submission"
+      ],
+      "doesNotProve": [
+        "App Store manual evidence",
+        "APP/ICP filing receipt",
+        "public-security filing",
+        "Submit for Review permission"
+      ],
+      "requiredBeforeMainlandSubmit": true,
+      "initialStatus": "pending"
+    }
+  ],
+  "separationRules": [
+    "this packet is not a filing receipt",
+    "03-app-filing.pdf or 03-app-filing.png must come from the real filing or applicability surface",
+    "do not write placeholder filing numbers into public pages, app UI, or App Store Review Notes",
+    "do not use simulator screenshots as iOS 26.5 real-device evidence",
+    "do not use provider templates as WeChat, SMS, OBS, filing, privacy, or age-rating evidence",
+    "China mainland submission remains blocked until app-store-evidence.json, production-readiness.json, and launch-objective-audit.json are ready=true"
+  ],
+  "preSubmissionSequence": [
+    {
+      "step": "confirmCompanyAndDomain",
+      "action": "Confirm business license, legal representative, App owner, network security owner, domain certificate, DNS, public IP, Huawei Cloud access provider, and filing service number."
+    },
+    {
+      "step": "confirmDeveloperAndProviderDependencies",
+      "action": "Confirm D-U-N-S follow-up, Apple Developer Organization enrollment, Team ID, App Store Connect company account, WeChat Open Platform, SMS provider, OBS, production proof, and iOS 26.5 TestFlight or signed-device evidence.",
+      "evidence": [
+        "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+        "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+        "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+        "Docs/08_Release/AppStoreEvidence/09-obs-policy.png"
+      ]
+    },
+    {
+      "step": "submitMainlandFiling",
+      "action": "Submit App filing and applicable ICP information through Huawei Cloud or the access provider filing surface.",
+      "boundary": "Do not claim filing completion until the filing system shows a real status, receipt, filing number, or applicability result."
+    },
+    {
+      "step": "captureFilingEvidence",
+      "action": "Capture 03-app-filing.pdf or 03-app-filing.png with App name, company, filing status, filing number, or applicability result visible.",
+      "evidence": "Docs/08_Release/AppStoreEvidence/03-app-filing.png"
+    },
+    {
+      "step": "deferPublicNumberUpdatesUntilRealNumber",
+      "action": "Only after a real filing number exists, update Backend/static/privacy.html, Backend/static/terms.html, Backend/static/support.html, App internal display, and App Store Review Notes.",
+      "boundary": "No placeholder filing number is allowed before the real number exists."
+    },
+    {
+      "step": "completePublicSecurityFiling",
+      "action": "Complete public-security filing after ICP/App filing and service opening, then archive the submission or approval evidence.",
+      "evidence": "Docs/08_Release/AppStoreEvidence/03b-public-security-filing.png"
+    },
+    {
+      "step": "refreshPostFilingGates",
+      "commands": [
+        "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+        "python3 Backend/scripts/check_public_pages.py --output Backend/proof/public-pages.json",
+        "python3 Backend/scripts/check_review_notes.py --output Backend/proof/review-notes.json",
+        "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+        "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+        "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+      ]
+    }
+  ],
+  "redactionChecklist": [
+    "hide personal ID card numbers",
+    "hide legal representative ID details",
+    "hide full contact phone numbers",
+    "hide email full values where not needed for review",
+    "hide verification codes",
+    "hide Huawei Cloud AK/SK",
+    "hide AppSecret",
+    "hide recovery keys",
+    "hide tokens",
+    "hide server passwords",
+    "hide real baby photos"
+  ],
+  "stopConditions": [
+    {
+      "id": "noCompanyAccountEvidence",
+      "condition": "01-company-account.png is missing or does not show the company account",
+      "action": "Stop China mainland App Store review preparation and capture the real company account evidence first."
+    },
+    {
+      "id": "noDunsOrTeamId",
+      "condition": "D-U-N-S follow-up, Apple Developer Organization enrollment, or Team ID evidence is missing",
+      "action": "Stop Archive, TestFlight, and filing-to-review handoff until Apple Developer company identity is confirmed."
+    },
+    {
+      "id": "noExternalProviderEvidence",
+      "condition": "SMS provider, WeChat Open Platform, OBS, or production current proof is missing",
+      "action": "Stop submission and refresh XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630 evidence first."
+    },
+    {
+      "id": "noRealFilingNumber",
+      "condition": "No real filing number, receipt, filing system status, or applicability result exists",
+      "action": "Do not update public pages, App UI, or Review Notes with a filing number."
+    },
+    {
+      "id": "placeholderFilingNumberDetected",
+      "condition": "Public pages, App UI copy, or Review Notes contain a placeholder filing number",
+      "action": "Remove the placeholder and rerun public pages, review notes, mainland filing, and production readiness gates."
+    },
+    {
+      "id": "noIos265RealDeviceOrTestFlightEvidence",
+      "condition": "iOS 26.5 TestFlight or signed-device regression evidence is missing",
+      "action": "Do not use iOS 27, simulator, or device-availability logs as real-device proof."
+    },
+    {
+      "id": "productionReadinessNotReady",
+      "condition": "production-readiness.json or launch-objective-audit.json is not ready=true",
+      "action": "Stop Submit for Review until the current same-round proof gates are ready."
+    }
+  ],
+  "postExecutionGates": [
+    "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "python3 Backend/scripts/check_public_pages.py --output Backend/proof/public-pages.json",
+    "python3 Backend/scripts/check_review_notes.py --output Backend/proof/review-notes.json",
+    "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "completionRule": "execution-packet-not-evidence; not submission permission; this packet only defines the same-day filing workflow. China mainland filing evidence is complete only after real 03-app-filing.pdf or 03-app-filing.png exists, any real filing number is reflected in public pages, app UI, and Review Notes, public-security filing evidence is archived when applicable, app-store-evidence.json is ready=true, production-readiness.json is ready=true, and launch-objective-audit.json is ready=true."
+}

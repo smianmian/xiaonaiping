@@ -1,0 +1,64 @@
+{
+  "startedAt": "2026-07-03T23:21:39+00:00",
+  "completedAt": "2026-07-03T23:21:39+00:00",
+  "containsSecrets": false,
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "aasaFilePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/static/apple-app-site-association"
+    },
+    "aasaValidJSON": {
+      "passed": true,
+      "required": true,
+      "evidence": "AASA is valid JSON"
+    },
+    "aasaExpectedAppIDPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "expected JGCT3GY9CT.com.mewpow.xiaonaiping; found JGCT3GY9CT.com.mewpow.Emotion-Isle, JGCT3GY9CT.com.mewpow.xiaonaiping"
+    },
+    "aasaWeChatCallbackPathsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "AASA contains dedicated and transitional WeChat callback paths"
+    },
+    "backendAASARoutesConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "backend serves root and .well-known AASA routes as application/json"
+    },
+    "iosAssociatedDomainsEntitlementPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "applinks:api.mewpow.com"
+    },
+    "iosEntitlementsConfiguredInProject": {
+      "passed": true,
+      "required": true,
+      "evidence": "project.yml points at XiaoNaiPing.entitlements"
+    },
+    "releaseWeChatUniversalLinkConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "https://api.mewpow.com/xiaonaiping/wechat/"
+    },
+    "universalLinkMatchesAssociatedDomain": {
+      "passed": true,
+      "required": true,
+      "evidence": "expected applinks:api.mewpow.com; effective domains: applinks:api.mewpow.com"
+    },
+    "universalLinkPathCoveredByAASA": {
+      "passed": true,
+      "required": true,
+      "evidence": "link path /xiaonaiping/wechat/; AASA paths: /wechat/*, /ww/*, /xiaonaiping/wechat/*"
+    },
+    "aasaContainsNoSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "AASA contains no secret-like markers"
+    }
+  }
+}

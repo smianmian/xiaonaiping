@@ -15,7 +15,7 @@
 | `record-iphone16pro.png` | Quick record evidence | Captured and visually checked as nonblank |
 | `growth-iphone16pro.png` | Growth chart evidence | Captured and visually checked as nonblank |
 | `profile-iphone16pro.png` | Settings/profile evidence | Captured and visually checked as nonblank |
-| `profile-backup-iphone16pro.png` | Account, phone login, WeChat login, and backup evidence | Captured and visually checked as nonblank |
+| `profile-sync-iphone16pro.png` | Account, phone login, WeChat login, and sync evidence | Captured and visually checked as nonblank |
 
 ## Not Final App Store Artwork
 

@@ -24,12 +24,12 @@ HUAWEI_OBS_PREFIX=xiaonaiping
 XNP_SMS_PROVIDER=webhook
 XNP_SMS_WEBHOOK_URL=http://127.0.0.1:8791/send
 XNP_SMS_SECRET=replace-in-private-deployment
-XNP_SMS_TEMPLATE_ID=replace-with-approved-aliyun-template-code
+XNP_SMS_TEMPLATE_ID=SMS_508990073
 
-XNP_WECHAT_APP_ID=replace-with-wechat-app-id
 # Configure these only in the production private env for App Review. The code must
 # never appear in source control, logs, or public deployment proof.
 XNP_APP_REVIEW_PHONE_NUMBER=replace-with-private-app-review-phone
 XNP_APP_REVIEW_PHONE_CODE=replace-with-private-six-digit-code
 
+XNP_WECHAT_APP_ID=replace-with-wechat-app-id
 XNP_WECHAT_APP_SECRET=replace-in-private-deployment

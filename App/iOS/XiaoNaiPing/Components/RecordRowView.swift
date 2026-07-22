@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct RecordRowView: View {
-    let icon: String
+    let icon: String?
+    var systemIcon: String? = nil
     let time: String
     let title: String
     let detail: String
@@ -9,7 +10,16 @@ struct RecordRowView: View {
 
     var body: some View {
         HStack(spacing: AppSpacing.medium) {
-            AssetWatercolorImage(name: icon, mode: .multiply)
+            Group {
+                if let systemIcon {
+                    Image(systemName: systemIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(AppColors.blueInk)
+                } else if let icon {
+                    AssetWatercolorImage(name: icon, mode: .multiply)
+                }
+            }
                 .frame(width: 36, height: 36)
             Text(time)
                 .font(AppTypography.bodyLarge)

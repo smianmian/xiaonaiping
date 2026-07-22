@@ -1,0 +1,224 @@
+{
+  "artifactType": "sms-provider-live-send-packet",
+  "status": "live-send-packet-not-evidence",
+  "date": "2026-06-30",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "sourceFiles": {
+    "smsAdapterHandoff": "Backend/deploy/aliyun-sms-webhook-adapter.md",
+    "smsProviderEvidenceTemplate": "Docs/08_Release/AppStoreEvidence/_templates/sms-provider-evidence.template.json",
+    "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+    "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+    "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
+    "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md"
+  },
+  "localSecretHandling": {
+    "testPhoneEnv": "XNP_SMS_TEST_PHONE",
+    "storage": "private local shell environment or private env file only",
+    "forbidden": [
+      "full phone number in command line",
+      "echoing the env value",
+      "committing the phone value"
+    ]
+  },
+  "targetEvidenceFiles": {
+    "smsProviderConsole": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+    "smsProviderConsolePdf": "Docs/08_Release/AppStoreEvidence/07-sms-provider.pdf",
+    "providerConfigProof": "Backend/proof/auth-providers-20260630T-current.json",
+    "smsLiveSendProof": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+    "stableAuthAlias": "Backend/proof/auth-providers.json"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "smsProviderConsole",
+      "target": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsSmsLiveSend": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "providerConfigProof",
+      "target": "Backend/proof/auth-providers-20260630T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsSmsLiveSend": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "smsLiveSendProof",
+      "target": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsSmsLiveSend": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "stableAuthAlias",
+      "target": "Backend/proof/auth-providers.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsSmsLiveSend": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "evidenceDependencyMatrix": [
+    {
+      "artifactId": "smsProviderConsole",
+      "target": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png or .pdf",
+      "proves": [
+        "provider name",
+        "approved SMS signature",
+        "account-login/verification template",
+        "template audit status",
+        "send region",
+        "masked recipient phone fragment",
+        "no marketing, medical, feeding advice, or vaccine advice"
+      ],
+      "doesNotProve": [
+        "provider configuration proof",
+        "real SMS live send proof",
+        "stable auth alias",
+        "App Store submission readiness"
+      ],
+      "requiredBeforeAliasSync": false,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "providerConfigProof",
+      "target": "Backend/proof/auth-providers-20260630T-current.json",
+      "proves": [
+        "production SMS provider configuration",
+        "live-check reached provider configuration",
+        "secrets are redacted"
+      ],
+      "doesNotProve": [
+        "real SMS live send proof",
+        "SMS provider console screenshot",
+        "stable auth alias"
+      ],
+      "requiredBeforeAliasSync": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "smsLiveSendProof",
+      "target": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+      "proves": [
+        "real SMS sent to redacted test phone",
+        "--send-test-sms",
+        "--require-sms-live-send",
+        "verification code value is redacted"
+      ],
+      "doesNotProve": [
+        "SMS provider console screenshot",
+        "App Store evidence ready",
+        "production readiness ready"
+      ],
+      "requiredBeforeAliasSync": true,
+      "initialStatus": "pending"
+    },
+    {
+      "artifactId": "stableAuthAlias",
+      "target": "Backend/proof/auth-providers.json",
+      "proves": [
+        "stable alias synced from sms live-send proof only after provider config and live send pass",
+        "same evidence round"
+      ],
+      "doesNotProve": [
+        "App Store evidence ready",
+        "production readiness ready",
+        "launch objective audit ready"
+      ],
+      "requiredBeforeAliasSync": false,
+      "initialStatus": "pending"
+    }
+  ],
+  "separationRules": [
+    "providerConfigProof is not smsLiveSendProof",
+    "verify_auth_providers.py --live-check only proves provider configuration",
+    "verify_auth_providers.py --send-test-sms --require-sms-live-send is required for real live send proof",
+    "07-sms-provider.png or .pdf is required for SMS provider console evidence",
+    "stableAuthAlias must be copied from auth-providers-sms-live-20260630T-current.json only after providerConfigProof and smsLiveSendProof both pass",
+    "do not use screenshots of server env, logs, or local mock output as SMS provider console evidence"
+  ],
+  "consoleEvidenceMustKeep": [
+    "provider name",
+    "阿里云 Dysmsapi or current production SMS provider",
+    "approved SMS signature",
+    "account-login/verification template ID or name",
+    "template audit status",
+    "send region",
+    "at least one successful send state",
+    "masked recipient phone fragment",
+    "template is account login / verification only",
+    "template contains no marketing wording",
+    "template contains no medical wording",
+    "template contains no feeding advice",
+    "template contains no vaccine advice"
+  ],
+  "redactionChecklist": [
+    "hide XNP_SMS_SECRET",
+    "hide webhook secret",
+    "hide AccessKey",
+    "hide SecretKey",
+    "hide complete phone numbers",
+    "hide verification code values",
+    "hide tokens",
+    "hide request signatures",
+    "hide private backend paths"
+  ],
+  "executionOrder": [
+    {
+      "step": "confirmProviderTemplate",
+      "action": "Confirm SMS signature and account-login/verification template are approved and production-ready.",
+      "evidence": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png"
+    },
+    {
+      "step": "captureProviderConsole",
+      "action": "Capture SMS provider console evidence with provider, signature, template audit status, send region, and successful send state visible.",
+      "evidence": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+      "boundary": "Do not rename the template JSON into 07-sms-provider.* and do not use API server logs as provider console evidence."
+    },
+    {
+      "step": "refreshProviderConfigProof",
+      "action": "Run live provider configuration check without sending SMS.",
+      "command": "python3 Backend/scripts/verify_auth_providers.py --live-check --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete",
+      "output": "Backend/proof/auth-providers-20260630T-current.json"
+    },
+    {
+      "step": "runRealSmsLiveSend",
+      "action": "Run a separate real SMS live send proof with a redacted test phone value.",
+      "command": "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-sms-live-20260630T-current.json --allow-incomplete",
+      "output": "Backend/proof/auth-providers-sms-live-20260630T-current.json"
+    },
+    {
+      "step": "refreshAppStoreEvidence",
+      "action": "Refresh App Store evidence after console screenshot and live-send proof exist.",
+      "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json"
+    },
+    {
+      "step": "syncStableAuthAlias",
+      "action": "Only after providerConfigProof and smsLiveSendProof both pass and 07-sms-provider evidence exists, sync sms-live proof to stable auth alias.",
+      "command": "cp Backend/proof/auth-providers-sms-live-20260630T-current.json Backend/proof/auth-providers.json"
+    }
+  ],
+  "postExecutionGates": [
+    "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "completionRule": "live-send-packet-not-evidence；not submission permission；do not treat this packet as proof that SMS is complete. SMS evidence is complete only after real 07-sms-provider.png or PDF exists, auth-providers-20260630T-current.json passes, auth-providers-sms-live-20260630T-current.json proves a real live send, auth-providers.json is synced from sms-live proof, app-store-evidence.json is ready=true, and production-readiness.json plus launch-objective-audit.json are ready=true."
+}

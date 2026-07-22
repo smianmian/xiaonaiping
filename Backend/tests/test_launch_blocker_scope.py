@@ -18,6 +18,7 @@ def write_json(path: Path, value: dict) -> None:
 
 def write_known_blockers(root: Path, extra_production_blockers: list[str] | None = None) -> None:
     production_blockers = [
+        "deploymentProofCurrent",
         "productionSecretConfigured",
         "productionDataDirConfigured",
         "mysqlDatabaseSelected",
@@ -27,10 +28,14 @@ def write_known_blockers(root: Path, extra_production_blockers: list[str] | None
         "phoneLoginProviderConfigured",
         "wechatLoginProviderConfigured",
         "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
         "xiaonaipingProductionNamespaceConfigured",
         "storageBackendProofPassed",
+        "storageBackendProofCurrent",
         "iosReleaseReadinessProofPassed",
         "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
         "authProvidersProofPassed",
         "appStoreManualEvidenceReady",
     ]
@@ -44,11 +49,15 @@ def write_known_blockers(root: Path, extra_production_blockers: list[str] | None
                 "mainlandAvailability",
                 "mainlandFiling",
                 "privacyLabel",
+                "ageRatingResult",
                 "signedArchive",
                 "testFlight",
+                "appleDeveloperAccountAccess",
                 "smsProvider",
                 "wechatOpenPlatform",
+                "wechatUniversalLinkAasa",
                 "huaweiObsPolicy",
+                "finalScreenshots",
                 "realDeviceRegression",
             ]
         },

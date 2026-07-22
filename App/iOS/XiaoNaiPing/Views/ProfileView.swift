@@ -4,8 +4,8 @@ import UIKit
 
 struct ProfileView: View {
     @EnvironmentObject private var store: BabyRecordStore
-    @EnvironmentObject private var cloudBackup: CloudBackupController
-    @State private var isBackupStatusPresented = false
+    @EnvironmentObject private var cloudSync: CloudSyncController
+    @State private var isSyncStatusPresented = false
     @State private var isSignOutPresented = false
     @State private var isPrivacyStatusPresented = false
     @State private var isBabyEditorPresented = false
@@ -19,7 +19,7 @@ struct ProfileView: View {
 
     init() {
         #if DEBUG
-        _isBackupStatusPresented = State(initialValue: ProcessInfo.processInfo.arguments.contains("-XNPScreenshotBackupSheet"))
+        _isSyncStatusPresented = State(initialValue: ProcessInfo.processInfo.arguments.contains("-XNPScreenshotSyncSheet"))
         #endif
     }
 
@@ -45,9 +45,9 @@ struct ProfileView: View {
                             }
                             .buttonStyle(.plain)
                             Button {
-                                isBackupStatusPresented = true
+                                isSyncStatusPresented = true
                             } label: {
-                                ProfileMenuRow(icon: "icloud.and.arrow.up", title: "登录与自动同步", value: cloudBackup.serviceStatusLabel)
+                                ProfileMenuRow(icon: "icloud.and.arrow.up", title: "登录与自动同步", value: cloudSync.serviceStatusLabel)
                             }
                             .buttonStyle(.plain)
                             Button {
@@ -77,17 +77,17 @@ struct ProfileView: View {
                 .padding(.bottom, AppSpacing.bottomBarSpace)
             }
         }
-        .sheet(isPresented: $isBackupStatusPresented) {
-            DataStatusSheet(kind: .backup, cloudBackup: cloudBackup)
-                .presentationDetents(backupPresentationDetents)
+        .sheet(isPresented: $isSyncStatusPresented) {
+            DataStatusSheet(kind: .sync, cloudSync: cloudSync)
+                .presentationDetents(syncPresentationDetents)
         }
         .sheet(isPresented: $isPrivacyStatusPresented) {
-            DataStatusSheet(kind: .privacy, cloudBackup: cloudBackup)
+            DataStatusSheet(kind: .privacy, cloudSync: cloudSync)
                 .presentationDetents([.medium, .large])
         }
         .alert("退出当前账号？", isPresented: $isSignOutPresented) {
             Button("退出", role: .destructive) {
-                cloudBackup.signOut()
+                cloudSync.signOut()
             }
             Button("取消", role: .cancel) {}
         } message: {
@@ -187,16 +187,16 @@ struct ProfileView: View {
         WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Button {
-                    isBackupStatusPresented = true
+                    isSyncStatusPresented = true
                 } label: {
                     HStack(alignment: .center, spacing: AppSpacing.medium) {
-                        Image(systemName: cloudBackup.hasSession ? "checkmark.icloud.fill" : "person.crop.circle.badge.plus")
+                        Image(systemName: cloudSync.hasSession ? "checkmark.icloud.fill" : "person.crop.circle.badge.plus")
                             .font(.system(size: 24, weight: .medium))
                             .foregroundStyle(AppColors.coral)
                             .frame(width: 34)
 
                         VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                            Text(cloudBackup.hasSession ? "账号已登录，正在自动同步" : "登录并自动同步")
+                            Text(cloudSync.hasSession ? "账号已登录，正在自动同步" : "登录并自动同步")
                                 .font(AppTypography.bodyLarge)
                                 .foregroundStyle(AppColors.inkGreen)
                             Text(accountAccessDetail)
@@ -213,9 +213,9 @@ struct ProfileView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityHint(cloudBackup.hasSession ? "管理账号、同步和云端备份" : "使用手机号或微信登录")
+                .accessibilityHint(cloudSync.hasSession ? "管理账号、同步和云端同步" : "使用手机号或微信登录")
 
-                if cloudBackup.hasSession {
+                if cloudSync.hasSession {
                     Divider()
                         .overlay(AppColors.softStroke.opacity(0.40))
 
@@ -229,15 +229,15 @@ struct ProfileView: View {
                             .frame(minHeight: 36)
                     }
                     .buttonStyle(.plain)
-                    .disabled(cloudBackup.isWorking)
+                    .disabled(cloudSync.isWorking)
                 }
             }
         }
     }
 
     private var accountAccessDetail: String {
-        if cloudBackup.hasSession {
-            return "\(cloudBackup.accountSummary) · \(cloudBackup.statusDetail)"
+        if cloudSync.hasSession {
+            return "\(cloudSync.accountSummary) · \(cloudSync.statusDetail)"
         }
         return "用手机号或微信登录，换新手机后可恢复宝宝资料和照片。"
     }
@@ -516,9 +516,9 @@ struct ProfileView: View {
         #endif
     }
 
-    private var backupPresentationDetents: Set<PresentationDetent> {
+    private var syncPresentationDetents: Set<PresentationDetent> {
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("-XNPScreenshotBackupSheet") {
+        if ProcessInfo.processInfo.arguments.contains("-XNPScreenshotSyncSheet") {
             return [.large]
         }
         #endif
@@ -777,13 +777,13 @@ struct BabyAvatarView: View {
 }
 
 private enum DataStatusKind {
-    case backup
+    case sync
     case privacy
 
     var title: String {
         switch self {
-        case .backup:
-            "账号与备份"
+        case .sync:
+            "账号与同步"
         case .privacy:
             "数据与隐私"
         }
@@ -797,7 +797,7 @@ private struct DataStatusSheet: View {
     }
 
     let kind: DataStatusKind
-    @ObservedObject var cloudBackup: CloudBackupController
+    @ObservedObject var cloudSync: CloudSyncController
     @EnvironmentObject private var store: BabyRecordStore
     @Environment(\.dismiss) private var dismiss
     @State private var isCloudDeletePresented = false
@@ -812,9 +812,9 @@ private struct DataStatusSheet: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
                     headerCard
-                    if kind == .backup {
-                        if cloudBackup.isServiceConfigured {
-                            backupContent
+                    if kind == .sync {
+                        if cloudSync.isServiceConfigured {
+                            syncContent
                         } else {
                             serviceUnavailableCard
                         }
@@ -827,10 +827,10 @@ private struct DataStatusSheet: View {
             .background(PaperBackgroundView())
             .navigationTitle(kind.title.localizedText)
             .navigationBarTitleDisplayMode(.inline)
-            .alert("删除云端账号与备份？", isPresented: $isCloudDeletePresented) {
+            .alert("删除云端账号与同步？", isPresented: $isCloudDeletePresented) {
                 Button("删除", role: .destructive) {
                     Task {
-                        await cloudBackup.deleteCloudAccount(store: store)
+                        await cloudSync.deleteCloudAccount(store: store)
                     }
                 }
                 Button("取消", role: .cancel) {}
@@ -839,7 +839,7 @@ private struct DataStatusSheet: View {
             }
             .alert("退出当前账号？", isPresented: $isSignOutPresented) {
                 Button("退出", role: .destructive) {
-                    cloudBackup.signOut()
+                    cloudSync.signOut()
                 }
                 Button("取消", role: .cancel) {}
             } message: {
@@ -863,12 +863,12 @@ private struct DataStatusSheet: View {
     }
 
     private var headerCard: some View {
-        WatercolorCard(tint: kind == .backup ? AppColors.mistBlue : AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
+        WatercolorCard(tint: kind == .sync ? AppColors.mistBlue : AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label((kind == .backup ? cloudBackup.statusTitle : "账号自动同步已开启").localizedText, systemImage: kind == .backup ? "icloud.and.arrow.up" : "shield")
+                Label((kind == .sync ? cloudSync.statusTitle : "账号自动同步已开启").localizedText, systemImage: kind == .sync ? "icloud.and.arrow.up" : "shield")
                     .font(AppTypography.sectionTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text(kind == .backup ? cloudBackup.statusDetail.localizedText : "宝宝昵称、生日、记录、照片、疫苗提醒都属于高敏感家庭数据，会自动同步到你的账号，并可在这里管理删除。")
+                Text(kind == .sync ? cloudSync.statusDetail.localizedText : "宝宝昵称、生日、记录、照片、疫苗提醒都属于高敏感家庭数据，会自动同步到你的账号，并可在这里管理删除。")
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.ink)
                     .fixedSize(horizontal: false, vertical: true)
@@ -877,16 +877,16 @@ private struct DataStatusSheet: View {
         }
     }
 
-    private var backupContent: some View {
+    private var syncContent: some View {
         VStack(spacing: AppSpacing.regular) {
-            statusRow(icon: "person.crop.circle", title: "账号", value: cloudBackup.accountSummary, detail: "使用手机号或微信登录；云端只保存必要账号标识。")
-            if !cloudBackup.hasSession {
+            statusRow(icon: "person.crop.circle", title: "账号", value: cloudSync.accountSummary, detail: "使用手机号或微信登录；云端只保存必要账号标识。")
+            if !cloudSync.hasSession {
                 phoneLoginSection
-                if cloudBackup.isWeChatLoginConfigured {
+                if cloudSync.isWeChatLoginConfigured {
                     weChatLoginSection
                 }
             }
-            statusRow(icon: "photo.on.rectangle", title: "照片原图云备份", value: "自动同步", detail: "登录后会自动上传小奶瓶中的照片原图，不返回公开长期 URL。")
+            statusRow(icon: "photo.on.rectangle", title: "照片原图自动同步", value: "自动同步", detail: "登录后会自动上传小奶瓶中的照片原图，不返回公开长期 URL。")
             statusRow(icon: "arrow.clockwise.icloud", title: "换机恢复", value: "同一账号", detail: "在新手机用同一个手机号或微信登录后，会自动恢复服务器中的资料。")
             statusRow(icon: "trash", title: "删除账号", value: "App 内可用", detail: "删除账号会删除同步记录、照片和账号信息。")
             actionButtons
@@ -922,7 +922,7 @@ private struct DataStatusSheet: View {
                     focusedPhoneLoginField = nil
                     isPhoneCodeRequested = true
                     Task {
-                        await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
+                        await cloudSync.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
                     }
                 }
                 .font(AppTypography.bodyLarge)
@@ -934,7 +934,7 @@ private struct DataStatusSheet: View {
                         .stroke(AppColors.coral.opacity(0.35), lineWidth: 1)
                 }
                 .buttonStyle(.plain)
-                .disabled(cloudBackup.isWorking || !canRequestPhoneCode)
+                .disabled(cloudSync.isWorking || !canRequestPhoneCode)
 
                 if isPhoneCodeRequested {
                     TextField("6 位验证码", text: $phoneCode)
@@ -942,7 +942,7 @@ private struct DataStatusSheet: View {
                         .textFieldStyle(.roundedBorder)
                         .focused($focusedPhoneLoginField, equals: .verificationCode)
                         .onChange(of: phoneCode) { _, code in
-                            if CloudBackupController.validateSmsCode(code) {
+                            if CloudSyncController.validateSmsCode(code) {
                                 focusedPhoneLoginField = nil
                             }
                         }
@@ -956,12 +956,12 @@ private struct DataStatusSheet: View {
                     Button("手机号登录") {
                         focusedPhoneLoginField = nil
                         Task {
-                            await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
+                            await cloudSync.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
                         }
                     }
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.coral)
-                    .disabled(cloudBackup.isWorking || !canVerifyPhoneCode)
+                    .disabled(cloudSync.isWorking || !canVerifyPhoneCode)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -977,28 +977,28 @@ private struct DataStatusSheet: View {
     }
 
     private var canRequestPhoneCode: Bool {
-        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
-        && !cloudBackup.isWorking
+        CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && !cloudSync.isWorking
     }
 
     private var canVerifyPhoneCode: Bool {
-        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
-        && CloudBackupController.validateSmsCode(normalizedPhoneCode)
-        && !cloudBackup.isWorking
+        CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && CloudSyncController.validateSmsCode(normalizedPhoneCode)
+        && !cloudSync.isWorking
     }
 
     private var phoneValidationMessage: String? {
         if normalizedPhoneNumber.isEmpty || normalizedPhoneNumber == "+86" {
             return nil
         }
-        return CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头，且为 E.164 数字位数。"
+        return CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头，且为 E.164 数字位数。"
     }
 
     private var codeValidationMessage: String? {
         if normalizedPhoneCode.isEmpty {
             return nil
         }
-        return CloudBackupController.validateSmsCode(normalizedPhoneCode) ? nil : "验证码格式不正确，需 6 位数字。"
+        return CloudSyncController.validateSmsCode(normalizedPhoneCode) ? nil : "验证码格式不正确，需 6 位数字。"
     }
 
     private var weChatLoginSection: some View {
@@ -1013,24 +1013,24 @@ private struct DataStatusSheet: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Button("微信登录") {
                     Task {
-                        await cloudBackup.loginWithWeChat(store: store)
+                        await cloudSync.loginWithWeChat(store: store)
                     }
                 }
                 .font(AppTypography.bodyLarge)
                 .foregroundStyle(AppColors.inkGreen)
-                .disabled(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured)
+                .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
     private var weChatLoginDetail: String {
-        if cloudBackup.isNativeWeChatLoginAvailable {
-            return "微信开放平台已配置；登录会通过微信授权 code 换取私有备份账号。".localizedText
+        if cloudSync.isNativeWeChatLoginAvailable {
+            return "微信开放平台已配置；登录会通过微信授权 code 换取私有同步账号。".localizedText
         }
         #if DEBUG
-        if cloudBackup.isDebugWeChatLoginAvailable {
-            return "微信开放平台配置完成后，可通过微信授权连接同一个私有备份账号。".localizedText
+        if cloudSync.isDebugWeChatLoginAvailable {
+            return "微信开放平台配置完成后，可通过微信授权连接同一个私有同步账号。".localizedText
         }
         #endif
         return "微信登录未启用：请先完成微信 OpenSDK、AppID、URL Scheme、Universal Link 和服务端凭证配置。".localizedText
@@ -1056,12 +1056,12 @@ private struct DataStatusSheet: View {
             PrimaryWatercolorButton(title: "退出当前账号", tint: AppColors.mistBlue, foreground: AppColors.inkGreen) {
                 isSignOutPresented = true
             }
-            .disabled(cloudBackup.isWorking || !cloudBackup.hasSession)
+            .disabled(cloudSync.isWorking || !cloudSync.hasSession)
 
-            PrimaryWatercolorButton(title: "删除云端账号与备份", tint: AppColors.cream, foreground: AppColors.coral) {
+            PrimaryWatercolorButton(title: "删除云端账号与同步", tint: AppColors.cream, foreground: AppColors.coral) {
                 isCloudDeletePresented = true
             }
-            .disabled(cloudBackup.isWorking || !cloudBackup.hasSession)
+            .disabled(cloudSync.isWorking || !cloudSync.hasSession)
         }
     }
 

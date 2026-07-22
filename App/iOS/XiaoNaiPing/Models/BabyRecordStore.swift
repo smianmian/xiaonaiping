@@ -193,7 +193,8 @@ final class BabyRecordStore: ObservableObject {
                 id: "water-\(record.id.uuidString)",
                 sortDate: record.occurredAt,
                 time: Self.timeString(from: record.occurredAt),
-                icon: AppAssets.peeDropIcon,
+                icon: nil,
+                systemIcon: "drop.fill",
                 title: "喝水",
                 detail: "\(record.amountML)ml"
             )
@@ -779,7 +780,7 @@ final class BabyRecordStore: ObservableObject {
         let fileName = "\(UUID().uuidString).jpg"
         let destinationURL = photosDirectory.appendingPathComponent(fileName)
         try sanitizedJPEGData(from: data).write(to: destinationURL, options: [.atomic])
-        try markExcludedFromBackup(destinationURL)
+        try markExcludedFromSync(destinationURL)
 
         let photo = BabyPhoto(
             capturedAt: capturedAt,
@@ -822,8 +823,8 @@ final class BabyRecordStore: ObservableObject {
         photosDirectory.appendingPathComponent(photo.localFileName)
     }
 
-    func encodedCloudBackupData() throws -> Data {
-        let payload = CloudBackupPayload(
+    func encodedCloudSyncData() throws -> Data {
+        let payload = CloudSyncPayload(
             schemaVersion: 1,
             generatedAt: Date(),
             hasCompletedOnboarding: hasCompletedOnboarding,
@@ -843,10 +844,10 @@ final class BabyRecordStore: ObservableObject {
         return try encoder.encode(payload)
     }
 
-    func restoreCloudBackupData(_ data: Data) throws {
+    func restoreCloudSyncData(_ data: Data) throws {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        let payload = try decoder.decode(CloudBackupPayload.self, from: data)
+        let payload = try decoder.decode(CloudSyncPayload.self, from: data)
         baby = payload.baby
         hasCompletedOnboarding = payload.hasCompletedOnboarding
         feedingRecords = payload.feedingRecords
@@ -864,34 +865,34 @@ final class BabyRecordStore: ObservableObject {
         saveState()
     }
 
-    func localPhotoBackupAssets() -> [LocalPhotoBackupAsset] {
+    func localPhotoSyncAssets() -> [LocalPhotoSyncAsset] {
         babyPhotos.compactMap { photo in
             let url = photoURL(for: photo)
             guard fileManager.fileExists(atPath: url.path) else { return nil }
-            return LocalPhotoBackupAsset(photo: photo, fileURL: url)
+            return LocalPhotoSyncAsset(photo: photo, fileURL: url)
         }
     }
 
     func restoreCloudPhotoData(for photo: BabyPhoto, data: Data) throws {
         let destinationURL = try ensurePhotosDirectory().appendingPathComponent(photo.localFileName)
         try data.write(to: destinationURL, options: [.atomic])
-        try markExcludedFromBackup(destinationURL)
-        markCloudPhotoBackedUp(photo)
+        try markExcludedFromSync(destinationURL)
+        markCloudPhotoSynced(photo)
     }
 
-    func markCloudPhotoBackedUp(_ photo: BabyPhoto) {
+    func markCloudPhotoSynced(_ photo: BabyPhoto) {
         guard let index = babyPhotos.firstIndex(where: { $0.id == photo.id }) else { return }
-        babyPhotos[index].backupStatus = .backedUp
+        babyPhotos[index].syncStatus = .backedUp
         saveState()
     }
 
     func markCloudPhotoDeletePending(_ photo: BabyPhoto) {
         guard let index = babyPhotos.firstIndex(where: { $0.id == photo.id }) else { return }
-        babyPhotos[index].backupStatus = .cloudDeletePending
+        babyPhotos[index].syncStatus = .cloudDeletePending
         saveState()
     }
 
-    func markCloudBackupCompleted() {
+    func markCloudSyncCompleted() {
         feedingRecords = feedingRecords.map { record in
             var updated = record
             updated.syncStatus = .synced
@@ -914,7 +915,7 @@ final class BabyRecordStore: ObservableObject {
         }
         babyPhotos = babyPhotos.map { photo in
             var updated = photo
-            updated.backupStatus = .backedUp
+            updated.syncStatus = .backedUp
             return updated
         }
         saveState()
@@ -938,7 +939,7 @@ final class BabyRecordStore: ObservableObject {
         }
         babyPhotos = babyPhotos.map { photo in
             var updated = photo
-            updated.backupStatus = .localOnly
+            updated.syncStatus = .localOnly
             return updated
         }
         saveState()
@@ -1064,7 +1065,7 @@ final class BabyRecordStore: ObservableObject {
             let data = try JSONEncoder().encode(state)
             try ensureApplicationSupportDirectory()
             try data.write(to: stateURL, options: [.atomic])
-            try markExcludedFromBackup(stateURL)
+            try markExcludedFromSync(stateURL)
             writeSharedTodaySnapshot()
             saveErrorMessage = nil
             NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
@@ -1091,13 +1092,13 @@ final class BabyRecordStore: ObservableObject {
 
     private func ensureApplicationSupportDirectory() throws {
         try fileManager.createDirectory(at: applicationSupportDirectory, withIntermediateDirectories: true)
-        try markExcludedFromBackup(applicationSupportDirectory)
+        try markExcludedFromSync(applicationSupportDirectory)
     }
 
     private func ensurePhotosDirectory() throws -> URL {
         try ensureApplicationSupportDirectory()
         try fileManager.createDirectory(at: photosDirectory, withIntermediateDirectories: true)
-        try markExcludedFromBackup(photosDirectory)
+        try markExcludedFromSync(photosDirectory)
         return photosDirectory
     }
 
@@ -1123,7 +1124,7 @@ final class BabyRecordStore: ObservableObject {
         return resized.jpegData(compressionQuality: 0.84)
     }
 
-    private func markExcludedFromBackup(_ url: URL) throws {
+    private func markExcludedFromSync(_ url: URL) throws {
         var resourceValues = URLResourceValues()
         resourceValues.isExcludedFromBackup = true
         var mutableURL = url
@@ -1448,7 +1449,8 @@ struct HomeRecentRecord: Identifiable, Equatable {
     var id: String
     var sortDate: Date
     var time: String
-    var icon: String
+    var icon: String?
+    var systemIcon: String? = nil
     var title: String
     var detail: String
 }

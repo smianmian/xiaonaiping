@@ -10,6 +10,7 @@ from typing import Any
 
 
 EXPECTED_PRODUCTION_BLOCKERS = {
+    "deploymentProofCurrent",
     "productionSecretConfigured",
     "productionDataDirConfigured",
     "mysqlDatabaseSelected",
@@ -19,10 +20,14 @@ EXPECTED_PRODUCTION_BLOCKERS = {
     "phoneLoginProviderConfigured",
     "wechatLoginProviderConfigured",
     "privateOperationsDashboardConfigured",
+    "publicInternalDashboardBlocked",
     "xiaonaipingProductionNamespaceConfigured",
     "storageBackendProofPassed",
+    "storageBackendProofCurrent",
     "iosReleaseReadinessProofPassed",
     "iosAppBundleProofPassed",
+    "testFlightRegressionPlanProofPassed",
+    "appStoreAssetsProofPassed",
     "authProvidersProofPassed",
     "appStoreManualEvidenceReady",
 }
@@ -32,11 +37,15 @@ EXPECTED_APP_STORE_EVIDENCE_GAPS = {
     "mainlandAvailability",
     "mainlandFiling",
     "privacyLabel",
+    "ageRatingResult",
     "signedArchive",
     "testFlight",
+    "appleDeveloperAccountAccess",
     "smsProvider",
     "wechatOpenPlatform",
+    "wechatUniversalLinkAasa",
     "huaweiObsPolicy",
+    "finalScreenshots",
     "realDeviceRegression",
 }
 
@@ -127,6 +136,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "comparisons": comparisons,
         "knownBlockerMeaning": {
             "productionEnv": "Private production env, MySQL, OBS, dashboard, and namespace values are not proven in this local current proof.",
+            "publicInternalDashboard": "Public /internal routes must be proven blocked before submission.",
+            "proofFreshness": "Deployment and storage backend proofs must be refreshed for the current release day before submission.",
+            "testFlightRegressionPrerequisite": "The TestFlight regression plan cannot pass until iOS 26.5 physical-device availability proof is readable and current.",
             "sms": "SMS webhook provider private env is not loaded in the current proof, and provider screenshot evidence is not archived.",
             "wechat": "WeChat Open Platform AppID/AppSecret and real wx URL Scheme are not configured.",
             "appStoreManualEvidence": "App Store Connect screenshots, filing, signed archive, TestFlight, providers, OBS policy, and real-device regression are not archived.",

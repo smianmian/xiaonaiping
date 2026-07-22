@@ -1,0 +1,33 @@
+{
+  "appGroup": {
+    "identifier": "group.com.mewpow.xiaonaiping.shared",
+    "note": "Created after group.com.mewpow.xiaonaiping was unavailable in Apple Developer."
+  },
+  "capturedAtLocal": "2026-07-04T00:00:00+08:00",
+  "createdIdentifiers": [
+    {
+      "identifier": "com.mewpow.xiaonaiping",
+      "name": "XiaoNaiPing",
+      "requiredCapabilities": [
+        "App Groups",
+        "Associated Domains"
+      ]
+    },
+    {
+      "identifier": "com.mewpow.xiaonaiping.widgets",
+      "name": "XiaoNaiPingWidgets",
+      "requiredCapabilities": [
+        "App Groups"
+      ]
+    }
+  ],
+  "evidence": {
+    "widgetVisible": true,
+    "xiaoNaiPingVisible": true
+  },
+  "source": "Apple Developer Certificates, Identifiers & Profiles visible browser session",
+  "team": "Shenzhen Flash Life Technology Co., Ltd - L2TYJNDTJK",
+  "title": "Certificates, Identifiers & Profiles - Apple Developer",
+  "url": "https://developer.apple.com/account/resources/identifiers/list",
+  "visibleText": "Apple Developer 面面 佘 Shenzhen Flash Life Technology Co., Ltd - L2TYJNDTJK Certificates, Identifiers & Profiles Certificates Identifiers Devices Profiles Keys Services Identifiers App IDs NAME IDENTIFIER XiaoNaiPing com.mewpow.xiaonaiping XiaoNaiPingWidgets com.mewpow.xiaonaiping.widgets Yi Gen Dai Mao com.mewpow.Emotion-Isle Yi Gen Dai Mao Widget com.mewpow.Emotion-Isle.EmotionWidget Copyright © 2026 Apple Inc. All rights reserved. Terms of Use Privacy Policy"
+}

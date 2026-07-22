@@ -192,8 +192,8 @@
       ["deletedAccounts", "已删除账号"],
       ["newAccountsLast24h", "24小时新增"],
       ["newAccountsLast7d", "7天新增"],
-      ["accountsWithBackup", "有云备份账号"],
-      ["backupBytes", "备份总字节"],
+      ["accountsWithSync", "有云同步账号"],
+      ["syncBytes", "同步总字节"],
       ["photoObjects", "照片对象"],
       ["photoBytes", "照片总字节"],
       ["pendingPhoneCodes", "待验证短信码"]
@@ -228,7 +228,7 @@
           `数据库：${data.databaseBackend}`,
           `对象存储：${data.storageBackend}`,
           `埋点留存：${formatNumber((data.analytics || {}).retentionDays)} 天`,
-          `最近备份：${formatTime(data.latestBackupAt)}`,
+          `最近同步：${formatTime(data.latestSyncAt)}`,
           `最近照片：${formatTime(data.latestPhotoAt)}`
         ].map((item) => `<div>${item}</div>`).join("");
 

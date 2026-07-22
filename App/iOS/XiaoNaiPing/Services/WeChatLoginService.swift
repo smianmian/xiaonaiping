@@ -53,9 +53,9 @@ final class WeChatLoginService: NSObject {
     private var expectedState: String?
 
     var isNativeLoginAvailable: Bool {
-        guard CloudBackupConfiguration.isWeChatLoginConfigured,
-              let appID = CloudBackupConfiguration.weChatAppID,
-              let universalLink = CloudBackupConfiguration.weChatUniversalLink else {
+        guard CloudSyncConfiguration.isWeChatLoginConfigured,
+              let appID = CloudSyncConfiguration.weChatAppID,
+              let universalLink = CloudSyncConfiguration.weChatUniversalLink else {
             return false
         }
 
@@ -71,12 +71,12 @@ final class WeChatLoginService: NSObject {
     }
 
     func requestAuthorizationCode() async throws -> String {
-        guard CloudBackupConfiguration.isWeChatLoginConfigured else {
+        guard CloudSyncConfiguration.isWeChatLoginConfigured else {
             throw WeChatLoginError.notConfigured
         }
 
-        guard let appID = CloudBackupConfiguration.weChatAppID,
-              let universalLink = CloudBackupConfiguration.weChatUniversalLink else {
+        guard let appID = CloudSyncConfiguration.weChatAppID,
+              let universalLink = CloudSyncConfiguration.weChatUniversalLink else {
             throw WeChatLoginError.notConfigured
         }
         guard continuation == nil else {

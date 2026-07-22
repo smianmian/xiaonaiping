@@ -14,13 +14,13 @@ SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_review_notes.p
 GOOD_NOTES = """
 小奶瓶用于父母或照护者记录宝宝成长。第一版免费，无 IAP，无广告，无第三方分析 SDK，不提供医疗诊断、治疗建议或专业疫苗建议，不是医疗器械。
 
-数据默认本地优先保存。用户可以在“资料 -> 账号与备份”中使用恢复密钥、手机号或微信登录并主动备份。备份会上传宝宝记录、照片元数据，以及用户主动加入 App 的照片原图。手机号和微信登录仅用于账号识别和恢复。
+数据默认本地优先保存。用户可以在“资料 -> 账号与同步”中使用恢复密钥、手机号或微信登录并主动同步。同步会上传宝宝记录、照片元数据，以及用户主动加入 App 的照片原图。手机号和微信登录仅用于账号识别和恢复。
 
-账号删除路径为：“资料 -> 账号与备份 -> 删除云端账号与备份”。该操作会删除账号、云端 JSON 备份和云端照片原图。
+账号删除路径为：“资料 -> 账号与同步 -> 删除云端账号与同步”。该操作会删除账号、云端 JSON 同步和云端照片原图。
 
 疫苗模板仅用于记录和提醒，App 内文案不构成医疗建议。
 
-灵动岛和锁屏 Live Activity 只显示用户设置的下一次喝奶提醒、固定间隔和宝宝昵称/头像缩略图；桌面/锁屏小组件只读展示今日摘要。这些状态展示只反映用户主动记录的数据，不生成健康建议、压力提醒、喂养建议或医疗判断。所有摘要都来自用户在 App 内输入并保存在本机记录的数据，不接入 HealthKit、传感器、医院系统或第三方健康数据源，不提供压力评估、心理健康判断或医疗诊断。
+灵动岛和锁屏 Live Activity 只显示用户设置的下一次喝奶提醒、固定间隔和宝宝昵称/头像缩略图；桌面/锁屏小组件只读展示今日摘要。用户可以手动顺延下一次提醒：保存新喂养时，如果已设置固定喝奶间隔，可以用 5 分钟一档的滚轮选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；App 不根据奶量、月龄、传感器或健康数据自动推算喂养时间，也不构成喂养建议。这些状态展示只反映用户主动记录的数据，不生成健康建议、压力提醒、喂养建议或医疗判断。所有摘要都来自用户在 App 内输入并保存在本机记录的数据，不接入 HealthKit、传感器、医院系统或第三方健康数据源，不提供压力评估、心理健康判断或医疗诊断。
 
 审核测试登录需使用生产测试手机号和微信测试号；正式提交包不得提供或依赖 debug code。
 """.strip()
@@ -94,6 +94,27 @@ class ReviewNotesTest(unittest.TestCase):
             self.assertIn("submissionReviewNotesStatusDisplayBoundary", report["failedRequiredChecks"])
             self.assertIn("submissionReviewNotesNoHealthPressureFeedingAdvice", report["failedRequiredChecks"])
 
+    def test_review_notes_require_manual_deferral_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            weak_notes = GOOD_NOTES.replace(
+                "用户可以手动顺延下一次提醒：保存新喂养时，如果已设置固定喝奶间隔，可以用 5 分钟一档的滚轮选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；App 不根据奶量、月龄、传感器或健康数据自动推算喂养时间，也不构成喂养建议。",
+                "",
+            )
+            write(root / "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md", f"# Packet\n\n## Review Notes\n\n{weak_notes}\n\n## Next\n")
+            write(root / "Docs/08_Release/APP_STORE_METADATA.md", f"# Metadata\n\n## 审核说明草案\n\n{GOOD_NOTES}\n\n## Next\n")
+
+            report = self.run_checker(root)
+
+            self.assertFalse(report["passed"])
+            self.assertIn("submissionReviewNotesManualFeedingReminderDeferral", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesFeedingReminderDeferralGranularity", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesFeedingReminderDeferralOptions", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesFeedingReminderDeferralCalculation", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesFeedingReminderNoDurationFallback", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesFeedingReminderNoPersistentField", report["failedRequiredChecks"])
+            self.assertIn("submissionReviewNotesNoAutomaticFeedingInference", report["failedRequiredChecks"])
+
     def test_review_notes_reject_secret_values(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
@@ -110,6 +131,23 @@ class ReviewNotesTest(unittest.TestCase):
             self.assertIn("recoveryKeyAssignment", evidence)
             self.assertIn("bearerToken", evidence)
             self.assertIn("mainlandPhoneNumber", evidence)
+
+    def test_review_notes_reject_placeholder_filing_numbers(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            submission_notes = GOOD_NOTES + "\n备案号：ICP备000000号\n"
+            metadata_notes = GOOD_NOTES + "\nplaceholder filing\n"
+            write(root / "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md", f"# Packet\n\n## Review Notes\n\n{submission_notes}\n\n## Next\n")
+            write(root / "Docs/08_Release/APP_STORE_METADATA.md", f"# Metadata\n\n## 审核说明草案\n\n{metadata_notes}\n\n## Next\n")
+
+            report = self.run_checker(root)
+
+            self.assertFalse(report["passed"])
+            self.assertTrue(report["containsSecrets"])
+            self.assertIn("reviewNotesDoNotExposeSecrets", report["failedRequiredChecks"])
+            evidence = report["checks"]["reviewNotesDoNotExposeSecrets"]["evidence"]
+            self.assertIn("APP_STORE_SUBMISSION_PACKET.md:placeholderFilingNumber", evidence)
+            self.assertIn("APP_STORE_METADATA.md:placeholderFilingNumber", evidence)
 
 
 if __name__ == "__main__":

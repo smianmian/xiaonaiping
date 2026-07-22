@@ -1,0 +1,24 @@
+{
+  "completedAt": "2026-06-28T16:37:19Z",
+  "passed": true,
+  "simulator": {
+    "name": "iPhone 17 Pro",
+    "udid": "07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4",
+    "runtime": "iOS 26.5"
+  },
+  "app": {
+    "bundleIdentifier": "com.mewpow.xiaonaiping",
+    "bundlePath": "/tmp/XiaoNaiPing-DebugSim-26_5-20260629/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app",
+    "apiBaseURL": null,
+    "dtPlatformVersion": "26.5",
+    "dtSdkName": "iphonesimulator26.5",
+    "supportsLiveActivities": true
+  },
+  "commands": {
+    "build": "xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Debug -sdk iphonesimulator26.5 -destination 'platform=iOS Simulator,id=07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4' -derivedDataPath /tmp/XiaoNaiPing-DebugSim-26_5-20260629 CODE_SIGNING_ALLOWED=NO build",
+    "bootstatus": "xcrun simctl bootstatus 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 -b",
+    "install": "xcrun simctl install 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 /tmp/XiaoNaiPing-DebugSim-26_5-20260629/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app",
+    "launch": "xcrun simctl launch --terminate-running-process 07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4 com.mewpow.xiaonaiping"
+  },
+  "launchOutput": "com.mewpow.xiaonaiping: 98328"
+}

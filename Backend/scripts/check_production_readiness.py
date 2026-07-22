@@ -8,7 +8,7 @@ import re
 import sys
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +21,9 @@ PLACEHOLDER_HOSTS = (
     "0.0.0.0",
     "::1",
 )
+LOCAL_PROOF_TIMEZONE = timezone(timedelta(hours=8))
+DEFAULT_DEPLOYMENT_PROOF = "Backend/proof/huawei-baota-deploy.json"
+DEFAULT_STORAGE_PROOF = "Backend/proof/storage-backend.json"
 
 XNP_NAMESPACE_MARKERS = ("xiaonaiping", "xnp")
 WECHAT_APP_ID_RE = re.compile(r"^wx[a-f0-9]{16}$")
@@ -117,6 +120,43 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def expected_proof_date() -> str:
+    return datetime.now(timezone.utc).date().isoformat()
+
+
+def timestamp_matches_date(value: Any, expected_date: str) -> bool:
+    if not isinstance(value, str) or not value.strip():
+        return False
+    normalized = value.strip().replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return value.startswith(expected_date)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return expected_date in {
+        parsed.astimezone(timezone.utc).date().isoformat(),
+        parsed.astimezone(LOCAL_PROOF_TIMEZONE).date().isoformat(),
+    }
+
+
+def proof_has_current_timestamp(data: dict[str, Any], expected_date: str) -> tuple[bool, str]:
+    for key in ("startedAt", "completedAt", "checkedAt", "verifiedAt"):
+        if timestamp_matches_date(data.get(key), expected_date):
+            return True, f"{key}={data.get(key)}"
+    return False, "missing current timestamp in startedAt, completedAt, checkedAt"
+
+
+def current_dated_proof_path(root: Path, explicit_path: str, default_path: str, proof_stem: str, expected_date: str) -> str:
+    if explicit_path:
+        return explicit_path
+    compact_date = expected_date.replace("-", "")
+    current_path = f"Backend/proof/{proof_stem}-{compact_date}T-current.json"
+    if (root / current_path).is_file():
+        return current_path
+    return default_path
+
+
 def configured_wechat_app_id(value: str) -> bool:
     value = value.strip()
     if not value or not WECHAT_APP_ID_RE.fullmatch(value):
@@ -142,6 +182,13 @@ def read_json(path: Path) -> dict[str, Any]:
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
     return data if isinstance(data, dict) else {}
+
+
+def latest_sim_launch_proof(root: Path) -> Path:
+    candidates = sorted((root / "Backend/proof").glob("sim-launch-ios265-*.json"))
+    if candidates:
+        return candidates[-1]
+    return root / "Backend/proof/sim-launch-ios265-20260626.json"
 
 
 def parse_release_api_base_url(project_yml: Path) -> str:
@@ -742,7 +789,27 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     started_at = utc_now()
     root = Path(args.repo_root).resolve()
     report = Report()
-    deployment_proof = read_json(root / args.deployment_proof)
+    deployment_proof_path = current_dated_proof_path(
+        root,
+        args.deployment_proof,
+        DEFAULT_DEPLOYMENT_PROOF,
+        "huawei-baota-deploy",
+        args.expected_proof_date,
+    )
+    storage_proof_path = current_dated_proof_path(
+        root,
+        args.storage_proof,
+        DEFAULT_STORAGE_PROOF,
+        "storage-backend",
+        args.expected_proof_date,
+    )
+    deployment_proof = read_json(root / deployment_proof_path)
+    deployment_current, deployment_current_evidence = proof_has_current_timestamp(deployment_proof, args.expected_proof_date)
+    report.add(
+        "deploymentProofCurrent",
+        deployment_current,
+        deployment_current_evidence,
+    )
     private_env_status = deployment_proof.get("privateEnvStatus", {})
     private_env_set = set(private_env_status.get("set", [])) if isinstance(private_env_status, dict) else set()
     deployment_paths = deployment_proof.get("remotePaths", {}) if isinstance(deployment_proof.get("remotePaths", {}), dict) else {}
@@ -943,11 +1010,18 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     remote_passed, remote_evidence = proof_passed(root / args.remote_proof, require_https=True)
     report.add("remoteReleaseFlowProofPassed", remote_passed, remote_evidence)
 
-    storage_passed, storage_evidence = storage_proof(root / args.storage_proof, args.require_huawei_obs)
+    storage_passed, storage_evidence = storage_proof(root / storage_proof_path, args.require_huawei_obs)
     report.add(
         "storageBackendProofPassed",
         storage_passed,
         storage_evidence,
+        required=args.require_huawei_obs,
+    )
+    storage_current, storage_current_evidence = proof_has_current_timestamp(read_json(root / storage_proof_path), args.expected_proof_date)
+    report.add(
+        "storageBackendProofCurrent",
+        storage_current,
+        storage_current_evidence,
         required=args.require_huawei_obs,
     )
 
@@ -966,7 +1040,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     testflight_regression_plan_passed, testflight_regression_plan_evidence = testflight_regression_plan_proof(root / args.testflight_regression_plan_proof)
     report.add("testFlightRegressionPlanProofPassed", testflight_regression_plan_passed, testflight_regression_plan_evidence)
 
-    sim_launch_passed, sim_launch_evidence = ios_sim_launch_proof(root / args.sim_launch_proof, args.expected_sim_runtime)
+    sim_launch_path = root / args.sim_launch_proof if args.sim_launch_proof else latest_sim_launch_proof(root)
+    sim_launch_passed, sim_launch_evidence = ios_sim_launch_proof(sim_launch_path, args.expected_sim_runtime)
     report.add("ios265SimulatorLaunchProofPassed", sim_launch_passed, sim_launch_evidence)
 
     app_store_assets_passed, app_store_assets_evidence = app_store_assets_proof(root / args.app_store_assets_proof)
@@ -1042,14 +1117,14 @@ def main() -> None:
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--base-url", default="")
     parser.add_argument("--remote-proof", default="Backend/proof/remote-api.json")
-    parser.add_argument("--deployment-proof", default="Backend/proof/huawei-baota-deploy.json")
-    parser.add_argument("--storage-proof", default="Backend/proof/storage-backend.json")
+    parser.add_argument("--deployment-proof", default="")
+    parser.add_argument("--storage-proof", default="")
     parser.add_argument("--ios-release-proof", default="Backend/proof/ios-release-readiness.json")
     parser.add_argument("--ios-app-bundle-proof", default="Backend/proof/ios-app-bundle.json")
     parser.add_argument("--ios-265-build-proof", default="Backend/proof/ios-265-build.json")
     parser.add_argument("--testflight-precheck-proof", default="Backend/proof/testflight-precheck.json")
     parser.add_argument("--testflight-regression-plan-proof", default="Backend/proof/testflight-regression-plan.json")
-    parser.add_argument("--sim-launch-proof", default="Backend/proof/sim-launch-ios265-20260626.json")
+    parser.add_argument("--sim-launch-proof")
     parser.add_argument("--expected-sim-runtime", default="iOS 26.5")
     parser.add_argument("--app-store-assets-proof", default="Backend/proof/app-store-assets.json")
     parser.add_argument("--app-store-connect-materials-proof", default="Backend/proof/app-store-connect-materials.json")
@@ -1067,6 +1142,7 @@ def main() -> None:
     parser.add_argument("--app-store-evidence", default="Backend/proof/app-store-evidence.json")
     parser.add_argument("--screenshot-dir", default="Docs/08_Release/Screenshots")
     parser.add_argument("--output", default="Backend/proof/production-readiness.json")
+    parser.add_argument("--expected-proof-date", default=expected_proof_date())
     parser.add_argument("--require-huawei-obs", action="store_true")
     parser.add_argument("--require-screenshots", action="store_true")
     parser.add_argument("--require-app-store-evidence", action="store_true")

@@ -1,0 +1,13 @@
+{
+  "capturedAt": "2026-07-04T04:33:54+00:00",
+  "appStoreConnectAppId": "6787332971",
+  "testFlightUrl": "https://appstoreconnect.apple.com/teams/2f11344b-a0e9-4c28-beb5-0f4712e560c6/apps/6787332971/testflight",
+  "uiObservedStatus": "No builds visible in TestFlight UI after multiple refreshes",
+  "xcodeUploadStatus": "Upload succeeded; uploaded package is processing",
+  "xcodeUploadProof": "Backend/proof/app-store-connect-upload-succeeded-20260704.json",
+  "screenshot": "Backend/proof/app-store-connect-testflight-no-builds-refreshed-20260704.png",
+  "passed": false,
+  "statusBoundary": "Do not claim TestFlight build availability until App Store Connect lists the build.",
+  "finalRefreshAt": "2026-07-04T04:35:42+00:00",
+  "finalRefreshScreenshot": "Backend/proof/app-store-connect-testflight-no-builds-final-refresh-20260704.png"
+}

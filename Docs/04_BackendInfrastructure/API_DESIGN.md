@@ -5,13 +5,13 @@
 - 项目：小奶瓶 / 宝宝成长记录
 - 阶段：API 设计与最小实现更新
 - 日期：2026-06-14
-- 当前结论：已新增最小第一方 API 实现 `Backend/api/server.py`，覆盖恢复密钥账号、手机号登录接口、微信登录接口、备份恢复、照片原图上传/下载/删除、账号删除和第一方合规埋点；服务端已支持短信 webhook、阿里云短信 webhook adapter、微信 code 换 openid/unionid 和白名单行为事件，生产域名、真实阿里云短信签名/模板、微信开放平台凭证、iOS OpenSDK、云主机和对象存储区域仍需发布前私有确认
+- 当前结论：已新增最小第一方 API 实现 `Backend/api/server.py`，覆盖恢复密钥账号、手机号登录接口、微信登录接口、同步恢复、照片原图上传/下载/删除、账号删除和第一方合规埋点；服务端已支持短信 webhook、阿里云短信 webhook adapter、微信 code 换 openid/unionid 和白名单行为事件，生产域名、真实阿里云短信签名/模板、微信开放平台凭证、iOS OpenSDK、云主机和对象存储区域仍需发布前私有确认
 
 ## 已确认事实
 
 1. 第一版必须离线可本地记录。
 2. 第一版需要账号。
-3. 第一版需要备份恢复。
+3. 第一版需要同步恢复。
 4. 服务器需要存照片原图。
 5. 首发地区改为中国大陆，香港第二批。
 
@@ -43,19 +43,19 @@
 
 | API | 用途 | 第一版状态 |
 |---|---|---|
-| `POST /v1/accounts` | 创建私有备份账号并返回恢复密钥 | 已实现 |
+| `POST /v1/accounts` | 创建私有同步账号并返回恢复密钥 | 已实现 |
 | `POST /v1/sessions/recover` | 使用恢复密钥换取会话 | 已实现 |
 | `POST /v1/auth/phone/request-code` | 请求手机号登录验证码 | 已实现；生产需配置短信 webhook |
 | `POST /v1/auth/phone/verify` | 校验手机号验证码并换取会话 | 已实现 |
 | `POST /v1/auth/wechat/login` | 使用微信授权 code 登录 | 已实现；生产需配置微信开放平台凭证和 iOS OpenSDK |
 | `GET /v1/account` | 查看账号状态 | 已实现 |
-| `PUT /v1/backup` | 上传宝宝档案、记录、提醒、照片元数据 JSON 备份 | 已实现 |
-| `GET /v1/backup` | 恢复最新 JSON 备份 | 已实现 |
+| `PUT /v1/sync` | 上传宝宝档案、记录、提醒、照片元数据 JSON 同步 | 已实现 |
+| `GET /v1/sync` | 恢复最新 JSON 同步 | 已实现 |
 | `PUT /v1/photos/{photoId}` | 上传用户主动加入 App 的照片原图 | 已实现 |
 | `GET /v1/photos` | 列出账号下的照片对象元数据 | 已实现 |
 | `GET /v1/photos/{photoId}` | 下载账号下的私有照片原图 | 已实现 |
 | `DELETE /v1/photos/{photoId}` | 删除单张云端照片对象 | 已实现 |
-| `DELETE /v1/account` | 删除账号、云端备份和云端照片对象 | 已实现 |
+| `DELETE /v1/account` | 删除账号、云端同步和云端照片对象 | 已实现 |
 | `POST /v1/analytics/events` | 提交第一方白名单行为事件 | 已实现；只收聚合分析所需枚举属性 |
 
 ## 合规埋点 API
@@ -67,10 +67,10 @@
   "events": [
     {
       "eventId": "UUID",
-      "name": "cloud_backup_completed",
+      "name": "cloud_sync_completed",
       "occurredAt": "2026-06-24T00:00:00Z",
       "properties": {
-        "source": "backup",
+        "source": "sync",
         "result": "success",
         "platform": "ios"
       }

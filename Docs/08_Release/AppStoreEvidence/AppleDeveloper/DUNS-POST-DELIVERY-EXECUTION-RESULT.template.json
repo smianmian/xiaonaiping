@@ -1,0 +1,210 @@
+{
+  "status": "template-not-evidence",
+  "instructions": [
+    "Copy this file to DUNS-POST-DELIVERY-EXECUTION-RESULT.json only after D&B delivery and Apple Developer Organization continuation have been handled live.",
+    "Do not store the complete D-U-N-S number in this repository, screenshots, filenames, shell history, logs, Markdown, JSON, or chat. Fill it only on the Apple official enrollment page.",
+    "This file is a same-round execution index. It does not replace D&B screenshots/PDFs, Apple Developer official status, payment receipt proof, Organization approval, Team ID proof, signing, Archive, TestFlight, XiaoNaiPing production proof, iOS 26.5 real-device evidence, or XiaoNaiPing submit permission.",
+    "Cross-app proof is reference only and cannot replace XiaoNaiPing WeChat, AASA, SMS, OBS, filing, final screenshot, production, or iOS 26.5 real-device proof."
+  ],
+  "allowedFinalStatus": "captured-live-duns-post-delivery",
+  "doNotTreatAsSubmitPermission": true,
+  "canSubmitAtCapture": false,
+  "company": "深圳市闪现生活科技有限公司",
+  "apps": [
+    "XiaoNaiPing"
+  ],
+  "capturedAt": "",
+  "capturedBy": "佘鹏辉 / Penghui She",
+  "crossAppDoesNotReplaceXiaoNaiPingProof": true,
+  "first60MinuteQueue": [
+    {
+      "step": "save-redacted-dnb-delivery-proof",
+      "done": false,
+      "requiredEvidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-duns-delivery.png or .pdf"
+    },
+    {
+      "step": "continue-apple-organization-enrollment",
+      "done": false,
+      "requiredEvidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/17-apple-org-enrollment-continued.png or .pdf"
+    },
+    {
+      "step": "submit-or-pay-on-apple-official-page",
+      "done": false,
+      "requiredEvidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/19-apple-developer-payment-receipt.png or .pdf"
+    },
+    {
+      "step": "confirm-team-provider-context-before-signing",
+      "done": false,
+      "requiredEvidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/18-team-context-and-app-record.png or .pdf"
+    },
+    {
+      "step": "refresh-xiaonaiping-auth-and-app-bundle-proofs",
+      "done": false,
+      "requiredEvidence": "Backend/proof/ios-app-bundle-20260704T-current-ios265.json"
+    }
+  ],
+  "identityAndEntityMatch": {
+    "legalEntityNameVisible": false,
+    "chinaMainlandVisible": false,
+    "englishLegalNameMatchesBusinessLicense": false,
+    "companyAddressMatchesBusinessLicense": false,
+    "usccMatchesBusinessLicenseRedactedInProof": false,
+    "contactIsPenghuiShe": false,
+    "entityDisplayMismatchGuard": {
+      "rejectMissingOrDifferentChineseCharacter": true,
+      "doNotSelectSimilarEntity": true,
+      "supportCaseRequiredBeforeRetry": false
+    },
+    "wrongNamesAbsent": [
+      "Penghui Yu",
+      "余鹏辉"
+    ]
+  },
+  "appleDeveloperContinuation": {
+    "entityType": "Organization",
+    "appleOfficialPageOnly": true,
+    "organizationNotIndividual": true,
+    "appleIdEmailHiddenInProof": false,
+    "completePhoneHiddenInProof": false,
+    "submittedOrPendingOrApprovedVisible": false
+  },
+  "appleDunsLookupFailureHandling": {
+    "lookupStatus": "not-run",
+    "notFoundOrMismatchScreenshot": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/20-duns-lookup-error.png or .pdf",
+    "waitForDnbApplePropagation": false,
+    "appleDeveloperSupportCaseIdRedacted": "",
+    "doNotSwitchToIndividual": true,
+    "doNotUseOtherCompanyDuns": true,
+    "doNotRepeatSubmitSameError": true
+  },
+  "paymentAndInvoiceRedaction": {
+    "paymentReceiptEvidenceFiles": [
+      "Docs/08_Release/AppStoreEvidence/AppleDeveloper/19-apple-developer-payment-receipt.png or .pdf"
+    ],
+    "paymentSuccessOrMembershipActiveVisible": false,
+    "cardNumberHidden": false,
+    "cvvHidden": false,
+    "invoiceDetailsHidden": false,
+    "taxAndBankDetailsHidden": false
+  },
+  "teamIdAndProviderContext": {
+    "teamIdCapturedAfterOrganizationApproval": false,
+    "teamIdStoredOnlyWhereNeededForMigrationAndAppleBackends": false,
+    "sameOrganizationTeamAcrossApps": false,
+    "sameTeamAsAasaArchiveAndTestFlight": false,
+    "providerIsOrganizationNotIndividual": false,
+    "oldPersonalTeamNotUsed": false
+  },
+  "certificatesProfilesArchiveTestFlightChain": {
+    "xnpWechatAasaUsesSameOrganizationTeam": false,
+    "xnpMainAndWidgetProfilesCreated": false,
+    "appStoreDistributionCertificateCreated": false,
+    "archiveUsesAppStoreDistribution": false,
+    "testFlightBuildProcessed": false,
+    "ios265RealDeviceOrTestFlightRegressionCaptured": false
+  },
+  "evidenceFiles": [
+    {
+      "artifactId": "dunsDelivery",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-duns-delivery.png or .pdf",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appleOrganizationEnrollmentContinued",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/17-apple-org-enrollment-continued.png or .pdf",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appleDunsLookupError",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/20-duns-lookup-error.png or .pdf",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "teamContextAndAppRecord",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/18-team-context-and-app-record.png or .pdf",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "paymentReceipt",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/19-apple-developer-payment-receipt.png or .pdf",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "xnpWechatAasa",
+      "target": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+      "captured": false,
+      "redactionChecked": false,
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "sameRoundAsDunsPostDelivery": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "redactionReviewed": {
+    "neverStoreCompleteDunsNumber": true,
+    "appleIdEmailHidden": false,
+    "completePhoneHidden": false,
+    "paymentDataHidden": false,
+    "taxAndInvoiceDataHidden": false,
+    "bankAccountHidden": false,
+    "certificatePrivateKeysHidden": false,
+    "appSecretsTokensAndVerificationCodesHidden": false
+  },
+  "sourceFreshness": {
+    "checkedAt": "2026-07-04 02:18 CST",
+    "sameDayEmotionIsleDunsRunbookPresent": false,
+    "missingSameDaySource": "/Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260704-current.json",
+    "latestVisibleSource": "/Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260629-current.json",
+    "latestVisibleSourceIsHistoricalReferenceOnly": true
+  },
+  "postCaptureProofReruns": {
+    "checkDunsPostDelivery": "latest visible historical reference: /Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260629-current.json; generate and review a 2026-07-04 current source before treating it as same-day evidence",
+    "checkSignedArchiveTestFlightMaterials": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+    "checkIOSAppBundle": "python3 Backend/scripts/check_ios_app_bundle.py --app /path/to/XiaoNaiPing.app --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+    "checkWechatClientConfiguration": "python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704-current.json",
+    "checkProviderEvidenceMaterials": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "checkMainlandFilingMaterials": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "checkAppStoreSubmissionPacket": "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+    "checkAppStoreEvidence": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
+    "checkProductionReadiness": "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness.json",
+    "checkLaunchObjectiveAudit": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  },
+  "operatorNotes": ""
+}

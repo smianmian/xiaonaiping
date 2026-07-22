@@ -1,0 +1,316 @@
+{
+  "startedAt": "2026-07-03T23:33:34+00:00",
+  "completedAt": "2026-07-03T23:33:34+00:00",
+  "ready": false,
+  "failedRequiredChecks": [
+    "deploymentProofCurrent",
+    "storageBackendProofCurrent",
+    "testFlightRegressionPlanProofPassed",
+    "appStoreAssetsProofPassed",
+    "appStoreConnectMaterialsProofPassed",
+    "appStoreConnectEvidenceMaterialsProofPassed",
+    "appStoreManualEvidenceReady"
+  ],
+  "checks": {
+    "deploymentProofCurrent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing current timestamp in startedAt, completedAt, checkedAt"
+    },
+    "productionApiBaseUrlPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "--base-url: https://api.mewpow.com/xiaonaiping"
+    },
+    "productionApiBaseUrlUsesHttps": {
+      "passed": true,
+      "required": true,
+      "evidence": "https://api.mewpow.com/xiaonaiping"
+    },
+    "productionApiBaseUrlNotPlaceholder": {
+      "passed": true,
+      "required": true,
+      "evidence": "https://api.mewpow.com/xiaonaiping"
+    },
+    "productionSecretConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "remote private env reports XNP_SECRET_KEY=set"
+    },
+    "productionDataDirConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNP_DATA_DIR is set"
+    },
+    "authDebugModeDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "deployment proof reports authDebugModeDisabled=true"
+    },
+    "mysqlDatabaseSelected": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNP_DATABASE_BACKEND=mysql"
+    },
+    "mysqlDatabaseEnvPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "all required XNP_MYSQL_* variables are set"
+    },
+    "huaweiObsSelected": {
+      "passed": true,
+      "required": true,
+      "evidence": "deployment proof reports storageBackendIsHuaweiOBS=true"
+    },
+    "huaweiObsEnvPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "all required HUAWEI_OBS_* variables are set"
+    },
+    "phoneLoginProviderConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "SMS webhook provider is configured"
+    },
+    "wechatLoginProviderConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "valid XNP_WECHAT_APP_ID and XNP_WECHAT_APP_SECRET are set"
+    },
+    "privateOperationsDashboardConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "remote private env reports XNP_ADMIN_TOKEN=set"
+    },
+    "publicInternalDashboardBlocked": {
+      "passed": true,
+      "required": true,
+      "evidence": "public internal paths blocked: /xiaonaiping/internal, /xiaonaiping/internal/"
+    },
+    "xiaonaipingProductionNamespaceConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "data directory, MySQL identity, and object storage namespace are xiaonaiping-specific"
+    },
+    "sharedServiceNamespaceRejected": {
+      "passed": true,
+      "required": true,
+      "evidence": "no Emotion/YDM/Daimao namespace markers in deployment values"
+    },
+    "privacyReviewExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/07_PrivacySecurity/PRIVACY_REVIEW.md"
+    },
+    "sdkInventoryExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/07_PrivacySecurity/SDK_DATA_INVENTORY.md"
+    },
+    "testPlanExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/05_QA/TEST_PLAN.md"
+    },
+    "releaseChecklistExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/06_Release/RELEASE_CHECKLIST.md"
+    },
+    "proofPackExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/06_Release/PROOF_PACK.md"
+    },
+    "regionalStrategyExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md"
+    },
+    "appStoreMetadataExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_METADATA.md"
+    },
+    "appStorePrivacyLabelExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+    },
+    "appStoreSubmissionPacketExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md"
+    },
+    "mainlandFilingMaterialsExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/MAINLAND_FILING_MATERIALS.md"
+    },
+    "privacyPolicyDraftExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md"
+    },
+    "termsDraftExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md"
+    },
+    "screenshotPlanExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/SCREENSHOT_PLAN.md"
+    },
+    "rollbackPlanExists": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/06_Release/ROLLBACK_PLAN.md"
+    },
+    "appStoreUrlsFinalized": {
+      "passed": true,
+      "required": true,
+      "evidence": "no placeholder App Store URL found"
+    },
+    "localReleaseFlowProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "passed 12 checks"
+    },
+    "remoteReleaseFlowProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "passed 16 checks"
+    },
+    "storageBackendProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "storage proof passed with backend huawei_obs"
+    },
+    "storageBackendProofCurrent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing current timestamp in startedAt, completedAt, checkedAt"
+    },
+    "iosReleaseReadinessProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS release proof passed 21 checks"
+    },
+    "iosAppBundleProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS app bundle proof passed 15 checks for /private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app"
+    },
+    "ios265BuildProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 build proof passed 24 checks for /private/tmp/XiaoNaiPing-Gate-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app and /private/tmp/XiaoNaiPing-Gate-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app"
+    },
+    "testFlightClientPrecheckProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "TestFlight client precheck passed 32 checks for /private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app"
+    },
+    "testFlightRegressionPlanProofPassed": {
+      "passed": false,
+      "required": true,
+      "evidence": "failed TestFlight regression plan checks: ios265SmokeProofDateCurrent, ios265SmokeTextMatchesProof, ios265PhysicalDeviceAvailable"
+    },
+    "ios265SimulatorLaunchProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 simulator install/launch proof passed: com.mewpow.xiaonaiping: 65651"
+    },
+    "appStoreAssetsProofPassed": {
+      "passed": false,
+      "required": true,
+      "evidence": "failed asset checks: finalScreenshotsUploadProvenancePresent"
+    },
+    "appStoreConnectMaterialsProofPassed": {
+      "passed": false,
+      "required": true,
+      "evidence": "failed App Store Connect material checks: appStoreConnectMaterialDateCurrent, copyPastePacketPresent, appStoreConnectEntrySessionPacketPresent, reviewInformationPacketPresent, privacyAnswersPresent, versionReleaseSettingsPresent, finalEntryAuditPresent, copyPastePacketCompleteAndRedacted, copyPastePacketMatchesFillSheetDraft, copyPasteAppInformationMatchesFillSheet, reviewInformationPacketCompleteAndRedacted, reviewAccountRedactedEvidenceMatchesReviewInfo, reviewInformationSubmissionBlockersPresent, appReviewTestAccountPacketReferenced, privacyAnswersCompleteAndRedacted, ageRatingAnswerSheetReferencedByDraft, versionReleaseSettingsCompleteAndRedacted, versionReleaseSettingsMatchesFillSheetWhatsNew, finalEntryAuditCompleteAndRedacted, finalEntryPageEvidenceIndexPresent, finalSubmitReviewGuardRequiresXiaoNaiPingProofs, finalFieldSourceConsistencyLockPresent, appStoreConnectEntrySessionPacketReferenced, metadataCurrentLaunchHandoffPresent, appStoreScreenshotUploadMatrixPresent, appStoreConnectEntrySessionPacketValid, ascBackfillResultTemplateValid, ascPrivacyAgeReviewResultTemplateValid, appStoreConnectFieldBudgetTablesCurrent"
+    },
+    "appStoreConnectEvidenceMaterialsProofPassed": {
+      "passed": false,
+      "required": true,
+      "evidence": "failed App Store Connect evidence material checks: fillSheetUsesExpectedMaterialDate, captureGuideUsesCurrentAgeRatingAnswerSheet"
+    },
+    "appStoreSubmissionPacketProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store submission packet proof passed 36 checks"
+    },
+    "mainlandFilingMaterialsProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing materials proof passed 22 checks"
+    },
+    "signedArchiveTestFlightMaterialsProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "signed archive/TestFlight materials proof passed 39 checks"
+    },
+    "providerEvidenceMaterialsProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "provider evidence materials proof passed 50 checks"
+    },
+    "authProvidersProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "auth provider proof passed 6 checks"
+    },
+    "diagnosticsRedactionProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "diagnostics redaction proof passed 4 checks"
+    },
+    "publicPagesProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "public pages proof passed 74 checks"
+    },
+    "reviewNotesProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "review notes proof passed 55 checks"
+    },
+    "legalDraftsProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "legal drafts proof passed 70 checks"
+    },
+    "universalLinksProofPassed": {
+      "passed": true,
+      "required": true,
+      "evidence": "universal links proof passed 11 checks"
+    },
+    "appStoreScreenshotsCaptured": {
+      "passed": true,
+      "required": true,
+      "evidence": "home-iphone16pro.png: 1206x2622"
+    },
+    "livePrivacyAvailable": {
+      "passed": true,
+      "required": true,
+      "evidence": "/privacy"
+    },
+    "liveTermsAvailable": {
+      "passed": true,
+      "required": true,
+      "evidence": "/terms"
+    },
+    "liveSupportAvailable": {
+      "passed": true,
+      "required": true,
+      "evidence": "/support"
+    },
+    "appStoreManualEvidenceReady": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing evidence: companyAccount, mainlandAvailability, mainlandFiling, privacyLabel, ageRatingResult, signedArchive, testFlight, appleDeveloperAccountAccess, wechatOpenPlatform, wechatUniversalLinkAasa, huaweiObsPolicy, finalScreenshots, realDeviceRegression"
+    }
+  }
+}

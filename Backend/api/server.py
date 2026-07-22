@@ -37,12 +37,12 @@ STATIC_ROUTES = {
     "/support-assets/operation-flow.jpg": ("support-assets/operation-flow.jpg", "image/jpeg"),
     "/support-assets/screenshot-home.jpg": ("support-assets/screenshot-home.jpg", "image/jpeg"),
     "/support-assets/screenshot-record.jpg": ("support-assets/screenshot-record.jpg", "image/jpeg"),
-    "/support-assets/screenshot-backup.jpg": ("support-assets/screenshot-backup.jpg", "image/jpeg"),
+    "/support-assets/screenshot-sync.jpg": ("support-assets/screenshot-sync.jpg", "image/jpeg"),
     "/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/.well-known/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/internal/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
 }
-MAX_BACKUP_BYTES = 5 * 1024 * 1024
+MAX_SYNC_BYTES = 5 * 1024 * 1024
 MAX_PHOTO_BYTES = 20 * 1024 * 1024
 MAX_ANALYTICS_BYTES = 64 * 1024
 MAX_ANALYTICS_EVENTS = 50
@@ -61,8 +61,8 @@ ANALYTICS_EVENT_NAMES = {
     "onboarding_completed",
     "account_created",
     "login_completed",
-    "cloud_backup_enabled",
-    "cloud_backup_completed",
+    "cloud_sync_enabled",
+    "cloud_sync_completed",
     "cloud_restore_completed",
     "photo_added",
     "record_created",
@@ -72,13 +72,13 @@ ANALYTICS_EVENT_NAMES = {
     "purchase_completed",
 }
 ANALYTICS_PROPERTY_VALUES = {
-    "screen": {"home", "record", "profile", "album", "growth", "backup", "onboarding", "paywall"},
-    "source": {"app_launch", "onboarding", "profile", "record", "album", "growth", "backup", "restore", "system"},
+    "screen": {"home", "record", "profile", "album", "growth", "sync", "onboarding", "paywall"},
+    "source": {"app_launch", "onboarding", "profile", "record", "album", "growth", "sync", "restore", "system"},
     "recordType": {"feeding", "sleep", "diaper", "growth", "milestone", "vaccine", "photo"},
     "reminderType": {"feeding", "vaccine"},
     "authProvider": {"recovery_key", "phone", "wechat"},
     "result": {"success", "failure", "cancelled"},
-    "feature": {"cloud_backup", "cloud_restore", "photo_backup", "account", "reminder", "commercial"},
+    "feature": {"cloud_sync", "cloud_restore", "photo_sync", "account", "reminder", "commercial"},
     "productTier": {"free", "premium"},
     "platform": {"ios"},
 }
@@ -408,11 +408,11 @@ def upsert_phone_code(
     )
 
 
-def upsert_backup(db: DatabaseConnection, account_id: str, payload: bytes, updated_at: str) -> None:
+def upsert_sync(db: DatabaseConnection, account_id: str, payload: bytes, updated_at: str) -> None:
     if db.dialect == "mysql":
         db.execute(
             """
-            INSERT INTO backups(account_id, payload, updated_at) VALUES (?, ?, ?)
+            INSERT INTO syncs(account_id, payload, updated_at) VALUES (?, ?, ?)
             ON DUPLICATE KEY UPDATE payload = VALUES(payload), updated_at = VALUES(updated_at)
             """,
             (account_id, payload, updated_at),
@@ -420,7 +420,7 @@ def upsert_backup(db: DatabaseConnection, account_id: str, payload: bytes, updat
         return
     db.execute(
         """
-        INSERT INTO backups(account_id, payload, updated_at) VALUES (?, ?, ?)
+        INSERT INTO syncs(account_id, payload, updated_at) VALUES (?, ?, ?)
         ON CONFLICT(account_id) DO UPDATE SET payload = excluded.payload, updated_at = excluded.updated_at
         """,
         (account_id, payload, updated_at),
@@ -535,8 +535,8 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
 
         if path == "/v1/account":
             self.handle_get_account(account_id)
-        elif path == "/v1/backup":
-            self.handle_get_backup(account_id)
+        elif path == "/v1/sync":
+            self.handle_get_sync(account_id)
         elif path == "/v1/photos":
             self.handle_list_photos(account_id)
         elif path.startswith("/v1/photos/"):
@@ -569,8 +569,8 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             return
 
         path = urlparse(self.path).path
-        if path == "/v1/backup":
-            self.handle_put_backup(account_id)
+        if path == "/v1/sync":
+            self.handle_put_sync(account_id)
         elif path.startswith("/v1/photos/"):
             self.handle_put_photo(account_id, path.removeprefix("/v1/photos/"))
         else:
@@ -606,7 +606,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         )
 
     def handle_recover_session(self) -> None:
-        body = self.read_json(MAX_BACKUP_BYTES)
+        body = self.read_json(MAX_SYNC_BYTES)
         if not isinstance(body, dict):
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
             return
@@ -637,7 +637,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         )
 
     def handle_phone_request_code(self) -> None:
-        body = self.read_json(MAX_BACKUP_BYTES)
+        body = self.read_json(MAX_SYNC_BYTES)
         if not isinstance(body, dict):
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
             return
@@ -671,7 +671,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         self.write_json(response)
 
     def handle_phone_verify(self) -> None:
-        body = self.read_json(MAX_BACKUP_BYTES)
+        body = self.read_json(MAX_SYNC_BYTES)
         if not isinstance(body, dict):
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
             return
@@ -700,7 +700,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         self.write_json(response)
 
     def handle_wechat_login(self) -> None:
-        body = self.read_json(MAX_BACKUP_BYTES)
+        body = self.read_json(MAX_SYNC_BYTES)
         if not isinstance(body, dict):
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
             return
@@ -736,29 +736,29 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             return
         self.write_json({"accountId": row["account_id"], "createdAt": row["created_at"]})
 
-    def handle_put_backup(self, account_id: str) -> None:
-        payload = self.read_body(MAX_BACKUP_BYTES)
+    def handle_put_sync(self, account_id: str) -> None:
+        payload = self.read_body(MAX_SYNC_BYTES)
         try:
             json.loads(payload.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError):
-            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_backup", "备份必须是 UTF-8 JSON。")
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_sync", "同步必须是 UTF-8 JSON。")
             return
 
         now = utc_now()
         with connect(self.config) as db:
-            upsert_backup(db, account_id, payload, now)
+            upsert_sync(db, account_id, payload, now)
             db.commit()
 
         self.write_json({"updatedAt": now, "sizeBytes": len(payload)})
 
-    def handle_get_backup(self, account_id: str) -> None:
+    def handle_get_sync(self, account_id: str) -> None:
         with connect(self.config) as db:
             row = db.execute(
-                "SELECT payload, updated_at FROM backups WHERE account_id = ?",
+                "SELECT payload, updated_at FROM syncs WHERE account_id = ?",
                 (account_id,),
             ).fetchone()
         if row is None:
-            self.write_error(HTTPStatus.NOT_FOUND, "backup_not_found", "还没有云端备份。")
+            self.write_error(HTTPStatus.NOT_FOUND, "sync_not_found", "还没有云端同步。")
             return
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -960,9 +960,9 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                 "SELECT COUNT(*) AS count FROM accounts WHERE created_at >= ?",
                 (utc_days_ago(7),),
             ).fetchone()["count"]
-            accounts_with_backup = db.execute("SELECT COUNT(*) AS count FROM backups").fetchone()["count"]
-            backup_totals = db.execute(
-                "SELECT COALESCE(SUM(LENGTH(payload)), 0) AS bytes, MAX(updated_at) AS latest FROM backups"
+            accounts_with_sync = db.execute("SELECT COUNT(*) AS count FROM syncs").fetchone()["count"]
+            sync_totals = db.execute(
+                "SELECT COALESCE(SUM(LENGTH(payload)), 0) AS bytes, MAX(updated_at) AS latest FROM syncs"
             ).fetchone()
             photo_totals = db.execute(
                 "SELECT COUNT(*) AS count, COALESCE(SUM(size_bytes), 0) AS bytes, MAX(updated_at) AS latest FROM photos"
@@ -1020,9 +1020,9 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                 "deletedAccounts": int(deleted_accounts),
                 "newAccountsLast24h": int(accounts_last_day),
                 "newAccountsLast7d": int(accounts_last_week),
-                "accountsWithBackup": int(accounts_with_backup),
-                "backupBytes": int(backup_totals["bytes"] or 0),
-                "latestBackupAt": backup_totals["latest"],
+                "accountsWithSync": int(accounts_with_sync),
+                "syncBytes": int(sync_totals["bytes"] or 0),
+                "latestSyncAt": sync_totals["latest"],
                 "photoObjects": int(photo_totals["count"]),
                 "photoBytes": int(photo_totals["bytes"]),
                 "latestPhotoAt": photo_totals["latest"],
@@ -1052,24 +1052,24 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             photo_count = db.execute("SELECT COUNT(*) AS count FROM photos WHERE account_id = ?", (account_id,)).fetchone()[
                 "count"
             ]
-            had_backup = db.execute("SELECT 1 FROM backups WHERE account_id = ?", (account_id,)).fetchone() is not None
+            had_sync = db.execute("SELECT 1 FROM syncs WHERE account_id = ?", (account_id,)).fetchone() is not None
             analytics_digest = subject_hash(self.config.secret_key, "analytics_account", account_id)
             analytics_count = db.execute(
                 "SELECT COUNT(*) AS count FROM analytics_events WHERE account_hash = ?",
                 (analytics_digest,),
             ).fetchone()["count"]
             now = utc_now()
-            db.execute("DELETE FROM backups WHERE account_id = ?", (account_id,))
+            db.execute("DELETE FROM syncs WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM photos WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM account_identities WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM analytics_events WHERE account_hash = ?", (analytics_digest,))
             db.execute("UPDATE accounts SET deleted_at = ? WHERE account_id = ?", (now, account_id))
             db.execute(
                 """
-                INSERT INTO deletion_audit(audit_id, account_id, deleted_at, backup_deleted, photo_count)
+                INSERT INTO deletion_audit(audit_id, account_id, deleted_at, sync_deleted, photo_count)
                 VALUES (?, ?, ?, ?, ?)
                 """,
-                (str(uuid.uuid4()), account_id, now, int(had_backup), int(photo_count)),
+                (str(uuid.uuid4()), account_id, now, int(had_sync), int(photo_count)),
             )
             db.commit()
 
@@ -1079,7 +1079,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             {
                 "accountId": account_id,
                 "deletedAt": now,
-                "backupDeleted": had_backup,
+                "syncDeleted": had_sync,
                 "photoCountDeleted": photo_count,
                 "analyticsEventsDeleted": int(analytics_count),
             }

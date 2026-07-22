@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-07-03T23:54:32.612Z",
+  "page": "Apple Developer / Certificates, Identifiers & Profiles / Identifiers",
+  "url": "https://developer.apple.com/account/resources/identifiers/list",
+  "screenshot": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/apple-developer-identifiers-missing-xnp-bundle-20260704.png",
+  "observedTeam": "Shenzhen Flash Life Technology Co., Ltd - L2TYJNDTJK",
+  "identifiersObserved": [
+    "com.mewpow.Emotion-Isle",
+    "com.mewpow.Emotion-Isle.EmotionWidget"
+  ],
+  "expectedXiaoNaiPingBundleId": "com.mewpow.xiaonaiping",
+  "xiaoNaiPingBundleIdRegistered": false,
+  "conclusion": "Current Apple Developer account is logged in and can view identifiers, but com.mewpow.xiaonaiping is not registered; project Team ID should be aligned to L2TYJNDTJK before registering bundle/capabilities and archiving."
+}

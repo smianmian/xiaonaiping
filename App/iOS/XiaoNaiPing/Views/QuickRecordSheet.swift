@@ -23,15 +23,22 @@ enum QuickRecordAction: CaseIterable, Identifiable {
         }
     }
 
-    var asset: String {
+    var asset: String? {
         switch self {
         case .feeding: AppAssets.bottleIcon
-        case .water: AppAssets.peeDropIcon
+        case .water: nil
         case .sleep: AppAssets.moonIcon
         case .diaper: AppAssets.diaperIcon
         case .photo: AppAssets.cameraIcon
         case .growth: AppAssets.quickGrowthIcon
         case .milestone: AppAssets.milestoneMedalIcon
+        }
+    }
+
+    var systemIcon: String? {
+        switch self {
+        case .water: "drop.fill"
+        default: nil
         }
     }
 

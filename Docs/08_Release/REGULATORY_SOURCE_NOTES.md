@@ -45,7 +45,7 @@
    - https://developer.apple.com/app-store/app-privacy-details/
 2. Apple App Store Connect Manage App Privacy：iOS App 需要隐私政策 URL；App Privacy 回答需要准确反映所有平台的数据实践，且数据实践变化后需要更新。
    - https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/
-3. Apple Screenshot Specifications：当前 iPhone 16 Pro 候选截图尺寸 `1206 x 2622` 属于 Apple 接受的 iPhone 6.3 英寸竖屏尺寸。
+3. Apple Screenshot Specifications：当前 2026-06-28 候选截图已重截为 iPhone 17 Pro Max / iPhone 6.9" display / `1320 x 2868`，属于本项目 App Store 6.9 英寸槽位候选；它仍只是 Debug simulator 候选，不替代 TestFlight 或签名真机最终上传证据。
    - https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
 4. Apple App Review：提交审核前必须彻底测试，隐私政策和支持链接需要可用；需要登录的功能应在 App Review Information 中提供有效测试账号。
    - https://developer.apple.com/distribute/app-review/

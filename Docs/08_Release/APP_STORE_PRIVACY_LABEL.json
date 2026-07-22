@@ -19,7 +19,7 @@
       "usedForTracking": false,
       "purposes": ["App Functionality"],
       "projectData": ["account id", "session token", "WeChat openid/unionid hash when WeChat login is enabled"],
-      "notes": "Used only for account login, backup, restore, and deletion."
+      "notes": "Used only for account login, sync, restore, and deletion."
     },
     {
       "category": "Contact Info",
@@ -37,7 +37,7 @@
       "usedForTracking": false,
       "purposes": ["App Functionality"],
       "projectData": ["baby profile", "notes", "feeding records", "sleep records", "diaper records", "growth records", "vaccine reminders", "photo metadata"],
-      "notes": "Uploaded only for account backup and restore."
+      "notes": "Uploaded only for account sync and restore."
     },
     {
       "category": "Photos or Videos",
@@ -46,7 +46,7 @@
       "usedForTracking": false,
       "purposes": ["App Functionality"],
       "projectData": ["original photos added by the user to the app"],
-      "notes": "Private account backup only; no public sharing in V1."
+      "notes": "Private account sync only; no public sharing in V1."
     },
     {
       "category": "Health and Fitness",
@@ -72,7 +72,7 @@
       "linkedToUser": true,
       "usedForTracking": false,
       "purposes": ["Analytics"],
-      "projectData": ["first-party product interaction events such as login, account creation, backup completion, restore completion, record type, reminder type"],
+      "projectData": ["first-party product interaction events such as login, account creation, sync completion, restore completion, record type, reminder type"],
       "notes": "Stored only on the first-party backend with HMAC account hash and whitelisted enum properties; no baby content, photos, photo keys, phone numbers, WeChat identifiers, location, advertising ID, or device fingerprint."
     }
   ],

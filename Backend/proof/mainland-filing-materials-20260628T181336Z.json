@@ -1,0 +1,113 @@
+{
+  "startedAt": "2026-06-28T18:13:38+00:00",
+  "completedAt": "2026-06-28T18:13:38+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "materialsDocumentPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/MAINLAND_FILING_MATERIALS.md"
+    },
+    "mainlandFilingPrivacyEvidenceTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/AppStoreEvidence/_templates/mainland-filing-privacy-evidence.template.json"
+    },
+    "currentJudgmentCoversLaunchAndFilingPath": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland-first filing path and post-filing display boundary present"
+    },
+    "dunsAppleDeveloperDependencyDocumented": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S follow-up, Apple Developer Organization enrollment, and Team ID dependency are documented"
+    },
+    "externalPlatformEvidenceHandoffDocumented": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat, SMS, OBS, production proof, and iOS 26.5 evidence handoff is documented"
+    },
+    "draftFilingFieldsComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "draft filing fields cover entity, app, URLs, cloud, storage, and auth methods"
+    },
+    "externalMaterialCollectionListComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "external company/cloud/provider material list is complete"
+    },
+    "evidenceArchiveFilenamesMatchGate": {
+      "passed": true,
+      "required": true,
+      "evidence": "evidence filenames align with AppStoreEvidence gate"
+    },
+    "postFilingCodeChangesDeferredUntilRealNumber": {
+      "passed": true,
+      "required": true,
+      "evidence": "filing number UI/page/review-note changes are explicitly deferred until real filing number"
+    },
+    "submissionSequenceKeepsFilingBeforeChinaReview": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission order keeps filing and public-security evidence before China App Store review"
+    },
+    "filingSameDayExecutionTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "filing execution template ties company/domain/cloud/App Store evidence, filing proof, public-security filing, post-number updates, reruns, and redaction into one China review decision"
+    },
+    "filingExecutionPacketReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing materials reference the structured execution packet and keep it separate from real evidence or submission permission"
+    },
+    "filingExecutionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260629.json"
+    },
+    "filingExecutionPacketValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing execution packet locks source files, target evidence files, stop conditions, redaction, post-execution gates, and no-submission boundary"
+    },
+    "mainlandFilingPrivacyEvidenceTemplateValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing/privacy evidence template covers company account, China mainland availability, filing, privacy label, age rating result, URLs, medical/privacy boundary, redaction, post-capture gates, and template-only completion boundary"
+    },
+    "captureGuideCoversFilingEvidenceRedaction": {
+      "passed": true,
+      "required": true,
+      "evidence": "capture guide describes filing evidence contents and redaction boundary"
+    },
+    "chinaMainlandGapAssessmentCurrent": {
+      "passed": true,
+      "required": true,
+      "evidence": "China mainland launch gap assessment references current proof gates, current blockers, and no-submission boundary"
+    },
+    "regionalLaunchStrategyCurrent": {
+      "passed": true,
+      "required": true,
+      "evidence": "regional launch strategy uses current China-first, Hong Kong-second, 2026-06-29 proof, handoff, and no-submission boundaries"
+    },
+    "mainlandMaterialsUseCurrentDayHandoff": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing materials and China gap assessment use the current 2026-06-29 external handoff and current proof names"
+    },
+    "chinaMainlandComplianceCurrent": {
+      "passed": true,
+      "required": true,
+      "evidence": "China mainland compliance note points to current filing materials, handoffs, proof gates, external evidence, iOS 26.5/TestFlight, and no-submission boundary"
+    },
+    "doesNotPretendFilingCompleteBeforeEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "materials do not claim App/ICP/public-security filing is complete before archived evidence"
+    }
+  }
+}

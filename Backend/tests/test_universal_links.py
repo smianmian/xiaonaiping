@@ -36,7 +36,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.mewpow.xiaonaiping
-        DEVELOPMENT_TEAM: JGCT3GY9CT
+        DEVELOPMENT_TEAM: L2TYJNDTJK
       configs:
         Release:
           XNP_WECHAT_UNIVERSAL_LINK: "{universal_link}"
@@ -56,7 +56,7 @@ targets:
                     "apps": [],
                     "details": [
                         {
-                            "appID": "JGCT3GY9CT.com.mewpow.xiaonaiping",
+                            "appID": "L2TYJNDTJK.com.mewpow.xiaonaiping",
                             "paths": paths,
                         }
                     ],

@@ -1,0 +1,43 @@
+{
+  "startedAt": "2026-06-28T18:24:38+00:00",
+  "completedAt": "2026-06-28T18:24:38+00:00",
+  "containsSecrets": false,
+  "apiBaseUrl": "https://api.mewpow.com/xiaonaiping",
+  "passed": false,
+  "failedRequiredChecks": [
+    "smsProviderConfigured",
+    "wechatProviderConfigured"
+  ],
+  "checks": {
+    "deploymentProofReadable": {
+      "passed": true,
+      "required": true,
+      "evidence": "Backend/proof/huawei-baota-deploy-20260629T-current.json"
+    },
+    "authDebugModeDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "deployment proof reports authDebugModeDisabled=true"
+    },
+    "smsProviderConfigured": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing: XNP_SMS_PROVIDER=webhook, XNP_SMS_SECRET, XNP_SMS_WEBHOOK_URL"
+    },
+    "wechatProviderConfigured": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing valid XNP_WECHAT_APP_ID (wx + 16 hex) or XNP_WECHAT_APP_SECRET"
+    },
+    "wechatDebugLoginRejected": {
+      "passed": false,
+      "required": false,
+      "evidence": "skipped; pass --live-check to probe public API"
+    },
+    "smsLiveSendVerified": {
+      "passed": false,
+      "required": false,
+      "evidence": "skipped to avoid sending real SMS; pass --send-test-sms --phone +... for final carrier test"
+    }
+  }
+}

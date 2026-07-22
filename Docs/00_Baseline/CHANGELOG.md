@@ -28,7 +28,7 @@
 - App 可见显示名保持“小奶瓶”，工程/target 使用 `XiaoNaiPing` 以保证构建稳定。
 - 新增第一批客户端目录：`DesignSystem`、`Components`、`Models`、`Mock`、`Views`、`Assets.xcassets`。
 - 新增最小可运行 SwiftUI App 入口、4 Tab 骨架和本地 mock 首页占位。
-- 当前已接入最小第一方后端、恢复密钥账号、备份恢复、照片原图云备份和账号删除；未接入 CloudKit、第三方 SDK 或真实生产用户数据。
+- 当前已接入最小第一方后端、恢复密钥账号、同步恢复、照片原图云同步和账号删除；未接入 CloudKit、第三方 SDK 或真实生产用户数据。
 - 通过 iOS Simulator generic build 验证：`xcodebuild -project XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Debug -destination 'generic/platform=iOS Simulator' build`。
 - 修复 Debug 构建在未配置 Apple Developer Team 时的签名报错：Debug 关闭 code signing，Release/上架签名后续再接正式开发者账号。
 - 调整 Debug 签名策略：模拟器关闭签名，真机 Debug 使用 Apple Development Team `TNF9B47CJ2` 自动签名；当前真机仍需要在 Xcode Accounts 中登录对应 Apple ID 以生成 provisioning profile。
@@ -46,15 +46,15 @@
 - 将 Apple 客户端启动模板改为 iOS-only 第一版边界。
 - 生成产品、MVP、用户故事、验收、UX、UI、数据、同步和隐私审查文档。
 - 合并 AppLaunchOS v2 框架：后端决策、后端部署方案基线、区域上线合规、SDK 清单、隐私安全指标、账号删除和 App Store 合规时间线。
-- 确认首发地区为香港和美国，第一版需要账号、备份恢复和服务器照片原图备份。
-- 将后端从“是否需要”推进为“需要做最小账号 + 备份恢复 + 原图文件存储方案”；后续已按该边界实现最小后端，不包含管理后台或 BI。
+- 确认首发地区为香港和美国，第一版需要账号、同步恢复和服务器照片原图同步。
+- 将后端从“是否需要”推进为“需要做最小账号 + 同步恢复 + 原图文件存储方案”；后续已按该边界实现最小后端，不包含管理后台或 BI。
 - 确认疫苗提醒模板范围为国内 + 香港，崩溃上报进入第一版。
 - 增加同机部署隔离要求：小奶瓶使用独立目录、端口、进程和 反向代理站点，禁止影响 同机已有服务。
 - 明确当前阶段不创建 Xcode 工程、不写 Swift 代码、不安装依赖。
 
 ## 2026-06-14
 
-- 新增 `Backend/api/server.py` 最小第一方后端，覆盖恢复密钥账号、备份上传/恢复、照片原图上传/下载/删除和账号删除。
-- iOS 资料页接入账号与备份操作，会话存入 Keychain，Debug 默认连接本机 API，Release 需要配置真实 `XNP_API_BASE_URL`。
+- 新增 `Backend/api/server.py` 最小第一方后端，覆盖恢复密钥账号、同步上传/恢复、照片原图上传/下载/删除和账号删除。
+- iOS 资料页接入账号与同步操作，会话存入 Keychain，Debug 默认连接本机 API，Release 需要配置真实 `XNP_API_BASE_URL`。
 - 新增隐私政策草案、用户协议草案、App Store 元数据草案和当前发布证据包。
 - 当前仍不允许正式提交 App Store：缺真实 HTTPS API 域名、生产部署、App Store Connect、截图、公开隐私政策 URL、生产删除 SLA 和崩溃脱敏证据。

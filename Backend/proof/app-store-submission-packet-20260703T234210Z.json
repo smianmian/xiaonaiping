@@ -1,0 +1,188 @@
+{
+  "startedAt": "2026-07-03T23:42:28+00:00",
+  "completedAt": "2026-07-03T23:42:28+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "submissionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md"
+    },
+    "ageRatingAnswersPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260630.md"
+    },
+    "submissionPacketDoesNotExposeSecrets": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission packet and age rating answer sheet do not expose recovery keys, tokens, debug codes, API keys, or complete phone numbers"
+    },
+    "submissionPacketUsesCurrentDayMaterials": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission packet references 2026-06-30 current App Store, evidence, age-rating, and XiaoNaiPing submit proof materials"
+    },
+    "officialAppleCheckpointsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "official Apple App Review/App Privacy/screenshot/age/medical URLs present"
+    },
+    "appInformationComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Information contains bundle/name/category/price/region/login fields"
+    },
+    "appInformationAvoidsHealthFitnessCategory": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Information does not use Health & Fitness category wording"
+    },
+    "currentGateStatusUsesDatedProofs": {
+      "passed": true,
+      "required": true,
+      "evidence": "current gate status uses 2026-06-30 current proof files and names active blockers"
+    },
+    "manualEvidenceChecklistReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "manual evidence checklist and real-device boundary are referenced"
+    },
+    "reviewNotesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes section present"
+    },
+    "liveActivityBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 灵动岛, Live Activity, 下一次喝奶提醒"
+    },
+    "widgetBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 小组件, 今日摘要"
+    },
+    "statusDisplayBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 状态展示"
+    },
+    "manualFeedingReminderDeferral": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 手动顺延下一次提醒, 5 分钟一档, 不顺延, +5, +10, +15, +20, +25, +30 分钟"
+    },
+    "feedingReminderDeferralCalculation": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 本顿结束时间 + 固定间隔 + 顺延分钟, 本顿发生时间"
+    },
+    "feedingReminderDeferralPersistenceBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 顺延只改变下一次提醒时间, 不新增持久化字段"
+    },
+    "noAutomaticFeedingInference": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 不根据奶量、月龄、传感器或健康数据自动推算喂养时间"
+    },
+    "userEnteredDataSource": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 用户在 App 内输入, 本机记录"
+    },
+    "noHealthPressureFeedingAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 不生成健康建议、压力提醒、喂养建议"
+    },
+    "noHealthKit": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 不接入 HealthKit"
+    },
+    "noPressureOrDiagnosis": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: 不提供压力评估, 医疗诊断"
+    },
+    "noDebugCode": {
+      "passed": true,
+      "required": true,
+      "evidence": "Review Notes contains: debug code"
+    },
+    "doNotSubmitSectionPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit section present"
+    },
+    "noRealFamilyData": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit contains: real baby photos, real phone numbers, recovery keys, tokens"
+    },
+    "noDebugOrLocal": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit contains: debug login codes, 127.0.0.1, localhost"
+    },
+    "noMedicalClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit contains: medical diagnosis, doctor replacement"
+    },
+    "noUnfinishedWeChat": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit contains: WeChat login before Open Platform proof"
+    },
+    "noSensorClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "Do Not Submit contains: HealthKit, stress detection, medical interpretation"
+    },
+    "privacyLabelSourcesComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "privacy label source documents are listed"
+    },
+    "exportComplianceAnswerPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "export compliance answer covers standard encryption and excludes custom crypto/VPN/DRM/E2EE messaging"
+    },
+    "ageRatingAndMedicalDeviceAnswersPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "age rating and regulated medical device answers are explicit"
+    },
+    "ageRatingAnswerSheetComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "dedicated age rating answer sheet covers Kids, content, medical-device, data-source, and re-check boundaries"
+    },
+    "ageRatingAnswerSheetReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "submission packet references the dedicated age rating answer sheet"
+    },
+    "releaseBundleVerificationUsesIOS265Proofs": {
+      "passed": true,
+      "required": true,
+      "evidence": "Release Bundle Verification points to current iOS 26.5 build and app-bundle proofs"
+    },
+    "screenshotStatusHasFinalEvidenceBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Screenshot Status contains final signed/TestFlight and privacy/medical boundaries"
+    },
+    "preSubmitCommandsComplete": {
+      "passed": true,
+      "required": true,
+      "evidence": "pre-submit commands include unified and component gates"
+    }
+  }
+}

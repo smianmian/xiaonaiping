@@ -1,0 +1,180 @@
+{
+  "artifactType": "huawei-app-filing-execution-packet",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "date": "2026-07-05",
+  "status": "blocked-by-existing-huawei-app-order",
+  "canSubmitNow": false,
+  "isFilingEvidence": false,
+  "company": {
+    "name": "深圳市闪现生活科技有限公司",
+    "icpSubjectNumber": "粤ICP备2025379333号",
+    "responsiblePersonName": "佘鹏辉",
+    "secretValuesRecorded": false,
+    "redactionRule": "Do not record full phone number, ID number, SMS code, token, server password, AK/SK, AppSecret, recovery key, or real baby photos in repo artifacts."
+  },
+  "currentHuaweiBlocker": {
+    "observedAt": "2026-07-05",
+    "console": "Huawei Cloud ICP filing console",
+    "message": "您有正在进行中的订单，请完成或放弃后再操作",
+    "disabledAction": "新增互联网信息",
+    "existingOrderId": "1220260705000319",
+    "existingOrderType": "新增互联网信息 (1APP)",
+    "existingOrderStatus": "等待初审",
+    "existingOrderApp": "一根呆毛",
+    "recommendedAction": "Do not abandon the existing Yi Gen Dai Mao order. Wait for it to complete or move past the blocking state, then create XiaoNaiPing as a new APP internet information filing.",
+    "proofScreenshot": {
+      "path": "Docs/08_Release/AppStoreEvidence/FilingAssets/huawei-existing-app-order-blocker-20260705.png",
+      "sha256": "61c08ac0005073a7c567b1235f3f8238ea4b9f04fe00a539e090134a7ecacb43",
+      "sizeBytes": 97035
+    }
+  },
+  "officialSources": [
+    "https://support.huaweicloud.com/usermanual-icp/zh-cn_topic_0000002127712329.html",
+    "https://support.huaweicloud.com/usermanual-icp/zh-cn_topic_0000002127792641.html",
+    "https://support.huaweicloud.com/usermanual-icp/zh-cn_topic_0000002085120221.html",
+    "https://support.huaweicloud.com/prepare-icp/icp_02_0049.html",
+    "https://support.huaweicloud.com/prepare-icp/zh-cn_topic_0000002049126804.html"
+  ],
+  "appServiceInfo": {
+    "appName": "小奶瓶",
+    "displayName": "小奶瓶",
+    "platform": "iOS",
+    "serviceDescription": "父母和照护者记录宝宝喂养、睡眠、排便、成长、疫苗提醒和照片时间线。",
+    "preferredCategory": "生活服务 -> 母婴",
+    "fallbackCategory": "生活服务 -> 工具",
+    "forbiddenCategories": [
+      "医疗服务",
+      "宠物",
+      "新闻",
+      "出版",
+      "宗教"
+    ],
+    "medicalBoundaryRemark": "本 App 不提供医疗诊断、治疗、处方、在线问诊或专业疫苗建议，仅提供家庭成长记录和本地/账号提醒工具。",
+    "providesSdkService": false,
+    "usesThirdPartySdkService": true
+  },
+  "urls": {
+    "homepage": {
+      "url": "https://www.mewpow.com/xiaonaiping/",
+      "liveCheckedAt": "2026-07-05",
+      "result": "HTTP 200 after redirect"
+    },
+    "privacy": {
+      "url": "https://api.mewpow.com/xiaonaiping/privacy",
+      "liveCheckedAt": "2026-07-05",
+      "result": "HTTP 200"
+    },
+    "terms": {
+      "url": "https://api.mewpow.com/xiaonaiping/terms",
+      "liveCheckedAt": "2026-07-05",
+      "result": "HTTP 200"
+    },
+    "support": {
+      "url": "https://api.mewpow.com/xiaonaiping/support",
+      "liveCheckedAt": "2026-07-05",
+      "result": "HTTP 200"
+    },
+    "apiPrefix": {
+      "url": "https://api.mewpow.com/xiaonaiping",
+      "note": "current production transition path"
+    },
+    "healthz": {
+      "url": "https://api.mewpow.com/xiaonaiping/healthz",
+      "liveCheckedAt": "2026-07-05",
+      "result": "status=ok"
+    }
+  },
+  "domainsAndIp": {
+    "domainsToFill": [
+      "api.mewpow.com",
+      "www.mewpow.com",
+      "mewpow.com"
+    ],
+    "domainCertificateNeeded": true,
+    "doNotUseObservedDnsIp": "198.18.0.83",
+    "whyNotUseObservedDnsIp": "198.18.0.83 is reserved benchmark address space and is not a public filing IP.",
+    "ipSourceOfTruth": "Huawei Cloud filing console resource / EIP selection for the current subject and service.",
+    "candidateSeenInYiGenDaiMaoFlow": "113.45.236.95",
+    "candidateMustBeReverifiedForXiaoNaiPing": true
+  },
+  "iosFeatureInfo": {
+    "bundleId": "com.mewpow.xiaonaiping",
+    "version": "1.0",
+    "build": "2",
+    "teamId": "L2TYJNDTJK",
+    "signedArchive": "/tmp/XiaoNaiPing-CN-L2TYJNDTJK-20260704-appstore-build2.xcarchive",
+    "certificateSubject": "Apple Distribution: Shenzhen Flash Life Technology Co., Ltd (L2TYJNDTJK)",
+    "certificateSha1FingerprintColon": "33:2D:58:D0:9E:E0:F9:0D:7D:D6:25:CD:B0:7A:05:C9:7C:3D:8D:69",
+    "huaweiIosMd5FieldValue": "332D58D09EE0F90D7DD625CDB07A05C97C3D8D69",
+    "huaweiIosMd5FieldNote": "Huawei Cloud iOS feature info says the MD5 signature field should use the iOS certificate SHA-1 hex value.",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAorok/q67euUtkXmAJZ5b\n4jNY1/boSJduuNbpqlFZGP40KWCZTy7+/KcIyitozcCUNK5Vh3SeMShLxUZd3oNM\n2RKWvKYZ6P/qbmuHaYVd6VOKrUP8yFwYgNWLEIQERqGyY1LqpNvaio3+fXsacQZY\nzRp80ydXjvZWp6+fo3bPv6LRz7zDVMn314orSYk5AzKp/RPlvtDyttIKRpb6BN5g\n7krC43HgHYkmYY4YuSXF6rBuxHjeJuCzao/sUatofRN/mdeViqfoI1UoPE+g1e6v\nG9ELUghgZC5LWT+W3ZrDA7zH1W1SKBiNfCKJ0Pcvl4S2/J6KLe5pFqrDilO21T83\nAwIDAQAB\n-----END PUBLIC KEY-----\n"
+  },
+  "assets": {
+    "preferredIcon": {
+      "path": "Docs/08_Release/AppStoreEvidence/FilingAssets/xiaonaiping-app-icon-256.png",
+      "sizeBytes": 81781,
+      "sha256": "dd6ea97d9f31a40dac782d59dd0e7d2102a360a29bfa25c3111f42c27dee300d",
+      "reason": "Huawei Cloud recommends app icon under 100KB."
+    },
+    "syncIcon": {
+      "path": "Docs/08_Release/AppStoreEvidence/FilingAssets/xiaonaiping-app-icon-512.png",
+      "sizeBytes": 332708,
+      "sha256": "81e52a4a11c8febf2859f8be2ef20287819374cf65c5ae06936838cdac9fa125"
+    },
+    "runningFlowScreenshots": {
+      "directory": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/",
+      "note": "Use current final screenshots for app running flow evidence; redact unrelated desktop or account data before upload."
+    }
+  },
+  "sdkServices": [
+    {
+      "name": "WeChat OpenSDK / 微信开放平台",
+      "vendor": "深圳市腾讯计算机系统有限公司",
+      "purpose": "微信登录 / 授权",
+      "clientSideSdk": true,
+      "note": "iOS links OpenSDK; backend exchanges code. Use current WeChat Open Platform screenshots for AppID, Bundle ID, URL Scheme, Universal Link, and AppSecret status, but do not store AppSecret."
+    },
+    {
+      "name": "阿里云 Dysmsapi / 短信服务 API",
+      "vendor": "阿里云计算有限公司",
+      "purpose": "手机号验证码",
+      "clientSideSdk": false,
+      "note": "Server-side webhook adapter; the app does not directly embed the SMS SDK."
+    },
+    {
+      "name": "华为云 OBS",
+      "vendor": "华为云计算技术有限公司",
+      "purpose": "服务端对象存储，存储用户主动同步的照片原图",
+      "clientSideSdk": false,
+      "note": "Client uploads through first-party API; do not expose AK/SK or bucket credentials."
+    },
+    {
+      "name": "自有后端 API / 第一方埋点",
+      "vendor": "深圳市闪现生活科技有限公司",
+      "purpose": "账号、同步恢复、合规聚合行为统计",
+      "clientSideSdk": false,
+      "note": "No third-party analytics SDK, no ad SDK, no third-party crash SDK."
+    }
+  ],
+  "missingEvidenceBeforeFinalSubmission": [
+    "XiaoNaiPing app filing order cannot be created until the existing Yi Gen Dai Mao order is no longer blocking new internet information.",
+    "Business license and responsible person ID materials must be uploaded in Huawei Cloud; do not store full ID images in the repo.",
+    "Domain certificate / domain real-name proof / DNS screenshots need current upload evidence.",
+    "Huawei Cloud EIP / access provider / filing service resource must be selected in the console for XiaoNaiPing.",
+    "WeChat Open Platform mobile app evidence is still needed for XiaoNaiPing.",
+    "OBS policy / private bucket / lifecycle / deletion evidence is still needed.",
+    "Public security filing must be completed within 30 days after ICP / APP filing success."
+  ],
+  "nextActions": [
+    "Wait for order 1220260705000319 to complete or move past the blocking state; do not abandon it without explicit user confirmation.",
+    "Return to Huawei Cloud filing console and click 新增互联网信息.",
+    "Create a new APP internet information filing for 小奶瓶.",
+    "Fill app service info using Docs/08_Release/APP_FILING_HUAWEI_EXECUTION_SHEET_20260705.md.",
+    "Upload the 256x256 icon, running screenshots, domain certificate, business license, and responsible person materials.",
+    "Have the responsible person complete QR/live authenticity verification.",
+    "Pause before the final submit-initial-review button for explicit confirmation.",
+    "After Huawei initial review, finish MIIT SMS verification within 24 hours.",
+    "After 管局 approval, archive filing evidence, add the real filing number to public pages and app UI, then start public security filing."
+  ]
+}

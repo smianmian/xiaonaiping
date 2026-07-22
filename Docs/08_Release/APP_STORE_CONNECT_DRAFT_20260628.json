@@ -1,0 +1,558 @@
+{
+  "artifactType": "app-store-connect-draft",
+  "status": "draft-only-not-submission",
+  "date": "2026-06-28",
+  "sourceFiles": {
+    "fillSheet": "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+    "copyPastePacket": "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md",
+    "metadata": "Docs/08_Release/APP_STORE_METADATA.md",
+    "privacyLabel": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "privacyAnswers": "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260628.md",
+    "ageRatingAnswers": "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+    "reviewInformation": "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260628.md",
+    "versionReleaseSettings": "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260628.md",
+    "finalEntryAudit": "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260628.md"
+  },
+  "appInformation": {
+    "appName": "小奶瓶",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "sku": "xiaonaiping-ios-1",
+    "subtitle": "温柔记录宝宝每一天",
+    "primaryCategory": "生活",
+    "secondaryCategory": "留空",
+    "price": "免费",
+    "firstReleaseRegion": "China mainland",
+    "secondReleaseRegion": "Hong Kong",
+    "copyright": "© 2026 深圳市闪现生活科技有限公司",
+    "privacyPolicyUrl": "https://api.mewpow.com/xiaonaiping/privacy",
+    "supportUrl": "https://api.mewpow.com/xiaonaiping/support",
+    "termsUrl": "https://api.mewpow.com/xiaonaiping/terms"
+  },
+  "versionInformation": {
+    "keywords": "宝宝记录,育儿,喂奶,睡眠,尿布,成长记录,疫苗提醒,相册",
+    "promotionalText": "用低负担的方式记录喂养、睡眠、排便、成长、疫苗提醒和珍贵照片。",
+    "description": {
+      "pasteText": [
+        "小奶瓶是一款为新手父母和照护者设计的宝宝成长记录 App。你可以快速记录喂养、睡眠、排便、身高体重、疫苗提醒和成长瞬间，也可以把宝宝照片整理在私密时间线里。",
+        "",
+        "数据默认本地优先保存。开启账号与同步后，可通过恢复密钥、手机号或微信登录私有账号，并将记录和主动加入 App 的照片原图同步到账号空间，便于换机恢复。",
+        "",
+        "主要功能：",
+        "",
+        "- 宝宝档案：记录昵称、生日、性别和成长信息。",
+        "- 日常记录：快速记录喂养、睡眠、排便和备注。",
+        "- 喝奶提醒：手动设置下一次喝奶提醒或固定间隔；新增喂养后可按 5 分钟一档顺延下一次提醒。",
+        "- 成长回看：整理身高、体重和月度变化。",
+        "- 疫苗提醒：提供中国大陆和香港模板切换，用于记录和提醒。",
+        "- 照片时间线：整理用户主动加入 App 的宝宝照片。",
+        "- 账号与同步：支持恢复密钥、手机号、微信登录、云端同步恢复和账号删除。",
+        "",
+        "喝奶提醒仅按你设置的固定间隔和手动顺延重新安排；小奶瓶不根据奶量、月龄、传感器或健康数据自动推算喂养时间，也不构成喂养建议。",
+        "",
+        "小奶瓶不提供医疗诊断、治疗建议或专业疫苗建议。疫苗模板仅用于记录和提醒，实际接种安排请以医生和当地官方信息为准。"
+      ]
+    },
+    "whatsNew": "第一版：宝宝档案、日常记录、喝奶提醒、成长记录、疫苗提醒、照片时间线、手机号/微信/恢复密钥账号同步恢复和云端账号删除。"
+  },
+  "ageRating": {
+    "answerSheet": "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+    "expectedRating": "4+",
+    "kidsCategory": "No",
+    "ageCategoriesAndOverride": "Not Applicable",
+    "regulatedMedicalDevice": "No",
+    "boundaries": [
+      "not a medical device",
+      "no diagnosis",
+      "no treatment",
+      "no disease prediction",
+      "no HealthKit",
+      "no sensors",
+      "no hospital records",
+      "no automatic feeding inference"
+    ]
+  },
+  "appPrivacy": {
+    "privacyLabel": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "privacyAnswers": "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260628.md",
+    "usesTracking": false,
+    "thirdPartyAdvertising": false,
+    "thirdPartyAnalytics": false,
+    "dataCategories": [
+      "Identifiers",
+      "Contact Info",
+      "User Content",
+      "Photos or Videos",
+      "Health and Fitness",
+      "Usage Data",
+      "Diagnostics"
+    ]
+  },
+  "reviewNotes": {
+    "reviewInformation": "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260628.md",
+    "signInRequired": true,
+    "preferredTestAccount": "recovery-key",
+    "debugCodeAllowed": false,
+    "realSmsWechatAccountsPending": true,
+    "boundaryChecklist": {
+      "liveActivityAndWidgetsStatusOnly": true,
+      "manualDeferralOptions": [
+        "不顺延",
+        "+5 分钟",
+        "+10 分钟",
+        "+15 分钟",
+        "+20 分钟",
+        "+25 分钟",
+        "+30 分钟"
+      ],
+      "deferralCalculation": "本顿结束时间 + 固定间隔 + 顺延分钟；本顿无喂养时长时按本顿发生时间计算",
+      "deferralPersistenceBoundary": "只写入下一次 remindAt；不新增持久化字段",
+      "noAutomaticFeedingInference": true,
+      "noFeedingAdvice": true,
+      "noHealthDataSource": true,
+      "reviewLoginBoundary": "优先使用恢复密钥测试账号；手机号和微信测试号等待真实服务证据；不依赖 debug code"
+    },
+    "text": {
+      "pasteText": [
+        "小奶瓶用于父母或照护者记录宝宝成长。第一版免费，无 IAP，无广告，无第三方分析 SDK，不提供医疗诊断、治疗建议或专业疫苗建议，不是医疗器械，也不作为医疗器械使用。",
+        "",
+        "数据默认本地优先保存。用户可以在“资料 -> 账号与同步”中使用恢复密钥、手机号或微信登录并主动同步。同步会上传宝宝记录、照片元数据，以及用户主动加入 App 的照片原图。手机号和微信登录仅用于账号识别和恢复。",
+        "",
+        "账号删除路径为：“资料 -> 账号与同步 -> 删除云端账号与同步”。该操作会删除账号、云端 JSON 同步和云端照片原图。本机资料默认保留，用户可以另行清空本地记录或删除宝宝档案。",
+        "",
+        "疫苗模板仅用于记录和提醒，App 内文案不构成医疗建议。实际接种安排请以医生和当地官方信息为准。",
+        "",
+        "灵动岛和锁屏 Live Activity 只显示用户设置的下一次喝奶提醒、固定间隔和宝宝昵称/头像缩略图；桌面/锁屏小组件只读展示今日摘要。用户可以手动顺延下一次提醒：保存新喂养时，如果已设置固定喝奶间隔，可以用 5 分钟一档的滚轮选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；App 不根据奶量、月龄、传感器或健康数据自动推算喂养时间，也不构成喂养建议。这些状态展示只反映用户主动记录的数据，不生成健康建议、压力提醒、喂养建议或医疗判断。所有摘要都来自用户在 App 内输入并保存在本机记录的数据，不接入 HealthKit、传感器、医院系统或第三方健康数据源，不提供压力评估、心理健康判断或医疗诊断。",
+        "",
+        "审核测试登录请优先使用 App Review Information 中提供的恢复密钥测试账号。手机号和微信测试号会在真实短信服务与微信开放平台配置完成后补充；正式提交包不提供、不依赖 debug code。"
+      ]
+    }
+  },
+  "pageEvidenceMap": {
+    "directory": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/",
+    "status": "post-fill-page-evidence-only",
+    "doesNotReplace": [
+      "01-company-account.png",
+      "02-mainland-availability.png",
+      "04-privacy-label.png",
+      "05-signed-archive.png",
+      "06-testflight.png",
+      "12-real-device-regression.md",
+      "17-age-rating-result"
+    ],
+    "items": [
+      {
+        "file": "AppStoreConnect/ASC-01-app-information.png",
+        "captures": [
+          "App 名称",
+          "副标题",
+          "Bundle ID",
+          "SKU",
+          "主类别生活",
+          "第二类别留空",
+          "版权",
+          "隐私政策 URL",
+          "技术支持 URL",
+          "用户协议 URL"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "电话",
+          "付款信息",
+          "D-U-N-S 编码完整值"
+        ],
+        "crossCheck": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md",
+          "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-02-version-information.png",
+        "captures": [
+          "Version 1.0",
+          "选中 build",
+          "描述",
+          "关键词",
+          "新版本说明",
+          "截图上传顺序"
+        ],
+        "redact": [
+          "测试员邮箱",
+          "Apple ID 邮箱",
+          "恢复密钥",
+          "验证码"
+        ],
+        "crossCheck": [
+          "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260628.md",
+          "Docs/08_Release/AppStoreEvidence/10-final-screenshots/",
+          "06-testflight.png"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-03-pricing-availability-release.png",
+        "captures": [
+          "Free",
+          "Specific Countries or Regions -> China mainland",
+          "手动发布",
+          "Phased release off"
+        ],
+        "redact": [
+          "付款信息",
+          "税务信息",
+          "无关地区账号资料"
+        ],
+        "crossCheck": [
+          "02-mainland-availability.png",
+          "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260628.md"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-04-app-privacy.png",
+        "captures": [
+          "Tracking 为 No",
+          "Data Linked to You",
+          "Data Not Linked to You",
+          "Health and Fitness",
+          "Usage Data",
+          "Diagnostics"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "账号私密信息"
+        ],
+        "crossCheck": [
+          "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260628.md",
+          "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+          "04-privacy-label.png"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-05-age-rating.png",
+        "captures": [
+          "4+ 或 App Store Connect 自动计算结果",
+          "Kids Category 未选择",
+          "Regulated Medical Device 为 No"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "电话",
+          "付款信息"
+        ],
+        "crossCheck": [
+          "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+          "17-age-rating-result"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-06-review-information.png",
+        "captures": [
+          "Sign-in required",
+          "恢复密钥测试账号说明",
+          "审核备注",
+          "联系人字段已填"
+        ],
+        "redact": [
+          "恢复密钥",
+          "验证码",
+          "完整手机号",
+          "Apple ID 邮箱",
+          "联系人完整电话"
+        ],
+        "crossCheck": [
+          "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260628.md",
+          "Docs/08_Release/AppStoreEvidence/11-test-account-redacted.json"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-07-build-testflight-link.png",
+        "captures": [
+          "选中 build",
+          "TestFlight 构建状态",
+          "版本和 build 与真机回归一致"
+        ],
+        "redact": [
+          "测试员邮箱",
+          "Apple ID 邮箱",
+          "内部备注"
+        ],
+        "crossCheck": [
+          "06-testflight.png",
+          "12-real-device-regression.md"
+        ]
+      },
+      {
+        "file": "AppStoreConnect/ASC-08-submit-review-precheck.png",
+        "captures": [
+          "Submit for Review 前页面无未处理警告",
+          "所有字段与本审计表一致"
+        ],
+        "redact": [
+          "恢复密钥",
+          "验证码",
+          "完整手机号",
+          "AppSecret",
+          "证书私钥",
+          "Apple ID 邮箱"
+        ],
+        "crossCheck": [
+          "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+          "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
+          "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+        ]
+      }
+    ]
+  },
+  "fieldAuditMatrix": {
+    "status": "source-locked-before-submit",
+    "rules": [
+      "人工填写 App Store Connect 时只能从本矩阵列出的源文件复制。",
+      "不得只改 App Store Connect 页面而不回写源文件。",
+      "页面截图只证明字段已回填，不替代外部平台、TestFlight、签名归档、备案、隐私标签或 iOS 26.5 真机回归证据。",
+      "任一字段改字后必须重跑 check_app_store_connect_materials.py、check_app_store_submission_packet.py 和 check_app_store_evidence.py --allow-incomplete。"
+    ],
+    "rows": [
+      {
+        "id": "appName",
+        "field": "App 名称",
+        "value": "小奶瓶",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png"
+        ],
+        "blockerProofs": [
+          "01-company-account.png",
+          "D-U-N-S delivered",
+          "Apple Developer Organization enrollment"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "D-U-N-S 编码完整值"
+        ]
+      },
+      {
+        "id": "subtitle",
+        "field": "副标题",
+        "value": "温柔记录宝宝每一天",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png"
+        ],
+        "blockerProofs": [
+          "Backend/proof/app-store-connect-materials.json"
+        ],
+        "redact": [
+          "Apple ID 邮箱"
+        ]
+      },
+      {
+        "id": "description",
+        "field": "描述",
+        "valueSource": "versionInformation.description",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-02-version-information.png"
+        ],
+        "blockerProofs": [
+          "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
+          "Backend/proof/app-store-evidence.json"
+        ],
+        "mustKeepBoundary": [
+          "本地优先",
+          "不提供医疗诊断",
+          "疫苗模板仅用于记录和提醒",
+          "手动顺延下一次提醒",
+          "不根据奶量、月龄、传感器或健康数据自动推算喂养时间"
+        ],
+        "redact": [
+          "恢复密钥",
+          "验证码",
+          "完整手机号"
+        ]
+      },
+      {
+        "id": "keywords",
+        "field": "关键词",
+        "value": "宝宝记录,育儿,喂奶,睡眠,尿布,成长记录,疫苗提醒,相册",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-02-version-information.png"
+        ],
+        "blockerProofs": [
+          "Backend/proof/app-store-connect-materials.json"
+        ],
+        "mustKeepBoundary": [
+          "100 UTF-8 bytes",
+          "73 bytes"
+        ],
+        "redact": [
+          "Apple ID 邮箱"
+        ]
+      },
+      {
+        "id": "category",
+        "field": "分类",
+        "value": "主类别：生活；第二类别：留空",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png"
+        ],
+        "blockerProofs": [
+          "Backend/proof/app-store-connect-materials.json"
+        ],
+        "mustKeepBoundary": [
+          "不选择健康健美",
+          "不选择 Kids 类目"
+        ],
+        "redact": [
+          "Apple ID 邮箱"
+        ]
+      },
+      {
+        "id": "ageRating",
+        "field": "年龄分级",
+        "value": "预期 4+；以 App Store Connect 自动计算结果为准",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-05-age-rating.png",
+          "17-age-rating-result.png 或 .pdf"
+        ],
+        "blockerProofs": [
+          "17-age-rating-result"
+        ],
+        "mustKeepBoundary": [
+          "Kids Category 未选择",
+          "Regulated Medical Device 为 No",
+          "not a medical device"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "电话"
+        ]
+      },
+      {
+        "id": "privacyPolicyUrl",
+        "field": "隐私政策 URL",
+        "value": "https://api.mewpow.com/xiaonaiping/privacy",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+          "Backend/static/privacy.html"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png",
+          "AppStoreConnect/ASC-04-app-privacy.png"
+        ],
+        "blockerProofs": [
+          "04-privacy-label.png",
+          "Backend/proof/public-pages.json"
+        ],
+        "redact": [
+          "Apple ID 邮箱",
+          "账号私密信息"
+        ]
+      },
+      {
+        "id": "supportUrl",
+        "field": "技术支持 URL",
+        "value": "https://api.mewpow.com/xiaonaiping/support",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+          "Backend/static/support.html"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png"
+        ],
+        "blockerProofs": [
+          "Backend/proof/public-pages.json"
+        ],
+        "redact": [
+          "Apple ID 邮箱"
+        ]
+      },
+      {
+        "id": "termsUrl",
+        "field": "用户协议 URL",
+        "value": "https://api.mewpow.com/xiaonaiping/terms",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Backend/static/terms.html"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-01-app-information.png"
+        ],
+        "blockerProofs": [
+          "Backend/proof/public-pages.json"
+        ],
+        "redact": [
+          "Apple ID 邮箱"
+        ]
+      },
+      {
+        "id": "reviewNotes",
+        "field": "审核备注",
+        "valueSource": "reviewNotes.text",
+        "sourceFiles": [
+          "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md",
+          "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260628.md",
+          "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260628.md"
+        ],
+        "ascEvidence": [
+          "AppStoreConnect/ASC-06-review-information.png"
+        ],
+        "blockerProofs": [
+          "Docs/08_Release/AppStoreEvidence/11-test-account-redacted.json",
+          "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+          "Backend/proof/app-store-evidence.json"
+        ],
+        "mustKeepBoundary": [
+          "不提供医疗诊断",
+          "不构成喂养建议",
+          "手机号和微信测试号会在真实短信服务与微信开放平台配置完成后补充",
+          "正式提交包不提供、不依赖 debug code"
+        ],
+        "redact": [
+          "恢复密钥",
+          "验证码",
+          "完整手机号",
+          "AppSecret",
+          "Apple ID 邮箱"
+        ]
+      }
+    ]
+  },
+  "submissionBoundary": {
+    "canSubmitFromThisDraft": false,
+    "requiresBeforeSubmit": [
+      "production-readiness.json ready=true",
+      "launch-objective-audit.json ready=true",
+      "D-U-N-S delivered and Apple Developer Organization enrollment resumed",
+      "Apple Developer Team ID confirmed",
+      "App Store Distribution Archive created",
+      "TestFlight build processed",
+      "微信开放平台 AppID/AppSecret/Universal Link configured",
+      "短信服务商截图 and real send proof archived",
+      "OBS private bucket policy and deletion proof archived",
+      "APP 备案 / ICP applicability evidence archived",
+      "iOS 26.5 TestFlight or signed real-device regression completed"
+    ]
+  }
+}

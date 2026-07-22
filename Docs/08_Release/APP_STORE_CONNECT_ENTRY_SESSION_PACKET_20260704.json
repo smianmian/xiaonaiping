@@ -1,0 +1,547 @@
+{
+  "artifactType": "app-store-connect-entry-session-packet",
+  "status": "entry-session-plan-not-evidence",
+  "date": "2026-07-04",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "sku": "xiaonaiping-ios-1",
+  "canSubmitFromThisPacket": false,
+  "sourceFiles": {
+    "draftJson": "Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json",
+    "fillSheet": "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+    "copyPastePacket": "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md",
+    "finalEntryAudit": "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md",
+    "executionSheet": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260704.md",
+    "privacyAnswers": "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260704.md",
+    "privacyLabel": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "ageRatingAnswers": "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260704.md",
+    "reviewInformation": "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md",
+    "versionReleaseSettings": "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md",
+    "screenshotPlan": "Docs/08_Release/SCREENSHOT_PLAN.md",
+    "evidenceChecklist": "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260704.md",
+    "submissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
+    "submitReviewPreflight": "Docs/08_Release/APP_STORE_CONNECT_SUBMIT_REVIEW_PREFLIGHT_20260704.json",
+    "privacyAgeReviewResultTemplate": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-PRIVACY-AGE-REVIEW-RESULT.template.json"
+  },
+  "targetPageEvidenceFiles": {
+    "appInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-01-app-information.png",
+    "versionInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
+    "pricingAvailabilityRelease": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-03-pricing-availability-release.png",
+    "appPrivacy": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-04-app-privacy.png",
+    "ageRating": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-05-age-rating.png",
+    "reviewInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-06-review-information.png",
+    "buildTestflightLink": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+    "submitReviewPrecheck": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png"
+  },
+  "pageEvidenceFileChecks": [
+    {
+      "artifactId": "appInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-01-app-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "versionInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "pricingAvailabilityRelease",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-03-pricing-availability-release.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "appPrivacy",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-04-app-privacy.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "ageRating",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-05-age-rating.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "reviewInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-06-review-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "buildTestflightLink",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "submitReviewPrecheck",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsEntrySession": false,
+      "sourceIsAllowedAppStoreConnectEvidenceRoot": false,
+      "matchesFieldSourceLocks": false,
+      "realPageEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "fieldSourceLocks": [
+    {
+      "id": "appName",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱",
+        "D-U-N-S 编码完整值"
+      ]
+    },
+    {
+      "id": "subtitle",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "description",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-02-version-information.png"
+      ],
+      "mustKeep": [
+        "不提供医疗诊断",
+        "手动顺延下一次提醒",
+        "不根据奶量、月龄、传感器或健康数据自动推算喂养时间"
+      ],
+      "mustNotExpose": [
+        "恢复密钥",
+        "验证码",
+        "完整手机号"
+      ]
+    },
+    {
+      "id": "keywords",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-02-version-information.png"
+      ],
+      "mustKeep": [
+        "100 UTF-8 bytes",
+        "73 bytes"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "promotionalText",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-02-version-information.png"
+      ],
+      "mustKeep": [
+        "低负担",
+        "记录喂养、睡眠、排便、成长、疫苗提醒和珍贵照片",
+        "不写医疗诊断",
+        "不写喂养建议"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "whatsNew",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md",
+        "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-02-version-information.png"
+      ],
+      "mustKeep": [
+        "喝奶提醒与手动顺延",
+        "恢复密钥账号同步恢复",
+        "云端账号删除"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "category",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png"
+      ],
+      "mustKeep": [
+        "主类别：生活",
+        "第二类别：留空",
+        "不选择健康健美",
+        "不选择 Kids 类目"
+      ]
+    },
+    {
+      "id": "privacyPolicyUrl",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+        "Backend/static/privacy.html"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png",
+        "AppStoreConnect/ASC-04-app-privacy.png"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱",
+        "账号私密信息"
+      ]
+    },
+    {
+      "id": "supportUrl",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Backend/static/support.html"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "termsUrl",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Backend/static/terms.html"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-01-app-information.png"
+      ],
+      "mustNotExpose": [
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "appPrivacy",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_PRIVACY_ANSWERS_20260704.md",
+        "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-04-app-privacy.png",
+        "04-privacy-label.png"
+      ],
+      "mustKeep": [
+        "Tracking 为 No",
+        "Data Linked to You",
+        "Data Not Linked to You",
+        "Health and Fitness",
+        "Usage Data",
+        "Diagnostics"
+      ]
+    },
+    {
+      "id": "ageRating",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-05-age-rating.png",
+        "17-age-rating-result.png 或 .pdf"
+      ],
+      "mustKeep": [
+        "Kids Category 未选择",
+        "Regulated Medical Device 为 No",
+        "not a medical device"
+      ]
+    },
+    {
+      "id": "reviewNotes",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+        "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md",
+        "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-06-review-information.png"
+      ],
+      "mustKeep": [
+        "不构成喂养建议",
+        "手机号和微信测试号会在真实短信服务与微信开放平台配置完成后补充",
+        "正式提交包不提供、不依赖 debug code"
+      ],
+      "mustNotExpose": [
+        "恢复密钥",
+        "验证码",
+        "完整手机号",
+        "AppSecret",
+        "Apple ID 邮箱"
+      ]
+    },
+    {
+      "id": "signInInformation",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md",
+        "Docs/08_Release/AppStoreEvidence/11-test-account-redacted.json"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-06-review-information.png"
+      ],
+      "mustNotExpose": [
+        "恢复密钥",
+        "验证码",
+        "完整手机号"
+      ]
+    },
+    {
+      "id": "versionReleaseSettings",
+      "copyFrom": [
+        "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-03-pricing-availability-release.png",
+        "AppStoreConnect/ASC-07-build-testflight-link.png"
+      ],
+      "mustKeep": [
+        "手动发布",
+        "Phased release off",
+        "Specific Countries or Regions -> China mainland"
+      ]
+    },
+    {
+      "id": "screenshots",
+      "copyFrom": [
+        "Docs/08_Release/SCREENSHOT_PLAN.md",
+        "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260704.md",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json"
+      ],
+      "captureTo": [
+        "AppStoreConnect/ASC-02-version-information.png"
+      ],
+      "mustKeep": [
+        "iPhone 6.9\" display",
+        "iOS 26.5",
+        "TestFlight 或 Xcode 签名真机包"
+      ]
+    }
+  ],
+  "entrySequence": [
+    {
+      "id": "openAppleDeveloperAccountContext",
+      "action": "先确认 D-U-N-S 后 Apple Developer Organization enrollment、Organization 名称和 Team ID。",
+      "stopIf": "缺少 01-company-account.png 或 AppleDeveloper/16-account-roles-access.png"
+    },
+    {
+      "id": "createOrOpenAppRecord",
+      "action": "在正确 Organization 下创建或打开 iOS App 记录。",
+      "stopIf": "主体、Bundle ID、SKU 或 Team ID 与源文件不一致"
+    },
+    {
+      "id": "fillAppInformation",
+      "action": "填写 App 名称、副标题、分类、版权、隐私政策 URL、技术支持 URL 和用户协议 URL。",
+      "evidenceAfter": "AppStoreConnect/ASC-01-app-information.png"
+    },
+    {
+      "id": "fillPricingAvailability",
+      "action": "填写免费、Specific Countries or Regions -> China mainland、手动发布和 Phased release off。",
+      "evidenceAfter": "AppStoreConnect/ASC-03-pricing-availability-release.png"
+    },
+    {
+      "id": "fillVersionInformation",
+      "action": "粘贴描述、关键词、新版本说明，并按最终截图顺序上传。",
+      "stopIf": "没有 iOS 26.5 TestFlight 或签名真机包最终截图",
+      "evidenceAfter": "AppStoreConnect/ASC-02-version-information.png"
+    },
+    {
+      "id": "fillAppPrivacy",
+      "action": "按隐私答案表和隐私标签 JSON 填写 App Privacy。",
+      "evidenceAfter": "AppStoreConnect/ASC-04-app-privacy.png"
+    },
+    {
+      "id": "fillAgeRating",
+      "action": "按年龄分级答案表填写，不选择 Kids Category，Regulated Medical Device 选择 No。",
+      "evidenceAfter": "AppStoreConnect/ASC-05-age-rating.png 和 17-age-rating-result"
+    },
+    {
+      "id": "fillReviewInformation",
+      "action": "填写审核备注、联系人和 Sign-In Information 私密字段。",
+      "stopIf": "真实恢复密钥、验证码、完整手机号或测试员邮箱会进入仓库材料",
+      "evidenceAfter": "AppStoreConnect/ASC-06-review-information.png"
+    },
+    {
+      "id": "attachBuildAndScreenshots",
+      "action": "选择 TestFlight 构建并核对截图、版本和 build。",
+      "stopIf": "缺少 05-signed-archive.png、06-testflight.png 或 12-real-device-regression.md",
+      "evidenceAfter": "AppStoreConnect/ASC-07-build-testflight-link.png"
+    },
+    {
+      "id": "capturePostFillPages",
+      "action": "归档 ASC-01 到 ASC-08 页面回填截图或 PDF，并完成脱敏。",
+      "evidenceAfter": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/"
+    },
+    {
+      "id": "runPostEntryGates",
+      "action": "重跑本包列出的 postEntryGates。",
+      "stopIf": "任一 required gate 仍为 false"
+    }
+  ],
+  "stopConditions": [
+    "companyAccountEvidenceMissing",
+    "dunsOrTeamIdMissing",
+    "appRecordCreatedUnderWrongEntity",
+    "bundleIdOrSkuMismatch",
+    "keywordsOverLimit",
+    "privacyUrlMismatch",
+    "privacyLabelMissing",
+    "ageRatingResultMissing",
+    "reviewAccountSecretLeak",
+    "signedArchiveMissing",
+    "buildOrTestFlightMissing",
+    "finalScreenshotsMissing",
+    "smsProviderMissing",
+    "wechatOpenPlatformMissing",
+    "mainlandFilingMissing",
+    "obsPolicyMissing",
+    "ios265RealDeviceRegressionMissing",
+    "productionReadinessStillRed",
+    "launchObjectiveAuditStillRed",
+    "appStoreEvidenceIncomplete",
+    "xiaonaipingSubmitProofsNotReady"
+  ],
+  "redactionChecklist": [
+    "Apple ID 邮箱",
+    "联系电话",
+    "付款信息",
+    "税务信息",
+    "恢复密钥",
+    "验证码",
+    "完整手机号",
+    "D-U-N-S 编码完整值",
+    "AppSecret",
+    "证书私钥",
+    "token",
+    "测试员邮箱"
+  ],
+  "postEntryGates": [
+    {
+      "command": "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_connect_evidence_materials.py --output Backend/proof/app-store-connect-evidence-materials.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+      "requires": "passed=true"
+    },
+    {
+      "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+      "requires": "ready=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+      "requires": "passed=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
+      "requires": "ready=true before Submit for Review"
+    },
+    {
+      "command": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
+      "requires": "ready=true before Submit for Review"
+    }
+  ],
+  "completionRule": "entry-session-plan-not-evidence; this packet only tells the operator how to fill App Store Connect and collect same-session page screenshots. It does not prove App Store Connect has been filled, does not replace external platform evidence, and cannot authorize Submit for Review until XiaoNaiPing's own production-readiness.json ready=true, launch-objective-audit.json ready=true, app-store-evidence.json ready=true, testflight-regression-plan.json passed=true, provider-evidence-materials.json passed=true, mainland-filing-materials.json passed=true, signed-archive-testflight-materials.json passed=true, and iOS 26.5 real-device evidence are ready.",
+  "noSubmitBoundary": [
+    "不是 App Store Connect 人工证据",
+    "不能作为提交许可",
+    "不能替代 01-company-account.png、02-mainland-availability.png、04-privacy-label.png、05-signed-archive.png、06-testflight.png、07-sms-provider.png、08-wechat-open-platform.png、09-obs-policy.png、10-final-screenshots/、12-real-device-regression.md 或 17-age-rating-result",
+    "Submit for Review 只能在所有 required proof 为 true 后人工执行"
+  ]
+}

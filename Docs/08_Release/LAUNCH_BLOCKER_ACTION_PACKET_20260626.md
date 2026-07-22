@@ -4,12 +4,14 @@
 
 这份行动包只处理当前上线目标总审计的红项，不代表 App 已可提交。红项来源以 `Backend/proof/launch-objective-audit.json` 和 `Backend/proof/app-store-evidence.json` 为准。
 
-当前 `launch-objective-audit.json` 仍有 4 个必需红项：
+当前 `launch-objective-audit.json` 仍有 6 个必需红项：
 
 1. `weChatConfigurationGreen`
-2. `realDeviceRegressionEvidenceReady`
-3. `appStoreManualEvidenceReady`
-4. `productionReadinessGreen`
+2. `ios265PhysicalDeviceAvailabilityReady`
+3. `testFlightRegressionPlanReadyButNotEvidence`
+4. `realDeviceRegressionEvidenceReady`
+5. `appStoreManualEvidenceReady`
+6. `productionReadinessGreen`
 
 ## 本机测试规则
 
@@ -25,9 +27,17 @@
 | 红项 | 当前含义 | 必须补齐的动作 | 通过后看哪个 proof |
 | --- | --- | --- | --- |
 | `weChatConfigurationGreen` | iOS Release 包和服务端微信 provider 都还没有真实微信开放平台配置 | 在微信开放平台创建/确认移动应用，配置 Bundle ID `com.mewpow.xiaonaiping`、真实 AppID、AppSecret、URL Scheme、Universal Link；把脱敏截图归档到 `08-wechat-open-platform` | `ios-release-readiness.json`、`ios-app-bundle.json`、`auth-providers.json` |
+| `ios265PhysicalDeviceAvailabilityReady` | `ios265-device-availability.json` 未能证明本机可读到 iOS 26.5 `physical iPhone` | 连接 iOS 26.5 真机，确保 `devicectl` 可读取设备列表且设备可用；iOS 27 和模拟器不能替代 | `ios265-device-availability.json` |
+| `testFlightRegressionPlanReadyButNotEvidence` | TestFlight 回归计划齐，但 `ios265-device-availability.json` 未能证明本机可读到 iOS 26.5 `physical iPhone` | 连接 iOS 26.5 真机，确保 `devicectl` 可读取设备列表，再复跑 iOS 26.5 真机可用性和 TestFlight 回归计划检查 | `ios265-device-availability.json`、`testflight-regression-plan.json` |
 | `realDeviceRegressionEvidenceReady` | 只有清单预检，没有真实 iOS 26.5 TestFlight / 签名真机执行结果 | 复制 `12-real-device-regression.template.md` 为 `12-real-device-regression.md`，用 TestFlight 或 Xcode 签名真机包跑完 RD-01 到 RD-24，全部状态写为“通过” | `app-store-evidence.json` |
 | `appStoreManualEvidenceReady` | App Store Connect、备案、签名归档、TestFlight、短信、微信、OBS 策略截图还没有归档 | 按下面文件清单补齐真实截图、PDF 或 JSON 证据 | `app-store-evidence.json` |
 | `productionReadinessGreen` | 生产总闸门被微信配置、iOS 包体微信配置、认证 provider 和人工证据牵连为红 | 先完成微信、真机回归和人工证据，再复跑总闸门 | `production-readiness.json` |
+
+`production-readiness.json` 还会检查 `deploymentProofCurrent` 和 `storageBackendProofCurrent`。提交前必须刷新当天部署 proof 和当天 OBS/存储 proof；旧日期 proof 只能用于定位问题，不能让生产总闸门变绿。
+
+当天部署 proof 优先使用 `XNP_DEPLOY_HOST=... Backend/deploy/deploy-huawei-baota.sh` 在服务器端刷新；该脚本会在真实私有 env 下运行 `collect_deployment_proof.py`，生成不含 secret 的证明；当天 OBS/存储 proof 使用 `verify_storage_backend.py` 生成，证明照片上传、下载、删除和账号删除清理路径仍可用。
+
+`production-readiness.json` 也会因为 `testFlightRegressionPlanProofPassed` 变红。`ios265-device-availability.json` 必须能由 `devicectl` 读到 iOS 26.5 `physical iPhone`；`devicectl` 超时、无 physical iPhone、iOS 27 真机或模拟器都不能替代该证据，也不能让 TestFlight 回归计划 proof 变绿。
 
 ## 外部证据文件清单
 
@@ -85,7 +95,7 @@
 - 环境写明 iOS 26.5。
 - 安装方式写明 `TestFlight` 或 `Xcode 签名真机包`。
 - RD-01 到 RD-24 全部存在，状态全部为“通过”。
-- 覆盖冷启动、手机号登录、微信登录、恢复密钥登录、云备份、云恢复、账号删除、通知权限、灵动岛、小组件和审核边界。
+- 覆盖冷启动、手机号登录、微信登录、恢复密钥登录、云同步、云恢复、账号删除、通知权限、灵动岛、小组件和审核边界。
 - 证据截图/录屏路径必须填写且脱敏。
 
 ## 复跑命令
@@ -105,6 +115,7 @@ Backend/scripts/run_launch_readiness.sh \
 补完部分证据后可先跑聚焦检查：
 
 ```bash
+XNP_DEPLOY_HOST=root@YOUR_SERVER Backend/deploy/deploy-huawei-baota.sh
 python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json
 python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json
 python3 Backend/scripts/check_launch_blocker_action_packet.py --allow-incomplete --output Backend/proof/launch-blocker-action-packet.json

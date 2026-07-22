@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-07-04T01:32:40.924Z",
+  "page": "Apple Developer / Identifiers / App Groups",
+  "url": "https://developer.apple.com/account/resources/identifiers/list/applicationGroup",
+  "observedTeam": "Shenzhen Flash Life Technology Co., Ltd - L2TYJNDTJK",
+  "createdAppGroup": "group.com.mewpow.xiaonaiping.shared",
+  "originalRequestedAppGroup": "group.com.mewpow.xiaonaiping",
+  "originalRequestedAppGroupResult": "Apple page reported not available; not created",
+  "screenshot": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/apple-developer-app-group-created-20260704.png",
+  "conclusion": "XiaoNaiPing App Group exists under current Apple Developer team; local entitlements must use group.com.mewpow.xiaonaiping.shared."
+}

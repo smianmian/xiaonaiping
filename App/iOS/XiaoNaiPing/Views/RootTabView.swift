@@ -16,11 +16,12 @@ enum AppRoute: Hashable {
 struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var store: BabyRecordStore
-    @StateObject private var cloudBackup = CloudBackupController()
+    @StateObject private var cloudSync = CloudSyncController()
     @State private var selectedTab: AppTab
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
     @State private var recordPath: [AppRoute] = []
+    @State private var isCreatingBabyProfile = false
     @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
 
     init() {
@@ -38,31 +39,37 @@ struct RootTabView: View {
 
     var body: some View {
         ZStack {
-            if shouldShowLaunchLogin {
-                LaunchLoginView(cloudBackup: cloudBackup, store: store)
-            } else if store.hasCompletedOnboarding {
-                tabContent
-            } else {
+            if store.hasCompletedOnboarding {
+                if shouldShowLaunchLogin {
+                    LaunchLoginView(cloudSync: cloudSync, store: store)
+                } else {
+                    tabContent
+                }
+            } else if isCreatingBabyProfile {
                 OnboardingView { name, birthDate, sex in
                     store.createBabyProfile(name: name, birthDate: birthDate, sex: sex)
+                }
+            } else {
+                WelcomeIntroView {
+                    isCreatingBabyProfile = true
                 }
             }
         }
         .ignoresSafeArea(.keyboard)
         .preferredColorScheme(nightModeEnabled ? .dark : nil)
         .environmentObject(store)
-        .environmentObject(cloudBackup)
+        .environmentObject(cloudSync)
         .onAppear(perform: syncFeedingReminderLiveActivity)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 syncFeedingReminderLiveActivity()
                 Task {
-                    await cloudBackup.syncIfNeeded(store: store)
+                    await cloudSync.syncIfNeeded(store: store)
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
-            cloudBackup.scheduleAutomaticSync(store: store)
+            cloudSync.scheduleAutomaticSync(store: store)
         }
         .alert("保存失败", isPresented: saveErrorAlertBinding) {
             Button("知道了") {
@@ -74,7 +81,7 @@ struct RootTabView: View {
     }
 
     private var shouldShowLaunchLogin: Bool {
-        guard !cloudBackup.hasSession else {
+        guard store.hasCompletedOnboarding, !cloudSync.hasSession else {
             return false
         }
 
@@ -82,10 +89,10 @@ struct RootTabView: View {
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-XNPScreenshotData")
             || arguments.contains("-XNPScreenshotTab")
-            || arguments.contains("-XNPScreenshotBackupSheet") {
+            || arguments.contains("-XNPScreenshotSyncSheet") {
             return false
         }
-        return cloudBackup.isServiceConfigured
+        return cloudSync.isServiceConfigured
         #else
         return true
         #endif
@@ -270,7 +277,7 @@ private struct LaunchLoginView: View {
         case verificationCode
     }
 
-    @ObservedObject var cloudBackup: CloudBackupController
+    @ObservedObject var cloudSync: CloudSyncController
     @ObservedObject var store: BabyRecordStore
 
     @State private var phoneNumber = "+86"
@@ -284,13 +291,13 @@ private struct LaunchLoginView: View {
                 VStack(spacing: AppSpacing.roomy) {
                     hero
 
-                    if cloudBackup.isServiceConfigured {
+                    if cloudSync.isServiceConfigured {
                         phoneLoginCard
                         if shouldShowStatusLine {
                             statusLine
                         }
 
-                        if cloudBackup.isWeChatLoginConfigured {
+                        if cloudSync.isWeChatLoginConfigured {
                             weChatLoginButton
                         }
                     } else {
@@ -322,7 +329,7 @@ private struct LaunchLoginView: View {
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
                     .multilineTextAlignment(.center)
-                Text("登录后可备份宝宝的每一次成长记录。")
+                Text("登录后可同步宝宝的每一次成长记录。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .multilineTextAlignment(.center)
@@ -359,7 +366,7 @@ private struct LaunchLoginView: View {
                     focusedPhoneLoginField = nil
                     isPhoneCodeRequested = true
                     Task {
-                        await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
+                        await cloudSync.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
                     }
                 }
                 .font(AppTypography.bodyLarge)
@@ -371,7 +378,7 @@ private struct LaunchLoginView: View {
                         .stroke(AppColors.coral.opacity(0.35), lineWidth: 1)
                 }
                 .buttonStyle(.plain)
-                .disabled(cloudBackup.isWorking || !canRequestPhoneCode)
+                .disabled(cloudSync.isWorking || !canRequestPhoneCode)
 
                 if isPhoneCodeRequested {
                     TextField("6 位验证码", text: $phoneCode)
@@ -379,7 +386,7 @@ private struct LaunchLoginView: View {
                         .textFieldStyle(.roundedBorder)
                         .focused($focusedPhoneLoginField, equals: .verificationCode)
                         .onChange(of: phoneCode) { _, code in
-                            if CloudBackupController.validateSmsCode(code) {
+                            if CloudSyncController.validateSmsCode(code) {
                                 focusedPhoneLoginField = nil
                             }
                         }
@@ -393,11 +400,11 @@ private struct LaunchLoginView: View {
                     PrimaryWatercolorButton(title: "手机号登录", tint: AppColors.blush, foreground: AppColors.coral) {
                         focusedPhoneLoginField = nil
                         Task {
-                            await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
+                            await cloudSync.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
                         }
                     }
-                    .disabled(cloudBackup.isWorking || !canVerifyPhoneCode)
-                    .opacity(cloudBackup.isWorking || !canVerifyPhoneCode ? 0.55 : 1)
+                    .disabled(cloudSync.isWorking || !canVerifyPhoneCode)
+                    .opacity(cloudSync.isWorking || !canVerifyPhoneCode ? 0.55 : 1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -406,9 +413,9 @@ private struct LaunchLoginView: View {
 
     private var statusLine: some View {
         HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-            Image(systemName: cloudBackup.isWorking ? "arrow.triangle.2.circlepath" : "info.circle")
+            Image(systemName: cloudSync.isWorking ? "arrow.triangle.2.circlepath" : "info.circle")
                 .foregroundStyle(AppColors.blueInk)
-            Text("\(cloudBackup.statusTitle.localizedText)：\(cloudBackup.statusDetail.localizedText)")
+            Text("\(cloudSync.statusTitle.localizedText)：\(cloudSync.statusDetail.localizedText)")
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
@@ -417,13 +424,13 @@ private struct LaunchLoginView: View {
     }
 
     private var shouldShowStatusLine: Bool {
-        cloudBackup.isWorking || cloudBackup.statusTitle != "未开启"
+        cloudSync.isWorking || cloudSync.statusTitle != "未开启"
     }
 
     private var weChatLoginButton: some View {
         Button {
             Task {
-                await cloudBackup.loginWithWeChat(store: store)
+                await cloudSync.loginWithWeChat(store: store)
             }
         } label: {
             Label("微信登录", systemImage: "message")
@@ -437,8 +444,8 @@ private struct LaunchLoginView: View {
                 }
         }
         .buttonStyle(.plain)
-        .disabled(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured)
-        .opacity(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured ? 0.55 : 1)
+        .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
+        .opacity(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured ? 0.55 : 1)
         .accessibilityHint(weChatLoginDetail)
     }
 
@@ -458,7 +465,7 @@ private struct LaunchLoginView: View {
     }
 
     private var weChatLoginDetail: String {
-        if cloudBackup.isNativeWeChatLoginAvailable {
+        if cloudSync.isNativeWeChatLoginAvailable {
             return "微信开放平台已配置；授权后会连接到小奶瓶私有账号。".localizedText
         }
         return "微信登录未启用：请先完成微信 OpenSDK、AppID、URL Scheme、Universal Link 和服务端凭证配置。".localizedText
@@ -473,28 +480,28 @@ private struct LaunchLoginView: View {
     }
 
     private var canRequestPhoneCode: Bool {
-        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
-        && !cloudBackup.isWorking
+        CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && !cloudSync.isWorking
     }
 
     private var canVerifyPhoneCode: Bool {
-        CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
-        && CloudBackupController.validateSmsCode(normalizedPhoneCode)
-        && !cloudBackup.isWorking
+        CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
+        && CloudSyncController.validateSmsCode(normalizedPhoneCode)
+        && !cloudSync.isWorking
     }
 
     private var phoneValidationMessage: String? {
         if normalizedPhoneNumber.isEmpty || normalizedPhoneNumber == "+86" {
             return nil
         }
-        return CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头。"
+        return CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber) ? nil : "手机号格式不正确，需以 + 开头。"
     }
 
     private var codeValidationMessage: String? {
         if normalizedPhoneCode.isEmpty {
             return nil
         }
-        return CloudBackupController.validateSmsCode(normalizedPhoneCode) ? nil : "验证码格式不正确，需 6 位数字。"
+        return CloudSyncController.validateSmsCode(normalizedPhoneCode) ? nil : "验证码格式不正确，需 6 位数字。"
     }
 }
 
@@ -631,7 +638,16 @@ private struct RecordHomeView: View {
                 } label: {
                     WatercolorCard(tint: action.tint, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
                         HStack(spacing: AppSpacing.regular) {
-                            AssetWatercolorImage(name: action.asset, mode: .multiply)
+                            Group {
+                                if let asset = action.asset {
+                                    AssetWatercolorImage(name: asset, mode: .multiply)
+                                } else if let systemIcon = action.systemIcon {
+                                    Image(systemName: systemIcon)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundStyle(AppColors.blueInk)
+                                }
+                            }
                                 .frame(width: 44, height: 44)
 
                             Text(title(for: action))
@@ -680,6 +696,7 @@ private struct RecordHomeView: View {
                     ForEach(store.recentHomeRecords.prefix(5)) { record in
                         RecordRowView(
                             icon: record.icon,
+                            systemIcon: record.systemIcon,
                             time: record.time,
                             title: record.title,
                             detail: record.detail,
@@ -769,6 +786,145 @@ private struct RecordSummaryMetric: View {
                 .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct WelcomeIntroView: View {
+    let onStart: () -> Void
+
+    @State private var page = 0
+
+    private let pages = [
+        (
+            title: "欢迎来到\n小奶瓶",
+            detail: "记录宝宝的每一次成长，\n贴心守护，陪伴每个珍贵瞬间。",
+            image: AppAssets.homeBottleHero,
+            imageSize: CGSize(width: 232, height: 290)
+        ),
+        (
+            title: "轻轻记一下",
+            detail: "喝奶、睡觉、换尿布，\n忙着照顾宝宝时也能快速完成。",
+            image: AppAssets.sleepHero,
+            imageSize: CGSize(width: 238, height: 260)
+        ),
+        (
+            title: "留住小小成长",
+            detail: "照片、纪念日和每一件小事，\n慢慢变成专属于宝宝的小册子。",
+            image: AppAssets.plantTimeline,
+            imageSize: CGSize(width: 250, height: 270)
+        )
+    ]
+
+    var body: some View {
+        ZStack {
+            PaperBackgroundView()
+
+            VStack(spacing: 0) {
+                illustration
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 410)
+
+                Text(pages[page].title)
+                    .font(AppTypography.heroTitle)
+                    .foregroundStyle(AppColors.blushDeep)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(8)
+                    .minimumScaleFactor(0.82)
+                    .padding(.horizontal, AppSpacing.page)
+
+                Text(pages[page].detail)
+                    .font(AppTypography.quietBody)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(6)
+                    .padding(.top, AppSpacing.medium)
+                    .padding(.horizontal, AppSpacing.page)
+
+                pageIndicator
+                    .padding(.top, AppSpacing.large)
+
+                Spacer(minLength: AppSpacing.large)
+
+                VStack(spacing: AppSpacing.small) {
+                    welcomeButton(title: "开始记录", filled: true, action: onStart)
+
+                    welcomeButton(
+                        title: page == pages.count - 1 ? "回到第一页" : "先看看",
+                        filled: false,
+                        action: advance
+                    )
+                }
+                .padding(.horizontal, AppSpacing.page)
+                .padding(.bottom, AppSpacing.xlarge)
+            }
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    @ViewBuilder
+    private var illustration: some View {
+        ZStack {
+            AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
+                .frame(width: 104, height: 58)
+                .offset(x: -118, y: -132)
+
+            AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
+                .frame(width: 88, height: 50)
+                .scaleEffect(x: -1, y: 1)
+                .offset(x: 118, y: -86)
+
+            Capsule()
+                .fill(AppColors.butter.opacity(0.62))
+                .frame(width: 235, height: 20)
+                .blur(radius: 5)
+                .offset(y: 120)
+
+            AssetWatercolorImage(name: pages[page].image, mode: .multiply)
+                .frame(width: pages[page].imageSize.width, height: pages[page].imageSize.height)
+                .offset(y: 8)
+                .id(page)
+                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        }
+        .animation(.easeInOut(duration: 0.28), value: page)
+        .padding(.top, AppSpacing.xlarge)
+        .accessibilityHidden(true)
+    }
+
+    private var pageIndicator: some View {
+        HStack(spacing: AppSpacing.small) {
+            ForEach(pages.indices, id: \.self) { index in
+                Capsule()
+                    .fill(index == page ? AppColors.peach : AppColors.paperDeep)
+                    .frame(width: index == page ? 22 : 11, height: 7)
+            }
+        }
+        .accessibilityLabel("欢迎引导第 \(page + 1) 页，共 \(pages.count) 页")
+    }
+
+    private func welcomeButton(title: String, filled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(AppTypography.bodyLarge)
+                .foregroundStyle(filled ? AppColors.milk : AppColors.blueInk)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .background {
+                    Capsule()
+                        .fill(filled ? AppColors.peach.opacity(0.88) : AppColors.milk.opacity(0.56))
+                        .overlay {
+                            Capsule()
+                                .stroke(filled ? AppColors.coral.opacity(0.36) : AppColors.blueInk.opacity(0.72), lineWidth: filled ? 1 : 2)
+                        }
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(filled ? "进入宝宝档案创建" : "查看下一页欢迎引导")
+    }
+
+    private func advance() {
+        withAnimation(.easeInOut(duration: 0.28)) {
+            page = page == pages.count - 1 ? 0 : page + 1
+        }
     }
 }
 
@@ -868,7 +1024,7 @@ private struct OnboardingView: View {
                 Label("隐私提示", systemImage: "shield")
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("登录后，宝宝资料、记录和主动加入 App 的照片原图会自动同步，并可在资料页管理账号与备份。")
+                Text("登录后，宝宝资料、记录和主动加入 App 的照片原图会自动同步，并可在资料页管理账号与同步。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)

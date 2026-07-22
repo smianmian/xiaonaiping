@@ -8,6 +8,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 SECRET_ENV_NAMES = {
@@ -71,6 +72,9 @@ WECHAT_SAMPLE_APP_ID_BODIES = {
     "abcdef1234567890",
     "fedcba9876543210",
 }
+LOCAL_SMS_WEBHOOK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+LOCAL_SMS_ADAPTER_PORT = 8791
+LOCAL_SMS_ADAPTER_PATH = "/send"
 
 
 def utc_now() -> str:
@@ -126,6 +130,27 @@ def configured_wechat_app_id(value: str) -> bool:
     return body not in WECHAT_SAMPLE_APP_ID_BODIES and len(set(body)) > 1
 
 
+def configured_sms_webhook_url(value: str) -> bool:
+    value = value.strip()
+    if not value or is_placeholder(value):
+        return False
+    parsed = urlparse(value)
+    host = (parsed.hostname or "").lower()
+    if (
+        parsed.scheme == "http"
+        and host in LOCAL_SMS_WEBHOOK_HOSTS
+        and parsed.port == LOCAL_SMS_ADAPTER_PORT
+        and parsed.path == LOCAL_SMS_ADAPTER_PATH
+    ):
+        return True
+    return (
+        parsed.scheme == "https"
+        and bool(host)
+        and host not in LOCAL_SMS_WEBHOOK_HOSTS
+        and "example" not in host
+    )
+
+
 def has_xiaonaiping_namespace(value: str) -> bool:
     lower = value.lower()
     return "xiaonaiping" in lower or "xnp" in lower
@@ -178,7 +203,7 @@ def provider_checks(values: dict[str, str]) -> dict[str, bool]:
         "obsBucketHasXiaoNaiPingNamespace": bool(obs_bucket and has_xiaonaiping_namespace(obs_bucket)),
         "obsPrefixHasXiaoNaiPingNamespace": bool(obs_prefix and has_xiaonaiping_namespace(obs_prefix)),
         "smsProviderIsWebhook": sms_provider == "webhook",
-        "smsWebhookURLConfigured": bool(values.get("XNP_SMS_WEBHOOK_URL", "").strip() and not is_placeholder(values.get("XNP_SMS_WEBHOOK_URL", ""))),
+        "smsWebhookURLConfigured": configured_sms_webhook_url(values.get("XNP_SMS_WEBHOOK_URL", "")),
         "wechatAppIDConfigured": configured_wechat_app_id(values.get("XNP_WECHAT_APP_ID", "")),
         "wechatAppSecretConfigured": bool(values.get("XNP_WECHAT_APP_SECRET", "").strip() and not is_placeholder(values.get("XNP_WECHAT_APP_SECRET", ""))),
     }
@@ -227,6 +252,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     now = utc_now()
     deploy_root = args.deploy_root
     return {
+        "startedAt": now,
+        "completedAt": now,
         "verifiedAt": now,
         "target": values.get("XNP_DEPLOYMENT_TARGET", args.target),
         "containsSecrets": False,

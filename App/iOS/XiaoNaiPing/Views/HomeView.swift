@@ -146,7 +146,7 @@ struct HomeView: View {
             ) { onRoute(.feeding) }
 
             HomeStatCard(
-                icon: AppAssets.peeDropIcon,
+                systemIcon: "drop.fill",
                 title: "记喝水",
                 value: "\(store.todayWaterRecords.count)次 / \(store.waterAmountML)ml",
                 tint: AppColors.mistBlue,
@@ -226,6 +226,7 @@ struct HomeView: View {
                     ForEach(store.recentHomeRecords.prefix(3)) { record in
                         RecordRowView(
                             icon: record.icon,
+                            systemIcon: record.systemIcon,
                             time: record.time,
                             title: record.title,
                             detail: record.detail,
@@ -417,7 +418,8 @@ private struct WhiteNoiseVolumeDots: View {
 }
 
 private struct HomeStatCard: View {
-    let icon: String
+    var icon: String? = nil
+    var systemIcon: String? = nil
     let title: String
     let value: String
     let tint: Color
@@ -428,8 +430,17 @@ private struct HomeStatCard: View {
         Button(action: action) {
             WatercolorCard(tint: tint, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
                 HStack(spacing: AppSpacing.regular) {
-                    AssetWatercolorImage(name: icon, mode: .multiply)
-                        .frame(width: 50, height: 50)
+                    Group {
+                        if let icon {
+                            AssetWatercolorImage(name: icon, mode: .multiply)
+                        } else if let systemIcon {
+                            Image(systemName: systemIcon)
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(AppColors.blueInk)
+                        }
+                    }
+                    .frame(width: 50, height: 50)
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                         Text(title)
                             .font(isQuietMode ? AppTypography.quietBody : AppTypography.body)

@@ -1,0 +1,102 @@
+{
+  "evidenceType": "final-app-store-upload",
+  "status": "final App Store upload evidence captured from the same iOS 26.5 TestFlight build or Xcode signed device build used for release regression",
+  "capturedAt": "YYYY-MM-DDTHH:MM:SS+08:00",
+  "installSource": "TestFlight",
+  "appStoreDeviceSlot": "iPhone 6.9\" display",
+  "device": {
+    "name": "FILL_WITH_PHYSICAL_DEVICE_NAME",
+    "runtime": "iOS 26.5"
+  },
+  "app": {
+    "bundleId": "com.mewpow.xiaonaiping",
+    "version": "FILL_WITH_APP_VERSION",
+    "build": "FILL_WITH_BUILD_NUMBER"
+  },
+  "sourceEvidence": {
+    "signedArchive": "../05-signed-archive.png",
+    "testFlight": "../06-testflight.png",
+    "appStoreConnectBuild": "../AppStoreConnect/ASC-07-build-testflight-link.png",
+    "appStoreConnectScreenshotOrder": "../AppStoreConnect/ASC-02-version-information.png",
+    "realDeviceRegression": "../12-real-device-regression.md"
+  },
+  "finalFiles": [
+    "01-home-iphone16pro.png",
+    "02-record-iphone16pro.png",
+    "03-growth-iphone16pro.png",
+    "04-profile-iphone16pro.png",
+    "05-profile-sync-iphone16pro.png"
+  ],
+  "fileChecks": [
+    {
+      "filename": "01-home-iphone16pro.png",
+      "width": 1320,
+      "height": 2868,
+      "fileSizeBytes": "FILL_WITH_FILE_SIZE_BYTES",
+      "sha256": "FILL_WITH_SHA256",
+      "redactionChecked": false,
+      "matchesFinalUploadOrder": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "filename": "02-record-iphone16pro.png",
+      "width": 1320,
+      "height": 2868,
+      "fileSizeBytes": "FILL_WITH_FILE_SIZE_BYTES",
+      "sha256": "FILL_WITH_SHA256",
+      "redactionChecked": false,
+      "matchesFinalUploadOrder": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "filename": "03-growth-iphone16pro.png",
+      "width": 1320,
+      "height": 2868,
+      "fileSizeBytes": "FILL_WITH_FILE_SIZE_BYTES",
+      "sha256": "FILL_WITH_SHA256",
+      "redactionChecked": false,
+      "matchesFinalUploadOrder": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "filename": "04-profile-iphone16pro.png",
+      "width": 1320,
+      "height": 2868,
+      "fileSizeBytes": "FILL_WITH_FILE_SIZE_BYTES",
+      "sha256": "FILL_WITH_SHA256",
+      "redactionChecked": false,
+      "matchesFinalUploadOrder": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "filename": "05-profile-sync-iphone16pro.png",
+      "width": 1320,
+      "height": 2868,
+      "fileSizeBytes": "FILL_WITH_FILE_SIZE_BYTES",
+      "sha256": "FILL_WITH_SHA256",
+      "redactionChecked": false,
+      "matchesFinalUploadOrder": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "redactionChecks": [
+    "real baby photo",
+    "complete phone number",
+    "verification code",
+    "recovery key",
+    "token",
+    "object storage key",
+    "local server marker",
+    "debug marker",
+    "internal dashboard",
+    "Apple ID email",
+    "unavailable WeChat success claim",
+    "medical advice claim",
+    "feeding recommendation claim",
+    "pressure reminder claim"
+  ],
+  "notes": [
+    "Copy this file to UPLOAD_PROVENANCE.json only after the screenshots are captured or accepted from the same iOS 26.5 TestFlight build or Xcode signed device build.",
+    "Do not use Debug simulator candidate screenshots as final App Store upload evidence."
+  ]
+}

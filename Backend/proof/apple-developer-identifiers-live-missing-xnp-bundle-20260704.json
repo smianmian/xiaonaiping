@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-07-04T00:04:09.666Z",
+  "page": "Apple Developer / Certificates, Identifiers & Profiles / Identifiers",
+  "url": "https://developer.apple.com/account/resources/identifiers/list",
+  "observedTeam": "Shenzhen Flash Life Technology Co., Ltd - L2TYJNDTJK",
+  "identifiersObserved": [
+    "com.mewpow.Emotion-Isle",
+    "com.mewpow.Emotion-Isle.EmotionWidget"
+  ],
+  "expectedXiaoNaiPingBundleId": "com.mewpow.xiaonaiping",
+  "expectedXiaoNaiPingWidgetBundleId": "com.mewpow.xiaonaiping.widgets",
+  "xiaoNaiPingBundleIdRegistered": false,
+  "xiaoNaiPingWidgetBundleIdRegistered": false,
+  "conclusion": "Current Apple Developer identifiers list still does not include XiaoNaiPing bundle IDs; create/register them before provisioning, archiving, or creating the App Store Connect app.",
+  "screenshot": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/apple-developer-identifiers-live-missing-xnp-bundle-20260704.png"
+}

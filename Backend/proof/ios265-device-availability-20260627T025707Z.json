@@ -1,0 +1,40 @@
+{
+  "startedAt": "2026-06-27T02:57:10+00:00",
+  "completedAt": "2026-06-27T02:57:30+00:00",
+  "passed": false,
+  "requiredIOS": "26.5",
+  "failedRequiredChecks": [
+    "deviceListReadable",
+    "physicalIphonesListed"
+  ],
+  "eligibleIOS265PhysicalIphones": [],
+  "unavailableIOS265PhysicalIphones": [],
+  "availableNonIOS265PhysicalIphones": [],
+  "devices": [],
+  "checks": {
+    "deviceListReadable": {
+      "passed": false,
+      "required": true,
+      "evidence": "devicectl timed out after 20s"
+    },
+    "physicalIphonesListed": {
+      "passed": false,
+      "required": true,
+      "evidence": "0 physical iPhone device(s) listed"
+    },
+    "ios265PolicyEnforced": {
+      "passed": true,
+      "required": true,
+      "evidence": "local project testing requires iOS 26.5; non-26.5 available devices are not eligible"
+    },
+    "eligibleIOS265PhysicalIphoneAvailable": {
+      "passed": false,
+      "required": false,
+      "evidence": "no available physical iPhone on iOS 26.5"
+    }
+  },
+  "meaning": {
+    "passed": "Device availability was inspected and local iOS 26.5 policy is enforced.",
+    "notRealDeviceRegression": "This proof does not replace TestFlight or signed physical-device regression."
+  }
+}

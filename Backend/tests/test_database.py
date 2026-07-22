@@ -13,7 +13,7 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from api.database import DatabaseConfigurationError, DatabaseSettings, connect_database, ensure_schema
-from api.server import upsert_backup, upsert_phone_code, upsert_photo
+from api.server import upsert_sync, upsert_phone_code, upsert_photo
 
 
 class FakeCursor:
@@ -91,7 +91,7 @@ class DatabaseTest(unittest.TestCase):
 
         db = DatabaseConnection("mysql", fake_connection)
         upsert_phone_code(db, "phone", "code", "now", 123)
-        upsert_backup(db, "account", b"{}", "now")
+        upsert_sync(db, "account", b"{}", "now")
         upsert_photo(db, "account", "photo", "image/jpeg", 10, "digest", "now")
 
         statements = [statement for statement, _ in fake_connection.statements]

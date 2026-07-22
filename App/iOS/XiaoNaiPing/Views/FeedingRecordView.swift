@@ -481,6 +481,8 @@ private struct FeedingEditorSheet: View {
     @State private var note: String
     @State private var reminderDeferralMinutes: Int
     @State private var errorMessage: String?
+    @State private var showsTimePicker = false
+    @State private var showsMoreDetails = false
 
     private let types = ["母乳", "瓶喂", "奶粉", "辅食"]
     private let reminderDeferralOptions = Array(stride(from: 0, through: 30, by: 5))
@@ -507,71 +509,65 @@ private struct FeedingEditorSheet: View {
                 VStack(spacing: AppSpacing.large) {
                     WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            DatePicker("时间", selection: $occurredAt, displayedComponents: [.date, .hourAndMinute])
-                                .font(AppTypography.readableBody)
                             Picker("类型", selection: $type) {
                                 ForEach(types, id: \.self) { type in
                                     Text(type).tag(type)
                                 }
                             }
                             .pickerStyle(.segmented)
-                        }
-                    }
 
-                    WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            Text("可选细节")
-                                .font(AppTypography.cardTitle)
-                                .foregroundStyle(AppColors.inkGreen)
-
-                            TextField("奶量 ml，可不填", text: $amountText)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(.roundedBorder)
-
-                            TextField("时长 分钟，可不填", text: $durationText)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(.roundedBorder)
-
-                            TextField("备注，可不填", text: $note, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                    }
-
-                    if shouldShowReminderDeferral {
-                        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius) {
-                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                                HStack(alignment: .top, spacing: AppSpacing.medium) {
-                                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                                        Text("下一次提醒")
-                                            .font(AppTypography.cardTitle)
-                                            .foregroundStyle(AppColors.inkGreen)
-                                        if let reminderRepeatIntervalMinutes {
-                                            Text("固定间隔 \(feedingReminderIntervalText(reminderRepeatIntervalMinutes))")
-                                                .font(AppTypography.caption)
-                                                .foregroundStyle(AppColors.inkSoft)
-                                        }
-                                    }
-
-                                    Spacer(minLength: 0)
-
-                                    Text(nextReminderPreviewText)
+                            HStack {
+                                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                                    Text(record == nil && !showsTimePicker ? "刚刚" : BabyRecordStore.reminderDateTimeString(from: occurredAt))
+                                        .font(AppTypography.cardTitle)
+                                        .foregroundStyle(AppColors.inkGreen)
+                                    Text(record == nil && !showsTimePicker ? "会按现在的时间保存" : "记录时间")
                                         .font(AppTypography.caption)
-                                        .foregroundStyle(AppColors.blueInk)
-                                        .multilineTextAlignment(.trailing)
-                                        .fixedSize(horizontal: false, vertical: true)
+                                        .foregroundStyle(AppColors.inkSoft)
                                 }
 
-                                Picker("顺延", selection: $reminderDeferralMinutes) {
-                                    ForEach(reminderDeferralOptions, id: \.self) { minutes in
-                                        Text(reminderDeferralTitle(minutes)).tag(minutes)
+                                Spacer(minLength: 0)
+
+                                Button(showsTimePicker ? "收起" : "修改时间") {
+                                    withAnimation {
+                                        showsTimePicker.toggle()
                                     }
                                 }
-                                .pickerStyle(.wheel)
-                                .frame(height: 94)
-                                .clipped()
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.blueInk)
+                            }
+
+                            if showsTimePicker {
+                                DatePicker("时间", selection: $occurredAt, displayedComponents: [.date, .hourAndMinute])
+                                    .font(AppTypography.readableBody)
+                                    .tint(AppColors.coral)
                             }
                         }
+                    }
+
+                    Button {
+                        withAnimation {
+                            showsMoreDetails.toggle()
+                        }
+                    } label: {
+                        HStack(spacing: AppSpacing.small) {
+                            Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                            Text("更多详情（可不填）")
+                            Spacer(minLength: 0)
+                        }
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.inkGreen)
+                        .padding(.horizontal, AppSpacing.medium)
+                        .padding(.vertical, AppSpacing.regular)
+                        .background {
+                            RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous)
+                                .fill(AppColors.blush.opacity(0.56))
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    if showsMoreDetails {
+                        optionalDetails
                     }
 
                     if let errorMessage {
@@ -581,7 +577,7 @@ private struct FeedingEditorSheet: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    PrimaryWatercolorButton(title: "保存喂养记录") {
+                    PrimaryWatercolorButton(title: record == nil ? "刚喂完，记录一下" : "保存修改") {
                         save()
                     }
                 }
@@ -594,6 +590,66 @@ private struct FeedingEditorSheet: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("取消") {
                         dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    private var optionalDetails: some View {
+        VStack(spacing: AppSpacing.large) {
+            WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius) {
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    if type == "瓶喂" || type == "奶粉" {
+                        TextField("奶量 ml，可不填", text: $amountText)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                    }
+
+                    if type == "母乳" {
+                        TextField("时长 分钟，可不填", text: $durationText)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                    }
+
+                    TextField("备注，可不填", text: $note, axis: .vertical)
+                        .lineLimit(2...4)
+                        .textFieldStyle(.roundedBorder)
+                }
+            }
+
+            if shouldShowReminderDeferral {
+                WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius) {
+                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                        HStack(alignment: .top, spacing: AppSpacing.medium) {
+                            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                                Text("下一次提醒")
+                                    .font(AppTypography.cardTitle)
+                                    .foregroundStyle(AppColors.inkGreen)
+                                if let reminderRepeatIntervalMinutes {
+                                    Text("固定间隔 \(feedingReminderIntervalText(reminderRepeatIntervalMinutes))")
+                                        .font(AppTypography.caption)
+                                        .foregroundStyle(AppColors.inkSoft)
+                                }
+                            }
+
+                            Spacer(minLength: 0)
+
+                            Text(nextReminderPreviewText)
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.blueInk)
+                                .multilineTextAlignment(.trailing)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Picker("顺延", selection: $reminderDeferralMinutes) {
+                            ForEach(reminderDeferralOptions, id: \.self) { minutes in
+                                Text(reminderDeferralTitle(minutes)).tag(minutes)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(height: 94)
+                        .clipped()
                     }
                 }
             }

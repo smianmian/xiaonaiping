@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_production_readiness.py"
+CURRENT_TS = "2026-06-29T00:00:00+00:00"
 
 
 def write(path: Path, value: str) -> None:
@@ -75,6 +76,8 @@ settings:
         )
     deployment_proof = json.dumps(
         {
+            "startedAt": CURRENT_TS,
+            "completedAt": CURRENT_TS,
             "remotePaths": {"dataDir": "/srv/xiaonaiping/data"},
             "isolation": {
                 "mysqlUser": "xiaonaiping_app",
@@ -94,6 +97,8 @@ settings:
         root / "Backend/proof/storage-backend.json",
         json.dumps(
             {
+                "startedAt": CURRENT_TS,
+                "completedAt": CURRENT_TS,
                 "passed": True,
                 "storageBackend": "huawei_obs",
                 "checks": {
@@ -557,6 +562,8 @@ class ProductionReadinessTest(unittest.TestCase):
             write_png_header(root / "Docs/08_Release/Screenshots/home.png", 1206, 2622)
             deployment_proof = json.dumps(
                 {
+                    "startedAt": CURRENT_TS,
+                    "completedAt": CURRENT_TS,
                     "remotePaths": {"dataDir": "/srv/xiaonaiping/data"},
                     "isolation": {
                         "mysqlUser": "xiaonaiping_app",
@@ -612,6 +619,92 @@ class ProductionReadinessTest(unittest.TestCase):
             self.assertTrue(report["ready"])
             self.assertTrue(report["checks"]["phoneLoginProviderConfigured"]["passed"])
             self.assertTrue(report["checks"]["wechatLoginProviderConfigured"]["passed"])
+
+    def test_rejects_stale_storage_backend_proof_even_when_production_report_is_current(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            release_url = "https://api.xiaonaiping.test"
+            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
+            write_png_header(root / "Docs/08_Release/Screenshots/home.png", 1206, 2622)
+            storage_path = root / "Backend/proof/storage-backend.json"
+            storage = json.loads(storage_path.read_text(encoding="utf-8"))
+            storage["startedAt"] = "2026-06-26T00:00:00+00:00"
+            storage["completedAt"] = "2026-06-26T00:00:00+00:00"
+            write(storage_path, json.dumps(storage))
+
+            report = self.run_checker(root, None, "--require-huawei-obs", "--require-screenshots")
+
+            self.assertFalse(report["ready"])
+            self.assertIn("storageBackendProofCurrent", report["failedRequiredChecks"])
+            self.assertFalse(report["checks"]["storageBackendProofCurrent"]["passed"])
+            self.assertIn("missing current timestamp", report["checks"]["storageBackendProofCurrent"]["evidence"])
+
+    def test_current_proof_accepts_beijing_date_when_timestamp_is_previous_utc_date(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            release_url = "https://api.xiaonaiping.test"
+            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
+            beijing_current_utc_timestamp = "2026-06-28T17:18:34+00:00"
+            for relative_path in (
+                "Backend/proof/huawei-baota-deploy.json",
+                "Backend/proof/storage-backend.json",
+            ):
+                proof_path = root / relative_path
+                proof = json.loads(proof_path.read_text(encoding="utf-8"))
+                proof["startedAt"] = beijing_current_utc_timestamp
+                proof["completedAt"] = beijing_current_utc_timestamp
+                write(proof_path, json.dumps(proof))
+
+            report = self.run_checker(
+                root,
+                None,
+                "--expected-proof-date",
+                "2026-06-29",
+                "--require-huawei-obs",
+            )
+
+            self.assertTrue(report["checks"]["deploymentProofCurrent"]["passed"])
+            self.assertTrue(report["checks"]["storageBackendProofCurrent"]["passed"])
+            self.assertIn("2026-06-28T17:18:34+00:00", report["checks"]["deploymentProofCurrent"]["evidence"])
+
+    def test_default_run_prefers_current_dated_deployment_and_storage_proofs(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            release_url = "https://api.xiaonaiping.test"
+            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
+            old_timestamp = "2026-06-26T00:00:00+00:00"
+            for stable_relative, current_relative in (
+                (
+                    "Backend/proof/huawei-baota-deploy.json",
+                    "Backend/proof/huawei-baota-deploy-20260629T-current.json",
+                ),
+                (
+                    "Backend/proof/storage-backend.json",
+                    "Backend/proof/storage-backend-20260629T-current.json",
+                ),
+            ):
+                stable_path = root / stable_relative
+                proof = json.loads(stable_path.read_text(encoding="utf-8"))
+                current_proof = dict(proof)
+                current_proof["startedAt"] = CURRENT_TS
+                current_proof["completedAt"] = CURRENT_TS
+                proof["startedAt"] = old_timestamp
+                proof["completedAt"] = old_timestamp
+                write(stable_path, json.dumps(proof))
+                write(root / current_relative, json.dumps(current_proof))
+
+            report = self.run_checker(
+                root,
+                None,
+                "--expected-proof-date",
+                "2026-06-29",
+                "--require-huawei-obs",
+            )
+
+            self.assertTrue(report["checks"]["deploymentProofCurrent"]["passed"])
+            self.assertTrue(report["checks"]["storageBackendProofCurrent"]["passed"])
+            self.assertIn(CURRENT_TS, report["checks"]["deploymentProofCurrent"]["evidence"])
+            self.assertIn(CURRENT_TS, report["checks"]["storageBackendProofCurrent"]["evidence"])
 
     def test_auth_debug_mode_is_rejected_for_production(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

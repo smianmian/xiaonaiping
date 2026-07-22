@@ -5,12 +5,12 @@
 - 项目：小奶瓶 / 宝宝成长记录
 - 阶段：后端架构与实现更新
 - 日期：2026-06-14
-- 当前结论：已新增最小后端实现，第一版后端只做恢复密钥账号、备份恢复、照片原图文件存储和删除机制
+- 当前结论：已新增最小后端实现，第一版后端只做恢复密钥账号、同步恢复、照片原图文件存储和删除机制
 
 ## 已确认事实
 
 1. 第一版需要账号。
-2. 第一版需要备份恢复。
+2. 第一版需要同步恢复。
 3. 第一版服务器需要存储照片原图。
 4. 第一版单人记录，不做家庭协作。
 5. 第一版不做管理后台。
@@ -19,7 +19,7 @@
 
 ## 合理推断
 
-1. 后端应只提供备份/恢复 API 和文件存储，不做运营查询。
+1. 后端应只提供同步/恢复 API 和文件存储，不做运营查询。
 2. 不应在第一版做客服随意查看用户宝宝数据的后台。
 3. 服务端日志必须避免敏感明文。
 4. 照片应使用私有对象存储，不应公开可访问。
@@ -42,17 +42,17 @@
 ## 最小后端边界
 
 1. 账号/身份：恢复密钥账号，不采集邮箱手机号，客户端会话存 Keychain。
-2. 备份 API：上传和恢复宝宝档案、记录、提醒、照片元数据。
+2. 同步 API：上传和恢复宝宝档案、记录、提醒、照片元数据。
 3. 文件 API：上传、下载、删除用户主动加入 App 的照片原图。
-4. 删除 API：删除账号、云端备份、照片对象和账号记录。
-5. 同步状态：当前通过备份响应、照片列表和删除响应反馈最小状态。
+4. 删除 API：删除账号、云端同步、照片对象和账号记录。
+5. 同步状态：当前通过同步响应、照片列表和删除响应反馈最小状态。
 
 ## 当前实现文件
 
 1. `Backend/api/server.py`
 2. `Backend/tests/test_api.py`
-3. `App/iOS/XiaoNaiPing/Services/CloudBackupAPIClient.swift`
-4. `App/iOS/XiaoNaiPing/Services/CloudBackupController.swift`
+3. `App/iOS/XiaoNaiPing/Services/CloudSyncAPIClient.swift`
+4. `App/iOS/XiaoNaiPing/Services/CloudSyncController.swift`
 5. `App/iOS/XiaoNaiPing/Services/CloudAccountSessionStore.swift`
 
 ## 安全边界

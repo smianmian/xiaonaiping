@@ -1,0 +1,403 @@
+{
+  "startedAt": "2026-07-03T23:47:06+00:00",
+  "completedAt": "2026-07-03T23:47:06+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "operatorWorkbenchPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260704.md"
+    },
+    "identityAndDateBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "2026-07-04 workbench is marked not evidence and references launch-day rollover"
+    },
+    "appStoreConnectDraftFieldsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect draft fields cover name, subtitle, description, keywords, category, age rating, privacy URLs, support URL, and review notes"
+    },
+    "appStoreReviewInformationPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md"
+    },
+    "reviewLoginInternalWordingAbsent": {
+      "passed": true,
+      "required": true,
+      "evidence": "operator workbench and App Review Information use reviewer-facing recovery-key wording"
+    },
+    "dunsPostDeliveryActionsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S post-delivery actions cover organization enrollment, Team ID, roles, capabilities, certificate/profile, Archive, and TestFlight"
+    },
+    "realDeviceTestFlightCaptureTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 TestFlight/signed-device capture checklist covers feeding deferral, login, account deletion, notification permission, Dynamic Island, Lock Screen, and widgets"
+    },
+    "externalPlatformProductionPrivacyFilingPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat, SMS, OBS, production proof, App Privacy, and ICP/App filing next actions are present"
+    },
+    "crossAppReuseBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "cross-app reusable company-level evidence is separated from XiaoNaiPing-specific App Store, Apple Developer, provider, production, build, and iOS 26.5 evidence"
+    },
+    "submitForReviewGuardPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Submit for Review remains blocked until same-day evidence, production readiness, final screenshots, real-device regression, and launch objective audit pass"
+    },
+    "rerunCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "rerun commands include operator workbench, rollover, App Store materials, submission packet, same-day evidence, and launch audit gates"
+    },
+    "secretBoundariesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "secret and privacy redaction boundaries are explicit"
+    },
+    "appStoreConnectDraftJsonPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json"
+    },
+    "appStoreConnectDraftJsonStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect draft JSON locks name, subtitle, description, keywords, category, age rating, privacy URLs, support URL, review notes, page evidence, field-source matrix, and no-submit boundary"
+    },
+    "appStoreConnectFinalEntryAuditPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md"
+    },
+    "appStoreConnectFinalEntryAuditStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect final entry audit locks same-round environment, final field values, source-file consistency, budgets, product review boundaries, external evidence index, final screenshot provenance, ASC-01 to ASC-08 page evidence, submit guard, rerun commands, and secret no-write rules"
+    },
+    "appStoreConnectFieldFreezePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260704.json"
+    },
+    "appStoreConnectFieldFreezePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect field-freeze packet locks draft copy sources, field values, length budgets, paste sequence, source-lock matrix, rerun gates, and no-submit boundary"
+    },
+    "appStoreConnectEntrySessionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260704.json"
+    },
+    "appStoreConnectEntrySessionPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect entry-session packet locks ASC page evidence targets, fill sequence, field locks, stop conditions, redaction checklist, post-entry gates, and no-submit boundary"
+    },
+    "appStoreManualEvidencePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_MANUAL_EVIDENCE_PACKET_20260704.json"
+    },
+    "appStoreManualEvidencePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store manual evidence packet locks required live evidence targets, same-round capture, redaction, dependency boundaries, post-capture gates, and no-submit boundary"
+    },
+    "dunsPostDeliveryActionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json"
+    },
+    "dunsPostDeliveryActionPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S post-delivery JSON covers Apple Developer organization continuation, signing, Archive, TestFlight, iOS 26.5 regression, and redaction boundaries"
+    },
+    "appleDeveloperExternalStatusPollTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/EXTERNAL-STATUS-POLL-RESULT.template.json"
+    },
+    "appleDeveloperExternalStatusPollTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "Apple Developer external status poll template indexes D&B, Apple Developer enrollment, Apple email, App Store Connect draft status, same-round proof checks, redaction, reruns, and no-submit boundaries"
+    },
+    "appleDeveloperDunsPostDeliveryExecutionTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/DUNS-POST-DELIVERY-EXECUTION-RESULT.template.json"
+    },
+    "appleDeveloperDunsPostDeliveryExecutionTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S post-delivery execution template locks first-hour actions, official Apple continuation, payment/team context, signing/TestFlight handoff, XiaoNaiPing reruns, cross-app boundaries, and secret redaction"
+    },
+    "appleDeveloperOrgSigningResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/APPLE-DEVELOPER-ORG-SIGNING-RESULT.template.json"
+    },
+    "appleDeveloperOrgSigningResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "Apple Developer org signing result template indexes D-U-N-S delivery, Organization enrollment, Team ID, permissions, certificate/profile, Archive, TestFlight, AASA, required XiaoNaiPing proofs, cross-app reference boundary, hashes, and redaction fields without becoming submit permission"
+    },
+    "appleDeveloperTeamSigningTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/_templates/apple-developer-team-signing-evidence.template.json"
+    },
+    "appleDeveloperTeamSigningTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "Apple Developer team signing evidence template locks Team ID, Bundle ID capabilities, distribution certificate/profile, account roles, AASA, Archive, TestFlight, iOS 26.5 regression evidence, same-round team/build matching, redaction, and post-capture gates"
+    },
+    "ascBackfillResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-BACKFILL-RESULT.template.json"
+    },
+    "ascBackfillResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect backfill result template indexes frozen draft fields, ASC page screenshots, field-freeze matching, same-session capture, private review-info handling, hashes, redaction fields, and no-submit boundaries"
+    },
+    "ascPrivacyAgeReviewResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-PRIVACY-AGE-REVIEW-RESULT.template.json"
+    },
+    "ascPrivacyAgeReviewResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect privacy, age-rating, and review-information result template indexes ASC-04/05/06 page evidence, privacy label proof, age rating result, redacted review account proof, answer-sheet matching, redaction fields, post-result gates, and no-submit boundaries"
+    },
+    "appReviewTestAccountPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_REVIEW_TEST_ACCOUNT_PACKET_20260704.json"
+    },
+    "appReviewTestAccountPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Review test-account packet locks private recovery-key handling, redacted account proof, RD-10/RD-13/RD-14/RD-15 same-build iOS 26.5 evidence, account deletion, redaction, and no-submit boundaries"
+    },
+    "externalPlatformCapturePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json"
+    },
+    "externalPlatformCapturePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "external-platform capture packet locks same-day WeChat, AASA, SMS, OBS, filing, privacy-label, production proof, dependency boundaries, redaction fields, and post-capture reruns"
+    },
+    "smsProviderLiveSendPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json"
+    },
+    "smsProviderLiveSendPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "SMS provider live-send packet locks provider-console evidence, private test-phone handling, provider config proof, real live-send proof, stable auth alias sync, redaction, post-execution gates, and no-submit boundary"
+    },
+    "obsStorageProofPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json"
+    },
+    "obsStorageProofPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "OBS storage proof packet locks private bucket/prefix evidence, storage proof, account deletion cleanup, production readiness, stable alias sync, redaction, post-execution gates, and no-submit boundary"
+    },
+    "mainlandFilingExecutionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260704.json"
+    },
+    "mainlandFilingExecutionPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing execution packet locks company account, China mainland availability, App/ICP/public-security filing, privacy label, age rating, public URL real-device evidence, no-placeholder-number guard, reruns, redaction, and no-submit boundary"
+    },
+    "mainlandFilingPrivacyEvidenceTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/_templates/mainland-filing-privacy-evidence.template.json"
+    },
+    "mainlandFilingPrivacyEvidenceTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "mainland filing/privacy evidence template locks company account, China mainland availability, App/ICP filing, privacy label, age rating result, source fields, redaction, post-capture gates, and template-only completion boundary"
+    },
+    "wechatReleaseConfigurationPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260704.json"
+    },
+    "wechatReleaseConfigurationPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat Release configuration packet locks real wx AppID propagation, URL Scheme equality, Universal Link/AASA, Team ID sync, server-only AppSecret boundary, iOS 26.5 Release proof chain, RD-14 evidence, stable-alias guard, and no-submit boundary"
+    },
+    "wechatOpenPlatformEvidenceTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/_templates/wechat-open-platform-evidence.template.json"
+    },
+    "wechatOpenPlatformEvidenceTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat Open Platform evidence template locks 08/08b target files, wx AppID, URL Scheme, Universal Link, AASA, server-only AppSecret boundary, redaction, post-capture gates, and template-only completion boundary"
+    },
+    "productionProofRefreshPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json"
+    },
+    "productionProofRefreshPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "production proof refresh packet locks same-day deployment, remote API, storage, auth, WeChat client, iOS 26.5 release/bundle, App Store evidence, readiness, launch audit, stable-alias sync guard, and no-submit boundary"
+    },
+    "productionProofRefreshStatusPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260704.json"
+    },
+    "productionProofRefreshStatusStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "production proof refresh status records current proof gaps, blocks stable alias sync while same-round proofs are red, and keeps no-submit boundary explicit"
+    },
+    "externalPlatformCaptureResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/ExternalPlatform/EXTERNAL-PLATFORM-CAPTURE-RESULT.template.json"
+    },
+    "externalPlatformCaptureResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "external-platform result template indexes same-round WeChat, SMS, OBS, filing, privacy label, age rating, live-send, production proof, required reruns, redaction, and no-submit boundaries"
+    },
+    "focusedCapturePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/FOCUSED_CAPTURE_PACKET_20260704.json"
+    },
+    "focusedCapturePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "focused iOS 26.5 capture packet covers required RD files, same-build rules, reminder deferral, login, deletion, notifications, Dynamic Island, and widget evidence"
+    },
+    "realDeviceExecutionSheetPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/EXECUTION_SHEET_20260704.md"
+    },
+    "realDeviceExecutionSheetStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device execution sheet locks iOS 26.5 only, same TestFlight/signed-device build, RD-03/RD-10/RD-13/RD-14/RD-15/RD-17/RD-22/RD-23 target evidence, notification double-path reset, Dynamic Island and widget visual checks, retest blocking, redaction, and formal result backfill"
+    },
+    "realDeviceCapturePreflightPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/REAL_DEVICE_CAPTURE_PREFLIGHT_20260704.json"
+    },
+    "realDeviceCapturePreflightPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device capture preflight packet locks iOS 26.5 availability, same-build inputs, notification reset, external login/storage preconditions, Dynamic Island/widget setup, redaction, post-capture gates, and no-submit boundary"
+    },
+    "realDeviceRegressionTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.template.md"
+    },
+    "realDeviceRegressionTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device regression template locks iOS 26.5, same TestFlight/signed-device build, RD-10/RD-13/RD-14/RD-15/RD-17/RD-22/RD-23 independent evidence, notification double-path reset, failure/retest blocking, and redaction boundaries"
+    },
+    "realDeviceCaptureResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/REAL-DEVICE-CAPTURE-RESULT.template.json"
+    },
+    "realDeviceCaptureResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device result template keeps live-capture status, iOS 26.5 install-source rules, SHA-256 placeholders, redaction, and submit-permission boundary"
+    },
+    "crossAppReusePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/CROSS_APP_REUSABLE_EVIDENCE_PACKET_20260704.json"
+    },
+    "crossAppReusePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "cross-app reuse packet limits Yi Gen Dai Mao / Emotion Isle materials to company-level D-U-N-S and Apple organization references while requiring XiaoNaiPing-specific evidence"
+    },
+    "submitReviewPreflightPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_SUBMIT_REVIEW_PREFLIGHT_20260704.json"
+    },
+    "submitReviewPreflightPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "Submit for Review preflight packet locks ASC-08, green proof dependencies, selected TestFlight build, iOS 26.5 screenshots, and no-submit boundaries"
+    },
+    "finalScreenshotUploadPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json"
+    },
+    "finalScreenshotUploadPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "final screenshot upload packet locks UPLOAD_PROVENANCE, five screenshot files, signed Archive/TestFlight/ASC build/order dependencies, iOS 26.5 same-build requirements, stop conditions, and no-submit boundaries"
+    },
+    "finalScreenshotUploadProvenanceTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.template.json"
+    },
+    "finalScreenshotUploadProvenanceTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "final screenshot upload provenance template locks iOS 26.5, TestFlight/signed-device source evidence, five upload files, SHA-256 placeholders, redaction checks, same upload order, and simulator/debug exclusions"
+    },
+    "productionPrivacyEvidenceWorkbenchPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260704.md"
+    },
+    "productionPrivacyEvidenceWorkbenchStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "production/privacy evidence workbench locks same-round production proof, public URLs, filing/privacy labels, OBS deletion proof, SMS/WeChat providers, reruns, stable-alias guard, and secret boundaries"
+    },
+    "productionPrivacyEvidenceWorkbenchCanonicalObsEnvNames": {
+      "passed": true,
+      "required": true,
+      "evidence": "production privacy workbench uses canonical HUAWEI_OBS_* env names"
+    }
+  }
+}

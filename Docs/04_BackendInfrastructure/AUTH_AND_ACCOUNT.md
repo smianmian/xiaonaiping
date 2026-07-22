@@ -10,7 +10,7 @@
 ## 已确认事实
 
 1. 第一版先做单人记录。
-2. 第一版需要备份恢复。
+2. 第一版需要同步恢复。
 3. 第一版需要服务器存储照片原图。
 4. 第一版需要稳定账号身份。
 5. 首发地区改为中国大陆，香港第二批。
@@ -35,7 +35,7 @@
 1. 手机号登录 UI、服务端 API 和阿里云 webhook adapter 已存在；生产阿里云短信签名/模板/RAM 密钥未配置时不能作为正式登录能力提交。
 2. 微信登录服务端 code exchange 已存在；iOS 端已接入 WechatOpenSDK 和 `WeChatLoginService` 授权桥，配置齐全后会拉起微信授权并把返回 code 交给后端。Release 未配置真实 AppID、URL Scheme、Universal Link 时按钮会被禁用。
 3. `CFBundleURLTypes` 已接到 `XNP_WECHAT_URL_SCHEME` build setting；拿到微信开放平台真实 `wx...` scheme 后不需要再手改 Info.plist。
-4. `Backend/scripts/verify_auth_providers.py` 会阻断未配置短信 webhook、微信 AppID/AppSecret 或线上接受 `debug_wechat_*` 的后端；脚本默认不发送真实短信，最终服务商测试需显式传 `--send-test-sms --phone +...`。
+4. `Backend/scripts/verify_auth_providers.py` 会阻断未配置短信 webhook、微信 AppID/AppSecret 或线上接受 `debug_wechat_*` 的后端；脚本默认不发送真实短信，最终服务商测试需显式传 `--send-test-sms --phone-env XNP_SMS_TEST_PHONE`。
 5. `Backend/scripts/check_ios_release_readiness.py` 和 `Backend/scripts/check_ios_app_bundle.py` 会分别阻断未接 WeChat OpenSDK、未配置真实 build setting、缺少授权桥或构建产物缺少真实 `wx...` URL Type 的包，避免把假微信登录提交到 App Store。
 
 ## 不进入第一版的功能
@@ -53,8 +53,8 @@
 1. 恢复密钥：保留为无手机号/微信时的恢复兜底。
 2. 手机号登录：服务端通过短信 webhook 发送验证码，阿里云 adapter 可独立调用 Dysmsapi `SendSms`；验证后绑定到账号，账号身份表只保存 HMAC 后的手机号标识。
 3. 微信登录：客户端拿到微信授权 code，服务端使用微信开放平台换取 openid/unionid 后绑定到账号；账号身份表只保存 HMAC 后的微信标识。
-4. 本地数据可以先创建，用户在开启备份恢复时再登录。
-5. 登录后将本地数据绑定到账号并进入备份队列。
+4. 本地数据可以先创建，用户在开启同步恢复时再登录。
+5. 登录后将本地数据绑定到账号并进入同步队列。
 6. 退出登录不删除本地数据，删除账号才触发云端删除流程。
 
 ## 账号删除要求

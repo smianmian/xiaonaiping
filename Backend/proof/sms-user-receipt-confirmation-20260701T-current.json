@@ -1,0 +1,10 @@
+{
+  "artifactType": "sms-user-receipt-confirmation",
+  "createdAt": "2026-07-01T11:22:40+00:00",
+  "containsSecrets": false,
+  "phone": "****2065",
+  "userConfirmedReceipt": true,
+  "confirmationText": "User confirmed the 159-number test phone received the SMS in the Codex thread.",
+  "pairedLiveSendProof": "Backend/proof/auth-providers-sms-live-20260701T-current.json",
+  "pairedAliyunSendDetailsProof": "Backend/proof/aliyun-sms-send-details-20260701T-current.json"
+}

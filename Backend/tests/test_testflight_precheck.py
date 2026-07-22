@@ -47,13 +47,13 @@ def write_complete_fixture(root: Path) -> Path:
         ios / "XiaoNaiPing/XiaoNaiPing.entitlements",
         {
             "com.apple.developer.associated-domains": ["$(XNP_ASSOCIATED_DOMAIN)"],
-            "com.apple.security.application-groups": ["group.com.mewpow.xiaonaiping"],
+            "com.apple.security.application-groups": ["group.com.mewpow.xiaonaiping.shared"],
         },
     )
     write_plist(
         ios / "XiaoNaiPingWidgets/XiaoNaiPingWidgets.entitlements",
         {
-            "com.apple.security.application-groups": ["group.com.mewpow.xiaonaiping"],
+            "com.apple.security.application-groups": ["group.com.mewpow.xiaonaiping.shared"],
         },
     )
     write_text(
@@ -185,8 +185,8 @@ struct FeedingReminderActivityAttributes {
         """
 struct ProfileView {
     var body: some View {
-        ProfileMenuRow(icon: "icloud.and.arrow.up", title: "账号与备份", value: cloudBackup.serviceStatusLabel)
-        DataStatusSheet(kind: .backup, cloudBackup: cloudBackup)
+        ProfileMenuRow(icon: "icloud.and.arrow.up", title: "账号与同步", value: cloudSync.serviceStatusLabel)
+        DataStatusSheet(kind: .sync, cloudSync: cloudSync)
         Toggle(isOn: Binding(
             get: { store.feedingLiveActivityEnabled },
             set: { setFeedingLiveActivityEnabled($0) }
@@ -205,29 +205,29 @@ private struct DataStatusSheet: View {
     var body: some View {
         Text("手机号登录")
         Button("获取") {
-            Task { await cloudBackup.requestPhoneCode(phoneNumber: normalizedPhoneNumber) }
+            Task { await cloudSync.requestPhoneCode(phoneNumber: normalizedPhoneNumber) }
         }
         Button("手机号登录") {
-            Task { await cloudBackup.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode) }
+            Task { await cloudSync.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode) }
         }
         Button("微信登录") {
-            Task { await cloudBackup.loginWithWeChat() }
+            Task { await cloudSync.loginWithWeChat() }
         }
-        .disabled(cloudBackup.isWorking || !cloudBackup.isWeChatLoginConfigured)
+        .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
         Text("恢复密钥登录")
         Button("使用恢复密钥登录") {
-            Task { await cloudBackup.recoverSession(recoveryKey: recoveryKey) }
+            Task { await cloudSync.recoverSession(recoveryKey: recoveryKey) }
         }
-        _ = CloudBackupController.validateE164PhoneNumber(normalizedPhoneNumber)
-        _ = CloudBackupController.validateSmsCode(normalizedPhoneCode)
-        Button("立即备份") {
-            Task { await cloudBackup.createAccountAndBackup(store: store) }
+        _ = CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
+        _ = CloudSyncController.validateSmsCode(normalizedPhoneCode)
+        Button("立即同步") {
+            Task { await cloudSync.createAccountAndSync(store: store) }
         }
         Button("从云端恢复") {
-            Task { await cloudBackup.restoreLatestBackup(store: store) }
+            Task { await cloudSync.restoreLatestSync(store: store) }
         }
-        Button("删除云端账号与备份") {
-            Task { await cloudBackup.deleteCloudAccount(store: store) }
+        Button("删除云端账号与同步") {
+            Task { await cloudSync.deleteCloudAccount(store: store) }
         }
         Text("本机资料保留")
     }
@@ -235,31 +235,31 @@ private struct DataStatusSheet: View {
 """,
     )
     write_text(
-        ios / "XiaoNaiPing/Services/CloudBackupController.swift",
+        ios / "XiaoNaiPing/Services/CloudSyncController.swift",
         """
-final class CloudBackupController {
-    func createAccountAndBackup(store: BabyRecordStore) async {}
+final class CloudSyncController {
+    func createAccountAndSync(store: BabyRecordStore) async {}
     func requestPhoneCode(phoneNumber: String) async {}
     func verifyPhoneCode(phoneNumber: String, code: String) async {}
     func recoverSession(recoveryKey: String) async {}
     func loginWithWeChat() async {}
-    func restoreLatestBackup(store: BabyRecordStore) async {
+    func restoreLatestSync(store: BabyRecordStore) async {
         client.downloadPhoto(id: photo.id, token: token)
     }
     func deleteCloudAccount(store: BabyRecordStore) async {
         sessionStore.clear()
         store.markCloudAccountDeletedLocally()
     }
-    private func uploadEverything(store: BabyRecordStore, client: CloudBackupAPIClient, token: String) async throws {
+    private func uploadEverything(store: BabyRecordStore, client: CloudSyncAPIClient, token: String) async throws {
         client.uploadPhoto(id: asset.photo.id, data: data, token: token)
     }
 }
 """,
     )
     write_text(
-        ios / "XiaoNaiPing/Services/CloudBackupAPIClient.swift",
+        ios / "XiaoNaiPing/Services/CloudSyncAPIClient.swift",
         """
-final class CloudBackupAPIClient {
+final class CloudSyncAPIClient {
     func createAccount() async throws {
         _ = try await request(path: "/v1/accounts", method: "POST", body: Data())
     }
@@ -275,11 +275,11 @@ final class CloudBackupAPIClient {
     func loginWithWeChat(code: String) async throws {
         _ = try await request(path: "/v1/auth/wechat/login", method: "POST", body: body)
     }
-    func uploadBackup(_ data: Data, token: String) async throws {
-        _ = try await request(path: "/v1/backup", method: "PUT", body: data, token: token)
+    func uploadSync(_ data: Data, token: String) async throws {
+        _ = try await request(path: "/v1/sync", method: "PUT", body: data, token: token)
     }
-    func downloadBackup(token: String) async throws {
-        _ = try await request(path: "/v1/backup", method: "GET", token: token)
+    func downloadSync(token: String) async throws {
+        _ = try await request(path: "/v1/sync", method: "GET", token: token)
     }
     func uploadPhoto(id: UUID, data: Data, token: String) async throws {
         _ = try await request(path: "/v1/photos/\\(id.uuidString)", method: "PUT", body: data, token: token)
@@ -364,7 +364,7 @@ class TestFlightPrecheckTest(unittest.TestCase):
                 """
 struct SharedTodaySnapshot {
     var babyName: String
-    var backupToken: String
+    var syncToken: String
 }
 struct FeedingReminderActivityAttributes {
     struct ContentState {
@@ -393,12 +393,12 @@ struct FeedingReminderActivityAttributes {
                 "struct ProfileView { let label = \"灵动岛\"; let debug = \"debug_wechat_ios\" }\n",
             )
             write_text(
-                root / "App/iOS/XiaoNaiPing/Services/CloudBackupController.swift",
-                "final class CloudBackupController {}\n",
+                root / "App/iOS/XiaoNaiPing/Services/CloudSyncController.swift",
+                "final class CloudSyncController {}\n",
             )
             write_text(
-                root / "App/iOS/XiaoNaiPing/Services/CloudBackupAPIClient.swift",
-                "final class CloudBackupAPIClient {}\n",
+                root / "App/iOS/XiaoNaiPing/Services/CloudSyncAPIClient.swift",
+                "final class CloudSyncAPIClient {}\n",
             )
             write_text(
                 root / "App/iOS/XiaoNaiPing/Models/BabyRecordStore.swift",
@@ -420,12 +420,12 @@ struct FeedingReminderActivityAttributes {
             self.assertIn("localNotificationDeniedAndFailureCopyPresent", report["failedRequiredChecks"])
             self.assertIn("feedingLiveActivityToggleControlPresent", report["failedRequiredChecks"])
             self.assertIn("feedingLiveActivityPreferencePersisted", report["failedRequiredChecks"])
-            self.assertIn("accountBackupReviewEntryPresent", report["failedRequiredChecks"])
+            self.assertIn("accountSyncReviewEntryPresent", report["failedRequiredChecks"])
             self.assertIn("accountLoginClientSurfacesPresent", report["failedRequiredChecks"])
-            self.assertIn("cloudBackupRestoreDeleteClientSurfacesPresent", report["failedRequiredChecks"])
-            self.assertIn("accountBackupReviewSurfaceAvoidsDebugSubstitutes", report["failedRequiredChecks"])
-            self.assertIn("cloudBackupControllerCoreFlowsPresent", report["failedRequiredChecks"])
-            self.assertIn("cloudBackupServiceEndpointsPresent", report["failedRequiredChecks"])
+            self.assertIn("cloudSyncRestoreDeleteClientSurfacesPresent", report["failedRequiredChecks"])
+            self.assertIn("accountSyncReviewSurfaceAvoidsDebugSubstitutes", report["failedRequiredChecks"])
+            self.assertIn("cloudSyncControllerCoreFlowsPresent", report["failedRequiredChecks"])
+            self.assertIn("cloudSyncServiceEndpointsPresent", report["failedRequiredChecks"])
             self.assertIn("sharedWidgetSnapshotPayloadIsScoped", report["failedRequiredChecks"])
             self.assertIn("liveActivityPayloadIsScoped", report["failedRequiredChecks"])
             self.assertIn("widgetAndLiveActivityCopyAvoidsHealthClaims", report["failedRequiredChecks"])

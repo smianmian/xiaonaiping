@@ -68,10 +68,13 @@ def write_green_proofs(root: Path) -> None:
     )
     for name in [
         "auth-providers",
+        "ios265-device-availability",
         "app-store-assets",
         "app-store-connect-materials",
         "app-store-connect-evidence-materials",
         "app-store-submission-packet",
+        "launch-day-rollover",
+        "launch-operator-workbench",
         "mainland-filing-materials",
         "signed-archive-testflight-materials",
         "provider-evidence-materials",
@@ -210,6 +213,20 @@ class LaunchObjectiveAuditTest(unittest.TestCase):
             self.assertFalse(report["ready"])
             self.assertIn("privacyManifestGreen", report["failedRequiredChecks"])
 
+    def test_ios_265_physical_device_availability_blocks_goal_completion(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            write_green_proofs(root)
+            write_json(
+                root / "Backend/proof/ios265-device-availability.json",
+                proof(False, failed=["deviceListReadable", "physicalIphonesListed"]),
+            )
+
+            report = self.run_checker(root)
+
+            self.assertFalse(report["ready"])
+            self.assertIn("ios265PhysicalDeviceAvailabilityReady", report["failedRequiredChecks"])
+
     def test_app_store_connect_evidence_materials_block_goal_completion(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
@@ -220,6 +237,36 @@ class LaunchObjectiveAuditTest(unittest.TestCase):
 
             self.assertFalse(report["ready"])
             self.assertIn("appStoreConnectEvidenceMaterialsReady", report["failedRequiredChecks"])
+
+    def test_launch_day_rollover_blocks_goal_completion(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            write_green_proofs(root)
+            write_json(
+                root / "Backend/proof/launch-day-rollover.json",
+                proof(False, failed=["sameDayEvidenceRefreshRequired"]),
+            )
+
+            report = self.run_checker(root)
+
+            self.assertFalse(report["ready"])
+            self.assertIn("launchDayRolloverReady", report["failedRequiredChecks"])
+            self.assertIn("sameDayEvidenceRefreshRequired", report["checks"]["launchDayRolloverReady"]["evidence"])
+
+    def test_launch_operator_workbench_blocks_goal_completion(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            write_green_proofs(root)
+            write_json(
+                root / "Backend/proof/launch-operator-workbench.json",
+                proof(False, failed=["appStoreConnectDraftFieldsPresent"]),
+            )
+
+            report = self.run_checker(root)
+
+            self.assertFalse(report["ready"])
+            self.assertIn("launchOperatorWorkbenchReady", report["failedRequiredChecks"])
+            self.assertIn("appStoreConnectDraftFieldsPresent", report["checks"]["launchOperatorWorkbenchReady"]["evidence"])
 
     def test_testflight_regression_plan_blocks_goal_completion(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

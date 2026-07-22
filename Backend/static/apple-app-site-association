@@ -3,13 +3,19 @@
     "apps": [],
     "details": [
       {
-        "appID": "JGCT3GY9CT.com.mewpow.xiaonaiping",
+        "appID": "L2TYJNDTJK.com.mewpow.Emotion-Isle",
+        "paths": [
+          "/ww/*"
+        ]
+      },
+      {
+        "appID": "L2TYJNDTJK.com.mewpow.xiaonaiping",
         "paths": [
           "/wechat/*",
           "/xiaonaiping/wechat/*"
         ],
         "appIDs": [
-          "JGCT3GY9CT.com.mewpow.xiaonaiping"
+          "L2TYJNDTJK.com.mewpow.xiaonaiping"
         ],
         "components": [
           {

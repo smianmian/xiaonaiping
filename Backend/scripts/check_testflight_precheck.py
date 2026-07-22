@@ -70,7 +70,7 @@ MAIN_APP_REVIEW_SURFACE_PATHS = (
     "XiaoNaiPing/Views/VaccineView.swift",
     "XiaoNaiPing/Views/AlbumView.swift",
     "XiaoNaiPing/Models/AppNotificationScheduler.swift",
-    "XiaoNaiPing/Services/CloudBackupController.swift",
+    "XiaoNaiPing/Services/CloudSyncController.swift",
     "XiaoNaiPingShared/XiaoNaiPingShared.swift",
 )
 
@@ -198,8 +198,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     profile_source = read_text(source_tree(root) / "XiaoNaiPing/Views/ProfileView.swift")
     feeding_source = read_text(source_tree(root) / "XiaoNaiPing/Views/FeedingRecordView.swift")
     store_source = read_text(source_tree(root) / "XiaoNaiPing/Models/BabyRecordStore.swift")
-    cloud_controller_source = read_text(source_tree(root) / "XiaoNaiPing/Services/CloudBackupController.swift")
-    cloud_api_source = read_text(source_tree(root) / "XiaoNaiPing/Services/CloudBackupAPIClient.swift")
+    cloud_controller_source = read_text(source_tree(root) / "XiaoNaiPing/Services/CloudSyncController.swift")
+    cloud_api_source = read_text(source_tree(root) / "XiaoNaiPing/Services/CloudSyncAPIClient.swift")
     project_source = read_text(source_tree(root) / "project.yml") + "\n" + read_text(source_tree(root) / "XiaoNaiPing.xcodeproj/project.pbxproj")
 
     report = Report()
@@ -400,31 +400,31 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else "feeding Live Activity user preference is stored and restored with app state",
     )
 
-    account_backup_entry_markers = {
-        "DataStatusSheet(kind: .backup",
-        "账号与备份",
-        "cloudBackup.serviceStatusLabel",
+    account_sync_entry_markers = {
+        "DataStatusSheet(kind: .sync",
+        "账号与同步",
+        "cloudSync.serviceStatusLabel",
     }
-    missing_account_backup_entry_markers = sorted(marker for marker in account_backup_entry_markers if marker not in profile_source)
+    missing_account_sync_entry_markers = sorted(marker for marker in account_sync_entry_markers if marker not in profile_source)
     report.add(
-        "accountBackupReviewEntryPresent",
-        not missing_account_backup_entry_markers,
-        "missing: " + ", ".join(missing_account_backup_entry_markers)
-        if missing_account_backup_entry_markers
-        else "Profile exposes the Account & Backup entry used by App Review",
+        "accountSyncReviewEntryPresent",
+        not missing_account_sync_entry_markers,
+        "missing: " + ", ".join(missing_account_sync_entry_markers)
+        if missing_account_sync_entry_markers
+        else "Profile exposes the Account & Sync entry used by App Review",
     )
 
     account_login_surface_markers = {
         "手机号登录",
-        "await cloudBackup.requestPhoneCode",
-        "await cloudBackup.verifyPhoneCode",
+        "await cloudSync.requestPhoneCode",
+        "await cloudSync.verifyPhoneCode",
         "微信登录",
-        "await cloudBackup.loginWithWeChat",
-        "!cloudBackup.isWeChatLoginConfigured",
+        "await cloudSync.loginWithWeChat",
+        "!cloudSync.isWeChatLoginConfigured",
         "恢复密钥登录",
-        "await cloudBackup.recoverSession",
-        "CloudBackupController.validateE164PhoneNumber",
-        "CloudBackupController.validateSmsCode",
+        "await cloudSync.recoverSession",
+        "CloudSyncController.validateE164PhoneNumber",
+        "CloudSyncController.validateSmsCode",
     }
     missing_account_login_surface_markers = sorted(marker for marker in account_login_surface_markers if marker not in profile_source)
     report.add(
@@ -435,24 +435,24 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else "Profile exposes recovery-key, phone, and gated WeChat login paths",
     )
 
-    backup_restore_delete_surface_markers = {
-        "await cloudBackup.createAccountAndBackup",
-        "await cloudBackup.restoreLatestBackup",
-        "await cloudBackup.deleteCloudAccount",
-        "立即备份",
+    sync_restore_delete_surface_markers = {
+        "await cloudSync.createAccountAndSync",
+        "await cloudSync.restoreLatestSync",
+        "await cloudSync.deleteCloudAccount",
+        "立即同步",
         "从云端恢复",
-        "删除云端账号与备份",
+        "删除云端账号与同步",
         "本机资料保留",
     }
-    missing_backup_restore_delete_surface_markers = sorted(
-        marker for marker in backup_restore_delete_surface_markers if marker not in profile_source
+    missing_sync_restore_delete_surface_markers = sorted(
+        marker for marker in sync_restore_delete_surface_markers if marker not in profile_source
     )
     report.add(
-        "cloudBackupRestoreDeleteClientSurfacesPresent",
-        not missing_backup_restore_delete_surface_markers,
-        "missing: " + ", ".join(missing_backup_restore_delete_surface_markers)
-        if missing_backup_restore_delete_surface_markers
-        else "Profile exposes backup, cloud restore, and cloud account deletion flows",
+        "cloudSyncRestoreDeleteClientSurfacesPresent",
+        not missing_sync_restore_delete_surface_markers,
+        "missing: " + ", ".join(missing_sync_restore_delete_surface_markers)
+        if missing_sync_restore_delete_surface_markers
+        else "Profile exposes sync, cloud restore, and cloud account deletion flows",
     )
 
     account_debug_surface_markers = {
@@ -464,20 +464,20 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
     account_debug_surface_hits = sorted(marker for marker in account_debug_surface_markers if marker in profile_source)
     report.add(
-        "accountBackupReviewSurfaceAvoidsDebugSubstitutes",
+        "accountSyncReviewSurfaceAvoidsDebugSubstitutes",
         not account_debug_surface_hits,
         "found: " + ", ".join(account_debug_surface_hits)
         if account_debug_surface_hits
-        else "Account & Backup review surface avoids debug codes, bearer tokens, and AppSecret markers",
+        else "Account & Sync review surface avoids debug codes, bearer tokens, and AppSecret markers",
     )
 
     cloud_controller_markers = {
-        "func createAccountAndBackup",
+        "func createAccountAndSync",
         "func requestPhoneCode",
         "func verifyPhoneCode",
         "func recoverSession",
         "func loginWithWeChat",
-        "func restoreLatestBackup",
+        "func restoreLatestSync",
         "func deleteCloudAccount",
         "sessionStore.clear()",
         "store.markCloudAccountDeletedLocally()",
@@ -487,11 +487,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
     missing_cloud_controller_markers = sorted(marker for marker in cloud_controller_markers if marker not in cloud_controller_source)
     report.add(
-        "cloudBackupControllerCoreFlowsPresent",
+        "cloudSyncControllerCoreFlowsPresent",
         not missing_cloud_controller_markers,
         "missing: " + ", ".join(missing_cloud_controller_markers)
         if missing_cloud_controller_markers
-        else "CloudBackupController wires account creation, login, backup, restore, photos, and cloud account deletion",
+        else "CloudSyncController wires account creation, login, sync, restore, photos, and cloud account deletion",
     )
 
     cloud_api_endpoint_markers = {
@@ -500,19 +500,19 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         'request(path: "/v1/auth/phone/request-code", method: "POST"',
         'request(path: "/v1/auth/phone/verify", method: "POST"',
         'request(path: "/v1/auth/wechat/login", method: "POST"',
-        'request(path: "/v1/backup", method: "PUT"',
-        'request(path: "/v1/backup", method: "GET"',
+        'request(path: "/v1/sync", method: "PUT"',
+        'request(path: "/v1/sync", method: "GET"',
         'path: "/v1/photos/\\(id.uuidString)"',
         'request(path: "/v1/photos", method: "GET"',
         'request(path: "/v1/account", method: "DELETE"',
     }
     missing_cloud_api_endpoint_markers = sorted(marker for marker in cloud_api_endpoint_markers if marker not in cloud_api_source)
     report.add(
-        "cloudBackupServiceEndpointsPresent",
+        "cloudSyncServiceEndpointsPresent",
         not missing_cloud_api_endpoint_markers,
         "missing: " + ", ".join(missing_cloud_api_endpoint_markers)
         if missing_cloud_api_endpoint_markers
-        else "CloudBackupAPIClient uses production account, login, backup, photo, and account deletion endpoints",
+        else "CloudSyncAPIClient uses production account, login, sync, photo, and account deletion endpoints",
     )
 
     shared_fields = swift_var_names(extract_type_body(shared_source, "SharedTodaySnapshot"))
@@ -597,7 +597,7 @@ def main() -> None:
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--expected-api-url", default="https://api.mewpow.com/xiaonaiping")
     parser.add_argument("--expected-bundle-id", default="com.mewpow.xiaonaiping")
-    parser.add_argument("--expected-app-group", default="group.com.mewpow.xiaonaiping")
+    parser.add_argument("--expected-app-group", default="group.com.mewpow.xiaonaiping.shared")
     parser.add_argument("--expected-associated-domain", default="applinks:api.mewpow.com")
     parser.add_argument("--output", default=str(repo_root() / "Backend/proof/testflight-precheck.json"))
     parser.add_argument("--allow-incomplete", action="store_true")

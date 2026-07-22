@@ -1,0 +1,402 @@
+{
+  "artifactType": "app-store-manual-evidence-packet",
+  "status": "manual-evidence-plan-not-evidence",
+  "date": "2026-06-28",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "canSubmitFromThisPacket": false,
+  "sourceFiles": {
+    "evidenceChecklist": "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260628.md",
+    "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
+    "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md",
+    "appStoreConnectExecutionSheet": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260628.md",
+    "appStoreConnectEntrySessionPacket": "Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260628.json",
+    "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260628.json",
+    "finalScreenshotUploadPacket": "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260628.json",
+    "privacyLabel": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "ageRatingAnswers": "Docs/08_Release/APP_STORE_AGE_RATING_ANSWERS_20260628.md",
+    "submissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md"
+  },
+  "targetEvidenceFiles": {
+    "companyAccount": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+    "mainlandAvailability": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+    "mainlandFiling": "Docs/08_Release/AppStoreEvidence/03-app-filing.png or .pdf",
+    "privacyLabel": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png or .pdf",
+    "ageRatingResult": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png or .pdf",
+    "signedArchive": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+    "testFlight": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+    "appleDeveloperAccountAccess": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png",
+    "smsProvider": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+    "wechatOpenPlatform": "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+    "wechatUniversalLinkAasa": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+    "huaweiObsPolicy": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+    "appStoreConnectAppInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-01-app-information.png",
+    "appStoreConnectVersionInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
+    "appStoreConnectPricingAvailabilityRelease": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-03-pricing-availability-release.png",
+    "appStoreConnectAppPrivacy": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-04-app-privacy.png",
+    "appStoreConnectAgeRating": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-05-age-rating.png",
+    "appStoreConnectReviewInformation": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-06-review-information.png",
+    "appStoreConnectBuildTestflightLink": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+    "appStoreConnectSubmitReviewPrecheck": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png",
+    "finalScreenshotUploadProvenance": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
+    "realDeviceRegression": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "companyAccount",
+      "target": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "mainlandAvailability",
+      "target": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "mainlandFiling",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "privacyLabel",
+      "target": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "ageRatingResult",
+      "target": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "signedArchive",
+      "target": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "testFlight",
+      "target": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appleDeveloperAccountAccess",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "smsProvider",
+      "target": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "wechatOpenPlatform",
+      "target": "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "wechatUniversalLinkAasa",
+      "target": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "huaweiObsPolicy",
+      "target": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectAppInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-01-app-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectVersionInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectPricingAvailabilityRelease",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-03-pricing-availability-release.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectAppPrivacy",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-04-app-privacy.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectAgeRating",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-05-age-rating.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectReviewInformation",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-06-review-information.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectBuildTestflightLink",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "appStoreConnectSubmitReviewPrecheck",
+      "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-08-submit-review-precheck.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "finalScreenshotUploadProvenance",
+      "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    },
+    {
+      "artifactId": "realDeviceRegression",
+      "target": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsManualEvidencePacket": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false
+    }
+  ],
+  "captureRules": [
+    "sameDaySameRoundRequired",
+    "realEvidenceOnly",
+    "noTemplateAsEvidence",
+    "evidenceFileChecks must record file size, SHA-256, redaction, same-round capture, allowed evidence root, and real-evidence-not-template confirmation before stable proof aliases are refreshed",
+    "iOS26.5OnlyForLocalProof",
+    "sameBuildForTestFlightFinalScreenshotsAndRealDeviceRegression",
+    "canSubmitFalseUntilProductionReadinessAndLaunchAuditReady",
+    "All screenshots, PDFs, JSON exports, and markdown regression files must come from the same evidence round before stable proof aliases are refreshed.",
+    "App Store Connect 真实页面截图才能归档为 ASC-01 到 ASC-08；Markdown、执行单、聊天记录和模板不能替代真实页面。",
+    "不写占位备案号；没有真实备案号或适用判断结果前，03-app-filing 只能保持缺失。",
+    "不把 Debug simulator 候选截图当最终上传证据；最终截图必须由 UPLOAD_PROVENANCE.json 绑定 iOS 26.5、TestFlight 或 Xcode 签名真机包、同一版本和 build。",
+    "不把模板、执行包或 Markdown 当证据；01 到 09、17、ASC、AppleDeveloper、RealDevice 文件都必须是真实截图、PDF、脱敏 JSON 或真机回归记录。",
+    "不声称微信、短信、OBS、TestFlight、签名归档或真机回归已完成，直到对应真实 evidence files 和 proof gates 变绿。"
+  ],
+  "redactionRules": [
+    "Apple ID 邮箱",
+    "测试员邮箱",
+    "完整手机号",
+    "验证码",
+    "恢复密钥",
+    "AppSecret",
+    "AK/SK",
+    "Bearer token",
+    "session token",
+    "证书私钥",
+    "付款信息",
+    "税务信息",
+    "D-U-N-S 编码完整值",
+    "对象存储完整 key",
+    "真实宝宝照片",
+    "真实家庭资料",
+    "internal dashboard",
+    "127.0.0.1",
+    "localhost"
+  ],
+  "cases": [
+    {
+      "id": "companyAccount",
+      "target": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+      "mustKeep": [
+        "深圳市闪现生活科技有限公司",
+        "App Store Connect or Apple Developer organization page",
+        "Team ID after D-U-N-S organization enrollment"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "companyAccount 已完成",
+        "公司主体证据已完成"
+      ]
+    },
+    {
+      "id": "mainlandAvailability",
+      "target": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+      "mustKeep": [
+        "Specific Countries or Regions",
+        "China mainland",
+        "manual release"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "中国大陆可售地区证据已完成"
+      ]
+    },
+    {
+      "id": "mainlandFiling",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.png or .pdf",
+      "mustKeep": [
+        "App 名称：小奶瓶",
+        "主体：深圳市闪现生活科技有限公司",
+        "备案系统提交状态、备案号或适用判断结果"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "备案号已取得",
+        "ICP/App 备案已完成"
+      ]
+    },
+    {
+      "id": "privacyLabel",
+      "target": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png or .pdf",
+      "mustKeep": [
+        "Tracking 为 No",
+        "APP_STORE_PRIVACY_LABEL.json categories",
+        "privacy policy URL https://api.mewpow.com/xiaonaiping/privacy"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "privacyLabel 已完成",
+        "App Privacy 证据已完成"
+      ]
+    },
+    {
+      "id": "ageRatingResult",
+      "target": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png or .pdf",
+      "mustKeep": [
+        "Kids Category 未选择",
+        "Regulated Medical Device 为 No",
+        "Vaccine templates are records and reminders only"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "ageRatingResult 已完成",
+        "年龄分级结果已完成"
+      ]
+    },
+    {
+      "id": "sameBuildReleaseEvidence",
+      "target": [
+        "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+        "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+        "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
+        "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json"
+      ],
+      "mustKeep": [
+        "same version",
+        "same build",
+        "iOS 26.5",
+        "TestFlight or Xcode 签名真机包"
+      ],
+      "mustNotClaimBeforeCapture": [
+        "TestFlight 已完成",
+        "真机回归已完成",
+        "最终截图已完成"
+      ]
+    }
+  ],
+  "postCaptureCommands": [
+    "python3 Backend/scripts/check_app_store_assets.py --allow-incomplete --output Backend/proof/app-store-assets.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-28 --output Backend/proof/app-store-evidence-20260628T-current.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
+    "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
+    "python3 Backend/scripts/check_app_store_connect_evidence_materials.py --output Backend/proof/app-store-connect-evidence-materials.json",
+    "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "completionRule": "manual-evidence-plan-not-evidence；not submission permission；不能替代真实截图、PDF、脱敏 JSON、TestFlight、签名归档、生产 proof 或 iOS 26.5 真机回归。只有 app-store-evidence.json ready=true、production-readiness.json ready=true、launch-objective-audit.json ready=true，并且 App Store Connect Submit for Review precheck 无未处理警告后，才允许进入提交审核判断。"
+}

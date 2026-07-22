@@ -14,7 +14,7 @@
     "Current replacement behavior is WeChat recording",
     "Visual direction should feel warm and keepsake-like",
     "Photos may be copied into the app private container",
-    "V1 needs account-based backup and restore",
+    "V1 needs account-based sync and restore",
     "V1 uploads original baby photos selected by the user",
     "First submission targets Hong Kong; installed app features are not location-gated",
     "Vaccine templates cover Mainland China and Hong Kong",
@@ -29,7 +29,7 @@
     "Exact brand color direction",
     "Whether dark mode is a v1 acceptance requirement",
     "Whether multiple baby profiles are required",
-    "Whether account sign-in appears during onboarding or backup setup",
+    "Whether account sign-in appears during onboarding or sync setup",
     "Which crash reporting channel is used"
   ],
   "excluded_from_v1": [
@@ -70,8 +70,8 @@
       {
         "id": "settings",
         "label": "设置",
-        "purpose": "Baby profile, account, privacy, backup, data management",
-        "primary_actions": ["edit_profile", "manage_account", "manage_backup", "delete_data"]
+        "purpose": "Baby profile, account, privacy, sync, data management",
+        "primary_actions": ["edit_profile", "manage_account", "manage_sync", "delete_data"]
       }
     ]
   },
@@ -86,10 +86,12 @@
       "destructive": "system_red_only_for_delete"
     },
     "typography": {
-      "style": "system",
+      "style": "xiaonaiping_custom_with_system_fallback",
       "supports_dynamic_type": true,
       "large_title_usage": "today_header_only",
-      "body_usage": "records_forms_empty_states"
+      "body_usage": "records_forms_empty_states",
+      "brand_family": "XiaoNaiPing",
+      "brand_weights": ["regular", "medium"]
     },
     "spacing": {
       "base": 8,
@@ -135,10 +137,11 @@
     {
       "id": "onboarding",
       "label": "首次启动",
-      "goal": "Create trust and baby profile",
-      "primary_action": "创建宝宝档案",
-      "empty_state": "No profile yet",
-      "error_state": "Invalid birth date"
+      "goal": "Introduce the app before profile creation",
+      "primary_action": "开始记录",
+      "secondary_action": "先看看",
+      "empty_state": "Welcome page one",
+      "error_state": "None"
     },
     {
       "id": "today",
@@ -205,12 +208,12 @@
       "error_state": "Delete failed"
     },
     {
-      "id": "account_backup",
-      "label": "账号与备份",
-      "goal": "Sign in with phone, WeChat, or recovery key; show backup status, restore data, delete account",
-      "primary_action": "手机号/微信/恢复密钥登录并开启备份",
+      "id": "account_sync",
+      "label": "账号与同步",
+      "goal": "Sign in with phone, WeChat, or recovery key; show sync status, restore data, delete account",
+      "primary_action": "手机号/微信/恢复密钥登录并开启同步",
       "empty_state": "Not signed in or cloud service not configured",
-      "error_state": "Backup or restore failed"
+      "error_state": "Sync or restore failed"
     }
   ],
   "empty_states": [
@@ -253,7 +256,7 @@
       "recovery": "keep_local_copy_and_retry_later"
     },
     {
-      "id": "photo_backup_failed",
+      "id": "photo_sync_failed",
       "recovery": "keep_local_original_and_retry_later"
     },
     {
@@ -271,7 +274,7 @@
     "must_explain_photo_access": true,
     "must_explain_server_storage_before_upload": true,
     "must_offer_data_delete_entry": true,
-    "must_explain_original_photo_backup": true,
+    "must_explain_original_photo_sync": true,
     "must_offer_account_delete_entry": true,
     "must_not_upload_photos_without_explicit_confirmation": true
   }

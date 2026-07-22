@@ -46,7 +46,7 @@
 
 ## 8. Backend Architect Agent
 
-只在 `BACKEND_DECISION.md` 证明后端必要后工作。负责后端部署原则、API、数据库、对象存储、备份和监控设计。
+只在 `BACKEND_DECISION.md` 证明后端必要后工作。负责后端部署原则、API、数据库、对象存储、自动同步和监控设计。
 
 ## 9. Analytics & Growth Agent
 

@@ -1,6 +1,6 @@
 import Foundation
 
-enum PhotoBackupStatus: String, Codable, Equatable {
+enum PhotoSyncStatus: String, Codable, Equatable {
     case localOnly
     case pending
     case backedUp
@@ -14,7 +14,7 @@ struct BabyPhoto: Identifiable, Equatable, Codable {
     var localFileName: String
     var source: String
     var note: String = ""
-    var backupStatus: PhotoBackupStatus = .localOnly
+    var syncStatus: PhotoSyncStatus = .localOnly
 
     var displayMonth: String {
         BabyRecordStore.monthString(from: capturedAt)
@@ -26,14 +26,14 @@ struct BabyPhoto: Identifiable, Equatable, Codable {
         localFileName: String,
         source: String,
         note: String = "",
-        backupStatus: PhotoBackupStatus = .localOnly
+        syncStatus: PhotoSyncStatus = .localOnly
     ) {
         self.id = id
         self.capturedAt = capturedAt
         self.localFileName = localFileName
         self.source = source
         self.note = note
-        self.backupStatus = backupStatus
+        self.syncStatus = syncStatus
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -42,7 +42,7 @@ struct BabyPhoto: Identifiable, Equatable, Codable {
         case localFileName
         case source
         case note
-        case backupStatus
+        case syncStatus
     }
 
     init(from decoder: Decoder) throws {
@@ -52,6 +52,6 @@ struct BabyPhoto: Identifiable, Equatable, Codable {
         localFileName = try container.decode(String.self, forKey: .localFileName)
         source = try container.decode(String.self, forKey: .source)
         note = try container.decodeIfPresent(String.self, forKey: .note) ?? ""
-        backupStatus = try container.decodeIfPresent(PhotoBackupStatus.self, forKey: .backupStatus) ?? .localOnly
+        syncStatus = try container.decodeIfPresent(PhotoSyncStatus.self, forKey: .syncStatus) ?? .localOnly
     }
 }

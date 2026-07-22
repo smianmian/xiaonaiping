@@ -16,12 +16,14 @@ SUBMISSION_PACKET = Path("Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md")
 CHINA_MAINLAND_RUNBOOK = Path("Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md")
 EVIDENCE_README = Path("Docs/08_Release/AppStoreEvidence/README.md")
 CAPTURE_GUIDE = Path("Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md")
+ASC_EXECUTION_SHEET = Path("Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260704.md")
 PRIVACY_LABEL = Path("Docs/08_Release/APP_STORE_PRIVACY_LABEL.json")
 EVIDENCE_ROOT = Path("Docs/08_Release/AppStoreEvidence")
 
 EXPECTED_COMPANY = "深圳市闪现生活科技有限公司"
 EXPECTED_APP_NAME = "小奶瓶"
 EXPECTED_BUNDLE_ID = "com.mewpow.xiaonaiping"
+EXPECTED_MATERIAL_DATE = "20260704"
 EXPECTED_PRIVACY_URL = "https://api.mewpow.com/xiaonaiping/privacy"
 EXPECTED_SUPPORT_URL = "https://api.mewpow.com/xiaonaiping/support"
 EXPECTED_PRIVACY_CATEGORIES = {
@@ -38,11 +40,29 @@ EVIDENCE_FILENAME_MARKERS = (
     "02-mainland-availability.png",
     "04-privacy-label.png",
 )
+ASC_EXECUTION_SHEET_MARKERS = (
+    "ASC-04-app-privacy.png",
+    "ASC-05-age-rating.png",
+    "ASC-06-review-information.png",
+    "ASC-PRIVACY-AGE-REVIEW-RESULT.json",
+    "ASC-PRIVACY-AGE-REVIEW-RESULT.template.json",
+    "captured-live-privacy-age-review",
+    "04-privacy-label",
+    "17-age-rating-result",
+    "11-test-account-redacted",
+    "answer-sheet matching",
+    "post-result gates",
+    "不能替代隐私标签、年龄分级结果、审核账号、production readiness 或 iOS 26.5 真机 proof",
+    "恢复密钥、验证码、完整手机号、Apple ID 邮箱、联系人完整电话",
+)
 CAPTURE_GUIDE_MARKERS = (
     "`01-company-account.png`",
     "App Store Connect 账号主体为深圳市闪现生活科技有限公司",
+    "D-U-N-S 后 Apple Developer Organization / Team ID 已确认",
     "团队/法律主体名称、账号页标题",
+    "Apple Developer Organization、Team ID",
     "邮箱、电话、付款信息",
+    "D-U-N-S 编码完整值",
     "`02-mainland-availability.png`",
     "首发只选 China mainland / 中国大陆",
     "App 名称、可售地区选择状态",
@@ -106,6 +126,8 @@ FORBIDDEN_SECRET_PATTERNS = {
     "chinaPhoneNumber": re.compile(r"\+86\s?1[3-9]\d{9}"),
 }
 ACCEPTED_EVIDENCE_SUFFIXES = {".png", ".jpg", ".jpeg", ".pdf", ".json"}
+FILL_SHEET_DATE_PATTERN = re.compile(r"APP_STORE_CONNECT_FILL_SHEET_(\d{8})\.md")
+AGE_RATING_ANSWER_PATTERN = re.compile(r"APP_STORE_AGE_RATING_ANSWERS_(\d{8})\.md")
 
 
 def utc_now() -> str:
@@ -136,6 +158,11 @@ def latest_fill_sheet(root: Path) -> str:
     if not candidates:
         return str(FALLBACK_FILL_SHEET)
     return str(candidates[-1].relative_to(root))
+
+
+def material_date_from_fill_sheet(path: str) -> str | None:
+    match = FILL_SHEET_DATE_PATTERN.search(path)
+    return match.group(1) if match else None
 
 
 def missing_markers(text: str, markers: tuple[str, ...]) -> list[str]:
@@ -231,6 +258,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     runbook = read_text(root / args.runbook)
     evidence_readme = read_text(root / args.evidence_readme)
     capture_guide = read_text(root / args.capture_guide)
+    asc_execution_sheet = read_text(root / args.asc_execution_sheet)
     privacy_label = read_json(root / args.privacy_label)
     report = Report()
 
@@ -239,6 +267,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     report.add("chinaRunbookPresent", bool(runbook), args.runbook if runbook else "missing China mainland runbook")
     report.add("evidenceReadmePresent", bool(evidence_readme), args.evidence_readme if evidence_readme else "missing AppStoreEvidence README")
     report.add("captureGuidePresent", bool(capture_guide), args.capture_guide if capture_guide else "missing capture guide")
+    report.add(
+        "ascExecutionSheetPresent",
+        bool(asc_execution_sheet),
+        args.asc_execution_sheet if asc_execution_sheet else "missing App Store Connect execution sheet",
+    )
     report.add("privacyLabelJsonPresent", bool(privacy_label), args.privacy_label if privacy_label else "missing privacy label JSON")
 
     evidence_index_text = evidence_readme + "\n" + capture_guide + "\n" + runbook
@@ -258,6 +291,54 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "missing: " + ", ".join(missing_capture)
         if missing_capture
         else "capture guide covers company account, mainland availability, and privacy label fields/redaction",
+    )
+
+    missing_asc_execution = missing_markers(asc_execution_sheet, ASC_EXECUTION_SHEET_MARKERS)
+    report.add(
+        "ascPrivacyAgeReviewExecutionSheetCovered",
+        not missing_asc_execution,
+        "missing: " + ", ".join(missing_asc_execution)
+        if missing_asc_execution
+        else "App Store Connect execution sheet covers ASC-04/05/06 privacy, age rating, review-account result capture and non-replacement boundaries",
+    )
+
+    fill_sheet_date = material_date_from_fill_sheet(fill_sheet_arg)
+    report.add(
+        "fillSheetUsesExpectedMaterialDate",
+        fill_sheet_date == args.expected_material_date,
+        f"fill sheet date={fill_sheet_date or '<unknown>'}, expected={args.expected_material_date}"
+        if fill_sheet_date != args.expected_material_date
+        else f"fill sheet is current expected material date {args.expected_material_date}",
+    )
+    expected_age_rating_answers = (
+        f"APP_STORE_AGE_RATING_ANSWERS_{fill_sheet_date}.md" if fill_sheet_date else ""
+    )
+    referenced_age_rating_answers = {
+        f"APP_STORE_AGE_RATING_ANSWERS_{date}.md"
+        for date in AGE_RATING_ANSWER_PATTERN.findall(capture_guide)
+    }
+    stale_age_rating_answers = sorted(
+        reference
+        for reference in referenced_age_rating_answers
+        if reference != expected_age_rating_answers
+    )
+    age_rating_answer_sheet_ok = (
+        bool(expected_age_rating_answers)
+        and expected_age_rating_answers in capture_guide
+        and not stale_age_rating_answers
+    )
+    report.add(
+        "captureGuideUsesCurrentAgeRatingAnswerSheet",
+        age_rating_answer_sheet_ok,
+        "expected: "
+        + (expected_age_rating_answers or "dated APP_STORE_CONNECT_FILL_SHEET_YYYYMMDD.md")
+        + (
+            "; stale: " + ", ".join(stale_age_rating_answers)
+            if stale_age_rating_answers
+            else ""
+        )
+        if not age_rating_answer_sheet_ok
+        else f"capture guide references {expected_age_rating_answers} and no stale age-rating answer sheets",
     )
 
     missing_fill_sheet = missing_markers(fill_sheet, FILL_SHEET_MARKERS)
@@ -287,7 +368,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else "pre-submit commands include App Store Connect materials, evidence-materials, and final evidence gates",
     )
 
-    all_materials = "\n".join([fill_sheet, packet, runbook, evidence_readme, capture_guide, json.dumps(privacy_label, ensure_ascii=False)])
+    all_materials = "\n".join([
+        fill_sheet,
+        packet,
+        runbook,
+        evidence_readme,
+        capture_guide,
+        asc_execution_sheet,
+        json.dumps(privacy_label, ensure_ascii=False),
+    ])
     secret_hits = forbidden_secret_hits(all_materials)
     report.add(
         "appStoreConnectEvidenceMaterialsDoNotExposeSecrets",
@@ -317,10 +406,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--fill-sheet")
+    parser.add_argument("--expected-material-date", default=EXPECTED_MATERIAL_DATE)
     parser.add_argument("--submission-packet", default=str(SUBMISSION_PACKET))
     parser.add_argument("--runbook", default=str(CHINA_MAINLAND_RUNBOOK))
     parser.add_argument("--evidence-readme", default=str(EVIDENCE_README))
     parser.add_argument("--capture-guide", default=str(CAPTURE_GUIDE))
+    parser.add_argument("--asc-execution-sheet", default=str(ASC_EXECUTION_SHEET))
     parser.add_argument("--privacy-label", default=str(PRIVACY_LABEL))
     parser.add_argument("--output", default="Backend/proof/app-store-connect-evidence-materials.json")
     parser.add_argument("--allow-incomplete", action="store_true")

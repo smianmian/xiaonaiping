@@ -1,0 +1,1015 @@
+{
+  "artifactType": "production-proof-refresh-status",
+  "status": "current-proof-status-not-submit-permission",
+  "date": "2026-07-04",
+  "checkedAt": "2026-06-29T19:37:44.629Z",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "xnpRoot": "/Users/smianmian/Downloads/小奶瓶",
+  "baseUrl": "https://api.mewpow.com/xiaonaiping",
+  "sourcePlan": "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json",
+  "canSubmitFromThisStatus": false,
+  "stableAliasSyncAllowed": false,
+  "stableAliasSyncReason": "current proof files are incomplete or failed; do not sync stable aliases",
+  "proofFileStatuses": [
+    {
+      "artifactId": "deploymentProofCurrent",
+      "target": "Backend/proof/huawei-baota-deploy-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 3077,
+      "sha256": "9c1b28cd5af0d5de527aa9f6d0a0ab2697e388c9aabf9485e2de1dda34f99cc1",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [
+        "Huawei OBS storage backend is not selected",
+        "Huawei OBS bucket is missing or does not contain xiaonaiping/xnp namespace",
+        "production SMS webhook provider is not fully configured",
+        "WeChat Open Platform AppID/AppSecret are not fully configured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "remoteApiCurrent",
+      "target": "Backend/proof/remote-api-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 734,
+      "sha256": "dea9bdf9c2ab9a4963b4661eef690ab1bbd756369dd5297a8691f4eeb27e2070",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "storageBackendCurrent",
+      "target": "Backend/proof/storage-backend-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 457,
+      "sha256": "fc7749e40fbffa430d1a291a59d91c6cfd6f58d7215812a1088a1080b0bd735e",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "authProvidersConfigCurrent",
+      "target": "Backend/proof/auth-providers-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 1384,
+      "sha256": "1cc69040917d6ba8f4657c5170c675741793dc1ce7186af26f64f645307ec056",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "authProvidersSmsLiveCurrent",
+      "target": "Backend/proof/auth-providers-sms-live-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 1377,
+      "sha256": "c446e2a5a1f1bbba035d05d4d1f8c11457f84fb9f23db9a9c23acf2bd4214cc7",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured",
+        "smsLiveSendVerified"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "wechatClientConfigurationCurrent",
+      "target": "Backend/proof/wechat-client-configuration-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 4127,
+      "sha256": "d2a1eef92a2227081baefba3df9a35a2f24f88898be2e556eba2ea5fd8aebc23",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "iosReleaseReadinessCurrent",
+      "target": "Backend/proof/ios-release-readiness-20260704T-current-ios265.json",
+      "exists": true,
+      "fileSizeBytes": 3726,
+      "sha256": "17d744b6a3bf589d241d3e790dd0b2c8ba88ab61643f5ee1ed6a39d0d06db841",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "iosAppBundleCurrent",
+      "target": "Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+      "exists": true,
+      "fileSizeBytes": 2979,
+      "sha256": "859f9e33b11b60f66a08a58850db4f066dfa386008ed069fd729630c851ba11a",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "appStoreEvidenceCurrent",
+      "target": "Backend/proof/app-store-evidence-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 9593,
+      "sha256": "4a6c19231220445e11e99668cace7f74e513a2d18c9fd83a9169298d99d48a83",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "companyAccount",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "ageRatingResult",
+        "signedArchive",
+        "testFlight",
+        "appleDeveloperAccountAccess",
+        "smsProvider",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa",
+        "huaweiObsPolicy",
+        "finalScreenshots",
+        "realDeviceRegression"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "productionReadinessCurrent",
+      "target": "Backend/proof/production-readiness-20260704T-current.json",
+      "exists": true,
+      "fileSizeBytes": 10140,
+      "sha256": "93d0552ca2e9c8dba62e79b4a980007c7b655b2b0fdcbc57e945946de497d9ee",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "productionSecretConfigured",
+        "productionDataDirConfigured",
+        "mysqlDatabaseSelected",
+        "mysqlDatabaseEnvPresent",
+        "phoneLoginProviderConfigured",
+        "wechatLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
+        "xiaonaipingProductionNamespaceConfigured",
+        "iosReleaseReadinessProofPassed",
+        "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
+        "authProvidersProofPassed"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "launchObjectiveAudit",
+      "target": "Backend/proof/launch-objective-audit.json",
+      "exists": true,
+      "fileSizeBytes": 5772,
+      "sha256": "e520bc2c705151f88422567f17b889630c560f58459c91bd5dc7df998ab486c5",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "ios265PhysicalDeviceAvailabilityReady",
+        "weChatConfigurationGreen",
+        "appStoreAssetsReady",
+        "testFlightRegressionPlanReadyButNotEvidence",
+        "realDeviceRegressionEvidenceReady",
+        "appStoreManualEvidenceReady",
+        "productionReadinessGreen"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": ""
+    },
+    {
+      "artifactId": "stableDeploymentAlias",
+      "target": "Backend/proof/huawei-baota-deploy.json",
+      "exists": true,
+      "fileSizeBytes": 3052,
+      "sha256": "4ead674732aa33b94e1bda49b527b1e25c7a01d9d603fb520a1ca79a912dd1e0",
+      "jsonParsed": true,
+      "currentDateStamped": false,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [
+        "Huawei OBS storage backend is not selected",
+        "Huawei OBS bucket is missing or does not contain xiaonaiping/xnp namespace",
+        "production SMS webhook provider is not fully configured",
+        "WeChat Open Platform AppID/AppSecret are not fully configured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableRemoteApiAlias",
+      "target": "Backend/proof/remote-api.json",
+      "exists": true,
+      "fileSizeBytes": 734,
+      "sha256": "550e3b9706ff77de6e005869f88aedba394c38864c5145f73a97169a18e72e8c",
+      "jsonParsed": true,
+      "currentDateStamped": false,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableStorageAlias",
+      "target": "Backend/proof/storage-backend.json",
+      "exists": true,
+      "fileSizeBytes": 450,
+      "sha256": "597f52f2a6719821eb53f477c025ee16e11c81351ff6f7d637e98d818cc48730",
+      "jsonParsed": true,
+      "currentDateStamped": false,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableAuthProvidersAlias",
+      "target": "Backend/proof/auth-providers.json",
+      "exists": true,
+      "fileSizeBytes": 1331,
+      "sha256": "2bed01745d16d44bf117362b4261eb34432f93c217d7fd298f2a6f0ae0fc7bb7",
+      "jsonParsed": true,
+      "currentDateStamped": false,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableWechatClientConfigurationAlias",
+      "target": "Backend/proof/wechat-client-configuration.json",
+      "exists": true,
+      "fileSizeBytes": 4127,
+      "sha256": "6dc1a62c24c15f7998a2db369c62c8dfa1301055aacf7d7979616ac640e9e752",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": true,
+      "failedRequiredChecks": [],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableIosReleaseReadinessAlias",
+      "target": "Backend/proof/ios-release-readiness.json",
+      "exists": true,
+      "fileSizeBytes": 3726,
+      "sha256": "17d744b6a3bf589d241d3e790dd0b2c8ba88ab61643f5ee1ed6a39d0d06db841",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "weChatReleaseBuildSettingsConfigured"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableIosAppBundleAlias",
+      "target": "Backend/proof/ios-app-bundle.json",
+      "exists": true,
+      "fileSizeBytes": 2979,
+      "sha256": "859f9e33b11b60f66a08a58850db4f066dfa386008ed069fd729630c851ba11a",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableAppStoreEvidenceAlias",
+      "target": "Backend/proof/app-store-evidence.json",
+      "exists": true,
+      "fileSizeBytes": 9593,
+      "sha256": "9135714ece948d867148e5920ccdf56f9a5b6a46a1b4c87ba3f2cbf0b3c4d152",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "companyAccount",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "ageRatingResult",
+        "signedArchive",
+        "testFlight",
+        "appleDeveloperAccountAccess",
+        "smsProvider",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa",
+        "huaweiObsPolicy",
+        "finalScreenshots",
+        "realDeviceRegression"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    },
+    {
+      "artifactId": "stableProductionReadinessAlias",
+      "target": "Backend/proof/production-readiness.json",
+      "exists": true,
+      "fileSizeBytes": 10288,
+      "sha256": "42caeb72b12903accf96c5d0c408c3e98847913c1b7b184c9fe5cb950dcacb0f",
+      "jsonParsed": true,
+      "currentDateStamped": true,
+      "passedOrReadyVerified": false,
+      "failedRequiredChecks": [
+        "productionSecretConfigured",
+        "productionDataDirConfigured",
+        "mysqlDatabaseSelected",
+        "mysqlDatabaseEnvPresent",
+        "huaweiObsSelected",
+        "huaweiObsEnvPresent",
+        "phoneLoginProviderConfigured",
+        "wechatLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
+        "xiaonaipingProductionNamespaceConfigured",
+        "storageBackendProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
+        "authProvidersProofPassed",
+        "appStoreManualEvidenceReady"
+      ],
+      "realProofNotTemplate": true,
+      "secretValuesNotRecorded": true,
+      "secretScanHits": [],
+      "stableAliasSyncedOnlyAfterGreen": false,
+      "syncBlockedReason": "stable alias remains blocked until same-round current proofs are all green"
+    }
+  ],
+  "summary": {
+    "totalProofFiles": 20,
+    "existingProofFiles": 20,
+    "missingProofFiles": 0,
+    "failedProofFiles": 14,
+    "secretScanFailures": 0,
+    "deploymentProofCurrentExists": true,
+    "authProvidersSmsLiveCurrentExists": true,
+    "stableAliasesBlocked": true
+  },
+  "missingProofs": [],
+  "failedProofs": [
+    {
+      "artifactId": "deploymentProofCurrent",
+      "failedRequiredChecks": [
+        "Huawei OBS storage backend is not selected",
+        "Huawei OBS bucket is missing or does not contain xiaonaiping/xnp namespace",
+        "production SMS webhook provider is not fully configured",
+        "WeChat Open Platform AppID/AppSecret are not fully configured"
+      ]
+    },
+    {
+      "artifactId": "authProvidersConfigCurrent",
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ]
+    },
+    {
+      "artifactId": "authProvidersSmsLiveCurrent",
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured",
+        "smsLiveSendVerified"
+      ]
+    },
+    {
+      "artifactId": "iosReleaseReadinessCurrent",
+      "failedRequiredChecks": [
+        "weChatReleaseBuildSettingsConfigured"
+      ]
+    },
+    {
+      "artifactId": "iosAppBundleCurrent",
+      "failedRequiredChecks": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ]
+    },
+    {
+      "artifactId": "appStoreEvidenceCurrent",
+      "failedRequiredChecks": [
+        "companyAccount",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "ageRatingResult",
+        "signedArchive",
+        "testFlight",
+        "appleDeveloperAccountAccess",
+        "smsProvider",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa",
+        "huaweiObsPolicy",
+        "finalScreenshots",
+        "realDeviceRegression"
+      ]
+    },
+    {
+      "artifactId": "productionReadinessCurrent",
+      "failedRequiredChecks": [
+        "productionSecretConfigured",
+        "productionDataDirConfigured",
+        "mysqlDatabaseSelected",
+        "mysqlDatabaseEnvPresent",
+        "phoneLoginProviderConfigured",
+        "wechatLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
+        "xiaonaipingProductionNamespaceConfigured",
+        "iosReleaseReadinessProofPassed",
+        "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
+        "authProvidersProofPassed"
+      ]
+    },
+    {
+      "artifactId": "launchObjectiveAudit",
+      "failedRequiredChecks": [
+        "ios265PhysicalDeviceAvailabilityReady",
+        "weChatConfigurationGreen",
+        "appStoreAssetsReady",
+        "testFlightRegressionPlanReadyButNotEvidence",
+        "realDeviceRegressionEvidenceReady",
+        "appStoreManualEvidenceReady",
+        "productionReadinessGreen"
+      ]
+    },
+    {
+      "artifactId": "stableDeploymentAlias",
+      "failedRequiredChecks": [
+        "Huawei OBS storage backend is not selected",
+        "Huawei OBS bucket is missing or does not contain xiaonaiping/xnp namespace",
+        "production SMS webhook provider is not fully configured",
+        "WeChat Open Platform AppID/AppSecret are not fully configured"
+      ]
+    },
+    {
+      "artifactId": "stableAuthProvidersAlias",
+      "failedRequiredChecks": [
+        "smsProviderConfigured",
+        "wechatProviderConfigured"
+      ]
+    },
+    {
+      "artifactId": "stableIosReleaseReadinessAlias",
+      "failedRequiredChecks": [
+        "weChatReleaseBuildSettingsConfigured"
+      ]
+    },
+    {
+      "artifactId": "stableIosAppBundleAlias",
+      "failedRequiredChecks": [
+        "weChatNativeConfigPresent",
+        "weChatURLTypePresent"
+      ]
+    },
+    {
+      "artifactId": "stableAppStoreEvidenceAlias",
+      "failedRequiredChecks": [
+        "companyAccount",
+        "mainlandAvailability",
+        "mainlandFiling",
+        "privacyLabel",
+        "ageRatingResult",
+        "signedArchive",
+        "testFlight",
+        "appleDeveloperAccountAccess",
+        "smsProvider",
+        "wechatOpenPlatform",
+        "wechatUniversalLinkAasa",
+        "huaweiObsPolicy",
+        "finalScreenshots",
+        "realDeviceRegression"
+      ]
+    },
+    {
+      "artifactId": "stableProductionReadinessAlias",
+      "failedRequiredChecks": [
+        "productionSecretConfigured",
+        "productionDataDirConfigured",
+        "mysqlDatabaseSelected",
+        "mysqlDatabaseEnvPresent",
+        "huaweiObsSelected",
+        "huaweiObsEnvPresent",
+        "phoneLoginProviderConfigured",
+        "wechatLoginProviderConfigured",
+        "privateOperationsDashboardConfigured",
+        "publicInternalDashboardBlocked",
+        "xiaonaipingProductionNamespaceConfigured",
+        "storageBackendProofPassed",
+        "iosReleaseReadinessProofPassed",
+        "iosAppBundleProofPassed",
+        "testFlightRegressionPlanProofPassed",
+        "appStoreAssetsProofPassed",
+        "authProvidersProofPassed",
+        "appStoreManualEvidenceReady"
+      ]
+    }
+  ],
+  "secretScanFailures": [],
+  "currentBlockerClosure": [
+    {
+      "id": "xnp.production.secret",
+      "title": "Configure the XiaoNaiPing production app secret in the private server env",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_SECRET_KEY"
+      ],
+      "requiredEvidence": [
+        "Backend/proof/huawei-baota-deploy-20260704T-current.json with containsSecrets=false"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.production.namespace",
+      "title": "Set XiaoNaiPing-specific data namespace, separated from Emotion Isle",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_DATA_DIR containing xiaonaiping or xnp namespace"
+      ],
+      "requiredEvidence": [
+        "Deployment proof showing the redacted namespace shape, not the full private path"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.production.mysql",
+      "title": "Select MySQL and configure an isolated XiaoNaiPing production database",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_DATABASE_BACKEND=mysql",
+        "XNP_MYSQL_HOST",
+        "XNP_MYSQL_USER containing xiaonaiping or xnp namespace",
+        "XNP_MYSQL_PASSWORD",
+        "XNP_MYSQL_DATABASE containing xiaonaiping or xnp namespace"
+      ],
+      "requiredEvidence": [
+        "Deployment proof showing database backend and redacted namespace, not credentials"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.production.admin-dashboard",
+      "title": "Configure the private operations dashboard token and keep public internal routes blocked",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_ADMIN_TOKEN"
+      ],
+      "requiredEvidence": [
+        "Deployment proof showing admin protection configured without exposing token"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.production.internal-block",
+      "title": "Prove public /internal routes are blocked in production",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [],
+      "requiredEvidence": [
+        "Deployment or HTTP proof showing public /internal is not exposed"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.auth.sms-provider",
+      "title": "Configure SMS webhook provider and capture provider console proof",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/auth-providers-20260704T-current.json",
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_SMS_PROVIDER=webhook",
+        "XNP_SMS_SECRET",
+        "XNP_SMS_WEBHOOK_URL"
+      ],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
+        "SMS provider name, signature, template, approved status, and masked send result"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/verify_auth_providers.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.auth.sms-live-send",
+      "title": "Run one real SMS live-send proof after provider config is in place",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/auth-providers-sms-live-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "A masked test phone number supplied only at execution time"
+      ],
+      "requiredEvidence": [
+        "Backend/proof/auth-providers-sms-live-20260704T-current.json",
+        "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json filled with redacted result metadata"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/verify_auth_providers.py --send-test-sms --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-sms-live-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.auth.wechat-provider",
+      "title": "Configure WeChat Open Platform server credentials without storing AppSecret in proof",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/auth-providers-20260704T-current.json",
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_WECHAT_APP_ID=wx + 16 lowercase hex",
+        "XNP_WECHAT_APP_SECRET"
+      ],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+        "WeChat Open Platform mobile app status with AppSecret fully hidden"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/verify_auth_providers.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.ios.wechat-client",
+      "title": "Build the iOS Release bundle with the same WeChat AppID, URL Scheme, and Universal Link",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [
+        "XNP_WECHAT_APP_ID=wx + 16 lowercase hex",
+        "XNP_WECHAT_URL_SCHEME equal to XNP_WECHAT_APP_ID",
+        "XNP_WECHAT_UNIVERSAL_LINK on api.mewpow.com"
+      ],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+        "Release app bundle proof showing Info.plist XNPWeChatAppID and CFBundleURLTypes are non-placeholder"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-current.json",
+        "python3 Backend/scripts/check_ios_app_bundle.py --app /tmp/XiaoNaiPing-WeChatClient-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+        ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.appstore.final-screenshots",
+      "title": "Replace Debug simulator screenshot candidates with final upload provenance",
+      "canProgressWithoutDuns": false,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/app-store-assets.json",
+        "Backend/proof/app-store-evidence-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
+        "Final screenshots from the same iOS 26.5 TestFlight build or Xcode signed-device build"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/check_app_store_assets.py --allow-incomplete --output Backend/proof/app-store-assets.json",
+        "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.real-device-regression",
+      "title": "Complete iOS 26.5 real-device or TestFlight regression evidence",
+      "canProgressWithoutDuns": false,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+        "Docs/08_Release/AppStoreEvidence/RealDevice/REAL-DEVICE-CAPTURE-RESULT.json"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan-20260704T-current.json",
+        "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.production.auth-proof-chain",
+      "title": "Refresh production readiness only after SMS and WeChat auth provider proofs are green",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [],
+      "requiredEvidence": [
+        "Backend/proof/auth-providers-20260704T-current.json with failedRequiredChecks=[]"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/verify_auth_providers.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-20260704T-current.json",
+        "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    },
+    {
+      "id": "xnp.external.obs-policy",
+      "title": "Capture Huawei OBS policy proof for private storage and account deletion boundary",
+      "canProgressWithoutDuns": true,
+      "blocksSubmit": true,
+      "sourceProofs": [
+        "Backend/proof/app-store-evidence-20260704T-current.json"
+      ],
+      "requiredPrivateValues": [],
+      "requiredEvidence": [
+        "Docs/08_Release/AppStoreEvidence/09-obs-policy.png"
+      ],
+      "rerunCommands": [
+        "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260704T-current.json"
+      ],
+      "mustNotRecord": [
+        "secret values",
+        "complete phone numbers",
+        "verification codes",
+        "AppSecret",
+        "SMS secret",
+        "OBS AK/SK",
+        "database password",
+        "tokens",
+        "recovery keys"
+      ]
+    }
+  ],
+  "nextActions": [
+    "Do not sync stable aliases until every same-round current proof is green.",
+    "Configure production private env, MySQL, Huawei OBS, SMS live send, and WeChat AppSecret without recording secret values in proof files.",
+    "Capture App Store Connect, Apple Developer, SMS, WeChat, OBS, filing, final screenshots, and iOS 26.5 real-device evidence before Submit for Review."
+  ]
+}

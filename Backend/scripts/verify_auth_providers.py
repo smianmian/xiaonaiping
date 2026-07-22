@@ -11,6 +11,7 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 PLACEHOLDER_MARKERS = ("replace", "example", "changeme", "todo", "your_", "YOUR_")
@@ -22,6 +23,9 @@ WECHAT_SAMPLE_APP_ID_BODIES = {
     "abcdef1234567890",
     "fedcba9876543210",
 }
+LOCAL_SMS_WEBHOOK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+LOCAL_SMS_ADAPTER_PORT = 8791
+LOCAL_SMS_ADAPTER_PATH = "/send"
 
 
 def utc_now() -> str:
@@ -55,6 +59,27 @@ def configured_wechat_app_id(value: str) -> bool:
         return False
     body = value[2:].lower()
     return body not in WECHAT_SAMPLE_APP_ID_BODIES and len(set(body)) > 1
+
+
+def configured_sms_webhook_url(value: str) -> bool:
+    value = value.strip()
+    if not configured_value(value):
+        return False
+    parsed = urlparse(value)
+    host = (parsed.hostname or "").lower()
+    if (
+        parsed.scheme == "http"
+        and host in LOCAL_SMS_WEBHOOK_HOSTS
+        and parsed.port == LOCAL_SMS_ADAPTER_PORT
+        and parsed.path == LOCAL_SMS_ADAPTER_PATH
+    ):
+        return True
+    return (
+        parsed.scheme == "https"
+        and bool(host)
+        and host not in LOCAL_SMS_WEBHOOK_HOSTS
+        and "example" not in host
+    )
 
 
 def deployment_private_set(deployment_proof: dict[str, Any]) -> set[str]:
@@ -111,6 +136,22 @@ def env_or_proof_wechat_app_id_configured(
     return provider_checks.get("wechatAppIDConfigured") is True
 
 
+def env_or_proof_sms_webhook_url_configured(
+    private_set: set[str],
+    public_env: dict[str, str],
+    provider_checks: dict[str, bool],
+) -> bool:
+    value = os.environ.get("XNP_SMS_WEBHOOK_URL", "").strip()
+    if value:
+        return configured_sms_webhook_url(value)
+    public_value = public_env.get("XNP_SMS_WEBHOOK_URL", "").strip()
+    if public_value:
+        return configured_sms_webhook_url(public_value)
+    if "XNP_SMS_WEBHOOK_URL" in private_set:
+        return True
+    return provider_checks.get("smsWebhookURLConfigured") is True
+
+
 def request_json(base_url: str, method: str, path: str, body: Any = None) -> tuple[int, dict[str, Any] | bytes]:
     data = None
     headers = {}
@@ -134,6 +175,15 @@ def request_json(base_url: str, method: str, path: str, body: Any = None) -> tup
             except json.JSONDecodeError:
                 return error.code, payload
         return error.code, payload
+
+
+def sms_live_send_phone(args: argparse.Namespace) -> tuple[str, str]:
+    if args.phone:
+        return args.phone.strip(), "--phone"
+    phone_env = (args.phone_env or "").strip()
+    if not phone_env:
+        return "", "--phone-env"
+    return os.environ.get(phone_env, "").strip(), f"--phone-env {phone_env}"
 
 
 class Report:
@@ -193,12 +243,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     sms_provider = os.environ.get("XNP_SMS_PROVIDER", "").strip() or public_env.get("XNP_SMS_PROVIDER", "").strip()
     sms_provider_is_webhook = sms_provider == "webhook" or provider_checks.get("smsProviderIsWebhook") is True
     sms_secret_configured = env_or_proof_configured("XNP_SMS_SECRET", private_set, public_env, provider_checks)
-    sms_webhook_configured = env_or_proof_configured(
-        "XNP_SMS_WEBHOOK_URL",
+    sms_webhook_configured = env_or_proof_sms_webhook_url_configured(
         private_set,
         public_env,
         provider_checks,
-        "smsWebhookURLConfigured",
     )
     sms_missing = []
     if not sms_provider_is_webhook:
@@ -206,7 +254,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     if not sms_secret_configured:
         sms_missing.append("XNP_SMS_SECRET")
     if not sms_webhook_configured:
-        sms_missing.append("XNP_SMS_WEBHOOK_URL")
+        sms_missing.append("XNP_SMS_WEBHOOK_URL=local adapter or https production webhook")
     report.add(
         "smsProviderConfigured",
         not sms_missing,
@@ -251,23 +299,24 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         report.add("wechatDebugLoginRejected", False, "skipped; pass --live-check to probe public API", required=False)
 
     if args.require_sms_live_send or args.send_test_sms:
+        phone_number, phone_source = sms_live_send_phone(args)
         if not args.send_test_sms:
             report.add("smsLiveSendVerified", False, "missing --send-test-sms", required=True)
-        elif not args.phone or not PHONE_RE.fullmatch(args.phone):
-            report.add("smsLiveSendVerified", False, "missing valid --phone in E.164 format", required=True)
+        elif not phone_number or not PHONE_RE.fullmatch(phone_number):
+            report.add("smsLiveSendVerified", False, f"missing valid test phone from {phone_source} in E.164 format", required=True)
         elif not base_url:
             report.add("smsLiveSendVerified", False, "missing --base-url or deployment publicRoute.baseUrl", required=True)
         elif not base_url.startswith("https://") and not args.allow_insecure_http:
             report.add("smsLiveSendVerified", False, f"live SMS check requires https:// base URL: {base_url}", required=True)
         else:
             try:
-                status, payload = request_json(base_url, "POST", "/v1/auth/phone/request-code", {"phoneNumber": args.phone})
+                status, payload = request_json(base_url, "POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
                 debug_code_returned = isinstance(payload, dict) and "debugCode" in payload
                 sent = status < 300 and isinstance(payload, dict) and payload.get("sent") is True and not debug_code_returned
                 report.add(
                     "smsLiveSendVerified",
                     sent,
-                    f"/v1/auth/phone/request-code returned HTTP {status} without debugCode"
+                    f"/v1/auth/phone/request-code returned HTTP {status} without debugCode using {phone_source}"
                     if sent
                     else f"/v1/auth/phone/request-code returned HTTP {status}"
                     + (" with debugCode" if debug_code_returned else ""),
@@ -279,7 +328,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         report.add(
             "smsLiveSendVerified",
             False,
-            "skipped to avoid sending real SMS; pass --send-test-sms --phone +... for final carrier test",
+            "skipped to avoid sending real SMS; pass --send-test-sms --phone-env XNP_SMS_TEST_PHONE for final carrier test",
             required=False,
         )
 
@@ -295,6 +344,7 @@ def main() -> None:
     parser.add_argument("--send-test-sms", action="store_true")
     parser.add_argument("--require-sms-live-send", action="store_true")
     parser.add_argument("--phone", default="")
+    parser.add_argument("--phone-env", default="XNP_SMS_TEST_PHONE")
     parser.add_argument("--output", default=str(repo_root() / "Backend/proof/auth-providers.json"))
     parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()

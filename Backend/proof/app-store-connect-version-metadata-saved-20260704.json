@@ -1,0 +1,40 @@
+{
+  "date": "2026-07-04",
+  "appStoreConnectAppId": "6787332971",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "version": "1.0",
+  "action": "app-store-connect-version-metadata-save-clicked",
+  "status": "saved-draft-observed",
+  "observedAfterSave": {
+    "saveButtonState": "disabled-with-checkmark",
+    "addForReviewButtonVisible": true,
+    "addForReviewClicked": false,
+    "manualReleaseSelected": true,
+    "marketingUrlLeftBlank": true,
+    "screenshotCountObserved": "0/10",
+    "buildSectionObserved": "App Store Connect version page still shows upload/select-build guidance; no selected build was recorded in this proof"
+  },
+  "savedPublicOrReviewFields": {
+    "promotionalText": "用低负担的方式记录喂养、睡眠、排便、成长、疫苗提醒和珍贵照片。",
+    "descriptionCharacterCount": 488,
+    "keywords": "宝宝记录,育儿,喂奶,睡眠,尿布,成长记录,疫苗提醒,相册",
+    "supportUrl": "https://api.mewpow.com/xiaonaiping/support",
+    "copyright": "© 2026 深圳市闪现生活科技有限公司",
+    "reviewNotesCharacterCount": 887,
+    "releaseType": "manual"
+  },
+  "notFilledByDesign": [
+    "demoAccountPassword",
+    "contactFirstName",
+    "contactLastName",
+    "contactPhone",
+    "contactEmail",
+    "screenshots",
+    "buildSelection",
+    "appReviewSubmission"
+  ],
+  "localEvidence": {
+    "screenshot": "Backend/proof/app-store-connect-version-metadata-saved-20260704.png"
+  },
+  "submissionBoundary": "No screenshots were uploaded, no private recovery key or contact details were transmitted, and Submit/Add for Review was not clicked."
+}

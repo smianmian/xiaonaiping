@@ -1,0 +1,98 @@
+{
+  "startedAt": "2026-07-03T23:21:39+00:00",
+  "completedAt": "2026-07-03T23:21:39+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "handoffDocumentPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md"
+    },
+    "handoffDocumentCoversRequiredValues": {
+      "passed": true,
+      "required": true,
+      "evidence": "document covers AppID, URL Scheme, Universal Link, server AppSecret, and evidence path"
+    },
+    "ios265ValidationCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document constrains local validation commands to iOS 26.5"
+    },
+    "proofRegenerationCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document lists focused proof regeneration commands"
+    },
+    "wechatValidationUsesCurrentProofChain": {
+      "passed": true,
+      "required": true,
+      "evidence": "document regenerates WeChat validation, iOS release readiness, app bundle, WeChat client configuration, and auth provider proof as 20260630T-current before syncing stable aliases"
+    },
+    "clientPreconfigurationMatrixPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document separates local client slots that can be prepared from external WeChat/Apple values that must not be faked"
+    },
+    "wechatReleaseConfigurationPacketReferenced": {
+      "passed": true,
+      "required": true,
+      "evidence": "document points to the structured real WeChat Release configuration packet and states it is not evidence or submission permission"
+    },
+    "wechatValuePropagationMatrixPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "document maps the same real WeChat AppID, URL Scheme, Universal Link, Team ID, server-only AppSecret, and iOS 26.5 signed-device login proof across all required destinations"
+    },
+    "wechatReleaseConfigurationPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260630.json"
+    },
+    "wechatReleaseConfigurationPacketValid": {
+      "passed": true,
+      "required": true,
+      "evidence": "structured packet covers real wx AppID, URL Scheme, server-only AppSecret boundary, Team ID/AASA sync, iOS 26.5 Release validation, provider proof, external evidence, stable aliases, and RD-14 completion boundary"
+    },
+    "docDoesNotAssignAppSecret": {
+      "passed": true,
+      "required": true,
+      "evidence": "document explains AppSecret is server-only and does not show shell assignment"
+    },
+    "projectBuildSettingsWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "project.yml wires Release WeChat build settings and Associated Domain"
+    },
+    "xcodeProjectReleaseBuildSettingsWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "Xcode project Release target wires Bundle ID, entitlements, WeChat build settings, and Associated Domain"
+    },
+    "infoPlistSlotsWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "Info.plist wires WeChat keys, URL type, and query schemes"
+    },
+    "associatedDomainsEntitlementWired": {
+      "passed": true,
+      "required": true,
+      "evidence": "Release entitlements wire Associated Domains to XNP_ASSOCIATED_DOMAIN"
+    },
+    "appEntryHandlesWeChatCallbacks": {
+      "passed": true,
+      "required": true,
+      "evidence": "SwiftUI app entry routes URL scheme and Universal Link callbacks to WeChatLoginService"
+    },
+    "wechatServiceUsesNativeSdkAuthFlow": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat login service registers the native SDK, sends snsapi_userinfo auth request, handles callbacks, and validates state/code"
+    },
+    "aasaCoversWeChatUniversalLinkPaths": {
+      "passed": true,
+      "required": true,
+      "evidence": "AASA covers the current Team ID / Bundle ID and both dedicated and transitional WeChat callback paths"
+    }
+  }
+}

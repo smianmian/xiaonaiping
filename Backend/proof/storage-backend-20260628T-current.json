@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-06-28T13:38:29+00:00",
+  "completedAt": "2026-06-28T13:38:29+00:00",
+  "containsSecrets": false,
+  "storageBackend": "disk",
+  "dataDir": "/private/tmp/xnp-storage-proof-20260628",
+  "accountId": "storage_probe_e26fe78dbe8547bd9b255d295e8ef8d5",
+  "checks": {
+    "photoUploaded": true,
+    "photoDownloaded": true,
+    "photoDeleted": true,
+    "accountDeleteRemovedPhotos": true
+  },
+  "passed": true,
+  "failedChecks": []
+}

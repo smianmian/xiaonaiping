@@ -1,0 +1,98 @@
+{
+  "startedAt": "2026-06-28T18:32:28+00:00",
+  "completedAt": "2026-06-28T18:32:28+00:00",
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "operatorWorkbenchPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260629.md"
+    },
+    "identityAndDateBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "2026-06-29 workbench is marked not evidence and references launch-day rollover"
+    },
+    "appStoreConnectDraftFieldsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "App Store Connect draft fields cover name, subtitle, description, keywords, category, age rating, privacy URLs, support URL, and review notes"
+    },
+    "dunsPostDeliveryActionsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S post-delivery actions cover organization enrollment, Team ID, roles, capabilities, certificate/profile, Archive, and TestFlight"
+    },
+    "realDeviceTestFlightCaptureTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "iOS 26.5 TestFlight/signed-device capture checklist covers feeding deferral, login, account deletion, notification permission, Dynamic Island, Lock Screen, and widgets"
+    },
+    "externalPlatformProductionPrivacyFilingPlanPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat, SMS, OBS, production proof, App Privacy, and ICP/App filing next actions are present"
+    },
+    "crossAppReuseBoundaryPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "cross-app reusable company-level evidence is separated from XiaoNaiPing-specific App Store, Apple Developer, provider, production, build, and iOS 26.5 evidence"
+    },
+    "submitForReviewGuardPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Submit for Review remains blocked until same-day evidence, production readiness, final screenshots, real-device regression, and launch objective audit pass"
+    },
+    "rerunCommandsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "rerun commands include operator workbench, rollover, App Store materials, submission packet, same-day evidence, and launch audit gates"
+    },
+    "secretBoundariesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "secret and privacy redaction boundaries are explicit"
+    },
+    "dunsPostDeliveryActionPacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json"
+    },
+    "dunsPostDeliveryActionPacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "D-U-N-S post-delivery JSON covers Apple Developer organization continuation, signing, Archive, TestFlight, iOS 26.5 regression, and redaction boundaries"
+    },
+    "focusedCapturePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/FOCUSED_CAPTURE_PACKET_20260629.json"
+    },
+    "focusedCapturePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "focused iOS 26.5 capture packet covers required RD files, same-build rules, reminder deferral, login, deletion, notifications, Dynamic Island, and widget evidence"
+    },
+    "realDeviceCaptureResultTemplatePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/AppStoreEvidence/RealDevice/REAL-DEVICE-CAPTURE-RESULT.template.json"
+    },
+    "realDeviceCaptureResultTemplateStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "real-device result template keeps live-capture status, iOS 26.5 install-source rules, SHA-256 placeholders, redaction, and submit-permission boundary"
+    },
+    "crossAppReusePacketPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/CROSS_APP_REUSABLE_EVIDENCE_PACKET_20260629.json"
+    },
+    "crossAppReusePacketStructured": {
+      "passed": true,
+      "required": true,
+      "evidence": "cross-app reuse packet limits Yi Gen Dai Mao / Emotion Isle materials to company-level D-U-N-S and Apple organization references while requiring XiaoNaiPing-specific evidence"
+    }
+  }
+}

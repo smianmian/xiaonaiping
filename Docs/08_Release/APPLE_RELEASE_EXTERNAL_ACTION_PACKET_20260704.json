@@ -1,0 +1,123 @@
+{
+  "artifactType": "apple-release-external-action-packet",
+  "status": "action-plan-not-evidence",
+  "date": "2026-07-04",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "requiresActionTimeConfirmationForExternalSideEffects": true,
+  "canSubmitFromThisPacket": false,
+  "liveBlockers": [
+    {
+      "id": "apple-developer-bundle-ids-missing",
+      "proof": "Backend/proof/apple-developer-identifiers-live-missing-xnp-bundle-20260704.json",
+      "missing": [
+        "com.mewpow.xiaonaiping",
+        "com.mewpow.xiaonaiping.widgets"
+      ]
+    },
+    {
+      "id": "app-store-connect-app-missing",
+      "proof": "Backend/proof/app-store-connect-apps-live-missing-xnp-20260704.json",
+      "missing": [
+        "XiaoNaiPing App Store Connect app record"
+      ]
+    },
+    {
+      "id": "provisioning-profiles-missing",
+      "proof": "Backend/proof/xcodebuild-archive-appstore-20260704-l2tyjndtjk.log",
+      "missing": [
+        "com.mewpow.xiaonaiping provisioning profile",
+        "com.mewpow.xiaonaiping.widgets provisioning profile"
+      ]
+    }
+  ],
+  "appleDeveloper": {
+    "teamName": "Shenzhen Flash Life Technology Co., Ltd",
+    "teamId": "L2TYJNDTJK",
+    "bundleIds": [
+      {
+        "name": "XiaoNaiPing",
+        "identifier": "com.mewpow.xiaonaiping",
+        "capabilities": [
+          "App Groups",
+          "Associated Domains"
+        ],
+        "appGroups": [
+          "group.com.mewpow.xiaonaiping.shared"
+        ],
+        "associatedDomains": [
+          "applinks:api.mewpow.com"
+        ]
+      },
+      {
+        "name": "XiaoNaiPingWidgets",
+        "identifier": "com.mewpow.xiaonaiping.widgets",
+        "capabilities": [
+          "App Groups"
+        ],
+        "appGroups": [
+          "group.com.mewpow.xiaonaiping.shared"
+        ]
+      }
+    ],
+    "mustNotEnable": [
+      "HealthKit",
+      "iCloud",
+      "Push Notifications",
+      "Sign In with Apple",
+      "In-App Purchase"
+    ]
+  },
+  "appStoreConnect": {
+    "platform": "iOS",
+    "name": "小奶瓶",
+    "primaryLanguage": "Simplified Chinese",
+    "bundleId": "com.mewpow.xiaonaiping",
+    "sku": "xiaonaiping-ios-1",
+    "sourceFiles": [
+      "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
+      "Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md",
+      "Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json"
+    ]
+  },
+  "requiredEvidence": {
+    "teamId": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png",
+    "bundleCapabilities": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png",
+    "distributionCertificateProfile": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png",
+    "accountRolesAccess": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png",
+    "wechatAasa": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+    "signedArchive": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+    "testFlight": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+    "realDeviceRegression": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md"
+  },
+  "postActionCommands": [
+    "python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links-20260704T-apple-live.json",
+    ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-apple-live.json",
+    ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-apple-live.json",
+    "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials-20260704T-apple-live.json",
+    ". /tmp/xnp-wechat-release.env && xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Release -destination 'generic/platform=iOS' -archivePath /tmp/XiaoNaiPing-CN.xcarchive XNP_WECHAT_APP_ID=\"$XNP_WECHAT_APP_ID\" XNP_WECHAT_URL_SCHEME=\"$XNP_WECHAT_URL_SCHEME\" XNP_WECHAT_UNIVERSAL_LINK=\"$XNP_WECHAT_UNIVERSAL_LINK\" archive",
+    "xcodebuild -exportArchive -archivePath /tmp/XiaoNaiPing-CN.xcarchive -exportPath /tmp/XiaoNaiPing-CN-AppStoreConnect -exportOptionsPlist Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist -allowProvisioningUpdates",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-apple-live.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-apple-live.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit-20260704T-apple-live.json"
+  ],
+  "stopConditions": [
+    "Bundle IDs are not registered under L2TYJNDTJK",
+    "App Group group.com.mewpow.xiaonaiping.shared is missing",
+    "Associated Domain applinks:api.mewpow.com is missing from the main app",
+    "Current Apple ID lacks certificate, profile, app management, build upload, TestFlight, or submit-review permissions",
+    "TestFlight build is not processed and testable",
+    "No iOS 26.5 physical iPhone is available"
+  ],
+  "redactionRequired": [
+    "Apple ID email",
+    "complete phone numbers",
+    "payment details",
+    "certificate private keys",
+    "provisioning profile downloads",
+    "App Store Connect API keys",
+    "verification codes",
+    "AppSecret",
+    "tokens"
+  ]
+}

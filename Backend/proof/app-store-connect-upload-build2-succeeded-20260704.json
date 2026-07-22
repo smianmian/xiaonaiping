@@ -1,0 +1,51 @@
+{
+  "status": "uploaded-processing",
+  "date": "2026-07-04",
+  "appStoreConnectAppId": "6787332971",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "version": "1.0",
+  "build": "2",
+  "archivePath": "/tmp/XiaoNaiPing-CN-L2TYJNDTJK-20260704-appstore-build2.xcarchive",
+  "exportPath": "/tmp/XiaoNaiPing-CN-L2TYJNDTJK-20260704-AppStoreConnect-build2",
+  "archiveLog": "Backend/proof/xcodebuild-archive-appstore-20260704-build2-wechat-minos.log",
+  "exportUploadLog": "Backend/proof/xcodebuild-export-upload-appstore-20260704-build2-wechat-minos.log",
+  "previousFailedBuild": {
+    "version": "1.0",
+    "build": "1",
+    "status": "failed",
+    "appleError": "ITMS-90208 Invalid Bundle: XiaoNaiPing.app/Frameworks/WechatOpenSDK.framework did not support the minimum OS Version specified in the Info.plist."
+  },
+  "fix": {
+    "projectFile": "App/iOS/project.yml",
+    "buildNumberIncremented": true,
+    "wechatOpenSDKMinimumOSVersionAligned": true,
+    "expectedMinimumOSVersion": "18.0",
+    "frameworkInfoPlistMinimumOSVersion": "18.0",
+    "frameworkBinaryMinOS": "18.0",
+    "codesignVerified": true
+  },
+  "uploadEvidence": {
+    "xcodebuildExportSucceeded": true,
+    "appleUploadSucceeded": true,
+    "appleProcessingStarted": true,
+    "logMarkers": [
+      "Uploaded package is processing.",
+      "Upload succeeded.",
+      "Uploaded XiaoNaiPing",
+      "** EXPORT SUCCEEDED **"
+    ],
+    "nonBlockingWarnings": [
+      "WechatOpenSDK.framework dSYM was not included, affecting symbolication only."
+    ]
+  },
+  "appStoreConnectUiStateAfterUpload": {
+    "testFlightBuildListShowsBuild2": true,
+    "build2Status": "正在处理",
+    "build1Status": "失败"
+  },
+  "submissionState": {
+    "submittedForReview": false,
+    "liveOnAppStore": false,
+    "remainingRequiredNextStep": "Wait for App Store Connect to finish processing build 1.0 (2), then select it on the 1.0 version page."
+  }
+}

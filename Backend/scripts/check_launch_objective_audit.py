@@ -88,6 +88,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     production = read_json(root / args.production_readiness)
     ios_265 = read_json(root / args.ios_265_build)
+    ios265_device_availability = read_json(root / args.ios265_device_availability)
     ios_release = read_json(root / args.ios_release)
     ios_bundle = read_json(root / args.ios_app_bundle)
     auth = read_json(root / args.auth_providers)
@@ -95,6 +96,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     privacy_materials = read_json(root / args.app_store_connect_materials)
     app_store_connect_evidence_materials = read_json(root / args.app_store_connect_evidence_materials)
     submission = read_json(root / args.app_store_submission_packet)
+    launch_day_rollover = read_json(root / args.launch_day_rollover)
+    launch_operator_workbench = read_json(root / args.launch_operator_workbench)
     mainland_filing_materials = read_json(root / args.mainland_filing_materials)
     signed_archive_testflight_materials = read_json(root / args.signed_archive_testflight_materials)
     provider_evidence_materials = read_json(root / args.provider_evidence_materials)
@@ -115,6 +118,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "ios265BuildGreen",
         ios_265_ok,
         "iOS 26.5 simulator/device build proof passed" if ios_265_ok else failed_detail(ios_265),
+    )
+
+    ios265_device_availability_ok = proof_bool(ios265_device_availability)
+    report.add(
+        "ios265PhysicalDeviceAvailabilityReady",
+        ios265_device_availability_ok,
+        "iOS 26.5 physical-device availability proof passed"
+        if ios265_device_availability_ok
+        else failed_detail(ios265_device_availability),
     )
 
     bundle_id_ok = (
@@ -218,6 +230,24 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else failed_detail(app_store_connect_evidence_materials),
     )
 
+    launch_day_rollover_ok = proof_bool(launch_day_rollover)
+    report.add(
+        "launchDayRolloverReady",
+        launch_day_rollover_ok,
+        "current launch-day rollover proof separates reusable draft copy from same-day evidence refresh"
+        if launch_day_rollover_ok
+        else failed_detail(launch_day_rollover),
+    )
+
+    launch_operator_workbench_ok = proof_bool(launch_operator_workbench)
+    report.add(
+        "launchOperatorWorkbenchReady",
+        launch_operator_workbench_ok,
+        "current operator workbench covers App Store Connect draft fields, D-U-N-S actions, TestFlight/iOS 26.5 capture templates, and external platform next actions"
+        if launch_operator_workbench_ok
+        else failed_detail(launch_operator_workbench),
+    )
+
     app_store_assets_ok = proof_bool(app_store_assets)
     report.add(
         "appStoreAssetsReady",
@@ -278,7 +308,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     report.add(
         "reviewTestAccountEvidenceReady",
         review_test_account_ok,
-        "redacted App Review test account proof is present, verified, backup-seeded, and secret-free"
+        "redacted App Review test account proof is present, verified, sync-seeded, and secret-free"
         if review_test_account_ok
         else "review test account redacted proof is missing or failed",
     )
@@ -326,6 +356,7 @@ def main() -> None:
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--production-readiness", default="Backend/proof/production-readiness.json")
     parser.add_argument("--ios-265-build", default="Backend/proof/ios-265-build.json")
+    parser.add_argument("--ios265-device-availability", default="Backend/proof/ios265-device-availability.json")
     parser.add_argument("--ios-release", default="Backend/proof/ios-release-readiness.json")
     parser.add_argument("--ios-app-bundle", default="Backend/proof/ios-app-bundle.json")
     parser.add_argument("--auth-providers", default="Backend/proof/auth-providers.json")
@@ -333,6 +364,8 @@ def main() -> None:
     parser.add_argument("--app-store-connect-materials", default="Backend/proof/app-store-connect-materials.json")
     parser.add_argument("--app-store-connect-evidence-materials", default="Backend/proof/app-store-connect-evidence-materials.json")
     parser.add_argument("--app-store-submission-packet", default="Backend/proof/app-store-submission-packet.json")
+    parser.add_argument("--launch-day-rollover", default="Backend/proof/launch-day-rollover.json")
+    parser.add_argument("--launch-operator-workbench", default="Backend/proof/launch-operator-workbench.json")
     parser.add_argument("--mainland-filing-materials", default="Backend/proof/mainland-filing-materials.json")
     parser.add_argument("--signed-archive-testflight-materials", default="Backend/proof/signed-archive-testflight-materials.json")
     parser.add_argument("--provider-evidence-materials", default="Backend/proof/provider-evidence-materials.json")

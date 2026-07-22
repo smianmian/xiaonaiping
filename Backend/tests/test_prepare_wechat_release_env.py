@@ -43,6 +43,18 @@ class PrepareWeChatReleaseEnvTest(unittest.TestCase):
             self.assertIn(f"export XNP_WECHAT_URL_SCHEME={VALID_APP_ID}", env_text)
             self.assertIn("XNP_WECHAT_UNIVERSAL_LINK", env_text)
             self.assertNotIn("SECRET", env_text)
+            self.assertIn('XNP_WECHAT_APP_ID="$XNP_WECHAT_APP_ID"', env_text)
+            self.assertIn('XNP_WECHAT_URL_SCHEME="$XNP_WECHAT_URL_SCHEME"', env_text)
+            self.assertIn('XNP_WECHAT_UNIVERSAL_LINK="$XNP_WECHAT_UNIVERSAL_LINK"', env_text)
+            self.assertEqual(
+                proof["xcodebuildBuildSettingTemplate"],
+                [
+                    'XNP_WECHAT_APP_ID="$XNP_WECHAT_APP_ID"',
+                    'XNP_WECHAT_URL_SCHEME="$XNP_WECHAT_URL_SCHEME"',
+                    'XNP_WECHAT_UNIVERSAL_LINK="$XNP_WECHAT_UNIVERSAL_LINK"',
+                ],
+            )
+            self.assertEqual(proof["envValues"], {})
 
     def test_placeholder_app_id_fails(self) -> None:
         result = subprocess.run(

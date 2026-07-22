@@ -1,0 +1,266 @@
+{
+  "status": "template-not-evidence",
+  "instructions": [
+    "Copy this file to APPLE-DEVELOPER-ORG-SIGNING-RESULT.json only after live D-U-N-S delivery, Apple Organization approval, Team ID, signing, Archive, and TestFlight evidence are captured.",
+    "Do not fill secrets, verification codes, complete phone numbers, Apple ID email, payment data, tax data, complete D-U-N-S number, AppSecret, token, certificate private key, provisioning profile contents, OBS AK/SK, SMS secrets, or recovery keys.",
+    "This result file is an index for same-round evidence. It does not replace screenshots, PDFs, App Store Distribution archives, TestFlight processing, XiaoNaiPing production readiness, App Store evidence, launch objective audit, iOS 26.5 real-device evidence, or XiaoNaiPing submit permission.",
+    "Cross-app / Emotion Isle proof is historical reference only and cannot replace XiaoNaiPing signing, Archive, TestFlight, App Store evidence, production readiness, launch objective audit, final screenshots, provider, filing, or iOS 26.5 real-device proof.",
+    "After capture, fill evidenceFileChecks with the final file path, file size, SHA-256, same-round Team ID/build confirmation, approved evidence-root confirmation, and redaction review result for each Apple Developer, Archive, TestFlight, AASA, and real-device artifact."
+  ],
+  "allowedFinalStatus": "captured-live-apple-developer-org",
+  "doNotTreatAsSubmitPermission": true,
+  "submissionBlockersEvenAfterCapture": [
+    "Do not mark ready if Team/Provider is Individual, old personal Team, or a different organization.",
+    "Do not mark ready if any Bundle ID, App Group, Associated Domain, Widget Extension, WeChat Universal Link, certificate, provisioning profile, Archive, TestFlight build, or real-device proof belongs to a different Team ID.",
+    "Do not use Development, Ad Hoc, Enterprise, simulator, debug, iOS 27, or stale-date builds as App Store Distribution / iOS 26.5 evidence.",
+    "Do not set canSubmitAtCapture=true until the same archived build is processed in TestFlight and the same iOS 26.5 TestFlight build or signed real-device build has passed all XiaoNaiPing proof gates.",
+    "Cross-app proof cannot replace XiaoNaiPing WeChat, AASA, SMS, OBS, filing, final screenshot, production, or iOS 26.5 real-device proof.",
+    "After filling this result, rerun XiaoNaiPing proof gates locally; do not use cross-app submission readiness as XiaoNaiPing submit permission."
+  ],
+  "company": "深圳市闪现生活科技有限公司",
+  "apps": [
+    "Yi Gen Dai Mao",
+    "XiaoNaiPing"
+  ],
+  "capturedAt": "",
+  "capturedBy": "佘鹏辉 / Penghui She",
+  "canSubmitAtCapture": false,
+  "sourceFreshness": {
+    "checkedAt": "2026-07-04 02:18 CST",
+    "sameDayEmotionIsleDunsRunbookPresent": false,
+    "missingSameDaySource": "/Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260704-current.json",
+    "latestVisibleSource": "/Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260629-current.json",
+    "latestVisibleSourceIsHistoricalReferenceOnly": true
+  },
+  "currentProofs": {
+    "dunsPostDeliveryRunbook": "/Users/smianmian/Emotion Isle/output/duns-post-delivery-apple-developer-runbook-20260629-current.json",
+    "xnpSignedArchiveTestFlightMaterials": "Backend/proof/signed-archive-testflight-materials.json",
+    "xnpAppStoreSubmissionPacket": "Backend/proof/app-store-submission-packet.json",
+    "xnpAppStoreConnectMaterials": "Backend/proof/app-store-connect-materials.json",
+    "xnpAppStoreEvidence": "Backend/proof/app-store-evidence.json",
+    "xnpProductionReadiness": "Backend/proof/production-readiness-20260704T-current.json",
+    "xnpLaunchObjectiveAudit": "Backend/proof/launch-objective-audit.json",
+    "xnpRealDeviceCaptureWorkbench": "Docs/08_Release/AppStoreEvidence/RealDevice/REAL-DEVICE-CAPTURE-RESULT.template.json"
+  },
+  "xiaonaipingRequiredProofs": {
+    "signedArchiveTestFlightMaterials": "Backend/proof/signed-archive-testflight-materials.json",
+    "iosReleaseReadiness": "Backend/proof/ios-release-readiness.json",
+    "iosAppBundle": "Backend/proof/ios-app-bundle.json",
+    "testflightRegressionPlan": "Backend/proof/testflight-regression-plan.json",
+    "providerEvidenceMaterials": "Backend/proof/provider-evidence-materials.json",
+    "mainlandFilingMaterials": "Backend/proof/mainland-filing-materials.json",
+    "appStoreSubmissionPacket": "Backend/proof/app-store-submission-packet.json",
+    "appStoreConnectMaterials": "Backend/proof/app-store-connect-materials.json",
+    "appStoreEvidence": "Backend/proof/app-store-evidence.json",
+    "productionReadiness": "Backend/proof/production-readiness.json",
+    "launchObjectiveAudit": "Backend/proof/launch-objective-audit.json"
+  },
+  "crossAppDoesNotReplaceXiaoNaiPingProof": true,
+  "postCaptureProofReruns": {
+    "checkSignedArchiveTestFlightMaterials": "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json",
+    "checkIOSReleaseReadiness": ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json",
+    "checkIOSAppBundle": "python3 Backend/scripts/check_ios_app_bundle.py --app /path/to/XiaoNaiPing.app --output Backend/proof/ios-app-bundle.json",
+    "checkTestFlightRegressionPlan": "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan.json",
+    "checkProviderEvidenceMaterials": "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "checkMainlandFilingMaterials": "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json",
+    "checkAppStoreSubmissionPacket": "python3 Backend/scripts/check_app_store_submission_packet.py --output Backend/proof/app-store-submission-packet.json",
+    "checkAppStoreConnectMaterials": "python3 Backend/scripts/check_app_store_connect_materials.py --expected-material-date 20260704 --output Backend/proof/app-store-connect-materials.json",
+    "checkAppStoreEvidence": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
+    "checkProductionReadiness": "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness.json",
+    "checkLaunchObjectiveAudit": "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  },
+  "appleDeveloperOrg": {
+    "status": "pending",
+    "dunsDelivery": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-duns-delivery.png or .pdf"
+      ],
+      "legalEntityNameVisible": false,
+      "chinaMainlandVisible": false,
+      "completeDunsHidden": false
+    },
+    "organizationEnrollment": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/AppleDeveloper/17-apple-org-enrollment-continued.png or .pdf"
+      ],
+      "entityTypeOrganizationVisible": false,
+      "individualNotSelected": false,
+      "approvalOrSubmittedStatusVisible": false
+    },
+    "paymentReceipt": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/AppleDeveloper/19-apple-developer-payment-receipt.png or .pdf"
+      ],
+      "organizationMembershipVisible": false,
+      "paymentAndInvoiceSecretsHidden": false
+    },
+    "teamContextAndBundleOwnership": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/AppleDeveloper/18-team-context-and-app-record.png or .pdf"
+      ],
+      "sameOrganizationTeamAcrossApps": false,
+      "sameTeamAsAasaArchiveAndTestFlight": false,
+      "providerIsOrganizationNotIndividual": false
+    },
+    "certificatesProfiles": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png"
+      ],
+      "appStoreDistributionCertificateVisible": false,
+      "xnpMainAndWidgetProfilesVisible": false
+    },
+    "archive": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/05-signed-archive.png"
+      ],
+      "appStoreDistributionArchive": false,
+      "sameVersionBuildAsTestFlight": false
+    },
+    "testFlight": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/06-testflight.png"
+      ],
+      "buildProcessedAndTestable": false,
+      "sameBuildAsArchiveAndRealDeviceCapture": false
+    },
+    "xnpWechatAasa": {
+      "evidenceFiles": [
+        "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png"
+      ],
+      "sameTeamIdAsOrganization": false,
+      "sameUniversalLinkAsWechatOpenPlatform": false
+    }
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "dunsDelivery",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-duns-delivery.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "organizationEnrollment",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/17-apple-org-enrollment-continued.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "organizationTeamId",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "bundleIdCapabilities",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "distributionCertificateProfile",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "accountRolesAccess",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "teamContextAndBundleOwnership",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/18-team-context-and-app-record.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "paymentReceipt",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/19-apple-developer-payment-receipt.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "wechatAasa",
+      "target": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "signedArchive",
+      "target": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "testFlight",
+      "target": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "realDeviceRegression",
+      "target": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTeamIdOrBuild": false,
+      "sourceIsApprovedEvidenceRoot": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "redactionReviewed": {
+    "appleIdEmailHidden": false,
+    "completePhoneHidden": false,
+    "completeDunsHidden": false,
+    "paymentDataHidden": false,
+    "taxAndInvoiceDataHidden": false,
+    "certificatePrivateKeysHidden": false,
+    "appSecretsTokensAndVerificationCodesHidden": false
+  },
+  "operatorNotes": ""
+}

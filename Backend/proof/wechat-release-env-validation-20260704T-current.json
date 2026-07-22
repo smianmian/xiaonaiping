@@ -1,0 +1,40 @@
+{
+  "startedAt": "2026-07-03T23:28:37+00:00",
+  "completedAt": "2026-07-03T23:28:37+00:00",
+  "passed": true,
+  "containsSecrets": false,
+  "failedRequiredChecks": [],
+  "envKeys": [
+    "XNP_WECHAT_APP_ID",
+    "XNP_WECHAT_URL_SCHEME",
+    "XNP_WECHAT_UNIVERSAL_LINK"
+  ],
+  "xcodebuildBuildSettingTemplate": [
+    "XNP_WECHAT_APP_ID=\"$XNP_WECHAT_APP_ID\"",
+    "XNP_WECHAT_URL_SCHEME=\"$XNP_WECHAT_URL_SCHEME\"",
+    "XNP_WECHAT_UNIVERSAL_LINK=\"$XNP_WECHAT_UNIVERSAL_LINK\""
+  ],
+  "checks": {
+    "appIDLooksReal": {
+      "passed": true,
+      "required": true,
+      "evidence": "AppID matches wx + 16 hex and is not placeholder/sample"
+    },
+    "urlSchemeLooksReal": {
+      "passed": true,
+      "required": true,
+      "evidence": "URL Scheme matches wx + 16 hex and is not placeholder/sample"
+    },
+    "urlSchemeMatchesAppID": {
+      "passed": true,
+      "required": true,
+      "evidence": "URL Scheme equals AppID"
+    },
+    "universalLinkAllowed": {
+      "passed": true,
+      "required": true,
+      "evidence": "Universal Link is the xiaonaiping WeChat HTTPS path on api.mewpow.com"
+    }
+  },
+  "envValues": {}
+}

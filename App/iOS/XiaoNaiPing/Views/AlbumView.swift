@@ -8,7 +8,7 @@ import UIKit
 struct AlbumView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var store: BabyRecordStore
-    @EnvironmentObject private var cloudBackup: CloudBackupController
+    @EnvironmentObject private var cloudSync: CloudSyncController
     @State private var selectedFilter = "全部"
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var editingPhoto: BabyPhoto?
@@ -176,7 +176,7 @@ struct AlbumView: View {
                     .frame(width: 46, height: 28)
             }
 
-            backupStatusSummary
+            syncStatusSummary
 
             if filteredPhotos.isEmpty {
                 filteredEmptyState
@@ -197,19 +197,19 @@ struct AlbumView: View {
         }
     }
 
-    private var backupStatusSummary: some View {
+    private var syncStatusSummary: some View {
         WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
             HStack(alignment: .top, spacing: AppSpacing.medium) {
-                Image(systemName: cloudBackup.hasSession ? "checkmark.icloud" : "lock.icloud")
+                Image(systemName: cloudSync.hasSession ? "checkmark.icloud" : "lock.icloud")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(AppColors.blueInk)
                     .frame(width: 28, height: 28)
 
                 VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                    Text(photoBackupTitle.localizedText)
+                    Text(photoSyncTitle.localizedText)
                         .font(AppTypography.bodyLarge)
                         .foregroundStyle(AppColors.inkGreen)
-                    Text(photoBackupDetail.localizedText)
+                    Text(photoSyncDetail.localizedText)
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)
@@ -218,19 +218,19 @@ struct AlbumView: View {
         }
     }
 
-    private var photoBackupTitle: String {
-        if cloudBackup.hasSession {
-            return "照片可随备份上传"
+    private var photoSyncTitle: String {
+        if cloudSync.hasSession {
+            return "照片可随同步上传"
         }
-        return cloudBackup.isServiceConfigured ? "正在等待自动同步" : "正在连接同步服务"
+        return cloudSync.isServiceConfigured ? "正在等待自动同步" : "正在连接同步服务"
     }
 
-    private var photoBackupDetail: String {
-        if cloudBackup.hasSession {
-            return "点击资料页的“立即备份”，会把主动加入小奶瓶的照片原图上传到私有账号空间。"
+    private var photoSyncDetail: String {
+        if cloudSync.hasSession {
+            return "点击资料页的“立即同步”，会把主动加入小奶瓶的照片原图上传到私有账号空间。"
         }
-        if cloudBackup.isServiceConfigured {
-            return "开启账号与备份前，照片只保存在 App 私有空间，不会自动上传。"
+        if cloudSync.isServiceConfigured {
+            return "开启账号与同步前，照片只保存在 App 私有空间，不会自动上传。"
         }
         return "照片会在联网后自动同步到你的账号。"
     }
@@ -342,7 +342,7 @@ struct AlbumView: View {
             return "会删除 App 私有空间里的这张照片，不会删除系统相册原图。"
         }
 
-        switch deleteCandidate.backupStatus {
+        switch deleteCandidate.syncStatus {
         case .localOnly, .pending, .failed:
             return "会删除 App 私有空间里的这张照片，不会删除系统相册原图。"
         case .backedUp:
@@ -356,10 +356,10 @@ struct AlbumView: View {
         guard let photo = deleteCandidate else { return }
         deleteCandidate = nil
 
-        switch photo.backupStatus {
+        switch photo.syncStatus {
         case .backedUp, .cloudDeletePending:
             Task {
-                if await cloudBackup.deleteCloudPhoto(photo) {
+                if await cloudSync.deleteCloudPhoto(photo) {
                     store.deletePhoto(photo)
                     editingPhoto = nil
                 } else {
@@ -577,12 +577,12 @@ private struct PhotoTimelineDaySection: View {
                         } label: {
                             ZStack(alignment: .bottomLeading) {
                                 LocalPhotoCell(url: photoURL(photo))
-                                PhotoBackupStatusBadge(status: photo.backupStatus)
+                                PhotoSyncStatusBadge(status: photo.syncStatus)
                                     .padding(6)
                             }
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("编辑\(title)的照片，\(photo.backupStatus.accessibilityText)")
+                        .accessibilityLabel("编辑\(title)的照片，\(photo.syncStatus.accessibilityText)")
                     }
                 }
             }
@@ -590,8 +590,8 @@ private struct PhotoTimelineDaySection: View {
     }
 }
 
-private struct PhotoBackupStatusBadge: View {
-    let status: PhotoBackupStatus
+private struct PhotoSyncStatusBadge: View {
+    let status: PhotoSyncStatus
 
     var body: some View {
         HStack(spacing: 4) {
@@ -610,17 +610,17 @@ private struct PhotoBackupStatusBadge: View {
     }
 }
 
-private extension PhotoBackupStatus {
+private extension PhotoSyncStatus {
     var title: String {
         switch self {
         case .localOnly:
             "等待同步"
         case .pending:
-            "待备份"
+            "待同步"
         case .backedUp:
-            "已备份"
+            "已同步"
         case .failed:
-            "备份失败"
+            "同步失败"
         case .cloudDeletePending:
             "待删云端"
         }
@@ -631,11 +631,11 @@ private extension PhotoBackupStatus {
         case .localOnly:
             "联网后会自动同步"
         case .pending:
-            "等待云备份"
+            "等待云同步"
         case .backedUp:
-            "已经完成云备份"
+            "已经完成云同步"
         case .failed:
-            "云备份失败"
+            "云同步失败"
         case .cloudDeletePending:
             "云端删除待完成"
         }
@@ -792,7 +792,7 @@ private struct PhotoEditorSheet: View {
             VStack(spacing: AppSpacing.large) {
                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
                     VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                        PhotoBackupStatusBadge(status: photo.backupStatus)
+                        PhotoSyncStatusBadge(status: photo.syncStatus)
                         DatePicker("照片日期", selection: $capturedAt, displayedComponents: [.date])
                         TextField("备注，可不填", text: $note, axis: .vertical)
                             .lineLimit(2...4)

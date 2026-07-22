@@ -1,0 +1,70 @@
+{
+  "artifactType": "wechat-open-platform-evidence-template",
+  "status": "template-only-not-evidence",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "targetEvidenceFiles": {
+    "mobileApplication": "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+    "universalLinkAASA": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "mobileApplication",
+      "target": "Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "universalLinkAASA",
+      "target": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "doNotRenameThisTemplateTo": [
+    "08-wechat-open-platform.json",
+    "08-wechat-open-platform.png",
+    "08b-wechat-universal-link-aasa.json",
+    "08b-wechat-universal-link-aasa.png"
+  ],
+  "wechatOpenPlatformFieldsToVerify": {
+    "mobileAppName": "小奶瓶",
+    "iosBundleId": "com.mewpow.xiaonaiping",
+    "appId": "wx + 16 lowercase hex characters from WeChat Open Platform",
+    "urlScheme": "same value as appId",
+    "universalLink": "https://api.mewpow.com/xiaonaiping/wechat/",
+    "configurationStatus": "approved or active in WeChat Open Platform"
+  },
+  "serverOnlySecrets": {
+    "XNP_WECHAT_APP_SECRET": "must be stored only in private server env; never in iOS project, screenshots, JSON evidence, or repository"
+  },
+  "redactionChecklist": [
+    "Hide AppSecret completely",
+    "Hide administrator account details",
+    "Hide complete phone numbers and verification codes",
+    "Hide access tokens, session tokens, and private backend paths",
+    "Keep AppID, Bundle ID, URL Scheme, Universal Link, and configuration status visible"
+  ],
+  "postCaptureChecks": [
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+    "python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-current.json",
+    ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json",
+    "python3 Backend/scripts/check_ios_app_bundle.py --app <Release XiaoNaiPing.app from iOS 26.5 build> --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+    "python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --base-url https://api.mewpow.com/xiaonaiping --live-check --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete",
+    "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan-20260704T-current.json",
+    "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "completionRule": "This template is only a capture worksheet. The App Store evidence gate is still incomplete until real 08-wechat-open-platform.png or PDF evidence exists; real 08b-wechat-universal-link-aasa.png or PDF evidence proves same-round AASA alignment; real wx AppID and URL Scheme are injected into the Release build; server-side XNP_WECHAT_APP_SECRET is configured; auth-providers-20260704T-current.json is refreshed; RD-14 iOS 26.5 WeChat login evidence passes on TestFlight or a signed real device build; production-readiness.json is ready=true; and launch-objective-audit.json is ready=true."
+}

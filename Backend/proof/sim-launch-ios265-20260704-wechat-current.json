@@ -1,0 +1,18 @@
+{
+  "startedAt": "2026-07-03T23:30:01Z",
+  "completedAt": "2026-07-03T23:30:02Z",
+  "passed": true,
+  "simulator": {
+    "name": "iPhone 17 Pro",
+    "runtime": "iOS 26.5",
+    "id": "07D2E9B8-B283-4F62-88D7-AFF7B7E82ED4"
+  },
+  "app": {
+    "bundleId": "com.mewpow.xiaonaiping",
+    "dtPlatformVersion": "26.5",
+    "dtSdkName": "iphonesimulator26.5"
+  },
+  "appPath": "/tmp/XiaoNaiPing-WeChat-ReleaseSim-26_5/Build/Products/Release-iphonesimulator/XiaoNaiPing.app",
+  "launchOutput": "com.mewpow.xiaonaiping: 65651",
+  "sourceLog": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/xcodebuild-release-ios265-20260704-wechat-sim.log"
+}

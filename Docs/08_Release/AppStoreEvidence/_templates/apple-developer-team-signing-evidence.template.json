@@ -1,0 +1,167 @@
+{
+  "artifactType": "apple-developer-team-signing-evidence-template",
+  "status": "template-only-not-evidence",
+  "project": "XiaoNaiPing",
+  "company": "深圳市闪现生活科技有限公司",
+  "targetEvidenceFiles": {
+    "organizationTeamId": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png",
+    "bundleIdCapabilities": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png",
+    "distributionCertificateProfile": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png",
+    "accountRolesAccess": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png",
+    "wechatAasa": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+    "signedArchive": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+    "testFlight": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+    "realDeviceRegression": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "organizationTeamId",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "bundleIdCapabilities",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "distributionCertificateProfile",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "accountRolesAccess",
+      "target": "Docs/08_Release/AppStoreEvidence/AppleDeveloper/16-account-roles-access.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "wechatAasa",
+      "target": "Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "signedArchive",
+      "target": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "testFlight",
+      "target": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "realDeviceRegression",
+      "target": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "teamIdOrBuildMatchesTemplate": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "doNotRenameThisTemplateTo": [
+    "13-organization-team-id.json",
+    "14-bundle-id-capabilities.json",
+    "15-distribution-certificate-profile.json",
+    "16-account-roles-access.json",
+    "05-signed-archive.json",
+    "06-testflight.json"
+  ],
+  "teamConsistencyChecks": {
+    "appleDeveloperTeamId": "Team ID displayed on Apple Developer Organization page",
+    "projectYmlDevelopmentTeam": "App/iOS/project.yml DEVELOPMENT_TEAM",
+    "pbxprojDevelopmentTeam": "App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj DEVELOPMENT_TEAM",
+    "exportOptionsTeamId": "Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist teamID",
+    "aasaTeamPrefix": "Backend/static/apple-app-site-association appID/appIDs Team prefix",
+    "associatedDomains": "applinks:api.mewpow.com",
+    "wechatUniversalLink": "https://api.mewpow.com/xiaonaiping/wechat/"
+  },
+  "bundleAndCapabilityChecks": [
+    "com.mewpow.xiaonaiping is under the current organization Team",
+    "com.mewpow.xiaonaiping.widgets is under the current organization Team",
+    "group.com.mewpow.xiaonaiping.shared is enabled for app and widget",
+    "Associated Domains includes applinks:api.mewpow.com",
+    "XiaoNaiPing does not enable HealthKit"
+  ],
+  "archiveAndTestFlightChecks": [
+    "App Store Distribution certificate is valid",
+    "Provisioning profile is App Store distribution, not development/ad-hoc",
+    "Archive succeeds for com.mewpow.xiaonaiping",
+    "ExportOptions method is app-store-connect",
+    "ExportOptions destination is upload",
+    "TestFlight build is processed and testable",
+    "Version/build matches App Store Connect selection and 12-real-device-regression.md"
+  ],
+  "redactionChecklist": [
+    "Hide Apple ID email",
+    "Hide complete phone numbers",
+    "Hide payment and tax details",
+    "Hide complete D-U-N-S number",
+    "Hide certificate private keys and provisioning profile files",
+    "Hide App Store Connect API keys",
+    "Hide XNP_WECHAT_APP_SECRET, SMS secrets, OBS AK/SK, verification codes, bearer tokens, recovery keys, and complete phone numbers"
+  ],
+  "postCaptureChecks": [
+    "python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials-20260704T-current.json",
+    ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json",
+    "python3 Backend/scripts/check_ios_app_bundle.py --app /path/to/XiaoNaiPing.app --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+    "python3 Backend/scripts/check_testflight_precheck.py --app /path/to/XiaoNaiPing.app --output Backend/proof/testflight-precheck-20260704T-current-ios265.json",
+    "python3 Backend/scripts/check_testflight_regression_plan.py --output Backend/proof/testflight-regression-plan-20260704T-current.json --allow-incomplete",
+    "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials-20260704T-current.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json"
+  ],
+  "completionRule": "This template is only a capture worksheet. The Apple Developer, signing, Archive, TestFlight, and real-device gates remain incomplete until the real target evidence files exist and same-round proof checks pass."
+}

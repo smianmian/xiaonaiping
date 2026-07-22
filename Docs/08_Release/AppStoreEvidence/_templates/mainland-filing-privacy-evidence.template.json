@@ -1,0 +1,104 @@
+{
+  "artifactType": "mainland-filing-privacy-evidence-template",
+  "status": "template-only-not-evidence",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "company": "深圳市闪现生活科技有限公司",
+  "targetEvidenceFiles": {
+    "companyAccount": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+    "mainlandAvailability": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+    "mainlandFiling": "Docs/08_Release/AppStoreEvidence/03-app-filing.png or .pdf",
+    "privacyLabel": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
+    "ageRatingResult": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png or .pdf"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "companyAccount",
+      "target": "Docs/08_Release/AppStoreEvidence/01-company-account.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "mainlandAvailability",
+      "target": "Docs/08_Release/AppStoreEvidence/02-mainland-availability.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "mainlandFiling",
+      "target": "Docs/08_Release/AppStoreEvidence/03-app-filing.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "privacyLabel",
+      "target": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "ageRatingResult",
+      "target": "Docs/08_Release/AppStoreEvidence/17-age-rating-result.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsTemplateCapture": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "doNotRenameThisTemplateTo": [
+    "01-company-account.json",
+    "02-mainland-availability.json",
+    "03-app-filing.json",
+    "04-privacy-label.json",
+    "17-age-rating-result.json"
+  ],
+  "fieldsToVerify": {
+    "legalEntity": "深圳市闪现生活科技有限公司",
+    "saleRegion": "China mainland only for first launch",
+    "filing": "APP filing number, filing progress, or documented applicability judgment",
+    "privacyPolicyUrl": "https://api.mewpow.com/xiaonaiping/privacy",
+    "termsUrl": "https://api.mewpow.com/xiaonaiping/terms",
+    "supportUrl": "https://api.mewpow.com/xiaonaiping/support",
+    "privacyLabelSource": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
+    "tracking": "No tracking",
+    "medicalBoundary": "no HealthKit, no sensors, no hospital system, no medical diagnosis, no treatment advice, no professional vaccine advice"
+  },
+  "redactionChecklist": [
+    "Hide Apple ID email",
+    "Hide complete phone numbers",
+    "Hide payment details",
+    "Hide personal ID details",
+    "Hide complete D-U-N-S value",
+    "Hide verification codes and tokens",
+    "Keep app name, legal entity, China mainland availability, filing status/result, privacy categories, and URLs visible"
+  ],
+  "postCaptureChecks": [
+    "python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials-20260704T-current.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+    "python3 Backend/scripts/check_app_store_connect_materials.py --allow-incomplete --output Backend/proof/app-store-connect-materials-20260704-current.json"
+  ],
+  "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until each target evidence file is captured from the real App Store Connect, filing, privacy, or age-rating surface and passes redaction/size checks."
+}

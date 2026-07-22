@@ -1,0 +1,85 @@
+{
+  "startedAt": "2026-06-27T02:53:44+00:00",
+  "completedAt": "2026-06-27T02:53:44+00:00",
+  "passed": false,
+  "failedRequiredChecks": [
+    "failedLaunchObjectiveChecksCovered"
+  ],
+  "actionPacket": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260627.md",
+  "launchObjectiveFailedChecks": [
+    "weChatConfigurationGreen",
+    "testFlightRegressionPlanReadyButNotEvidence",
+    "realDeviceRegressionEvidenceReady",
+    "appStoreManualEvidenceReady",
+    "productionReadinessGreen"
+  ],
+  "missingEvidence": [
+    "companyAccount",
+    "mainlandAvailability",
+    "mainlandFiling",
+    "privacyLabel",
+    "signedArchive",
+    "testFlight",
+    "smsProvider",
+    "wechatOpenPlatform",
+    "huaweiObsPolicy",
+    "realDeviceRegression"
+  ],
+  "checks": {
+    "actionPacketPresent": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260627.md"
+    },
+    "launchObjectiveAuditReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/launch-objective-audit-20260627T025307Z.json"
+    },
+    "appStoreEvidenceReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/app-store-evidence-20260627T025307Z.json"
+    },
+    "ios265BuildProofReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/ios-265-build.json"
+    },
+    "productionReadinessReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/production-readiness.json"
+    },
+    "failedLaunchObjectiveChecksCovered": {
+      "passed": false,
+      "evidence": "all current failed launch objective checks are named",
+      "missingMarkers": [
+        "testFlightRegressionPlanReadyButNotEvidence"
+      ]
+    },
+    "missingEvidenceFilenamesCovered": {
+      "passed": true,
+      "evidence": "all current missing App Store evidence filenames are named"
+    },
+    "ios265OnlyRuleCovered": {
+      "passed": true,
+      "evidence": "local testing is constrained to iOS 26.5 and non-evidence devices are called out"
+    },
+    "wechatExternalConfigActionsCovered": {
+      "passed": true,
+      "evidence": "WeChat AppID/AppSecret/URL Scheme/Universal Link evidence actions are explicit"
+    },
+    "rerunCommandsCovered": {
+      "passed": true,
+      "evidence": "unified gate and focused blocker commands are listed"
+    },
+    "rerunCommandsUseCurrentIOS265BuildLogs": {
+      "passed": true,
+      "evidence": "rerun command references current iOS 26.5 simulator/device build proof logs"
+    },
+    "realDeviceEvidenceBoundaryCovered": {
+      "passed": true,
+      "evidence": "real TestFlight or signed-device regression evidence boundary is explicit"
+    },
+    "productionFreshnessBlockersCovered": {
+      "passed": true,
+      "evidence": "current deployment/storage proof refresh blockers are called out"
+    }
+  }
+}

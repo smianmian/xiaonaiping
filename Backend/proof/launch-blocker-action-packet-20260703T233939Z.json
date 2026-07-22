@@ -1,0 +1,131 @@
+{
+  "startedAt": "2026-07-03T23:39:57+00:00",
+  "completedAt": "2026-07-03T23:39:57+00:00",
+  "passed": false,
+  "failedRequiredChecks": [
+    "failedLaunchObjectiveChecksCovered",
+    "rerunCommandsUseCurrentIOS265BuildLogs",
+    "productionFreshnessBlockersCovered"
+  ],
+  "actionPacket": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260630.md",
+  "launchObjectiveFailedChecks": [
+    "ios265PhysicalDeviceAvailabilityReady",
+    "launchOperatorWorkbenchReady",
+    "appStoreAssetsReady",
+    "testFlightRegressionPlanReadyButNotEvidence",
+    "realDeviceRegressionEvidenceReady",
+    "appStoreManualEvidenceReady",
+    "productionReadinessGreen"
+  ],
+  "missingEvidence": [
+    "companyAccount",
+    "mainlandAvailability",
+    "mainlandFiling",
+    "privacyLabel",
+    "ageRatingResult",
+    "signedArchive",
+    "testFlight",
+    "appleDeveloperAccountAccess",
+    "wechatOpenPlatform",
+    "wechatUniversalLinkAasa",
+    "huaweiObsPolicy",
+    "finalScreenshots",
+    "realDeviceRegression"
+  ],
+  "checks": {
+    "actionPacketPresent": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/LAUNCH_BLOCKER_ACTION_PACKET_20260630.md"
+    },
+    "actionPacketDateMatches": {
+      "passed": true,
+      "evidence": "action packet must be LAUNCH_BLOCKER_ACTION_PACKET_20260630.md"
+    },
+    "launchObjectiveAuditReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/launch-objective-audit-20260703T233939Z.json"
+    },
+    "appStoreEvidenceReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/app-store-evidence-20260703T233939Z.json"
+    },
+    "ios265BuildProofReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/ios-265-build.json"
+    },
+    "productionReadinessReadable": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Backend/proof/production-readiness.json"
+    },
+    "productionProofRefreshPacketPresent": {
+      "passed": true,
+      "evidence": "/Users/smianmian/Downloads/小奶瓶/Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json"
+    },
+    "failedLaunchObjectiveChecksCovered": {
+      "passed": false,
+      "evidence": "all current failed launch objective checks are named",
+      "missingMarkers": [
+        "launchOperatorWorkbenchReady"
+      ]
+    },
+    "missingEvidenceFilenamesCovered": {
+      "passed": true,
+      "evidence": "all current missing App Store evidence filenames are named"
+    },
+    "ios265OnlyRuleCovered": {
+      "passed": true,
+      "evidence": "local testing is constrained to iOS 26.5 and non-evidence devices are called out"
+    },
+    "wechatExternalConfigActionsCovered": {
+      "passed": true,
+      "evidence": "WeChat AppID/AppSecret/URL Scheme/Universal Link evidence actions are explicit"
+    },
+    "rerunCommandsCovered": {
+      "passed": true,
+      "evidence": "unified gate and focused blocker commands are listed"
+    },
+    "rerunCommandsUseCurrentIOS265BuildLogs": {
+      "passed": false,
+      "evidence": "rerun command references current iOS 26.5 simulator/device build proof logs",
+      "missingMarkers": [
+        "xcodebuild-release-ios265-20260704-wechat-sim.log",
+        "xcodebuild-release-ios265-20260704-wechat-device.log"
+      ]
+    },
+    "realDeviceEvidenceBoundaryCovered": {
+      "passed": true,
+      "evidence": "real TestFlight or signed-device regression evidence boundary is explicit"
+    },
+    "productionFreshnessBlockersCovered": {
+      "passed": false,
+      "evidence": "current deployment/storage proof refresh blockers are called out",
+      "missingMarkers": [
+        "deploymentProofCurrent",
+        "collect_deployment_proof.py",
+        "storageBackendProofCurrent",
+        "当天 OBS/存储 proof",
+        "verify_storage_backend.py"
+      ]
+    },
+    "productionProofRefreshPacketReferenced": {
+      "passed": true,
+      "evidence": "launch blocker action packet references the structured production proof refresh packet and its no-evidence boundary"
+    },
+    "productionProofRefreshPacketValid": {
+      "passed": true,
+      "evidence": "production proof refresh packet locks current proof outputs, refresh order, stable alias sync, stop conditions, post gates, and no-submission boundary"
+    },
+    "authProviderTargetedTestLogCurrent": {
+      "passed": true,
+      "evidence": "launch blocker action packet references the current auth-provider targeted test log"
+    },
+    "authProviderTargetedTestLogPassed": {
+      "passed": true,
+      "evidence": "auth-provider targeted log proves Aliyun SMS adapter and auth provider verification tests passed"
+    },
+    "testflightRegressionPrerequisiteBlockersCovered": {
+      "passed": true,
+      "evidence": "iOS 26.5 physical-device availability blocker is called out"
+    }
+  }
+}

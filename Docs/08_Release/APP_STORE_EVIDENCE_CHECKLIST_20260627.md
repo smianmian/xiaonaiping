@@ -18,8 +18,24 @@
 | 审核测试账号脱敏证据 | `Docs/08_Release/AppStoreEvidence/11-test-account-redacted.json` |
 | 真机回归模板 | `Docs/08_Release/AppStoreEvidence/12-real-device-regression.template.md` |
 | App Store 截图资产 proof | `Backend/proof/app-store-assets.json` |
-| App Store Connect 素材 proof | `Backend/proof/app-store-connect-materials-20260627-current.json` |
-| App Store 人工证据 proof | `Backend/proof/app-store-evidence-20260627T-current.json` |
+| App Store Connect 素材 proof | `Backend/proof/app-store-connect-materials.json` |
+| App Store 人工证据 proof | `Backend/proof/app-store-evidence.json` |
+
+## 同轮人工证据索引模板
+
+复制下面表格到当天的私有执行记录或工单中填写；所有证据必须来自同一天同一轮采集。不要把 Apple ID 邮箱、测试员邮箱、完整手机号、验证码、恢复密钥、token、AK/SK、AppSecret、证书私钥、对象 key、完整证件号或真实宝宝照片写进仓库。
+
+| 项目 | 填写 |
+| --- | --- |
+| App 版本 | 待真实 TestFlight / Archive 后填写 |
+| Build 号 | 待真实 TestFlight / Archive 后填写 |
+| 安装方式 | `TestFlight` 或 `Xcode 签名真机包` |
+| 证据范围 | 01-company-account.png 到 09-obs-policy.png 和 17-age-rating-result、`10-final-screenshots/`、`11-test-account-redacted.json`、`12-real-device-regression.md` |
+| 同轮一致性 | App Store Connect 选中的 build 与 TestFlight / 12-real-device-regression.md 一致 |
+| 文件体积 | 每个文件已确认单个文件不低于 10KB，最终截图和 RD 证据不使用空白图 |
+| 脱敏 | 每个文件已脱敏，不含完整手机号、恢复密钥、token、AK/SK、AppSecret、验证码、证件号或真实宝宝照片 |
+| 复跑 | `check_app_store_evidence.py --allow-incomplete`、`check_app_store_connect_materials.py`、`check_production_readiness.py` 已复跑 |
+| 提交判断 | `production-readiness.json` 为 ready=true 后才进入 App Store Connect 提交审核 |
 
 ## 仍需补齐的人工证据
 
@@ -27,10 +43,11 @@
 
 | 文件名建议 | 证明什么 | 截图/证据要求 | 当前状态 |
 | --- | --- | --- | --- |
-| `01-company-account.png` | App Store Connect 主体为深圳市闪现生活科技有限公司 | 可见团队/法律主体；遮邮箱、电话、付款信息 | 未完成 |
+| `01-company-account.png` | App Store Connect 主体为深圳市闪现生活科技有限公司，且 D-U-N-S 后 Apple Developer Organization / Team ID 已确认 | 可见团队/法律主体、Apple Developer Organization、Team ID；遮邮箱、电话、付款信息、D-U-N-S 编码完整值 | 未完成 |
 | `02-mainland-availability.png` | 首发只选择 China mainland / 中国大陆 | 可见 App 名称和可售地区选择状态；不要展示无关账号信息 | 未完成 |
 | `03-app-filing.pdf` 或 `03-app-filing.png` | 中国大陆 APP 备案或适用判断 | 可见 App 名称、主体、备案号或提交状态；遮证件细节、联系人完整电话 | 未完成 |
 | `04-privacy-label.png` | App Privacy 已按 `APP_STORE_PRIVACY_LABEL.json` 填写 | 可见采集类别、用途、未 Tracking；遮账号邮箱 | 未完成 |
+| `17-age-rating-result.png` 或 `17-age-rating-result.pdf` | App Store Connect 年龄分级结果已按答案表完成 | 可见年龄分级结果、关键问答项，并与 `APP_STORE_AGE_RATING_ANSWERS_20260627.md` 一致；遮 Apple ID 邮箱、电话、付款信息 | 未完成 |
 | `05-signed-archive.png` | App Store Distribution Archive 成功 | 可见 `com.mewpow.xiaonaiping`、版本、build、archive/upload 成功状态 | 未完成 |
 | `06-testflight.png` | TestFlight 构建已处理完成并可测试 | 可见版本、build、处理完成或可测试状态；遮测试员邮箱 | 未完成 |
 | `07-sms-provider.png` | 真实短信服务商、签名、模板和发送成功 | 可见服务商、签名、模板 ID/名称、发送成功；隐藏 AK/SK、验证码、完整手机号 | 未完成 |
@@ -40,9 +57,12 @@
 | `10-final-screenshots/02-record-iphone16pro.png` | App Store 上传顺序图 2 | 记录页截图不写医疗承诺或喂养建议 | 已有候选 |
 | `10-final-screenshots/03-growth-iphone16pro.png` | App Store 上传顺序图 3 | 成长趋势只表达记录回看，不表达诊断或健康结论 | 已有候选 |
 | `10-final-screenshots/04-profile-iphone16pro.png` | App Store 上传顺序图 4 | 不展示恢复密钥、token、手机号明文 | 已有候选 |
-| `10-final-screenshots/05-profile-backup-iphone16pro.png` | App Store 上传顺序图 5 | 账号和备份路径只展示功能入口，不展示密钥 | 已有候选 |
+| `10-final-screenshots/05-profile-sync-iphone16pro.png` | App Store 上传顺序图 5 | 账号和同步路径只展示功能入口，不展示密钥 | 已有候选 |
 | `11-test-account-redacted.json` | App Review 恢复密钥测试账号脱敏证据 | 不能保存恢复密钥、验证码、token、完整手机号 | 已有 |
 | `12-real-device-regression.md` | iOS 26.5 TestFlight 或 Xcode 签名真机包回归 | 复制模板后填写；RD-01 到 RD-24 必须全部通过并指向真实证据文件，单个 RD 文件不低于 10KB | 未完成 |
+| `AppleDeveloper/13-organization-team-id.png` | D-U-N-S 后 Apple Developer 组织页确认主体、Membership 和 Team ID | 可见深圳市闪现生活科技有限公司、Team ID、Membership 状态；遮邮箱、电话、付款信息、D-U-N-S 编码完整值 | 未完成 |
+| `AppleDeveloper/14-bundle-id-capabilities.png` | Bundle ID / Identifier 页确认 `com.mewpow.xiaonaiping`、App Groups、Associated Domains | 可见 Bundle ID、当前 Team、`group.com.mewpow.xiaonaiping`、`applinks:api.mewpow.com`；遮无关 App 和人员信息 | 未完成 |
+| `AppleDeveloper/15-distribution-certificate-profile.png` | App Store Distribution 证书 / Profile 可用于 Archive | 可见类型、Bundle ID、Team ID、有效状态；遮证书私钥、下载链接、个人邮箱 | 未完成 |
 
 ## 真机回归必须覆盖
 
@@ -52,14 +72,17 @@
 4. 每个 RD 用例都必须填写证据文件路径，路径必须留在 `Docs/08_Release/AppStoreEvidence/` 内。
 5. 证据文件后缀只能是 `.png`、`.jpg`、`.jpeg`、`.mp4`、`.mov` 或 `.pdf`，并且文件真实存在，单个文件不低于 10KB。
 6. 环境字段必须填写：设备、iOS、安装方式、App 版本、Build、网络、证据截图/录屏。
-7. 视觉结论必须填写：灵动岛紧凑态结论、灵动岛展开态结论、锁屏通知栈结论、桌面小组件结论。
+7. 视觉结论必须填写：灵动岛紧凑态结论、灵动岛展开态结论、锁屏通知栈结论、锁屏小组件结论、桌面小组件结论。
 8. RD-18、RD-22、RD-23、RD-24 不能复用总览图或同一份泛证据。
-9. RD-17 路径必须体现 notification、permission、通知或权限。
-10. RD-18 路径必须同时体现 watch 和 mirror / notification。
-11. RD-22 路径必须体现 live-activity、dynamic-island、island 或灵动岛。
-12. RD-22 路径必须体现 switch、toggle 或开关。
-13. RD-23 路径必须同时体现 widget / 小组件 和 lock-screen / 锁屏。
-11. 不能保留“待测”“待填”“待真实”“TODO”“TBD”“失败”“跳过”等状态。
+9. RD-17 通知权限允许和拒绝必须使用独立证据文件：`RealDevice/RD-17-notification-allowed.png`、`RealDevice/RD-17-notification-denied.png`。
+10. RD-22 灵动岛紧凑态和展开态必须使用独立证据文件：`RealDevice/RD-22-dynamic-island-compact.png`、`RealDevice/RD-22-dynamic-island-expanded.png`。
+11. RD-23 锁屏通知栈、锁屏小组件和桌面小组件必须使用独立证据文件：`RealDevice/RD-23-lock-screen-notification-stack.png`、`RealDevice/RD-23-lock-screen-widget-summary.png`、`RealDevice/RD-23-home-widget-summary.png`。
+12. RD-17 路径必须体现 notification、permission、通知或权限。
+13. RD-18 路径必须同时体现 watch 和 mirror / notification。
+14. RD-22 路径必须体现 live-activity、dynamic-island、island 或灵动岛。
+15. RD-22 路径必须体现 switch、toggle、开关、compact 或 expanded。
+16. RD-23 代表路径必须体现 widget / 小组件或 lock-screen / 锁屏。
+17. 不能保留“待测”“待填”“待真实”“TODO”“TBD”“失败”“跳过”等状态。
 
 ## RD 用例列表
 
@@ -75,11 +98,11 @@
 | `RD-08` | 相册权限拒绝 |
 | `RD-09` | 相册权限允许 |
 | `RD-10` | 恢复密钥账号登录 |
-| `RD-11` | 云备份 |
+| `RD-11` | 云同步 |
 | `RD-12` | 云恢复 |
 | `RD-13` | 手机号登录 |
 | `RD-14` | 微信登录 |
-| `RD-15` | 删除云端账号与备份 |
+| `RD-15` | 删除云端账号与同步 |
 | `RD-16` | 断网保存 |
 | `RD-17` | 通知权限 |
 | `RD-18` | Apple Watch 镜像通知 |
@@ -98,11 +121,13 @@
 4. 锁屏通知栈上下相邻通知不能遮挡提醒卡片。
 5. 锁屏/桌面小组件只读展示本机今日摘要。
 6. 桌面小组件内容不能裁剪，不能展示隐私照片。
-7. Apple Watch 只作为系统镜像通知，不在 App Store 文案中承诺 Watch App。
-8. 状态展示只反映用户主动记录的数据。
-9. 不生成健康建议、压力提醒、喂养建议或医疗判断。
-10. 不接入 HealthKit、传感器、医院系统或第三方健康数据源。
-11. 不提供压力评估、心理健康判断、医疗诊断、治疗建议或专业疫苗建议。
+7. 灵动岛紧凑态、灵动岛展开态、锁屏通知栈、锁屏小组件和桌面小组件必须分别保留独立截图或录屏。
+8. 通知权限允许和通知权限拒绝必须分别保留独立截图或录屏。
+9. Apple Watch 只作为系统镜像通知，不在 App Store 文案中承诺 Watch App。
+10. 状态展示只反映用户主动记录的数据。
+11. 不生成健康建议、压力提醒、喂养建议或医疗判断。
+12. 不接入 HealthKit、传感器、医院系统或第三方健康数据源。
+13. 不提供压力评估、心理健康判断、医疗诊断、治疗建议或专业疫苗建议。
 
 ## 遮挡与脱敏规则
 
@@ -130,8 +155,8 @@
 ## 采集后必跑
 
 ```bash
-python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260627T-current.json
-python3 Backend/scripts/check_app_store_connect_materials.py --allow-incomplete --output Backend/proof/app-store-connect-materials-20260627-current.json
+python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json
+python3 Backend/scripts/check_app_store_connect_materials.py --allow-incomplete --output Backend/proof/app-store-connect-materials.json
 Backend/scripts/run_launch_readiness.sh \
   --deployment-proof Backend/proof/huawei-baota-deploy-20260625T080412Z.json \
   --storage-proof Backend/proof/storage-backend-20260625T080039Z.json \
@@ -141,4 +166,4 @@ Backend/scripts/run_launch_readiness.sh \
   --base-url https://api.mewpow.com/xiaonaiping
 ```
 
-如果 `app-store-evidence-20260627T-current.json` 仍有 `missingEvidence`，不能提交 App Store。
+如果 `app-store-evidence.json` 仍有 `missingEvidence`，不能提交 App Store。

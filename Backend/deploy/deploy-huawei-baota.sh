@@ -68,6 +68,8 @@ REMOTE_BUNDLE="$3"
 TIMESTAMP="$4"
 REMOTE_USER="xiaonaiping"
 ENV_FILE="$REMOTE_ROOT/private/xiaonaiping-api.env"
+SMS_ADAPTER_ENV_FILE="$REMOTE_ROOT/private/xiaonaiping-aliyun-sms-adapter.env"
+SMS_ADAPTER_SERVICE="xiaonaiping-aliyun-sms-adapter.service"
 RELEASE="$REMOTE_ROOT/releases/$TIMESTAMP"
 
 case "$REMOTE_ROOT" in
@@ -86,7 +88,16 @@ if [[ -e "$RELEASE" ]]; then
 fi
 
 test -f "$ENV_FILE"
-install -d -o "$REMOTE_USER" -g "$REMOTE_USER" -m 750 "$REMOTE_ROOT/releases" "$REMOTE_ROOT/data" "$REMOTE_ROOT/backups" "$REMOTE_ROOT/logs"
+. "$ENV_FILE"
+SMS_ADAPTER_REQUIRED=0
+if [[ "${XNP_SMS_PROVIDER:-}" == "webhook" ]]; then
+  case "${XNP_SMS_WEBHOOK_URL:-}" in
+    http://127.0.0.1:8791/send|http://localhost:8791/send)
+      SMS_ADAPTER_REQUIRED=1
+      ;;
+  esac
+fi
+install -d -o "$REMOTE_USER" -g "$REMOTE_USER" -m 750 "$REMOTE_ROOT/releases" "$REMOTE_ROOT/data" "$REMOTE_ROOT/syncs" "$REMOTE_ROOT/logs"
 install -d -o "$REMOTE_USER" -g "$REMOTE_USER" -m 750 "$RELEASE"
 tar -xzf "$REMOTE_BUNDLE" -C "$RELEASE"
 chown -R "$REMOTE_USER:$REMOTE_USER" "$RELEASE"
@@ -114,6 +125,13 @@ if [[ -f "$SMS_ADAPTER_DIR/package.json" ]]; then
     echo "warning: npm not found; Aliyun SMS adapter dependencies were not installed" >&2
   fi
 fi
+if [[ "$SMS_ADAPTER_REQUIRED" == "1" ]]; then
+  test -f "$SMS_ADAPTER_ENV_FILE"
+  install -m 644 "$RELEASE/Backend/deploy/xiaonaiping-aliyun-sms-adapter.service.example" \
+    "/etc/systemd/system/$SMS_ADAPTER_SERVICE"
+  systemctl daemon-reload
+  systemctl enable "$SMS_ADAPTER_SERVICE" >/dev/null
+fi
 
 sudo -u "$REMOTE_USER" env XNP_RELEASE_BACKEND="$RELEASE/Backend" XNP_ENV_FILE="$ENV_FILE" bash -lc '
   set -euo pipefail
@@ -127,6 +145,20 @@ sudo -u "$REMOTE_USER" env XNP_RELEASE_BACKEND="$RELEASE/Backend" XNP_ENV_FILE="
 ln -sfn "$RELEASE" "$REMOTE_ROOT/current"
 systemctl restart "$SERVICE_NAME"
 systemctl is-active "$SERVICE_NAME" >/dev/null
+if [[ "$SMS_ADAPTER_REQUIRED" == "1" ]]; then
+  systemctl restart "$SMS_ADAPTER_SERVICE"
+  systemctl is-active "$SMS_ADAPTER_SERVICE" >/dev/null
+  for attempt in $(seq 1 30); do
+    if curl -fsS "http://127.0.0.1:8791/healthz" >/dev/null 2>&1; then
+      break
+    fi
+    if [[ "$attempt" == "30" ]]; then
+      echo "SMS adapter did not answer /healthz after restart" >&2
+      exit 69
+    fi
+    sleep 1
+  done
+fi
 for attempt in $(seq 1 30); do
   if curl -fsS "http://127.0.0.1:8787/healthz" >/dev/null 2>&1; then
     break

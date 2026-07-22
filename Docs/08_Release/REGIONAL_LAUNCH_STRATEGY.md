@@ -4,16 +4,16 @@
 
 - 项目：小奶瓶 / 宝宝成长记录
 - 阶段：中国大陆首发策略更新
-- 日期：2026-06-18
+- 日期：2026-07-04
 - 公司主体：深圳市闪现生活科技有限公司
-- 当前结论：中国大陆 App Store 为第一批，香港 App Store 为第二批；完成大陆生产部署、备案和隐私合规前不得提交
+- 当前结论：中国大陆 App Store 为第一批，香港 App Store 为第二批；完成当天生产 proof、备案、App Store 人工证据、微信/短信/OBS 和 iOS 26.5 真机/TestFlight 证据前不得提交
 
 ## 已确认事实
 
 1. 小奶瓶涉及儿童、照片、家庭和成长记录。
 2. 第一版免费验证。
 3. 第一版不做社区、AI、订阅、电商。
-4. 第一版需要账号、备份恢复和服务器存储照片原图。
+4. 第一版需要账号、同步恢复和服务器存储照片原图。
 5. 当前提交目标调整为中国大陆 App Store。
 6. 香港进入第二批，美国暂不进入第一批。
 7. 疫苗模板覆盖中国大陆 + 香港，崩溃上报进入第一版并使用 Apple 原生渠道。
@@ -31,10 +31,16 @@
 ## 待我确认的问题
 
 1. 深圳市闪现生活科技有限公司的 Apple Developer 公司账号和 D-U-N-S 是否已准备。
-2. 是否已有隐私政策 URL、用户协议 URL 和支持 URL。
+2. 隐私政策 URL、用户协议 URL 和支持 URL 是否继续使用 `https://api.mewpow.com/xiaonaiping` 过渡路径，还是提交前切到小奶瓶专属子域名。
 3. 中国大陆 APP 备案所需域名、云资源和接入信息是否已准备。
-4. 小奶瓶 API 正式域名。
+4. 小奶瓶 API 正式域名和当天 `20260704T-current` 生产 proof 是否已刷新。
 5. 付费 Apple Developer 账号开通时间。
+
+## 当前证据口径
+
+1. 中国大陆首发判断以 `Backend/proof/production-readiness.json` 和 `Backend/proof/launch-objective-audit.json` 为准；任一不是 ready 都不得提交。
+2. 2026-07-04 当天生产 proof、外部平台证据和稳定 alias 同步按 `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 执行。
+3. 当前仍缺 APP 备案、App Store 人工证据、微信/短信/OBS 真实证据、签名归档 / TestFlight、iOS 26.5 真机/TestFlight 回归和 production readiness。
 
 ## 不进入第一版的功能
 
@@ -55,9 +61,9 @@
 ## 发布要求
 
 1. App Store Connect 第一批选择中国大陆，并补齐中国大陆适用的合规信息；香港在第二批开放。
-2. Review Notes 写清楚：免费、无医疗诊断、账号备份恢复、照片原图云备份、删除账号路径。
+2. Review Notes 写清楚：免费、无医疗诊断、账号同步恢复、照片原图云同步、删除账号路径。
 3. 隐私政策必须覆盖跨境传输、账号、照片原图存储、删除机制。
-4. 按 `CHINA_MAINLAND_LAUNCH_GAP_ASSESSMENT.md` 完成 APP 备案、正式域名、华为云生产环境和远程验证。
+4. 按 `CHINA_MAINLAND_LAUNCH_GAP_ASSESSMENT.md` 和 `XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 完成 APP 备案、正式域名、当天生产 proof、微信/短信/OBS、App Store 人工证据和 iOS 26.5 真机/TestFlight 验证。
 5. 疫苗模板文案必须写成提醒工具，不写成医疗建议。
 6. 崩溃上报必须在隐私政策和 App Privacy Label 中按实际方案披露。
 7. 中国大陆使用简体中文主元数据；香港第二批使用繁中，截图不得使用真实宝宝照片。

@@ -1,0 +1,115 @@
+{
+  "startedAt": "2026-06-28T17:57:10+00:00",
+  "completedAt": "2026-06-28T17:57:10+00:00",
+  "passed": false,
+  "failedRequiredChecks": [
+    "weChatReleaseBuildSettingsConfigured"
+  ],
+  "checks": {
+    "releaseApiBaseURLConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNP_API_BASE_URL=https://api.mewpow.com/xiaonaiping"
+    },
+    "infoPlistUsesReleaseAPIBuildSetting": {
+      "passed": true,
+      "required": true,
+      "evidence": "XNPAPIBaseURL=$(XNP_API_BASE_URL)"
+    },
+    "bundleIdentifierConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "PRODUCT_BUNDLE_IDENTIFIER=com.mewpow.xiaonaiping"
+    },
+    "developerTeamConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "DEVELOPMENT_TEAM=JGCT3GY9CT"
+    },
+    "zhHantHKResourcesPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "zh-Hant-HK strings and InfoPlist strings exist"
+    },
+    "zhHantHKKnownRegionConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "project knownRegions includes zh-Hant-HK"
+    },
+    "privacyUsageDescriptionsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "camera and photo usage descriptions exist"
+    },
+    "privacyManifestPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "App/iOS/XiaoNaiPing/PrivacyInfo.xcprivacy is valid plist"
+    },
+    "privacyManifestIncludedInResources": {
+      "passed": true,
+      "required": true,
+      "evidence": "PrivacyInfo.xcprivacy is listed in project.yml and Xcode Resources"
+    },
+    "privacyManifestAccessedAPITypesDeclared": {
+      "passed": true,
+      "required": true,
+      "evidence": "NSPrivacyAccessedAPITypes is declared as an array"
+    },
+    "privacyManifestTrackingDisabled": {
+      "passed": true,
+      "required": true,
+      "evidence": "tracking disabled in manifest and all collected data entries"
+    },
+    "privacyManifestMatchesPrivacyLabel": {
+      "passed": true,
+      "required": true,
+      "evidence": "manifest collected data types match App Store privacy label categories"
+    },
+    "weChatReleaseBuildSettingsConfigured": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing or invalid: XNP_WECHAT_APP_ID, XNP_WECHAT_URL_SCHEME"
+    },
+    "weChatInfoPlistBuildSettingsPresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat Info.plist build settings are present"
+    },
+    "weChatQuerySchemesConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "LSApplicationQueriesSchemes includes weixin and weixinULAPI"
+    },
+    "weChatURLTypeConfigured": {
+      "passed": true,
+      "required": true,
+      "evidence": "CFBundleURLTypes is wired to XNP_WECHAT_URL_SCHEME"
+    },
+    "weChatOpenSDKLinked": {
+      "passed": true,
+      "required": true,
+      "evidence": "Xcode project or source references WechatOpenSDK/WXApi"
+    },
+    "weChatRuntimeRequiresOpenSDK": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat service accepts native SDK or local fallback shim path"
+    },
+    "weChatAuthorizationBridgePresent": {
+      "passed": true,
+      "required": true,
+      "evidence": "WeChat service registers OpenSDK, sends auth request, handles URL callbacks, and exchanges returned code with backend"
+    },
+    "releaseWeChatDebugCodeBlocked": {
+      "passed": true,
+      "required": true,
+      "evidence": "debug markers guarded: debug_wechat_ios@189"
+    },
+    "releaseWeChatButtonGated": {
+      "passed": true,
+      "required": true,
+      "evidence": "Profile WeChat button is disabled until native WeChat config is present"
+    }
+  }
+}

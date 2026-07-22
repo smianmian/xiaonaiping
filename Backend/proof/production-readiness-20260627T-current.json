@@ -1,15 +1,22 @@
 {
-  "startedAt": "2026-06-27T02:13:03+00:00",
-  "completedAt": "2026-06-27T02:13:03+00:00",
+  "startedAt": "2026-06-27T02:27:35+00:00",
+  "completedAt": "2026-06-27T02:27:35+00:00",
   "ready": false,
   "failedRequiredChecks": [
+    "deploymentProofCurrent",
     "wechatLoginProviderConfigured",
+    "storageBackendProofCurrent",
     "iosReleaseReadinessProofPassed",
     "iosAppBundleProofPassed",
     "authProvidersProofPassed",
     "appStoreManualEvidenceReady"
   ],
   "checks": {
+    "deploymentProofCurrent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing current timestamp in startedAt, completedAt, checkedAt"
+    },
     "productionApiBaseUrlPresent": {
       "passed": true,
       "required": true,
@@ -179,6 +186,11 @@
       "passed": true,
       "required": true,
       "evidence": "storage proof passed with backend huawei_obs"
+    },
+    "storageBackendProofCurrent": {
+      "passed": false,
+      "required": true,
+      "evidence": "missing current timestamp in startedAt, completedAt, checkedAt"
     },
     "iosReleaseReadinessProofPassed": {
       "passed": false,

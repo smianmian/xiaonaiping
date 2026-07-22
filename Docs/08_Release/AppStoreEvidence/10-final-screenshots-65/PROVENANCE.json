@@ -1,0 +1,40 @@
+{
+  "createdAt": "2026-07-04T04:54:59+00:00",
+  "status": "ASC iPhone 6.5-inch draft upload candidates derived from existing iOS 26.5 debug simulator 6.9-inch screenshots; not TestFlight or signed real-device final evidence",
+  "sourceDirectory": "Docs/08_Release/AppStoreEvidence/10-final-screenshots",
+  "targetSlot": "iPhone 6.5-inch display",
+  "targetSize": "1242x2688",
+  "uploadBoundary": "May be used as App Store Connect draft screenshots only; final submission still needs upload provenance tied to TestFlight or signed iOS 26.5 evidence if project gate requires it.",
+  "files": [
+    {
+      "file": "Docs/08_Release/AppStoreEvidence/10-final-screenshots-65/01-home-iphone16pro.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "6640206b025e805b77d9794c972599dc0799fa982b33511ddd59f2dc76ea9fef"
+    },
+    {
+      "file": "Docs/08_Release/AppStoreEvidence/10-final-screenshots-65/02-record-iphone16pro.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "0c80311cc99c632d6b79215759a49ed570d5e529d5b6f9b28a218e7e96113661"
+    },
+    {
+      "file": "Docs/08_Release/AppStoreEvidence/10-final-screenshots-65/03-growth-iphone16pro.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "3eb3754abda4e5a5f6ad03301a5b932b50d2ec0f2b57689bb167b5fb5230c717"
+    },
+    {
+      "file": "Docs/08_Release/AppStoreEvidence/10-final-screenshots-65/04-profile-iphone16pro.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "f24316c79fdeef747cf1e50f7ae180a71408a58fe51e0ec0fa0777fbdd34740b"
+    },
+    {
+      "file": "Docs/08_Release/AppStoreEvidence/10-final-screenshots-65/05-profile-sync-iphone16pro.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "bd3b85ba5ebfec259f08366b08914db7be05915394a53f10ad6358cd1e225447"
+    }
+  ]
+}

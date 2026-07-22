@@ -44,15 +44,15 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
     status, created = request(base_url, "POST", "/v1/accounts")
     token = created["sessionToken"]
 
-    backup = {
+    sync = {
         "schemaVersion": 1,
         "baby": {"name": "RemoteVerificationBaby", "birthDate": "2026-06-01"},
         "feedingRecords": [{"id": "remote-feeding-1", "amountML": 90}],
         "photoIds": ["remote_photo_1"],
     }
-    backup_bytes = json.dumps(backup, ensure_ascii=False).encode("utf-8")
-    status, backup_upload = request(base_url, "PUT", "/v1/backup", backup, token=token)
-    status, backup_restore = request(base_url, "GET", "/v1/backup", token=token)
+    sync_bytes = json.dumps(sync, ensure_ascii=False).encode("utf-8")
+    status, sync_upload = request(base_url, "PUT", "/v1/sync", sync, token=token)
+    status, sync_restore = request(base_url, "GET", "/v1/sync", token=token)
 
     photo_bytes = b"remote-verification-photo-bytes"
     status, photo_upload = request(
@@ -73,9 +73,9 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
             "events": [
                 {
                     "eventId": "remote_" + uuid.uuid4().hex,
-                    "name": "cloud_backup_completed",
+                    "name": "cloud_sync_completed",
                     "occurredAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                    "properties": {"source": "backup", "result": "success", "platform": "ios"},
+                    "properties": {"source": "sync", "result": "success", "platform": "ios"},
                 }
             ]
         },
@@ -86,7 +86,7 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
 
     token_rejected_after_delete = False
     try:
-        request(base_url, "GET", "/v1/backup", token=token)
+        request(base_url, "GET", "/v1/sync", token=token)
     except urllib.error.HTTPError as error:
         token_rejected_after_delete = error.code == 401
 
@@ -100,14 +100,14 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
             "termsPage": "小奶瓶用户协议".encode("utf-8") in terms,
             "supportPage": "小奶瓶支持".encode("utf-8") in support,
             "accountCreated": bool(created.get("accountId")) and created.get("recoveryKey", "").startswith("xnp_"),
-            "backupUploaded": backup_upload.get("sizeBytes") == len(backup_bytes),
-            "backupRestored": backup_restore == backup,
+            "syncUploaded": sync_upload.get("sizeBytes") == len(sync_bytes),
+            "syncRestored": sync_restore == sync,
             "photoUploaded": photo_upload.get("photoId") == "remote_photo_1",
             "photoListed": photo_list.get("photos", [{}])[0].get("photoId") == "remote_photo_1",
             "photoDownloaded": photo_download == photo_bytes,
             "analyticsEventAccepted": analytics_event.get("accepted") == 1 and analytics_event.get("dropped") == 0,
             "recoveryKeyWorks": recovered.get("accountId") == created.get("accountId"),
-            "accountDeleteRemovedBackup": deleted.get("backupDeleted") is True,
+            "accountDeleteRemovedSync": deleted.get("syncDeleted") is True,
             "accountDeleteRemovedPhoto": deleted.get("photoCountDeleted") == 1,
             "accountDeleteRemovedAnalytics": deleted.get("analyticsEventsDeleted") == 1,
             "tokenRejectedAfterDelete": token_rejected_after_delete,

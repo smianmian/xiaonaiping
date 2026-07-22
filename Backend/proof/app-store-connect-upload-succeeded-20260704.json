@@ -1,0 +1,23 @@
+{
+  "completedAt": "2026-07-04T04:31:53+00:00",
+  "passed": true,
+  "archivePath": "/tmp/XiaoNaiPing-CN-L2TYJNDTJK-20260704-appstore.xcarchive",
+  "exportPath": "/tmp/XiaoNaiPing-CN-L2TYJNDTJK-20260704-AppStoreConnect",
+  "appStoreConnectAppId": "6787332971",
+  "bundleId": "com.mewpow.xiaonaiping",
+  "version": "1.0",
+  "build": "1",
+  "teamId": "L2TYJNDTJK",
+  "uploadLog": "Backend/proof/xcodebuild-export-upload-appstore-20260704-l2tyjndtjk-after-app-record.log",
+  "distributionLogs": "/var/folders/4b/kfn2_7111fj6x8nm9v8_rrl40000gp/T/XiaoNaiPing_2026-07-04_12-28-40.601.xcdistributionlogs",
+  "evidence": {
+    "uploadSucceededLinePresent": true,
+    "uploadedAppLinePresent": true,
+    "exportSucceededLinePresent": true,
+    "packageProcessingLinePresent": true
+  },
+  "warnings": [
+    "WechatOpenSDK.framework dSYM missing for UUID 9C728E9F-EBCB-311E-A60C-5DFE55BABCCB; crash symbolication may be incomplete."
+  ],
+  "statusBoundary": "Build uploaded and accepted for processing by App Store Connect; not submitted for App Review."
+}

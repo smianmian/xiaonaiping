@@ -48,7 +48,7 @@ REQUIRED_PRIVACY_TYPES = {
     "NSPrivacyCollectedDataTypePerformanceData",
 }
 DISALLOWED_BUNDLE_SUFFIXES = {
-    ".backup",
+    ".sync",
     ".bak",
     ".env",
     ".htm",

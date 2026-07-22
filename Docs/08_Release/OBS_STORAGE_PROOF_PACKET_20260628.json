@@ -1,0 +1,168 @@
+{
+  "artifactType": "obs-storage-proof-packet",
+  "status": "storage-proof-packet-not-evidence",
+  "date": "2026-06-28",
+  "project": "XiaoNaiPing",
+  "appName": "小奶瓶",
+  "sourceFiles": {
+    "obsHandoff": "Backend/deploy/huawei-obs.md",
+    "obsPolicyEvidenceTemplate": "Docs/08_Release/AppStoreEvidence/_templates/obs-policy-evidence.template.json",
+    "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260628.md",
+    "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260628.json",
+    "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
+    "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md"
+  },
+  "targetEvidenceFiles": {
+    "obsPolicyConsole": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+    "obsPolicyConsolePdf": "Docs/08_Release/AppStoreEvidence/09-obs-policy.pdf",
+    "storageProof": "Backend/proof/storage-backend-20260628T-current.json",
+    "productionReadinessCurrent": "Backend/proof/production-readiness-20260628T-current.json",
+    "stableStorageAlias": "Backend/proof/storage-backend.json",
+    "stableProductionReadinessAlias": "Backend/proof/production-readiness.json"
+  },
+  "evidenceFileChecks": [
+    {
+      "artifactId": "obsPolicyConsole",
+      "target": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png or .pdf",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsObsStorageProof": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "storageProof",
+      "target": "Backend/proof/storage-backend-20260628T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsObsStorageProof": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "productionReadinessCurrent",
+      "target": "Backend/proof/production-readiness-20260628T-current.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsObsStorageProof": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "stableStorageAlias",
+      "target": "Backend/proof/storage-backend.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsObsStorageProof": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    },
+    {
+      "artifactId": "stableProductionReadinessAlias",
+      "target": "Backend/proof/production-readiness.json",
+      "fileSizeBytes": "FILL_AFTER_CAPTURE",
+      "sha256": "FILL_AFTER_CAPTURE",
+      "redactionChecked": false,
+      "sameRoundAsObsStorageProof": false,
+      "sourceIsAllowedEvidenceRoot": false,
+      "realEvidenceNotTemplate": false,
+      "secretValuesNotRecorded": false
+    }
+  ],
+  "separationRules": [
+    "obsConsoleScreenshot is not storageProof",
+    "storageProof is not App Store manual evidence",
+    "productionReadinessCurrent is not storageProof alone",
+    "stable aliases sync only after current storage, production, and App Store evidence gates are green",
+    "no public bucket",
+    "no signed URL",
+    "no full object key",
+    "no real baby photos"
+  ],
+  "consoleEvidenceMustKeep": [
+    "Huawei Cloud OBS",
+    "private bucket",
+    "XiaoNaiPing bucket or prefix",
+    "production OBS region",
+    "private access policy",
+    "server-side upload/download/delete flow",
+    "encryption",
+    "lifecycle policy",
+    "deletion policy",
+    "account deletion cleanup",
+    "storage proof summary"
+  ],
+  "redactionChecklist": [
+    "HUAWEI_OBS_ACCESS_KEY_ID",
+    "HUAWEI_OBS_SECRET_ACCESS_KEY",
+    "AK/SK",
+    "SecretKey",
+    "temporary signed URLs",
+    "complete object keys",
+    "real baby photos",
+    "private server paths",
+    "account IDs"
+  ],
+  "executionOrder": [
+    {
+      "step": "confirmBucketPolicy",
+      "requires": [
+        "private bucket",
+        "no public object listing",
+        "no public object reads",
+        "XiaoNaiPing-specific prefix",
+        "server-side only credentials"
+      ]
+    },
+    {
+      "step": "captureObsConsole",
+      "target": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
+      "requires": [
+        "bucket or prefix",
+        "region",
+        "private access policy",
+        "encryption/lifecycle/deletion state",
+        "account deletion cleanup evidence"
+      ]
+    },
+    {
+      "step": "refreshStorageProof",
+      "command": "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260628T-current.json"
+    },
+    {
+      "step": "refreshAppStoreEvidence",
+      "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-28 --output Backend/proof/app-store-evidence-20260628T-current.json"
+    },
+    {
+      "step": "refreshProductionReadiness",
+      "command": "python3 Backend/scripts/check_production_readiness.py --storage-proof Backend/proof/storage-backend-20260628T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260628T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260628T-current.json --allow-incomplete"
+    },
+    {
+      "step": "syncStableStorageAliases",
+      "requires": [
+        "Backend/proof/storage-backend-20260628T-current.json passed",
+        "Backend/proof/production-readiness-20260628T-current.json ready=true",
+        "Backend/proof/app-store-evidence-20260628T-current.json ready=true"
+      ],
+      "commands": [
+        "cp Backend/proof/storage-backend-20260628T-current.json Backend/proof/storage-backend.json",
+        "cp Backend/proof/production-readiness-20260628T-current.json Backend/proof/production-readiness.json"
+      ]
+    }
+  ],
+  "postExecutionGates": [
+    "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
+    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
+    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness.json",
+    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json"
+  ],
+  "completionRule": "This packet is not evidence and not submission permission. OBS storage proof is complete only after real 09-obs-policy.png or PDF exists, current storage proof passes, account deletion cleanup is proven, production-readiness.json ready=true, and launch-objective-audit.json ready=true."
+}
