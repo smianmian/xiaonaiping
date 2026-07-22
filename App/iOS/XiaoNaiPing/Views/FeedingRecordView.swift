@@ -484,7 +484,7 @@ private struct FeedingEditorSheet: View {
     @State private var showsTimePicker = false
     @State private var showsMoreDetails = false
 
-    private let types = ["母乳", "瓶喂", "奶粉", "辅食"]
+    private let types = ["奶粉", "母乳", "瓶喂", "辅食"]
     private let reminderDeferralOptions = Array(stride(from: 0, through: 30, by: 5))
 
     init(
@@ -496,7 +496,7 @@ private struct FeedingEditorSheet: View {
         self.reminderRepeatIntervalMinutes = reminderRepeatIntervalMinutes
         self.onSave = onSave
         _occurredAt = State(initialValue: record?.occurredAt ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
-        _type = State(initialValue: record?.type ?? "母乳")
+        _type = State(initialValue: record?.type ?? "奶粉")
         _amountText = State(initialValue: record?.amountML.map(String.init) ?? "")
         _durationText = State(initialValue: record?.durationMinutes.map(String.init) ?? "")
         _note = State(initialValue: record?.note ?? "")
@@ -509,14 +509,22 @@ private struct FeedingEditorSheet: View {
                 VStack(spacing: AppSpacing.large) {
                     WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                            Text("这一次")
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.inkSoft)
+
                             Picker("类型", selection: $type) {
                                 ForEach(types, id: \.self) { type in
                                     Text(type).tag(type)
                                 }
                             }
                             .pickerStyle(.segmented)
+                            .tint(AppColors.peach)
 
                             HStack {
+                                AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
+                                    .frame(width: 34, height: 40)
+
                                 VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                                     Text(record == nil && !showsTimePicker ? "刚刚" : BabyRecordStore.reminderDateTimeString(from: occurredAt))
                                         .font(AppTypography.cardTitle)
@@ -545,26 +553,27 @@ private struct FeedingEditorSheet: View {
                         }
                     }
 
-                    Button {
-                        withAnimation {
-                            showsMoreDetails.toggle()
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "按需填写")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
                         }
-                    } label: {
-                        HStack(spacing: AppSpacing.small) {
-                            Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
-                            Text("更多详情（可不填）")
-                            Spacer(minLength: 0)
-                        }
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.inkGreen)
-                        .padding(.horizontal, AppSpacing.medium)
-                        .padding(.vertical, AppSpacing.regular)
-                        .background {
-                            RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous)
-                                .fill(AppColors.blush.opacity(0.56))
-                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
 
                     if showsMoreDetails {
                         optionalDetails

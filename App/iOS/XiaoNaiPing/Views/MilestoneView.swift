@@ -51,7 +51,7 @@ struct MilestoneView: View {
                                             Image(systemName: "trash")
                                                 .font(.system(size: 16, weight: .regular))
                                                 .foregroundStyle(AppColors.coral)
-                                                .frame(width: 36, height: 36)
+                                                .frame(width: 44, height: 44)
                                                 .background {
                                                     Circle().fill(AppColors.blush.opacity(0.5))
                                                 }
@@ -185,6 +185,7 @@ private struct MilestoneEditorSheet: View {
     @State private var date: Date
     @State private var note: String
     @State private var errorMessage: String?
+    @State private var showsMoreDetails = false
 
     init(milestone: Milestone?, onSave: @escaping (Milestone) -> Bool) {
         self.milestone = milestone
@@ -198,15 +199,42 @@ private struct MilestoneEditorSheet: View {
         NavigationStack {
             VStack(spacing: AppSpacing.large) {
                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
-                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                        TextField("纪念日名称", text: $title)
-                            .textFieldStyle(.roundedBorder)
-                        DatePicker("日期", selection: $date, displayedComponents: [.date])
-                        TextField("备注，可不填", text: $note, axis: .vertical)
-                            .lineLimit(2...4)
-                            .textFieldStyle(.roundedBorder)
+                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                            TextField("纪念日名称", text: $title)
+                                .textFieldStyle(.roundedBorder)
+                            DatePicker("日期", selection: $date, displayedComponents: [.date])
+                        }
                     }
-                }
+
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "添加备注")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if showsMoreDetails {
+                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
+                            TextField("备注，可不填", text: $note, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                    }
 
                 if let errorMessage {
                     Text(errorMessage)

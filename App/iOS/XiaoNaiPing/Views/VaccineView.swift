@@ -216,7 +216,7 @@ struct VaccineView: View {
         HStack(alignment: .bottom, spacing: AppSpacing.medium) {
             AssetWatercolorImage(name: AppAssets.vaccineTeddy, mode: .multiply)
                 .frame(width: 68, height: 76)
-            WatercolorCard(tint: AppColors.mistBlue, cornerRadius: 22, padding: AppSpacing.medium) {
+            WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
                 Text("疫苗本用于记录计划与实际接种日期；模板可编辑，实际安排请以医生或接种机构为准。")
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.ink)
@@ -427,7 +427,7 @@ private struct VaccineTimelineRow: View {
                         Image(systemName: "trash")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundStyle(AppColors.coral)
-                            .frame(width: 34, height: 34)
+                            .frame(width: 44, height: 44)
                             .background {
                                 Circle().fill(AppColors.blush.opacity(0.56))
                             }
@@ -489,7 +489,7 @@ private struct VaccineBookEntry: View {
         }
         .padding(AppSpacing.regular)
         .background {
-            CardBackground(tint: rowTint, cornerRadius: 22)
+            CardBackground(tint: rowTint, cornerRadius: AppShapes.cardRadius)
         }
     }
 

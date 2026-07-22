@@ -263,7 +263,7 @@ struct GrowthView: View {
     }
 
     private func metricCard(title: String, value: String, unit: String, icon: String, tint: Color, color: Color) -> some View {
-        WatercolorCard(tint: tint, cornerRadius: 22, padding: AppSpacing.medium) {
+        WatercolorCard(tint: tint, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
             VStack(spacing: AppSpacing.small) {
                 Label(title, systemImage: icon)
                     .font(AppTypography.caption)
@@ -624,7 +624,7 @@ private struct GrowthHistoryRow: View {
         .padding(.horizontal, AppSpacing.medium)
         .padding(.vertical, 11)
         .background {
-            CardBackground(tint: AppColors.cream, cornerRadius: 20)
+            CardBackground(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius)
         }
     }
 
@@ -657,6 +657,7 @@ private struct GrowthEditorSheet: View {
     @State private var headText: String
     @State private var note: String
     @State private var errorMessage: String?
+    @State private var showsMoreDetails = false
 
     init(record: GrowthRecord?, onSave: @escaping (GrowthRecord) -> Bool) {
         self.record = record
@@ -682,12 +683,41 @@ private struct GrowthEditorSheet: View {
                             TextField("身高 cm，可不填", text: $heightText)
                                 .keyboardType(.decimalPad)
                                 .textFieldStyle(.roundedBorder)
-                            TextField("头围 cm，可不填", text: $headText)
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.roundedBorder)
-                            TextField("备注，可不填", text: $note, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
+                        }
+                    }
+
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "头围、备注")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if showsMoreDetails {
+                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
+                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                                TextField("头围 cm，可不填", text: $headText)
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(.roundedBorder)
+                                TextField("备注，可不填", text: $note, axis: .vertical)
+                                    .lineLimit(2...4)
+                                    .textFieldStyle(.roundedBorder)
+                            }
                         }
                     }
 

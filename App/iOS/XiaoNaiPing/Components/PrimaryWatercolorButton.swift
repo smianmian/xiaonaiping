@@ -14,10 +14,10 @@ struct PrimaryWatercolorButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 13)
                 .background {
-                    Capsule()
+                    RoundedRectangle(cornerRadius: AppShapes.largeCardRadius, style: .continuous)
                         .fill(tint.opacity(0.70))
                         .overlay {
-                            Capsule()
+                            RoundedRectangle(cornerRadius: AppShapes.largeCardRadius, style: .continuous)
                                 .stroke(foreground.opacity(0.24), lineWidth: 1)
                         }
                 }

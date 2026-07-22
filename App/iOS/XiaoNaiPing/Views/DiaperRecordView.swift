@@ -169,6 +169,8 @@ private struct DiaperEditorSheet: View {
     @State private var texture: String
     @State private var note: String
     @State private var errorMessage: String?
+    @State private var showsTimePicker = false
+    @State private var showsMoreDetails = false
 
     private let kinds = ["大便", "小便"]
     private let colors = ["未选择", "金黄色", "黄色", "绿色", "棕色"]
@@ -190,44 +192,74 @@ private struct DiaperEditorSheet: View {
                 VStack(spacing: AppSpacing.large) {
                     WatercolorCard(tint: AppColors.grass, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            DatePicker("时间", selection: $occurredAt, displayedComponents: [.hourAndMinute])
-                                .font(AppTypography.readableBody)
+                            Text("这一次")
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.inkSoft)
+
                             Picker("类型", selection: $kind) {
                                 ForEach(kinds, id: \.self) { item in
                                     Text(item).tag(item)
                                 }
                             }
                             .pickerStyle(.segmented)
+                            .tint(AppColors.sage)
+
+                            HStack {
+                                AssetWatercolorImage(name: kind == "小便" ? AppAssets.peeDropIcon : AppAssets.diaperIcon, mode: .multiply)
+                                    .frame(width: 34, height: 40)
+
+                                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                                    Text(record == nil && !showsTimePicker ? "刚刚" : BabyRecordStore.reminderDateTimeString(from: occurredAt))
+                                        .font(AppTypography.cardTitle)
+                                        .foregroundStyle(AppColors.inkGreen)
+                                    Text(record == nil && !showsTimePicker ? "会按现在的时间保存" : "记录时间")
+                                        .font(AppTypography.caption)
+                                        .foregroundStyle(AppColors.inkSoft)
+                                }
+
+                                Spacer(minLength: 0)
+
+                                Button(showsTimePicker ? "收起" : "修改时间") {
+                                    withAnimation {
+                                        showsTimePicker.toggle()
+                                    }
+                                }
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.blueInk)
+                            }
+
+                            if showsTimePicker {
+                                DatePicker("时间", selection: $occurredAt, displayedComponents: [.date, .hourAndMinute])
+                                    .font(AppTypography.readableBody)
+                                    .tint(AppColors.sage)
+                            }
                         }
                     }
 
-                    if kind == "大便" {
-                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                                Text("可选细节")
-                                    .font(AppTypography.cardTitle)
-                                    .foregroundStyle(AppColors.inkGreen)
-                                Picker("颜色", selection: $color) {
-                                    ForEach(colors, id: \.self) { item in
-                                        Text(item).tag(item)
-                                    }
-                                }
-                                Picker("形态", selection: $texture) {
-                                    ForEach(textures, id: \.self) { item in
-                                        Text(item).tag(item)
-                                    }
-                                }
-                                TextField("备注，可不填", text: $note, axis: .vertical)
-                                    .lineLimit(2...4)
-                                    .textFieldStyle(.roundedBorder)
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
                             }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "按需填写")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
                         }
-                    } else {
-                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                            TextField("备注，可不填", text: $note, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
-                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if showsMoreDetails {
+                        optionalDetails
                     }
 
                     if let errorMessage {
@@ -237,7 +269,7 @@ private struct DiaperEditorSheet: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    PrimaryWatercolorButton(title: "保存排便记录", tint: AppColors.grass, foreground: AppColors.inkGreen) {
+                    PrimaryWatercolorButton(title: record == nil ? "刚换好，记录一下" : "保存修改", tint: AppColors.grass, foreground: AppColors.inkGreen) {
                         save()
                     }
                 }
@@ -252,6 +284,28 @@ private struct DiaperEditorSheet: View {
                         dismiss()
                     }
                 }
+            }
+        }
+    }
+
+    private var optionalDetails: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                if kind == "大便" {
+                    Picker("颜色", selection: $color) {
+                        ForEach(colors, id: \.self) { item in
+                            Text(item).tag(item)
+                        }
+                    }
+                    Picker("形态", selection: $texture) {
+                        ForEach(textures, id: \.self) { item in
+                            Text(item).tag(item)
+                        }
+                    }
+                }
+                TextField("备注，可不填", text: $note, axis: .vertical)
+                    .lineLimit(2...4)
+                    .textFieldStyle(.roundedBorder)
             }
         }
     }

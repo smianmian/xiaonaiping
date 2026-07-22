@@ -37,7 +37,7 @@ struct RecordRowView: View {
         .padding(.horizontal, AppSpacing.medium)
         .padding(.vertical, 11)
         .background {
-            CardBackground(tint: tint, cornerRadius: 20)
+            CardBackground(tint: tint, cornerRadius: AppShapes.cardRadius)
         }
     }
 }

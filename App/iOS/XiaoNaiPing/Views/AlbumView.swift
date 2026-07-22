@@ -56,45 +56,30 @@ struct AlbumView: View {
                     .padding(.bottom, AppSpacing.bottomBarSpace)
                 }
 
-                HStack(spacing: AppSpacing.small) {
-                    Button {
-                        openCamera()
-                    } label: {
-                        Image(systemName: "camera")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .background {
-                                Circle()
-                                    .fill(AppColors.inkGreen.opacity(0.78))
-                                    .shadow(color: AppColors.inkGreen.opacity(0.18), radius: 14, y: 7)
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("打开相机添加照片")
-                    .disabled(isImportingPhotos)
-
-                    Button {
-                        openPhotoPicker()
-                    } label: {
-                        HStack(spacing: AppSpacing.small) {
-                            Image(systemName: "photo.badge.plus")
-                                .font(.system(size: 20, weight: .regular))
-                            Text("添加照片")
+                WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.small) {
+                    HStack(spacing: AppSpacing.small) {
+                        Button {
+                            openCamera()
+                        } label: {
+                            Label("拍照", systemImage: "camera")
                                 .font(AppTypography.body)
+                                .foregroundStyle(AppColors.inkGreen)
+                                .frame(minWidth: 84, minHeight: 44)
+                                .background {
+                                    RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
+                                        .fill(AppColors.milk.opacity(0.78))
+                                }
                         }
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, AppSpacing.medium)
-                        .padding(.vertical, AppSpacing.small)
-                        .background {
-                            Capsule()
-                                .fill(AppColors.blueInk.opacity(0.76))
-                                .shadow(color: AppColors.blueInk.opacity(0.24), radius: 16, y: 8)
-                            }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("打开相机添加照片")
+                        .disabled(isImportingPhotos)
+
+                        PrimaryWatercolorButton(title: "从相册添加", tint: AppColors.cream, foreground: AppColors.blueInk) {
+                            openPhotoPicker()
+                        }
+                        .accessibilityLabel("从系统相册添加照片")
+                        .disabled(isImportingPhotos)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("从系统相册添加照片")
-                    .disabled(isImportingPhotos)
                 }
                 .padding(.trailing, AppSpacing.page)
                 .padding(.bottom, AppSpacing.bottomBarSpace - 22)
@@ -778,6 +763,7 @@ private struct PhotoEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var capturedAt: Date
     @State private var note: String
+    @State private var showsMoreDetails = false
 
     init(photo: BabyPhoto, onSave: @escaping (Date, String) -> Void, onDelete: @escaping () -> Void) {
         self.photo = photo
@@ -791,14 +777,41 @@ private struct PhotoEditorSheet: View {
         NavigationStack {
             VStack(spacing: AppSpacing.large) {
                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
-                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                        PhotoSyncStatusBadge(status: photo.syncStatus)
-                        DatePicker("照片日期", selection: $capturedAt, displayedComponents: [.date])
-                        TextField("备注，可不填", text: $note, axis: .vertical)
-                            .lineLimit(2...4)
-                            .textFieldStyle(.roundedBorder)
+                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                            PhotoSyncStatusBadge(status: photo.syncStatus)
+                            DatePicker("照片日期", selection: $capturedAt, displayedComponents: [.date])
+                        }
                     }
-                }
+
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "添加备注")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if showsMoreDetails {
+                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
+                            TextField("备注，可不填", text: $note, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                    }
 
                 PrimaryWatercolorButton(title: "保存照片信息") {
                     onSave(capturedAt, note)

@@ -91,7 +91,7 @@ struct SleepRecordView: View {
                                         .padding(.horizontal, AppSpacing.medium)
                                         .padding(.vertical, 11)
                                         .background {
-                                            CardBackground(tint: record.isOngoing ? AppColors.blush : AppColors.cream, cornerRadius: 20)
+                                            CardBackground(tint: record.isOngoing ? AppColors.blush : AppColors.cream, cornerRadius: AppShapes.cardRadius)
                                         }
                                     }
                                     .buttonStyle(.plain)
@@ -240,6 +240,7 @@ private struct SleepEditorSheet: View {
     @State private var type: String
     @State private var note: String
     @State private var errorMessage: String?
+    @State private var showsMoreDetails = false
 
     private let types = ["小睡", "夜睡"]
 
@@ -272,12 +273,31 @@ private struct SleepEditorSheet: View {
                         }
                     }
 
-                    WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            Text("备注")
-                                .font(AppTypography.cardTitle)
-                                .foregroundStyle(AppColors.inkGreen)
-                            TextField("可不填", text: $note, axis: .vertical)
+                    WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: 0) {
+                        Button {
+                            withAnimation {
+                                showsMoreDetails.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.small) {
+                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
+                                Text("更多详情（可不填）")
+                                Spacer(minLength: 0)
+                                Text(showsMoreDetails ? "收起" : "添加备注")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.vertical, AppSpacing.regular)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if showsMoreDetails {
+                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
+                            TextField("备注，可不填", text: $note, axis: .vertical)
                                 .lineLimit(2...4)
                                 .textFieldStyle(.roundedBorder)
                         }
