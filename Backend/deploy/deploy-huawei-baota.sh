@@ -88,7 +88,9 @@ if [[ -e "$RELEASE" ]]; then
 fi
 
 test -f "$ENV_FILE"
+set -a
 . "$ENV_FILE"
+set +a
 SMS_ADAPTER_REQUIRED=0
 if [[ "${XNP_SMS_PROVIDER:-}" == "webhook" ]]; then
   case "${XNP_SMS_WEBHOOK_URL:-}" in
@@ -133,11 +135,8 @@ if [[ "$SMS_ADAPTER_REQUIRED" == "1" ]]; then
   systemctl enable "$SMS_ADAPTER_SERVICE" >/dev/null
 fi
 
-sudo -u "$REMOTE_USER" env XNP_RELEASE_BACKEND="$RELEASE/Backend" XNP_ENV_FILE="$ENV_FILE" bash -lc '
+sudo -u "$REMOTE_USER" -E env XNP_RELEASE_BACKEND="$RELEASE/Backend" bash -lc '
   set -euo pipefail
-  set -a
-  . "$XNP_ENV_FILE"
-  set +a
   cd "$XNP_RELEASE_BACKEND"
   "$XNP_RELEASE_BACKEND/.venv/bin/python" scripts/migrate_database.py
 '
@@ -204,13 +203,14 @@ REMOTE_USER="xiaonaiping"
 ENV_FILE="$REMOTE_ROOT/private/xiaonaiping-api.env"
 BACKEND="$REMOTE_ROOT/current/Backend"
 
+test -f "$ENV_FILE"
+set -a
+. "$ENV_FILE"
+set +a
 install -d -o "$REMOTE_USER" -g "$REMOTE_USER" -m 750 "$BACKEND/proof"
 
-sudo -u "$REMOTE_USER" env XNP_RELEASE_BACKEND="$BACKEND" XNP_ENV_FILE="$ENV_FILE" XNP_STORAGE_PROOF="$REMOTE_STORAGE_PROOF" bash -lc '
+sudo -u "$REMOTE_USER" -E env XNP_RELEASE_BACKEND="$BACKEND" XNP_STORAGE_PROOF="$REMOTE_STORAGE_PROOF" bash -lc '
   set -euo pipefail
-  set -a
-  . "$XNP_ENV_FILE"
-  set +a
   cd "$XNP_RELEASE_BACKEND"
   PYTHONPATH="$XNP_RELEASE_BACKEND" "$XNP_RELEASE_BACKEND/.venv/bin/python" scripts/verify_storage_backend.py \
     --data-dir "$XNP_DATA_DIR" \
