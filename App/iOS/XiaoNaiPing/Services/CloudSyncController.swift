@@ -6,7 +6,7 @@ final class CloudSyncController: ObservableObject {
     @Published private(set) var isWorking = false
     @Published private(set) var isSyncing = false
     @Published private(set) var statusTitle = "未登录"
-    @Published private(set) var statusDetail = "登录后会自动同步宝宝资料、记录和照片。"
+    @Published private(set) var statusDetail = "登录后即可安全保存宝宝资料、记录和照片。"
 
     private let sessionStore = CloudAccountSessionStore()
     private var scheduledSyncTask: Task<Void, Never>?
@@ -14,10 +14,10 @@ final class CloudSyncController: ObservableObject {
     init() {
         if sessionStore.session != nil {
             statusTitle = "已登录"
-            statusDetail = "资料会自动同步到你的账号。"
+            statusDetail = "资料会安全保存在你的账号中。"
         } else if !isServiceConfigured {
-            statusTitle = "同步服务暂不可用"
-            statusDetail = "请检查网络后重试自动同步。"
+            statusTitle = "账号服务暂不可用"
+            statusDetail = "请检查网络后重试。"
         }
     }
 
@@ -27,10 +27,6 @@ final class CloudSyncController: ObservableObject {
 
     var isServiceConfigured: Bool {
         CloudSyncConfiguration.apiBaseURL != nil
-    }
-
-    var serviceStatusLabel: String {
-        hasSession ? "自动同步" : (isServiceConfigured ? "请登录" : "未配置")
     }
 
     var isWeChatLoginConfigured: Bool {
@@ -118,18 +114,18 @@ final class CloudSyncController: ObservableObject {
         guard let session = sessionStore.session else { return }
 
         isSyncing = true
-        statusTitle = "正在同步"
+        statusTitle = "正在保存"
         statusDetail = "正在安全上传资料和照片。"
         defer { isSyncing = false }
 
         do {
             let client = try makeClient()
             try await uploadEverything(store: store, client: client, token: session.sessionToken)
-            statusTitle = "已同步"
-            statusDetail = "资料和照片已自动保存到服务器。"
+            statusTitle = "已保存"
+            statusDetail = "资料和照片已保存到服务器。"
         } catch {
-            statusTitle = "待同步"
-            statusDetail = "联网后会自动重试同步。"
+            statusTitle = "等待连接"
+            statusDetail = "网络恢复后会再次保存。"
         }
     }
 
@@ -161,7 +157,7 @@ final class CloudSyncController: ObservableObject {
             sessionStore.clear()
             store.markCloudAccountDeletedLocally()
             statusTitle = "云端已删除"
-            statusDetail = "账号和同步资料已删除，照片原图删除数量：\(response.photoCountDeleted)。"
+            statusDetail = "账号资料已删除，照片原图删除数量：\(response.photoCountDeleted)。"
         }
     }
 
@@ -169,7 +165,7 @@ final class CloudSyncController: ObservableObject {
         scheduledSyncTask?.cancel()
         sessionStore.clear()
         statusTitle = "已退出账号"
-        statusDetail = "已退出当前账号；下次登录后会继续自动同步。"
+        statusDetail = "已退出当前账号。"
     }
 
     static func validateE164PhoneNumber(_ phoneNumber: String) -> Bool {
@@ -206,10 +202,10 @@ final class CloudSyncController: ObservableObject {
         do {
             try await restoreRemoteData(store: store, client: client, token: session.sessionToken)
             statusTitle = "已登录"
-            statusDetail = "已同步服务器中的宝宝资料。"
+            statusDetail = "已恢复服务器中的宝宝资料。"
         } catch {
             statusTitle = "已登录"
-            statusDetail = "完成建档后会自动同步到服务器。"
+            statusDetail = "完成建档后会自动保存到服务器。"
         }
     }
 

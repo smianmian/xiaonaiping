@@ -125,7 +125,7 @@ enum CloudSyncError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingBaseURL:
-            return "同步服务暂不可用，请稍后重试。"
+            return "账号服务暂不可用，请稍后重试。"
         case .missingSession:
             return "请先登录账号。"
         case .invalidPhoneNumber:

@@ -89,7 +89,7 @@ struct RootTabView: View {
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-XNPScreenshotData")
             || arguments.contains("-XNPScreenshotTab")
-            || arguments.contains("-XNPScreenshotSyncSheet") {
+            || arguments.contains("-XNPScreenshotAccountSheet") {
             return false
         }
         return cloudSync.isServiceConfigured
@@ -329,7 +329,7 @@ private struct LaunchLoginView: View {
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
                     .multilineTextAlignment(.center)
-                Text("登录后可同步宝宝的每一次成长记录。")
+                Text("登录后即可安全保存宝宝的每一次成长记录。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .multilineTextAlignment(.center)
@@ -1024,7 +1024,7 @@ private struct OnboardingView: View {
                 Label("隐私提示", systemImage: "shield")
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("登录后，宝宝资料、记录和主动加入 App 的照片原图会自动同步，并可在资料页管理账号与同步。")
+                Text("登录后，宝宝资料、记录和主动加入 App 的照片原图会安全保存到私有服务中，并可在资料页管理账号。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)

@@ -353,7 +353,7 @@ struct MonthlyReportDetailView: View {
                 Text("原始记录来源")
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("喂养、喝水、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都会自动同步。要修改内容，请回到对应页面编辑原始记录。")
+                Text("喂养、喝水、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都来自原始记录。要修改内容，请回到对应页面编辑原始记录。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)

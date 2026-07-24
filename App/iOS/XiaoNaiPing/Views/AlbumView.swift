@@ -161,8 +161,6 @@ struct AlbumView: View {
                     .frame(width: 46, height: 28)
             }
 
-            syncStatusSummary
-
             if filteredPhotos.isEmpty {
                 filteredEmptyState
             } else {
@@ -180,44 +178,6 @@ struct AlbumView: View {
                 }
             }
         }
-    }
-
-    private var syncStatusSummary: some View {
-        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-            HStack(alignment: .top, spacing: AppSpacing.medium) {
-                Image(systemName: cloudSync.hasSession ? "checkmark.icloud" : "lock.icloud")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(AppColors.blueInk)
-                    .frame(width: 28, height: 28)
-
-                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                    Text(photoSyncTitle.localizedText)
-                        .font(AppTypography.bodyLarge)
-                        .foregroundStyle(AppColors.inkGreen)
-                    Text(photoSyncDetail.localizedText)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkSoft)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
-    }
-
-    private var photoSyncTitle: String {
-        if cloudSync.hasSession {
-            return "照片可随同步上传"
-        }
-        return cloudSync.isServiceConfigured ? "正在等待自动同步" : "正在连接同步服务"
-    }
-
-    private var photoSyncDetail: String {
-        if cloudSync.hasSession {
-            return "点击资料页的“立即同步”，会把主动加入小奶瓶的照片原图上传到私有账号空间。"
-        }
-        if cloudSync.isServiceConfigured {
-            return "开启账号与同步前，照片只保存在 App 私有空间，不会自动上传。"
-        }
-        return "照片会在联网后自动同步到你的账号。"
     }
 
     private var filteredEmptyState: some View {
@@ -349,7 +309,7 @@ struct AlbumView: View {
                     editingPhoto = nil
                 } else {
                     store.markCloudPhotoDeletePending(photo)
-                    importErrorMessage = "照片删除同步失败，请稍后重试。"
+                    importErrorMessage = "照片删除失败，请稍后重试。"
                 }
             }
         case .localOnly, .pending, .failed:
@@ -560,104 +520,14 @@ private struct PhotoTimelineDaySection: View {
                         Button {
                             onEdit(photo)
                         } label: {
-                            ZStack(alignment: .bottomLeading) {
-                                LocalPhotoCell(url: photoURL(photo))
-                                PhotoSyncStatusBadge(status: photo.syncStatus)
-                                    .padding(6)
-                            }
+                            LocalPhotoCell(url: photoURL(photo))
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("编辑\(title)的照片，\(photo.syncStatus.accessibilityText)")
+                        .accessibilityLabel("编辑\(title)的照片")
                     }
                 }
             }
         }
-    }
-}
-
-private struct PhotoSyncStatusBadge: View {
-    let status: PhotoSyncStatus
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: status.systemImage)
-                .font(.system(size: 10, weight: .semibold))
-            Text(status.title)
-                .font(.caption2)
-        }
-        .foregroundStyle(status.foreground)
-        .padding(.horizontal, 7)
-        .padding(.vertical, 4)
-        .background {
-            Capsule()
-                .fill(status.tint.opacity(0.88))
-        }
-    }
-}
-
-private extension PhotoSyncStatus {
-    var title: String {
-        switch self {
-        case .localOnly:
-            "等待同步"
-        case .pending:
-            "待同步"
-        case .backedUp:
-            "已同步"
-        case .failed:
-            "同步失败"
-        case .cloudDeletePending:
-            "待删云端"
-        }
-    }
-
-    var accessibilityText: String {
-        switch self {
-        case .localOnly:
-            "联网后会自动同步"
-        case .pending:
-            "等待云同步"
-        case .backedUp:
-            "已经完成云同步"
-        case .failed:
-            "云同步失败"
-        case .cloudDeletePending:
-            "云端删除待完成"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .localOnly:
-            "lock.fill"
-        case .pending:
-            "icloud.and.arrow.up"
-        case .backedUp:
-            "checkmark.icloud"
-        case .failed:
-            "exclamationmark.icloud"
-        case .cloudDeletePending:
-            "icloud.slash"
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .localOnly:
-            AppColors.inkGreen
-        case .pending:
-            AppColors.blueInk
-        case .backedUp:
-            AppColors.sage
-        case .failed:
-            AppColors.coral
-        case .cloudDeletePending:
-            AppColors.inkSoft
-        }
-    }
-
-    var foreground: Color {
-        .white
     }
 }
 
@@ -777,10 +647,7 @@ private struct PhotoEditorSheet: View {
         NavigationStack {
             VStack(spacing: AppSpacing.large) {
                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            PhotoSyncStatusBadge(status: photo.syncStatus)
-                            DatePicker("照片日期", selection: $capturedAt, displayedComponents: [.date])
-                        }
+                        DatePicker("照片日期", selection: $capturedAt, displayedComponents: [.date])
                     }
 
                     WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
