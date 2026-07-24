@@ -23,6 +23,9 @@ class FakeCursor:
     def execute(self, statement: str, parameters: tuple = ()) -> None:
         self.statements.append((statement, parameters))
 
+    def fetchone(self):
+        return None
+
 
 class FakeConnection:
     def __init__(self) -> None:
@@ -55,6 +58,25 @@ class DatabaseTest(unittest.TestCase):
                 }
             self.assertIn("accounts", tables)
             self.assertIn("deletion_audit", tables)
+
+    def test_sqlite_schema_migrates_legacy_deletion_audit(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = Path(tempdir) / "xiaonaiping.sqlite3"
+            with connect_database(DatabaseSettings(backend="sqlite", sqlite_path=path)) as db:
+                db.execute(
+                    """
+                    CREATE TABLE deletion_audit (
+                        audit_id TEXT PRIMARY KEY,
+                        account_id TEXT NOT NULL,
+                        deleted_at TEXT NOT NULL,
+                        photo_count INTEGER NOT NULL
+                    )
+                    """
+                )
+                ensure_schema(db)
+                columns = {row["name"] for row in db.execute("PRAGMA table_info(deletion_audit)").fetchall()}
+
+            self.assertIn("sync_deleted", columns)
 
     def test_mysql_requires_complete_configuration(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

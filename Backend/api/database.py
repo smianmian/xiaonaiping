@@ -188,6 +188,7 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 ON analytics_events(account_hash, occurred_at);
             """
         )
+        ensure_deletion_audit_sync_deleted_column(db)
         db.commit()
         return
 
@@ -268,4 +269,27 @@ def ensure_schema(db: DatabaseConnection) -> None:
     ]
     for statement in statements:
         db.execute(statement)
+    ensure_deletion_audit_sync_deleted_column(db)
     db.commit()
+
+
+def ensure_deletion_audit_sync_deleted_column(db: DatabaseConnection) -> None:
+    if db.dialect == "sqlite":
+        columns = {row["name"] for row in db.execute("PRAGMA table_info(deletion_audit)").fetchall()}
+        if "sync_deleted" not in columns:
+            db.execute("ALTER TABLE deletion_audit ADD COLUMN sync_deleted INTEGER NOT NULL DEFAULT 0")
+        return
+
+    column = db.execute(
+        """
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = 'deletion_audit'
+          AND column_name = 'sync_deleted'
+        """
+    ).fetchone()
+    if column is None:
+        db.execute(
+            "ALTER TABLE deletion_audit ADD COLUMN sync_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER deleted_at"
+        )
