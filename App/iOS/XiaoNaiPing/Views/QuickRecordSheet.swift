@@ -54,3 +54,82 @@ enum QuickRecordAction: CaseIterable, Identifiable {
         }
     }
 }
+
+struct QuickRecordSheet: View {
+    let onSelect: (QuickRecordAction) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    private let primaryActions: [QuickRecordAction] = [
+        .feeding, .sleep, .diaper, .water, .photo, .growth
+    ]
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    Text("记下刚刚发生的事")
+                        .font(AppTypography.sectionTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+
+                    Text("选择记录类型后继续填写。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+
+                    ForEach(primaryActions) { action in
+                        Button {
+                            onSelect(action)
+                            dismiss()
+                        } label: {
+                            HStack(spacing: AppSpacing.regular) {
+                                actionIcon(for: action)
+                                    .frame(width: 32, height: 32)
+
+                                Text(action.title)
+                                    .font(AppTypography.bodyLarge)
+                                    .foregroundStyle(AppColors.inkGreen)
+
+                                Spacer(minLength: 0)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            .padding(.horizontal, AppSpacing.medium)
+                            .frame(maxWidth: .infinity, minHeight: 56)
+                            .background {
+                                RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous)
+                                    .fill(action.tint)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("记录\(action.title)")
+                        .accessibilityHint("打开\(action.title)表单")
+                    }
+                }
+                .padding(AppSpacing.large)
+            }
+            .background(PaperBackgroundView())
+            .navigationTitle("记录")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("关闭") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func actionIcon(for action: QuickRecordAction) -> some View {
+        if let asset = action.asset {
+            AssetWatercolorImage(name: asset, mode: .multiply)
+        } else if let systemIcon = action.systemIcon {
+            Image(systemName: systemIcon)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppColors.blueInk)
+        }
+    }
+}

@@ -107,12 +107,9 @@ enum AppNotificationScheduler {
                 }
             }
 
-            let body: String
-            if let repeatIntervalText = reminder.repeatIntervalText {
-                body = AppLocalization.format("到喝奶时间了；已按%@节奏继续提醒。", repeatIntervalText)
-            } else {
-                body = "到你设置的喝奶时间了。".localizedText
-            }
+            let body = reminder.origin == .automatic
+                ? "到你设定的喝奶时间了。".localizedText
+                : "到你设置的喝奶时间了。".localizedText
 
             let request = notificationRequest(
                 identifier: feedingReminderIdentifier(index),
@@ -189,20 +186,7 @@ enum AppNotificationScheduler {
     }
 
     private static func feedingReminderDates(for reminder: FeedingReminder) -> [Date] {
-        let now = Date()
-        guard var nextDate = reminder.nextRemindAt(after: now) else { return [] }
-        let repeatIntervalMinutes = reminder.repeatIntervalMinutes ?? 0
-        var dates = [nextDate]
-
-        guard repeatIntervalMinutes > 0 else { return dates }
-
-        let interval = TimeInterval(repeatIntervalMinutes * 60)
-        while dates.count < feedingReminderScheduleLimit {
-            nextDate = nextDate.addingTimeInterval(interval)
-            dates.append(nextDate)
-        }
-
-        return dates
+        reminder.remindAt > Date() ? [reminder.remindAt] : []
     }
 
     private static func feedingReminderIdentifier(_ index: Int) -> String {

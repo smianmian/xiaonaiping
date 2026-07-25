@@ -10,6 +10,14 @@ private enum PhotoImportError: Error {
     case saveFailed
 }
 
+enum AutomaticFeedingReminderUpdate {
+    case scheduled(FeedingReminder)
+    case skipped
+    case preservedManual
+    case disabled
+    case failed
+}
+
 final class BabyRecordStore: ObservableObject {
     static let mainlandVaccineRegion = "中国大陆"
     static let hongKongVaccineRegion = "香港"
@@ -20,6 +28,7 @@ final class BabyRecordStore: ObservableObject {
     @Published var feedingRecords: [FeedingRecord] = []
     @Published var waterRecords: [WaterRecord] = []
     @Published var feedingReminder: FeedingReminder?
+    @Published private(set) var feedingReminderPreference = FeedingReminderPreference()
     @Published var sleepRecords: [SleepRecord] = []
     @Published var diaperRecords: [DiaperRecord] = []
     @Published var growthRecords: [GrowthRecord] = []
@@ -32,6 +41,7 @@ final class BabyRecordStore: ObservableObject {
     @Published var saveErrorMessage: String?
 
     private let fileManager = FileManager.default
+    private let userDefaults = UserDefaults.standard
     private let stateFileName = "xiaonaiping-local-state.json"
 
     init(seedMockData: Bool = false) {
@@ -40,6 +50,7 @@ final class BabyRecordStore: ObservableObject {
             applyMockData()
         }
 
+        loadFeedingReminderPreference()
         normalizeRecordsForCurrentBaby()
         writeSharedTodaySnapshot()
     }
@@ -68,8 +79,8 @@ final class BabyRecordStore: ObservableObject {
                 title: definition.title,
                 dayNumber: definition.dayNumber,
                 date: date,
-                daysRemaining: max(0, definition.dayNumber - baby.daysSinceBirth),
-                isReached: baby.daysSinceBirth >= definition.dayNumber
+                daysRemaining: max(0, definition.dayNumber - currentBabyDaysSinceBirth),
+                isReached: currentBabyDaysSinceBirth >= definition.dayNumber
             )
         }
     }
@@ -100,6 +111,14 @@ final class BabyRecordStore: ObservableObject {
         todayFeedingRecords.first
     }
 
+    var currentBabyDaysSinceBirth: Int {
+        Self.daysSinceBirth(from: baby.birthDate)
+    }
+
+    var currentBabyAgeText: String {
+        Self.ageText(from: baby.birthDate)
+    }
+
     var lastFeedingIntervalText: String {
         guard let record = lastFeedingRecord else { return "暂无" }
         return Self.elapsedText(since: Self.feedingEndDate(record), now: Date())
@@ -111,8 +130,7 @@ final class BabyRecordStore: ObservableObject {
 
     var totalSleepMinutes: Int {
         todaySleepRecords
-            .filter { !$0.isOngoing }
-            .compactMap(\.durationMinutes)
+            .map(Self.sleepMinutesDuringToday)
             .reduce(0, +)
     }
 
@@ -147,11 +165,10 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var nextFeedingReminder: FeedingReminder? {
-        guard var feedingReminder,
-              let nextRemindAt = feedingReminder.nextRemindAt(after: Date()) else {
+        guard let feedingReminder,
+              feedingReminder.remindAt > Date() else {
             return nil
         }
-        feedingReminder.remindAt = nextRemindAt
         return feedingReminder
     }
 
@@ -331,6 +348,7 @@ final class BabyRecordStore: ObservableObject {
             sex: sex
         )
         removeAllLocalRecords()
+        loadFeedingReminderPreference()
         hasCompletedOnboarding = true
         saveState()
     }
@@ -446,6 +464,60 @@ final class BabyRecordStore: ObservableObject {
             return false
         }
         return true
+    }
+
+    @discardableResult
+    func setAutomaticFeedingReminderEnabled(_ isEnabled: Bool, intervalMinutes: Int?) -> Bool {
+        guard !isEnabled || FeedingReminderPreference.supportedIntervalMinutes.contains(intervalMinutes ?? -1) else {
+            return false
+        }
+
+        let preference = FeedingReminderPreference(
+            babyId: baby.id,
+            isAutoReminderEnabled: isEnabled,
+            intervalMinutes: isEnabled ? intervalMinutes : nil
+        )
+        guard saveFeedingReminderPreference(preference) else { return false }
+
+        feedingReminderPreference = preference
+        if !isEnabled, feedingReminder?.origin == .automatic {
+            return cancelFeedingReminder()
+        }
+        return true
+    }
+
+    @discardableResult
+    func updateAutomaticFeedingReminder(for record: FeedingRecord, skipForThisRecord: Bool) -> AutomaticFeedingReminderUpdate {
+        if let reminder = feedingReminder, reminder.origin == .manual {
+            guard reminder.remindAt <= Date() else {
+                return .preservedManual
+            }
+            guard cancelFeedingReminder() else { return .failed }
+        }
+
+        if skipForThisRecord {
+            if feedingReminder?.origin == .automatic, !cancelFeedingReminder() {
+                return .failed
+            }
+            return .skipped
+        }
+
+        guard feedingReminderPreference.isAutoReminderEnabled,
+              let intervalMinutes = feedingReminderPreference.intervalMinutes,
+              feedingReminderPreference.hasValidAutomaticInterval else {
+            return .disabled
+        }
+
+        let baseDate = Self.feedingEndDate(record)
+        let remindAt = Calendar.current.date(byAdding: .minute, value: intervalMinutes, to: baseDate)
+            ?? baseDate.addingTimeInterval(TimeInterval(intervalMinutes * 60))
+        let reminder = FeedingReminder(
+            babyId: baby.id,
+            remindAt: remindAt,
+            origin: .automatic
+        )
+        guard upsert(reminder) else { return .failed }
+        return .scheduled(reminder)
     }
 
     @discardableResult
@@ -691,6 +763,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     func deleteBabyProfileAndLocalRecords() {
+        removeFeedingReminderPreference(for: baby.id)
         baby = Baby(
             id: UUID(),
             name: "宝宝",
@@ -700,6 +773,7 @@ final class BabyRecordStore: ObservableObject {
             sex: "未设置"
         )
         removeAllLocalRecords()
+        loadFeedingReminderPreference()
         hasCompletedOnboarding = false
         saveState()
     }
@@ -861,6 +935,7 @@ final class BabyRecordStore: ObservableObject {
         photoCount = babyPhotos.count
         AppNotificationScheduler.removeFeedingReminder()
         feedingReminder = nil
+        loadFeedingReminderPreference()
         normalizeRecordsForCurrentBaby()
         saveState()
     }
@@ -1000,12 +1075,6 @@ final class BabyRecordStore: ObservableObject {
         }
         if let reminder = feedingReminder {
             guard reminder.remindAt > Date() else {
-                if reminder.nextRemindAt(after: Date()) != nil {
-                    var normalized = reminder
-                    normalized.babyId = baby.id
-                    feedingReminder = normalized
-                    return
-                }
                 feedingReminder = nil
                 return
             }
@@ -1041,6 +1110,30 @@ final class BabyRecordStore: ObservableObject {
         if baby.id == Self.legacyMockBabyID {
             resetToEmptyProfile()
         }
+    }
+
+    private func loadFeedingReminderPreference() {
+        guard let data = userDefaults.data(forKey: feedingReminderPreferenceKey(for: baby.id)),
+              let preference = try? JSONDecoder().decode(FeedingReminderPreference.self, from: data),
+              preference.babyId == baby.id else {
+            feedingReminderPreference = FeedingReminderPreference(babyId: baby.id)
+            return
+        }
+        feedingReminderPreference = preference
+    }
+
+    private func saveFeedingReminderPreference(_ preference: FeedingReminderPreference) -> Bool {
+        guard let data = try? JSONEncoder().encode(preference) else { return false }
+        userDefaults.set(data, forKey: feedingReminderPreferenceKey(for: preference.babyId))
+        return true
+    }
+
+    private func removeFeedingReminderPreference(for babyID: UUID) {
+        userDefaults.removeObject(forKey: feedingReminderPreferenceKey(for: babyID))
+    }
+
+    private func feedingReminderPreferenceKey(for babyID: UUID) -> String {
+        "xiaonaiping.feeding-reminder-preference.\(babyID.uuidString)"
     }
 
     @discardableResult
@@ -1158,24 +1251,23 @@ final class BabyRecordStore: ObservableObject {
     }
 
     static func reminderDateTimeString(from date: Date) -> String {
-        if Calendar.current.isDateInToday(date) {
-            return AppLocalization.format("今天 %@", timeString(from: date))
-        }
-
-        if Calendar.current.isDateInTomorrow(date) {
-            return AppLocalization.format("明天 %@", timeString(from: date))
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = .autoupdatingCurrent
-        formatter.dateFormat = "M月d日 HH:mm"
-        return formatter.string(from: date)
+        "\(displayDateString(from: date)) \(timeString(from: date))"
     }
 
     static func displayDateString(from date: Date) -> String {
+        if Calendar.current.isDateInToday(date) {
+            return "今天".localizedText
+        }
+
+        if Calendar.current.isDateInTomorrow(date) {
+            return "明天".localizedText
+        }
+
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
-        formatter.dateFormat = "yyyy年M月d日"
+        formatter.dateFormat = Calendar.current.isDate(date, equalTo: Date(), toGranularity: .year)
+            ? "M月d日"
+            : "yyyy年M月d日"
         return formatter.string(from: date)
     }
 
@@ -1238,13 +1330,15 @@ final class BabyRecordStore: ObservableObject {
         SharedTodaySnapshot(
             hasCompletedOnboarding: hasCompletedOnboarding,
             babyName: baby.name,
-            daysSinceBirth: baby.daysSinceBirth,
+            daysSinceBirth: currentBabyDaysSinceBirth,
             feedingCount: feedingCount,
             milkAmountML: milkAmountML,
             lastFeedingAt: lastFeedingRecord.map(Self.feedingEndDate),
             ongoingSleepStartAt: ongoingSleep?.startAt,
             nextFeedingReminderAt: nextFeedingReminder?.remindAt,
-            feedingReminderRepeatIntervalMinutes: nextFeedingReminder?.repeatIntervalMinutes,
+            feedingReminderRepeatIntervalMinutes: nextFeedingReminder?.origin == .automatic
+                ? feedingReminderPreference.intervalMinutes
+                : nil,
             poopCount: poopCount,
             peeCount: peeCount,
             generatedAt: Date()
@@ -1273,6 +1367,15 @@ final class BabyRecordStore: ObservableObject {
         }
 
         return record.startAt < startOfTomorrow && endAt >= startOfToday
+    }
+
+    private static func sleepMinutesDuringToday(_ record: SleepRecord) -> Int {
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+        let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date()
+        let recordEnd = record.endAt ?? min(Date(), startOfTomorrow)
+        let overlapStart = max(record.startAt, startOfToday)
+        let overlapEnd = min(recordEnd, startOfTomorrow)
+        return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
     }
 
     private static func isSameMonth(_ date: Date, monthDate: Date) -> Bool {

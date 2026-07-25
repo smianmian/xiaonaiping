@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     let onRoute: (AppRoute) -> Void
     let onOpenAlbum: () -> Void
+    let onQuickRecord: () -> Void
     @EnvironmentObject private var store: BabyRecordStore
     @StateObject private var whiteNoisePlayer = WhiteNoisePlayer()
 
@@ -12,6 +13,8 @@ struct HomeView: View {
                 VStack(spacing: AppSpacing.large) {
                     homeHeader
                     hero
+                    currentCareContext
+                    PrimaryWatercolorButton(title: "记录一件照护", action: onQuickRecord)
                     SectionTitleView(title: "今日记录")
                     todayGrid
                     if !store.hasTodayRecords {
@@ -76,7 +79,7 @@ struct HomeView: View {
                 HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
                     Text("第")
                         .font(AppTypography.heroUnit)
-                    Text("\(store.baby.daysSinceBirth)")
+                    Text("\(store.currentBabyDaysSinceBirth)")
                         .font(AppTypography.heroNumber)
                         .foregroundStyle(AppColors.coral)
                     Text("天")
@@ -86,7 +89,47 @@ struct HomeView: View {
             }
             .padding(.top, 4)
         }
-        .frame(height: 166)
+        .frame(height: 132)
+    }
+
+    private var currentCareContext: some View {
+        Button {
+            onRoute(.feeding)
+        } label: {
+            WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.regular) {
+                    AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
+                        .frame(width: 40, height: 48)
+
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text("最近一次喂养")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                        Text(currentCareContextText)
+                            .font(AppTypography.cardTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .lineLimit(2)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("最近一次喂养，\(currentCareContextText)")
+        .accessibilityHint("查看喂养记录")
+    }
+
+    private var currentCareContextText: String {
+        guard let record = store.lastFeedingRecord else {
+            return "今天还没有喂养记录"
+        }
+        return "\(record.time) · \(record.detail) · 距上次 \(store.lastFeedingIntervalText)"
     }
 
     private var reminderCards: some View {
@@ -99,7 +142,7 @@ struct HomeView: View {
                         Text((store.nextAutomaticMilestone?.title ?? "成长纪念日").localizedText)
                             .font(AppTypography.cardTitle)
                         HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                            Text(store.nextAutomaticMilestone.map { "\($0.daysRemaining)" } ?? "\(store.baby.daysSinceBirth)")
+                            Text(store.nextAutomaticMilestone.map { "\($0.daysRemaining)" } ?? "\(store.currentBabyDaysSinceBirth)")
                                 .font(AppTypography.largeNumber)
                                 .foregroundStyle(AppColors.coral)
                             Text((store.nextAutomaticMilestone == nil ? "成长天数" : "天后").localizedText)

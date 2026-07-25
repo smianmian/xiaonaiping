@@ -17,6 +17,7 @@ enum FeedingReminderLiveActivityResult {
 enum FeedingReminderLiveActivityController {
     static func sync(
         reminder: FeedingReminder?,
+        repeatIntervalMinutes: Int? = nil,
         babyName: String,
         babyAvatarData: Data?,
         completion: @escaping (FeedingReminderLiveActivityResult) -> Void = { _ in }
@@ -36,7 +37,7 @@ enum FeedingReminderLiveActivityController {
             let state = FeedingReminderActivityAttributes.ContentState(
                 babyName: babyName,
                 nextReminderAt: reminder.remindAt,
-                repeatIntervalMinutes: reminder.repeatIntervalMinutes,
+                repeatIntervalMinutes: repeatIntervalMinutes,
                 babyAvatarData: liveActivityAvatarData(from: babyAvatarData)
             )
             let content = ActivityContent(

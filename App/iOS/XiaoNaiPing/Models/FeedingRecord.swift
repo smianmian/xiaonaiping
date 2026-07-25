@@ -127,11 +127,16 @@ struct WaterRecord: Identifiable, Equatable, Codable {
     }
 }
 
+enum FeedingReminderOrigin: String, Codable {
+    case manual
+    case automatic
+}
+
 struct FeedingReminder: Identifiable, Equatable, Codable {
     var id: UUID
     var babyId: UUID
     var remindAt: Date
-    var repeatIntervalMinutes: Int?
+    var origin: FeedingReminderOrigin
     var title: String
     var note: String?
     var createdAt: Date
@@ -141,7 +146,7 @@ struct FeedingReminder: Identifiable, Equatable, Codable {
         id: UUID = UUID(),
         babyId: UUID = RecordCodingDefaults.babyId,
         remindAt: Date,
-        repeatIntervalMinutes: Int? = nil,
+        origin: FeedingReminderOrigin = .manual,
         title: String = "喝奶提醒",
         note: String? = nil,
         createdAt: Date = Date(),
@@ -150,7 +155,7 @@ struct FeedingReminder: Identifiable, Equatable, Codable {
         self.id = id
         self.babyId = babyId
         self.remindAt = remindAt
-        self.repeatIntervalMinutes = repeatIntervalMinutes
+        self.origin = origin
         self.title = title
         self.note = note
         self.createdAt = createdAt
@@ -162,36 +167,36 @@ struct FeedingReminder: Identifiable, Equatable, Codable {
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         babyId = try container.decodeIfPresent(UUID.self, forKey: .babyId) ?? RecordCodingDefaults.babyId
         remindAt = try container.decode(Date.self, forKey: .remindAt)
-        repeatIntervalMinutes = try container.decodeIfPresent(Int.self, forKey: .repeatIntervalMinutes)
+        origin = try container.decodeIfPresent(FeedingReminderOrigin.self, forKey: .origin) ?? .manual
         title = try container.decodeIfPresent(String.self, forKey: .title) ?? "喝奶提醒"
         note = try container.decodeIfPresent(String.self, forKey: .note)
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
     }
+}
 
-    var repeatIntervalText: String? {
-        guard let repeatIntervalMinutes, repeatIntervalMinutes > 0 else { return nil }
-        let hours = repeatIntervalMinutes / 60
-        let minutes = repeatIntervalMinutes % 60
-        if minutes == 0 {
-            return "\(hours)小时"
-        }
-        if hours == 0 {
-            return "\(minutes)分钟"
-        }
-        return "\(hours)小时\(minutes)分"
+struct FeedingReminderPreference: Equatable, Codable {
+    static let supportedIntervalMinutes = [120, 150, 180, 210, 240]
+
+    var babyId: UUID
+    var isAutoReminderEnabled: Bool
+    var intervalMinutes: Int?
+    var updatedAt: Date
+
+    init(
+        babyId: UUID = RecordCodingDefaults.babyId,
+        isAutoReminderEnabled: Bool = true,
+        intervalMinutes: Int? = 180,
+        updatedAt: Date = Date()
+    ) {
+        self.babyId = babyId
+        self.isAutoReminderEnabled = isAutoReminderEnabled
+        self.intervalMinutes = intervalMinutes
+        self.updatedAt = updatedAt
     }
 
-    func nextRemindAt(after referenceDate: Date = Date()) -> Date? {
-        guard let repeatIntervalMinutes, repeatIntervalMinutes > 0 else {
-            return remindAt > referenceDate ? remindAt : nil
-        }
-
-        let interval = TimeInterval(repeatIntervalMinutes * 60)
-        guard remindAt <= referenceDate else { return remindAt }
-
-        let elapsed = referenceDate.timeIntervalSince(remindAt)
-        let steps = floor(elapsed / interval) + 1
-        return remindAt.addingTimeInterval(steps * interval)
+    var hasValidAutomaticInterval: Bool {
+        guard let intervalMinutes else { return false }
+        return Self.supportedIntervalMinutes.contains(intervalMinutes)
     }
 }

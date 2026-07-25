@@ -120,13 +120,25 @@
 |---|---|---:|---|
 | id | UUID/String | 是 | 提醒 ID |
 | babyId | UUID/String | 是 | 所属宝宝 |
-| remindAt | Date | 是 | 用户手动设置的下一次喝奶提醒时间 |
+| remindAt | Date | 是 | 下一次提醒时间 |
+| origin | Enum | 是 | manual / automatic，标记单次意图来源 |
 | title | String | 是 | 默认“喝奶提醒” |
 | note | String? | 否 | 备注，第一版默认不展示 |
 | createdAt | Date | 是 | 创建时间 |
 | updatedAt | Date | 是 | 更新时间 |
 
-规则：第一版只保存一个本机喝奶闹钟，不上传服务器，不根据月龄、上一顿时间或奶量自动推算喂养间隔；换宝宝档案、删除本地数据或恢复云端同步时清除旧提醒。
+规则：`FeedingReminder` 只表达下一次提醒意图；手动单次提醒不会被自动规则覆盖。本机只保存当前宝宝的下一次提醒，不上传服务器。
+
+### FeedingReminderPreference
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---:|---|
+| babyId | UUID/String | 是 | 所属宝宝，用作本地隔离键 |
+| isAutoReminderEnabled | Bool | 是 | 是否启用保存喂养后的自动提醒；初始为 true |
+| intervalMinutes | Int? | 否 | 仅允许 120 / 150 / 180 / 210 / 240；初始为 180 |
+| updatedAt | Date | 是 | 本地最后更新时间 |
+
+规则：偏好保存在以 `babyId` 隔离的本机存储，不进入 `CloudSyncPayload`。它与已发生的 `FeedingRecord`、下一次意图 `FeedingReminder` 分开保存；新偏好初始启用 3 小时，用户可调整或暂停；保存新喂养按结束时间（无时长则发生时间）加当前间隔重排自动提醒。
 
 ### SleepRecord
 

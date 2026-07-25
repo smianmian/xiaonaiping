@@ -280,7 +280,7 @@ def ensure_deletion_audit_sync_deleted_column(db: DatabaseConnection) -> None:
             db.execute("ALTER TABLE deletion_audit ADD COLUMN sync_deleted INTEGER NOT NULL DEFAULT 0")
         return
 
-    column = db.execute(
+    sync_deleted_column = db.execute(
         """
         SELECT 1
         FROM information_schema.columns
@@ -289,7 +289,19 @@ def ensure_deletion_audit_sync_deleted_column(db: DatabaseConnection) -> None:
           AND column_name = 'sync_deleted'
         """
     ).fetchone()
-    if column is None:
+    if sync_deleted_column is None:
         db.execute(
             "ALTER TABLE deletion_audit ADD COLUMN sync_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER deleted_at"
         )
+
+    backup_deleted_column = db.execute(
+        """
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = 'deletion_audit'
+          AND column_name = 'backup_deleted'
+        """
+    ).fetchone()
+    if backup_deleted_column is not None:
+        db.execute("ALTER TABLE deletion_audit MODIFY backup_deleted TINYINT(1) NOT NULL DEFAULT 0")

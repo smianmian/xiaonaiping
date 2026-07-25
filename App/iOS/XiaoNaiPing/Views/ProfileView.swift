@@ -155,12 +155,12 @@ struct ProfileView: View {
                 Text(store.baby.name)
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("\(store.baby.daysSinceBirth)天")
+                Text("\(store.currentBabyDaysSinceBirth)天")
                     .font(AppTypography.largeNumber)
                     .foregroundStyle(AppColors.coral)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
-                Text(store.baby.ageText)
+                Text(store.currentBabyAgeText)
                     .font(AppTypography.readableBody)
                     .foregroundStyle(AppColors.inkSoft)
                     .lineLimit(1)
@@ -248,6 +248,7 @@ struct ProfileView: View {
             .padding(.horizontal, AppSpacing.medium)
             .padding(.vertical, AppSpacing.small)
 
+            #if DEBUG
             Button {
                 testFeedingLiveActivity()
             } label: {
@@ -270,6 +271,7 @@ struct ProfileView: View {
                 .padding(.vertical, AppSpacing.small)
             }
             .buttonStyle(.plain)
+            #endif
         }
     }
 
@@ -322,14 +324,14 @@ struct ProfileView: View {
         }
     }
 
+    #if DEBUG
     private func testFeedingLiveActivity() {
         #if canImport(ActivityKit)
         if #available(iOS 16.2, *) {
             store.setFeedingLiveActivityEnabled(true)
             let reminder = FeedingReminder(
                 babyId: store.baby.id,
-                remindAt: Date().addingTimeInterval(3 * 60),
-                repeatIntervalMinutes: store.nextFeedingReminder?.repeatIntervalMinutes
+                remindAt: Date().addingTimeInterval(3 * 60)
             )
             FeedingReminderLiveActivityController.sync(
                 reminder: reminder,
@@ -362,6 +364,7 @@ struct ProfileView: View {
             liveActivityMessage = "灵动岛测试暂时没有显示。".localizedText + message.localizedText
         }
     }
+    #endif
 
     private var avatarErrorBinding: Binding<Bool> {
         Binding {

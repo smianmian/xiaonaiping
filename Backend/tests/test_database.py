@@ -12,7 +12,13 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-from api.database import DatabaseConfigurationError, DatabaseSettings, connect_database, ensure_schema
+from api.database import (
+    DatabaseConfigurationError,
+    DatabaseSettings,
+    connect_database,
+    ensure_deletion_audit_sync_deleted_column,
+    ensure_schema,
+)
 from api.server import upsert_sync, upsert_phone_code, upsert_photo
 
 
@@ -120,6 +126,24 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(len(statements), 3)
         self.assertTrue(all("ON DUPLICATE KEY UPDATE" in statement for statement in statements))
         self.assertTrue(all("?" not in statement for statement in statements))
+
+    def test_mysql_legacy_backup_deleted_column_gets_a_default(self) -> None:
+        class LegacyAuditDatabase:
+            dialect = "mysql"
+
+            def __init__(self) -> None:
+                self.statements: list[str] = []
+
+            def execute(self, statement: str):
+                self.statements.append(statement)
+                has_backup_deleted = "backup_deleted" in statement
+                return SimpleNamespace(fetchone=lambda: {"present": 1} if has_backup_deleted else None)
+
+        db = LegacyAuditDatabase()
+        ensure_deletion_audit_sync_deleted_column(db)
+
+        self.assertTrue(any("ADD COLUMN sync_deleted" in statement for statement in db.statements))
+        self.assertTrue(any("MODIFY backup_deleted" in statement for statement in db.statements))
 
 
 if __name__ == "__main__":

@@ -7,8 +7,9 @@ struct FeedingRecordView: View {
     @State private var deleteCandidate: FeedingRecord?
     @State private var isStatsPresented = false
     @State private var reminderDate = Date().addingTimeInterval(2 * 60 * 60)
-    @State private var repeatIntervalMinutes: Int?
+    @State private var selectedAutoIntervalMinutes: Int?
     @State private var notificationMessage: String?
+    @State private var isReminderExpanded = false
 
     var body: some View {
         ScreenScaffold(title: "喂养记录", trailingTitle: "统计", showBackButton: true, trailingAction: {
@@ -16,6 +17,10 @@ struct FeedingRecordView: View {
         }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
+                    PrimaryWatercolorButton(title: "记录喂养") {
+                        openEditor()
+                    }
+
                     WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
                         HStack(spacing: AppSpacing.medium) {
                             AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
@@ -37,7 +42,8 @@ struct FeedingRecordView: View {
 
                     feedingReminderCard
 
-                    VStack(spacing: AppSpacing.regular) {
+                    VStack(alignment: .leading, spacing: AppSpacing.regular) {
+                        SectionTitleView(title: "喂养历史")
                         if store.todayFeedingRecords.isEmpty {
                             EmptyRecordCard(
                                 icon: AppAssets.bottleIcon,
@@ -48,42 +54,36 @@ struct FeedingRecordView: View {
                             }
                         } else {
                             ForEach(store.todayFeedingRecords) { record in
-                                HStack(spacing: AppSpacing.small) {
-                                    Button {
+                                Button {
+                                    openEditor(record)
+                                } label: {
+                                    RecordRowView(
+                                        icon: record.icon,
+                                        time: record.time,
+                                        title: record.type,
+                                        detail: "\(record.detail) · 距上次 \(store.feedingIntervalText(before: record))",
+                                        tint: AppColors.cream
+                                    )
+                                    .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityHint("打开编辑")
+                                .contextMenu {
+                                    Button("编辑") {
                                         openEditor(record)
-                                    } label: {
-                                        RecordRowView(
-                                            icon: record.icon,
-                                            time: record.time,
-                                            title: record.type,
-                                            detail: "\(record.detail) · 距上次 \(store.feedingIntervalText(before: record))",
-                                            tint: AppColors.cream
-                                        )
-                                        .frame(maxWidth: .infinity)
                                     }
-                                    .buttonStyle(.plain)
-
-                                    Button {
+                                    Button("删除", role: .destructive) {
+                                        deleteCandidate = record
+                                    }
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
                                         deleteCandidate = record
                                     } label: {
-                                        Image(systemName: "trash")
-                                            .font(.system(size: 18, weight: .regular))
-                                            .foregroundStyle(AppColors.coral)
-                                            .frame(width: 44, height: 44)
-                                            .background {
-                                                Circle().fill(AppColors.blush.opacity(0.56))
-                                            }
+                                        Label("删除", systemImage: "trash")
                                     }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel("删除喂养记录")
                                 }
                             }
-                        }
-                    }
-
-                    if !store.todayFeedingRecords.isEmpty {
-                        PrimaryWatercolorButton(title: "+ 记录喂养") {
-                            openEditor()
                         }
                     }
                 }
@@ -94,9 +94,16 @@ struct FeedingRecordView: View {
         .sheet(isPresented: $isEditorPresented) {
             FeedingEditorSheet(
                 record: editingRecord,
-                reminderRepeatIntervalMinutes: store.nextFeedingReminder?.repeatIntervalMinutes
-            ) { record, reminderDeferralMinutes in
-                saveFeedingRecord(record, reminderDeferralMinutes: reminderDeferralMinutes)
+                automaticReminderIntervalMinutes: store.feedingReminderPreference.isAutoReminderEnabled
+                    ? store.feedingReminderPreference.intervalMinutes
+                    : nil,
+                onDelete: {
+                    guard let editingRecord else { return }
+                    deleteCandidate = editingRecord
+                    isEditorPresented = false
+                }
+            ) { record, skipAutomaticReminder in
+                saveFeedingRecord(record, skipAutomaticReminder: skipAutomaticReminder)
             }
             .presentationDetents([.medium, .large])
         }
@@ -137,7 +144,78 @@ struct FeedingRecordView: View {
 
     private var feedingReminderCard: some View {
         WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+            DisclosureGroup(isExpanded: $isReminderExpanded) {
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        Text("单次手动提醒")
+                            .font(AppTypography.cardTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        DatePicker("提醒时间", selection: $reminderDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                            .font(AppTypography.readableBody)
+                            .tint(AppColors.coral)
+                        PrimaryWatercolorButton(title: "保存本次提醒", tint: AppColors.cream, foreground: AppColors.blueInk) {
+                            saveManualReminder()
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        Toggle("保存喂养后自动提醒", isOn: automaticReminderEnabledBinding)
+                            .font(AppTypography.body)
+                            .tint(AppColors.coral)
+                        Text("由你选择固定间隔；不会根据月龄、奶量或历史记录推断。")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.small) {
+                            ForEach(FeedingReminderIntervalOption.allCases) { option in
+                                Button {
+                                    selectAutomaticInterval(option.minutes)
+                                } label: {
+                                    Text(option.title)
+                                        .font(AppTypography.caption)
+                                        .foregroundStyle(selectedAutoIntervalMinutes == option.minutes ? AppColors.blueInk : AppColors.ink)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 9)
+                                        .background {
+                                            Capsule()
+                                                .fill(selectedAutoIntervalMinutes == option.minutes ? AppColors.cream : AppColors.milk.opacity(0.56))
+                                                .overlay {
+                                                    Capsule().stroke(AppColors.softStroke.opacity(0.28), lineWidth: 1)
+                                                }
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+
+                        if store.feedingReminderPreference.isAutoReminderEnabled {
+                            Button("暂停自动提醒") {
+                                pauseAutomaticReminder()
+                            }
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                        }
+                    }
+
+                    HStack(alignment: .top, spacing: AppSpacing.tiny) {
+                        Image(systemName: "applewatch.radiowaves.left.and.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(AppColors.coral)
+                            .frame(width: 18, height: 18)
+                        Text("会提前5分钟提醒准备泡奶；通知未开启时仍会保留提醒意图。")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if store.nextFeedingReminder != nil {
+                        Button("取消当前提醒", role: .destructive) {
+                            cancelReminder()
+                        }
+                        .font(AppTypography.caption)
+                    }
+                }
+            } label: {
                 HStack(alignment: .top, spacing: AppSpacing.medium) {
                     Image(systemName: "bell.badge")
                         .font(.system(size: 19, weight: .semibold))
@@ -148,7 +226,7 @@ struct FeedingRecordView: View {
                         }
 
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text("喝奶闹钟")
+                        Text("喝奶提醒")
                             .font(AppTypography.cardTitle)
                             .foregroundStyle(AppColors.inkGreen)
                         Text(reminderStatusText)
@@ -156,91 +234,22 @@ struct FeedingRecordView: View {
                             .foregroundStyle(AppColors.inkSoft)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer(minLength: 0)
-                }
-
-                DatePicker("提醒时间", selection: $reminderDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
-                    .font(AppTypography.readableBody)
-                    .tint(AppColors.coral)
-
-                HStack(alignment: .top, spacing: AppSpacing.tiny) {
-                    Image(systemName: "applewatch.radiowaves.left.and.right")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(AppColors.coral)
-                        .frame(width: 18, height: 18)
-                    Text("会提前5分钟提醒准备泡奶，Apple Watch 可跟随系统通知震动。")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkSoft)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Text("之后继续提醒")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkGreen)
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.small) {
-                        ForEach(FeedingReminderRepeatOption.allCases) { option in
-                            Button {
-                                repeatIntervalMinutes = option.minutes
-                            } label: {
-                                Text(option.title)
-                                    .font(AppTypography.caption)
-                                    .foregroundStyle(repeatIntervalMinutes == option.minutes ? AppColors.blueInk : AppColors.ink)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 9)
-                                    .background {
-                                        Capsule()
-                                            .fill(repeatIntervalMinutes == option.minutes ? AppColors.cream : AppColors.milk.opacity(0.56))
-                                            .overlay {
-                                                Capsule().stroke(AppColors.softStroke.opacity(0.28), lineWidth: 1)
-                                            }
-                                    }
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-
-                HStack(spacing: AppSpacing.small) {
-                    PrimaryWatercolorButton(title: "保存闹钟", tint: AppColors.cream, foreground: AppColors.blueInk) {
-                        saveReminder()
-                    }
-
-                    if store.nextFeedingReminder != nil {
-                        Button {
-                            cancelReminder()
-                        } label: {
-                            Text("取消闹钟")
-                                .font(AppTypography.bodyLarge)
-                                .foregroundStyle(AppColors.coral)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 13)
-                                .background {
-                                    Capsule()
-                                        .fill(AppColors.blush.opacity(0.62))
-                                        .overlay {
-                                            Capsule().stroke(AppColors.coral.opacity(0.22), lineWidth: 1)
-                                        }
-                                }
-                        }
-                        .buttonStyle(.plain)
-                    }
                 }
             }
         }
     }
 
     private var reminderStatusText: String {
-        guard let reminder = store.nextFeedingReminder else {
-            return "还没有设置下一次喝奶提醒。"
+        if let reminder = store.nextFeedingReminder {
+            let source = reminder.origin == .automatic ? "自动" : "手动"
+            return "下一次：\(BabyRecordStore.reminderDateTimeString(from: reminder.remindAt)) · \(source)提醒"
         }
 
-        if let repeatIntervalText = reminder.repeatIntervalText {
-            return "下一次：\(BabyRecordStore.reminderDateTimeString(from: reminder.remindAt)) · 之后每\(repeatIntervalText)"
+        if store.feedingReminderPreference.isAutoReminderEnabled,
+           let minutes = store.feedingReminderPreference.intervalMinutes {
+            return "自动提醒已开启；保存下一条喂养后，按\(feedingReminderIntervalText(minutes))安排。"
         }
-
-        return "下一次：\(BabyRecordStore.reminderDateTimeString(from: reminder.remindAt)) · 只提醒一次"
+        return "还没有设置下一次喝奶提醒。"
     }
 
     private var notificationAlertBinding: Binding<Bool> {
@@ -268,51 +277,38 @@ struct FeedingRecordView: View {
         isEditorPresented = true
     }
 
-    private func saveFeedingRecord(_ record: FeedingRecord, reminderDeferralMinutes: Int?) -> Bool {
+    private var automaticReminderEnabledBinding: Binding<Bool> {
+        Binding {
+            store.feedingReminderPreference.isAutoReminderEnabled
+        } set: { isEnabled in
+            setAutomaticReminderEnabled(isEnabled)
+        }
+    }
+
+    private func saveFeedingRecord(_ record: FeedingRecord, skipAutomaticReminder: Bool) -> Bool {
         notificationMessage = nil
         guard store.upsert(record) else { return false }
-        guard let reminderDeferralMinutes,
-              let currentReminder = store.feedingReminder,
-              let repeatIntervalMinutes = currentReminder.repeatIntervalMinutes,
-              repeatIntervalMinutes > 0 else {
-            return true
-        }
-
-        let nextRemindAt = feedingReminderDate(
-            occurredAt: record.occurredAt,
-            durationMinutes: record.durationMinutes,
-            repeatIntervalMinutes: repeatIntervalMinutes,
-            deferralMinutes: reminderDeferralMinutes
-        )
-        guard nextRemindAt > Date() else {
-            notificationMessage = "喂养已保存；顺延后的提醒时间已早于现在，闹钟未调整。"
-            return true
-        }
-
-        let reminder = FeedingReminder(
-            id: currentReminder.id,
-            babyId: store.baby.id,
-            remindAt: nextRemindAt,
-            repeatIntervalMinutes: repeatIntervalMinutes,
-            title: currentReminder.title,
-            note: currentReminder.note,
-            createdAt: currentReminder.createdAt
-        )
-        guard store.upsert(reminder) else {
-            notificationMessage = "喂养已保存；喝奶闹钟更新失败，请稍后再试。"
-            return true
-        }
-
-        reminderDate = nextRemindAt
-        self.repeatIntervalMinutes = repeatIntervalMinutes
-        syncLiveActivity()
-        AppNotificationScheduler.scheduleFeedingReminder(reminder) { result in
-            notificationMessage = notificationMessage(for: result)
+        switch store.updateAutomaticFeedingReminder(for: record, skipForThisRecord: skipAutomaticReminder) {
+        case .scheduled(let reminder):
+            reminderDate = reminder.remindAt
+            syncLiveActivity()
+            AppNotificationScheduler.scheduleFeedingReminder(reminder) { result in
+                notificationMessage = notificationMessage(for: result)
+            }
+        case .skipped:
+            syncLiveActivity()
+            notificationMessage = "喂养已保存；本次不会自动提醒。"
+        case .preservedManual:
+            notificationMessage = "喂养已保存；你手动指定的提醒保持不变。"
+        case .disabled:
+            break
+        case .failed:
+            notificationMessage = "喂养已保存；自动提醒更新失败，请稍后再试。"
         }
         return true
     }
 
-    private func saveReminder() {
+    private func saveManualReminder() {
         notificationMessage = nil
         guard reminderDate > Date() else {
             notificationMessage = "提醒时间要晚于现在。"
@@ -322,7 +318,7 @@ struct FeedingRecordView: View {
         let reminder = FeedingReminder(
             babyId: store.baby.id,
             remindAt: reminderDate,
-            repeatIntervalMinutes: repeatIntervalMinutes
+            origin: .manual
         )
         guard store.upsert(reminder) else {
             notificationMessage = "保存失败，请稍后再试。"
@@ -345,14 +341,49 @@ struct FeedingRecordView: View {
         AppNotificationScheduler.removeFeedingReminder()
         endLiveActivity()
         reminderDate = defaultReminderDate
-        repeatIntervalMinutes = nil
         notificationMessage = "喝奶闹钟已取消。"
     }
 
     private func syncReminderDate() {
         let reminder = store.nextFeedingReminder
         reminderDate = reminder?.remindAt ?? defaultReminderDate
-        repeatIntervalMinutes = reminder?.repeatIntervalMinutes
+        selectedAutoIntervalMinutes = store.feedingReminderPreference.intervalMinutes
+    }
+
+    private func selectAutomaticInterval(_ minutes: Int) {
+        selectedAutoIntervalMinutes = minutes
+        guard store.feedingReminderPreference.isAutoReminderEnabled else { return }
+        guard store.setAutomaticFeedingReminderEnabled(true, intervalMinutes: minutes) else {
+            notificationMessage = "自动提醒设置未保存，请稍后再试。"
+            return
+        }
+        notificationMessage = "自动提醒已改为每\(feedingReminderIntervalText(minutes))；保存下一条喂养后生效。"
+    }
+
+    private func setAutomaticReminderEnabled(_ isEnabled: Bool) {
+        notificationMessage = nil
+        guard !isEnabled || selectedAutoIntervalMinutes != nil else {
+            notificationMessage = "请先选择 2 到 4 小时的提醒间隔。"
+            return
+        }
+
+        let hadAutomaticReminder = store.feedingReminder?.origin == .automatic
+        guard store.setAutomaticFeedingReminderEnabled(isEnabled, intervalMinutes: selectedAutoIntervalMinutes) else {
+            notificationMessage = "自动提醒设置未保存，请稍后再试。"
+            return
+        }
+
+        if !isEnabled, hadAutomaticReminder {
+            AppNotificationScheduler.removeFeedingReminder()
+            endLiveActivity()
+        }
+        notificationMessage = isEnabled
+            ? "自动提醒已开启；保存下一条喂养后开始安排。"
+            : "自动提醒已暂停。"
+    }
+
+    private func pauseAutomaticReminder() {
+        setAutomaticReminderEnabled(false)
     }
 
     private var defaultReminderDate: Date {
@@ -381,6 +412,9 @@ struct FeedingRecordView: View {
             }
             FeedingReminderLiveActivityController.sync(
                 reminder: store.nextFeedingReminder,
+                repeatIntervalMinutes: store.nextFeedingReminder?.origin == .automatic
+                    ? store.feedingReminderPreference.intervalMinutes
+                    : nil,
                 babyName: store.baby.name,
                 babyAvatarData: store.baby.avatarImageData
             )
@@ -420,27 +454,6 @@ struct FeedingRecordView: View {
     }
 }
 
-private func feedingReminderDate(
-    occurredAt: Date,
-    durationMinutes: Int?,
-    repeatIntervalMinutes: Int,
-    deferralMinutes: Int
-) -> Date {
-    let baseDate: Date
-    if let durationMinutes, durationMinutes > 0,
-       let finishedAt = Calendar.current.date(byAdding: .minute, value: durationMinutes, to: occurredAt) {
-        baseDate = finishedAt
-    } else {
-        baseDate = occurredAt
-    }
-
-    return Calendar.current.date(
-        byAdding: .minute,
-        value: repeatIntervalMinutes + deferralMinutes,
-        to: baseDate
-    ) ?? baseDate.addingTimeInterval(TimeInterval((repeatIntervalMinutes + deferralMinutes) * 60))
-}
-
 private func feedingReminderIntervalText(_ minutes: Int) -> String {
     let hours = minutes / 60
     let remainingMinutes = minutes % 60
@@ -453,25 +466,25 @@ private func feedingReminderIntervalText(_ minutes: Int) -> String {
     return "\(hours)小时\(remainingMinutes)分"
 }
 
-private struct FeedingReminderRepeatOption: Identifiable, CaseIterable {
+private struct FeedingReminderIntervalOption: Identifiable, CaseIterable {
     let id: String
     let title: String
-    let minutes: Int?
+    let minutes: Int
 
     static let allCases = [
-        FeedingReminderRepeatOption(id: "once", title: "只一次", minutes: nil),
-        FeedingReminderRepeatOption(id: "120", title: "2小时", minutes: 120),
-        FeedingReminderRepeatOption(id: "150", title: "2.5小时", minutes: 150),
-        FeedingReminderRepeatOption(id: "180", title: "3小时", minutes: 180),
-        FeedingReminderRepeatOption(id: "210", title: "3.5小时", minutes: 210),
-        FeedingReminderRepeatOption(id: "240", title: "4小时", minutes: 240)
+        FeedingReminderIntervalOption(id: "120", title: "2小时", minutes: 120),
+        FeedingReminderIntervalOption(id: "150", title: "2.5小时", minutes: 150),
+        FeedingReminderIntervalOption(id: "180", title: "3小时", minutes: 180),
+        FeedingReminderIntervalOption(id: "210", title: "3.5小时", minutes: 210),
+        FeedingReminderIntervalOption(id: "240", title: "4小时", minutes: 240)
     ]
 }
 
 private struct FeedingEditorSheet: View {
     let record: FeedingRecord?
-    let reminderRepeatIntervalMinutes: Int?
-    let onSave: (FeedingRecord, Int?) -> Bool
+    let automaticReminderIntervalMinutes: Int?
+    let onDelete: () -> Void
+    let onSave: (FeedingRecord, Bool) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var occurredAt: Date
@@ -479,28 +492,28 @@ private struct FeedingEditorSheet: View {
     @State private var amountText: String
     @State private var durationText: String
     @State private var note: String
-    @State private var reminderDeferralMinutes: Int
+    @State private var skipsAutomaticReminder = false
     @State private var errorMessage: String?
     @State private var showsTimePicker = false
     @State private var showsMoreDetails = false
+    @State private var isSaving = false
 
     private let types = ["奶粉", "母乳", "瓶喂", "辅食"]
-    private let reminderDeferralOptions = Array(stride(from: 0, through: 30, by: 5))
-
     init(
         record: FeedingRecord?,
-        reminderRepeatIntervalMinutes: Int?,
-        onSave: @escaping (FeedingRecord, Int?) -> Bool
+        automaticReminderIntervalMinutes: Int?,
+        onDelete: @escaping () -> Void,
+        onSave: @escaping (FeedingRecord, Bool) -> Bool
     ) {
         self.record = record
-        self.reminderRepeatIntervalMinutes = reminderRepeatIntervalMinutes
+        self.automaticReminderIntervalMinutes = automaticReminderIntervalMinutes
+        self.onDelete = onDelete
         self.onSave = onSave
         _occurredAt = State(initialValue: record?.occurredAt ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
         _type = State(initialValue: record?.type ?? "奶粉")
         _amountText = State(initialValue: record?.amountML.map(String.init) ?? "")
         _durationText = State(initialValue: record?.durationMinutes.map(String.init) ?? "")
         _note = State(initialValue: record?.note ?? "")
-        _reminderDeferralMinutes = State(initialValue: 0)
     }
 
     var body: some View {
@@ -579,6 +592,10 @@ private struct FeedingEditorSheet: View {
                         optionalDetails
                     }
 
+                    if let automaticReminderIntervalMinutes {
+                        automaticReminderChoice(intervalMinutes: automaticReminderIntervalMinutes)
+                    }
+
                     if let errorMessage {
                         Text(errorMessage)
                             .font(AppTypography.caption)
@@ -589,6 +606,8 @@ private struct FeedingEditorSheet: View {
                     PrimaryWatercolorButton(title: record == nil ? "刚喂完，记录一下" : "保存修改") {
                         save()
                     }
+                    .disabled(isSaving)
+                    .opacity(isSaving ? 0.55 : 1)
                 }
                 .padding(AppSpacing.large)
             }
@@ -601,71 +620,58 @@ private struct FeedingEditorSheet: View {
                         dismiss()
                     }
                 }
+                if record != nil {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("删除", role: .destructive) {
+                            onDelete()
+                            dismiss()
+                        }
+                    }
+                }
             }
         }
     }
 
     private var optionalDetails: some View {
-        VStack(spacing: AppSpacing.large) {
-            WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius) {
-                VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                    if type == "瓶喂" || type == "奶粉" {
-                        TextField("奶量 ml，可不填", text: $amountText)
-                            .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
-                    }
-
-                    if type == "母乳" {
-                        TextField("时长 分钟，可不填", text: $durationText)
-                            .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
-                    }
-
-                    TextField("备注，可不填", text: $note, axis: .vertical)
-                        .lineLimit(2...4)
+        WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                if type == "瓶喂" || type == "奶粉" {
+                    TextField("奶量 ml，可不填", text: $amountText)
+                        .keyboardType(.numberPad)
                         .textFieldStyle(.roundedBorder)
                 }
-            }
 
-            if shouldShowReminderDeferral {
-                WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius) {
-                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                        HStack(alignment: .top, spacing: AppSpacing.medium) {
-                            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                                Text("下一次提醒")
-                                    .font(AppTypography.cardTitle)
-                                    .foregroundStyle(AppColors.inkGreen)
-                                if let reminderRepeatIntervalMinutes {
-                                    Text("固定间隔 \(feedingReminderIntervalText(reminderRepeatIntervalMinutes))")
-                                        .font(AppTypography.caption)
-                                        .foregroundStyle(AppColors.inkSoft)
-                                }
-                            }
-
-                            Spacer(minLength: 0)
-
-                            Text(nextReminderPreviewText)
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppColors.blueInk)
-                                .multilineTextAlignment(.trailing)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-
-                        Picker("顺延", selection: $reminderDeferralMinutes) {
-                            ForEach(reminderDeferralOptions, id: \.self) { minutes in
-                                Text(reminderDeferralTitle(minutes)).tag(minutes)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(height: 94)
-                        .clipped()
-                    }
+                if type == "母乳" {
+                    TextField("时长 分钟，可不填", text: $durationText)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(.roundedBorder)
                 }
+
+                TextField("备注，可不填", text: $note, axis: .vertical)
+                    .lineLimit(2...4)
+                    .textFieldStyle(.roundedBorder)
+            }
+        }
+    }
+
+    private func automaticReminderChoice(intervalMinutes: Int) -> some View {
+        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Text("本次喂养后的提醒")
+                    .font(AppTypography.cardTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                Text("默认会在结束时间后 \(feedingReminderIntervalText(intervalMinutes)) 安排下一次提醒。")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                Toggle("本次不提醒", isOn: $skipsAutomaticReminder)
+                    .font(AppTypography.body)
+                    .tint(AppColors.coral)
             }
         }
     }
 
     private func save() {
+        guard !isSaving else { return }
         errorMessage = nil
         guard let amount = validatedNumber(amountText, fieldName: "奶量") else { return }
         guard let duration = validatedNumber(durationText, fieldName: "时长") else { return }
@@ -683,35 +689,13 @@ private struct FeedingEditorSheet: View {
         saved.durationMinutes = duration
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
         saved.detail = detailText(amount: amount, duration: duration)
-        if onSave(saved, shouldShowReminderDeferral ? reminderDeferralMinutes : nil) {
+        isSaving = true
+        if onSave(saved, skipsAutomaticReminder) {
             dismiss()
         } else {
+            isSaving = false
             errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
-    }
-
-    private var shouldShowReminderDeferral: Bool {
-        record == nil && (reminderRepeatIntervalMinutes ?? 0) > 0
-    }
-
-    private var nextReminderPreviewText: String {
-        guard let reminderRepeatIntervalMinutes else {
-            return "未设置"
-        }
-
-        let remindAt = feedingReminderDate(
-            occurredAt: occurredAt,
-            durationMinutes: previewDurationMinutes,
-            repeatIntervalMinutes: reminderRepeatIntervalMinutes,
-            deferralMinutes: reminderDeferralMinutes
-        )
-        return BabyRecordStore.reminderDateTimeString(from: remindAt)
-    }
-
-    private var previewDurationMinutes: Int? {
-        let trimmed = durationText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let value = Int(trimmed), value > 0 else { return nil }
-        return value
     }
 
     private func validatedNumber(_ value: String, fieldName: String) -> Int?? {
@@ -726,10 +710,6 @@ private struct FeedingEditorSheet: View {
         }
 
         return .some(number)
-    }
-
-    private func reminderDeferralTitle(_ minutes: Int) -> String {
-        minutes == 0 ? "不顺延" : "+\(minutes)分钟"
     }
 
     private func detailText(amount: Int?, duration: Int?) -> String {

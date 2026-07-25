@@ -20,8 +20,10 @@ struct RootTabView: View {
     @State private var selectedTab: AppTab
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
-    @State private var recordPath: [AppRoute] = []
+    @State private var isQuickRecordPresented = false
+    @State private var pendingQuickRecordRoute: AppRoute?
     @State private var isCreatingBabyProfile = false
+    @State private var isPreviewingMainPage = false
     @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
 
     init() {
@@ -49,10 +51,17 @@ struct RootTabView: View {
                 OnboardingView { name, birthDate, sex in
                     store.createBabyProfile(name: name, birthDate: birthDate, sex: sex)
                 }
+            } else if isPreviewingMainPage {
+                tabContent
             } else {
-                WelcomeIntroView {
-                    isCreatingBabyProfile = true
-                }
+                WelcomeIntroView(
+                    onStart: {
+                        isCreatingBabyProfile = true
+                    },
+                    onPreview: {
+                        isPreviewingMainPage = true
+                    }
+                )
             }
         }
         .ignoresSafeArea(.keyboard)
@@ -100,12 +109,15 @@ struct RootTabView: View {
 
     private var tabContent: some View {
         ZStack {
-            TabView(selection: $selectedTab) {
+            TabView(selection: tabSelection) {
                 NavigationStack(path: $homePath) {
                     HomeView(
                         onRoute: { homePath.append($0) },
                         onOpenAlbum: {
                             homePath.append(.album)
+                        },
+                        onQuickRecord: {
+                            isQuickRecordPresented = true
                         }
                     )
                     .navigationDestination(for: AppRoute.self) { route in
@@ -139,15 +151,8 @@ struct RootTabView: View {
                 }
                 .tag(AppTab.growth)
 
-                NavigationStack(path: $recordPath) {
-                    RecordHomeView { route in
-                        recordPath.append(route)
-                    }
-                    .navigationDestination(for: AppRoute.self) { route in
-                        routeView(route) {
-                            recordPath.append(.monthlyReport)
-                        }
-                    }
+                NavigationStack {
+                    Color.clear
                 }
                 .tabItem {
                     tabLabel(.record)
@@ -166,6 +171,46 @@ struct RootTabView: View {
             .toolbarBackground(AppColors.milk.opacity(0.94), for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
         }
+        .sheet(isPresented: $isQuickRecordPresented, onDismiss: openPendingQuickRecord) {
+            QuickRecordSheet { action in
+                openQuickRecord(action)
+            }
+            .presentationDetents([.medium, .large])
+        }
+    }
+
+    private var tabSelection: Binding<AppTab> {
+        Binding {
+            selectedTab
+        } set: { tab in
+            if tab == .record {
+                isQuickRecordPresented = true
+            } else {
+                selectedTab = tab
+            }
+        }
+    }
+
+    private func openQuickRecord(_ action: QuickRecordAction) {
+        let route: AppRoute
+        switch action {
+        case .feeding: route = .feeding
+        case .water: route = .water
+        case .sleep: route = .sleep
+        case .diaper: route = .diaper
+        case .photo: route = .album
+        case .growth: route = .growth
+        case .milestone: route = .milestone
+        }
+
+        pendingQuickRecordRoute = route
+    }
+
+    private func openPendingQuickRecord() {
+        guard let route = pendingQuickRecordRoute else { return }
+        pendingQuickRecordRoute = nil
+        selectedTab = .home
+        homePath.append(route)
     }
 
     private var saveErrorAlertBinding: Binding<Bool> {
@@ -791,6 +836,7 @@ private struct RecordSummaryMetric: View {
 
 private struct WelcomeIntroView: View {
     let onStart: () -> Void
+    let onPreview: () -> Void
 
     @State private var page = 0
 
@@ -849,9 +895,9 @@ private struct WelcomeIntroView: View {
                     welcomeButton(title: "开始记录", filled: true, action: onStart)
 
                     welcomeButton(
-                        title: page == pages.count - 1 ? "回到第一页" : "先看看",
+                        title: "先看看",
                         filled: false,
-                        action: advance
+                        action: page == pages.count - 1 ? onPreview : advance
                     )
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -918,12 +964,16 @@ private struct WelcomeIntroView: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityHint(filled ? "进入宝宝档案创建" : "查看下一页欢迎引导")
+        .accessibilityHint(
+            filled
+                ? "进入宝宝档案创建"
+                : page == pages.count - 1 ? "跳过建档，进入主页面" : "查看下一页欢迎引导"
+        )
     }
 
     private func advance() {
         withAnimation(.easeInOut(duration: 0.28)) {
-            page = page == pages.count - 1 ? 0 : page + 1
+            page += 1
         }
     }
 }

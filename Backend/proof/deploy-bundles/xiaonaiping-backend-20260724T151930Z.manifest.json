@@ -1,0 +1,358 @@
+{
+  "createdAt": "2026-07-24T15:19:30+00:00",
+  "bundle": "xiaonaiping-backend-20260724T151930Z.tar.gz",
+  "containsSecrets": false,
+  "files": [
+    {
+      "path": "Backend/README.md",
+      "sizeBytes": 8158,
+      "sha256": "8a2c34023bb4b41dbad3a16039e8b6d1404bf1cced7a0b147d7530db07496900"
+    },
+    {
+      "path": "Backend/api/__init__.py",
+      "sizeBytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "Backend/api/database.py",
+      "sizeBytes": 9833,
+      "sha256": "0dfe86f2caf537eddf527c6b1ee2e6b4d8684871e89a9c6c35d14592acf890b9"
+    },
+    {
+      "path": "Backend/api/server.py",
+      "sizeBytes": 49768,
+      "sha256": "0abd17ad143a61818a5f298fd768336da52406b58522e40c5b9e1f7a656c9a4e"
+    },
+    {
+      "path": "Backend/api/storage.py",
+      "sizeBytes": 6811,
+      "sha256": "c67e72076116cf760b6182ce2530637dc866fd50d6c33e30d39d7d2889432a31"
+    },
+    {
+      "path": "Backend/deploy/.env.example",
+      "sizeBytes": 828,
+      "sha256": "955b0328d06868c1dc8bb1c867b1a0be00e1a277c647e48a3909e2a09ae652c1"
+    },
+    {
+      "path": "Backend/deploy/aliyun-sms-adapter.env.example",
+      "sizeBytes": 405,
+      "sha256": "0c35ba3ba7769f23d040d9afe48e96345ef50e002c82c2e8cd32a7c37d5a768d"
+    },
+    {
+      "path": "Backend/deploy/aliyun-sms-webhook-adapter.md",
+      "sizeBytes": 8163,
+      "sha256": "29f69d0bbc8d87c50fbad4575eeb7690d0317f65922f4e2279bbcb8a9f3a828b"
+    },
+    {
+      "path": "Backend/deploy/deploy-huawei-baota.sh",
+      "sizeBytes": 8006,
+      "sha256": "6db40634d089584859b3488a0d44c9efefa1763583919586888049b7c27ccceb"
+    },
+    {
+      "path": "Backend/deploy/huawei-baota-production.md",
+      "sizeBytes": 7760,
+      "sha256": "fe2ccac51866402766cb167b692b6d320478c78812f190c9ce7634ecfd1f220b"
+    },
+    {
+      "path": "Backend/deploy/huawei-obs.md",
+      "sizeBytes": 4671,
+      "sha256": "fe4da8ceb40da5679da738307de28304a4a7731c91e0dbb5b4733b1d9101533e"
+    },
+    {
+      "path": "Backend/deploy/nginx-api-mewpow-xiaonaiping-path.conf",
+      "sizeBytes": 861,
+      "sha256": "615cafe6f30046c3bca1d6ca793b9e28feb736ff3a1fc339dc0d25ca51bd0257"
+    },
+    {
+      "path": "Backend/deploy/nginx.conf.example",
+      "sizeBytes": 1071,
+      "sha256": "113d6ec7e26e158fee9fe07561cf0e5e75d679065b631bd737dd0dfab3bfb7a5"
+    },
+    {
+      "path": "Backend/deploy/production-config.example",
+      "sizeBytes": 1218,
+      "sha256": "e9ca31d9f3af94d2257c11f1bad46819613bb7b71222bf4afe24b1c7df52651e"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-aliyun-sms-adapter.service.example",
+      "sizeBytes": 529,
+      "sha256": "ba268ca39760e67339397f950e9b96f144b857054250bf434cecd660a7f4431e"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-api.service.example",
+      "sizeBytes": 632,
+      "sha256": "e6e728e21e74dd13785051b9c6ff86d06ec1d9580d883c0d30e3ea564f7095dc"
+    },
+    {
+      "path": "Backend/deploy/xiaonaiping-mysql-snapshot.sh",
+      "sizeBytes": 984,
+      "sha256": "7897bc1d93f8c5ff65a8a9da0a0adf7ee7bf99b39bc3fbdaf0d80d847dbbde61"
+    },
+    {
+      "path": "Backend/requirements-obs.txt",
+      "sizeBytes": 16,
+      "sha256": "785e0064406abc15b953ac139094134bf7bdb8527ab6a902031634f5e2f67bcb"
+    },
+    {
+      "path": "Backend/requirements-production.txt",
+      "sizeBytes": 31,
+      "sha256": "a9651dccb6298dea2b59d4d92ea57c21fd1fe983e45c946a77cf23439471154d"
+    },
+    {
+      "path": "Backend/scripts/build_deploy_bundle.py",
+      "sizeBytes": 3140,
+      "sha256": "f681f82c643c9e5d4c3387feb1fb9f37aa5ff5989162a8eccb4e184dec42ce6a"
+    },
+    {
+      "path": "Backend/scripts/capture_ios_screenshots.py",
+      "sizeBytes": 2786,
+      "sha256": "888d6cb7bb2ef984726c73c3cd788e8c49133dcd66c3f92206b7e148f766ce8c"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_assets.py",
+      "sizeBytes": 63193,
+      "sha256": "47b9f46eeca531827a41d4bd221cc6247aeb1bf479fca703c29fd782d1ccac16"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_connect_evidence_materials.py",
+      "sizeBytes": 17430,
+      "sha256": "f93a757c202b12e590cffdb42bc151f5a57ec2da1a182de0df6bce3a67778782"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_connect_materials.py",
+      "sizeBytes": 247288,
+      "sha256": "59a769224757a9e25653cac417b4f3273948d8e22c7570abdead0a551809c0e1"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_evidence.py",
+      "sizeBytes": 60880,
+      "sha256": "7b584bec107efedaaac69c66e6bd61afc8141ab16629756e5df0ae996cf21fc4"
+    },
+    {
+      "path": "Backend/scripts/check_app_store_submission_packet.py",
+      "sizeBytes": 21599,
+      "sha256": "ebcc73b90ecb45bdd9d695f80343105f38710db6dd64e308560f7013dc2da7ca"
+    },
+    {
+      "path": "Backend/scripts/check_diagnostics_redaction.py",
+      "sizeBytes": 5998,
+      "sha256": "e41290a451875e838e4e4626f7beef61823da4bd601071a98972edc714416a71"
+    },
+    {
+      "path": "Backend/scripts/check_ios265_device_availability.py",
+      "sizeBytes": 8722,
+      "sha256": "0bc788128312032aeae1bab30ccb76c50869a05dee50c6b5a074693d157a0bb0"
+    },
+    {
+      "path": "Backend/scripts/check_ios_265_build_proof.py",
+      "sizeBytes": 10917,
+      "sha256": "ab23b3fcfd7402d5fe3a2e9825d31e5082d4c94939e46bd8a8db83e797763706"
+    },
+    {
+      "path": "Backend/scripts/check_ios_app_bundle.py",
+      "sizeBytes": 12712,
+      "sha256": "a09cae5ecd9654459ba797f3cef3080efe75f5b55b76f3814d1f447efe30e65b"
+    },
+    {
+      "path": "Backend/scripts/check_ios_release_readiness.py",
+      "sizeBytes": 22006,
+      "sha256": "20c4462640852b9f7cb0a23fe62065a460a2e767af14a0a15093b492c8e1c0ed"
+    },
+    {
+      "path": "Backend/scripts/check_launch_blocker_action_packet.py",
+      "sizeBytes": 31055,
+      "sha256": "794f83e56620e8e36f34c865435225d66f7af2747aa21639e9e03268e62dda21"
+    },
+    {
+      "path": "Backend/scripts/check_launch_blocker_scope.py",
+      "sizeBytes": 6773,
+      "sha256": "a291421ec62a0efe457bbd5e31e3daa35d78efc1889f74353ad8e673c207b88f"
+    },
+    {
+      "path": "Backend/scripts/check_launch_day_rollover.py",
+      "sizeBytes": 20381,
+      "sha256": "bf7fc1bf6787a6eb9a8be847a320fad8b6f0f1410cee52f0a8660865f3991419"
+    },
+    {
+      "path": "Backend/scripts/check_launch_objective_audit.py",
+      "sizeBytes": 17719,
+      "sha256": "38ed006c8515deb78f0dab1dd62199dca3342532c2ec455b68f681bebfa50d3d"
+    },
+    {
+      "path": "Backend/scripts/check_launch_operator_workbench.py",
+      "sizeBytes": 124400,
+      "sha256": "515b9fdf2f1d5b300956b63ce0b7ad912d36b40d3e1e14a72e750f435f074722"
+    },
+    {
+      "path": "Backend/scripts/check_legal_drafts.py",
+      "sizeBytes": 15788,
+      "sha256": "1ceec2f99c1c7cfa903c37f798e8911c1234c549f04e89e4b81124d7b09cfc39"
+    },
+    {
+      "path": "Backend/scripts/check_mainland_filing_materials.py",
+      "sizeBytes": 52641,
+      "sha256": "fb41e8f1533479da03a4d50d8c6f31821dd856d6f8998cbe362c9f02c0ed11cf"
+    },
+    {
+      "path": "Backend/scripts/check_production_proof_refresh_status.py",
+      "sizeBytes": 25806,
+      "sha256": "5ce849ccfbd2a80587cff8e394979b18c70af86993c0ef9468a798edc6cbfbce"
+    },
+    {
+      "path": "Backend/scripts/check_production_readiness.py",
+      "sizeBytes": 51828,
+      "sha256": "984d87b5784d079b797a6389cdf506cdf604b7ed08d1383a8eb00f9addff0bfa"
+    },
+    {
+      "path": "Backend/scripts/check_provider_evidence_materials.py",
+      "sizeBytes": 154124,
+      "sha256": "e443af1407aebb512ef64617e456ee7a6cd7402d94c7c937752b14d1a7c1774b"
+    },
+    {
+      "path": "Backend/scripts/check_public_pages.py",
+      "sizeBytes": 11132,
+      "sha256": "5c9f04c23694ed66eed027684ebd123fba877a0c97bfc8f4b495904ffc10dedb"
+    },
+    {
+      "path": "Backend/scripts/check_review_notes.py",
+      "sizeBytes": 7430,
+      "sha256": "48e8512b9ce9df858b33f930e46317f83f9fa77f451905bff00c584e84ecb33d"
+    },
+    {
+      "path": "Backend/scripts/check_signed_archive_testflight_materials.py",
+      "sizeBytes": 154649,
+      "sha256": "a3926a257c602ca71086ab794efd4585fcd0513490d587f4a7b4bd3ba0a7a73f"
+    },
+    {
+      "path": "Backend/scripts/check_testflight_precheck.py",
+      "sizeBytes": 25906,
+      "sha256": "62cf900f455299ae1ab42681a02a5df7e1b63bccab98ecc70a2f7a636efd9f9b"
+    },
+    {
+      "path": "Backend/scripts/check_testflight_regression_plan.py",
+      "sizeBytes": 116852,
+      "sha256": "8fa4cd11be5839b4aaf90c2290d7cd6a9f850a3b5ae2535742c71708846a1a7f"
+    },
+    {
+      "path": "Backend/scripts/check_universal_links.py",
+      "sizeBytes": 9588,
+      "sha256": "8ca316a043e150cb3d28cf1d74063026fd90e3f0180ed86cf3abee3ce6be5188"
+    },
+    {
+      "path": "Backend/scripts/check_wechat_client_configuration.py",
+      "sizeBytes": 41087,
+      "sha256": "b06e3414c905c180329aa9ec3dd8fd69789e65c274bf158ec5cf67c202fb43fa"
+    },
+    {
+      "path": "Backend/scripts/collect_deployment_proof.py",
+      "sizeBytes": 12287,
+      "sha256": "e9587e5e24593faf407d104e94c73864126449f596f94c9a70ac78e3ff7b9ae3"
+    },
+    {
+      "path": "Backend/scripts/inspect_final_screenshot_upload_files.py",
+      "sizeBytes": 6640,
+      "sha256": "114c9a48e5dacfff7c858625e71605afb0495a2baf8d158d060bf38039c492ad"
+    },
+    {
+      "path": "Backend/scripts/migrate_database.py",
+      "sizeBytes": 636,
+      "sha256": "ddcf27e3077ea31d4f2ecb4216cde11e16c8cca3d275323533fce931d708fe37"
+    },
+    {
+      "path": "Backend/scripts/prepare_wechat_release_env.py",
+      "sizeBytes": 6275,
+      "sha256": "e97b0b392d01eebe9ba8a742c6f8857154b3fced588d7056a7074252b6e43ca6"
+    },
+    {
+      "path": "Backend/scripts/run_launch_readiness.sh",
+      "sizeBytes": 24988,
+      "sha256": "22721f998cc1181b4e141d4427cd35a0ce219392147caa55e11c96fc14e97a5e"
+    },
+    {
+      "path": "Backend/scripts/verify_auth_providers.py",
+      "sizeBytes": 14713,
+      "sha256": "78639618046977b34fc7fe5e28b13cc7ed281d9a193be2487ab43a58bd20fd00"
+    },
+    {
+      "path": "Backend/scripts/verify_release_flow.py",
+      "sizeBytes": 6455,
+      "sha256": "5996ea54f87828029c07f8e3cd730e45d7eebcc53fd96138111bea3b4160d7f0"
+    },
+    {
+      "path": "Backend/scripts/verify_remote_api.py",
+      "sizeBytes": 6181,
+      "sha256": "f1e9059949133db9dbffab9533d48b2ced50d8582c72ab2f48279a8b0d08129d"
+    },
+    {
+      "path": "Backend/scripts/verify_storage_backend.py",
+      "sizeBytes": 3384,
+      "sha256": "d284298fc998ead6f7c21c8a7fe6b552d3b6bd66c010c2b65b9e67634f537380"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/package-lock.json",
+      "sizeBytes": 5067,
+      "sha256": "2b7516b7a1d2f32fcf10916fcf322ead9a575f05697db279073ce40a949c82c0"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/package.json",
+      "sizeBytes": 356,
+      "sha256": "cc0e94e25601dc51bc62e8df43e7ed8a65565ca2022c6ef4f44ebd051d52bb42"
+    },
+    {
+      "path": "Backend/sms/aliyun-webhook-adapter/server.js",
+      "sizeBytes": 6924,
+      "sha256": "09f3650ad1e1d375799c821041f2f9a7b2167978649cb4470f50163f5ee4f638"
+    },
+    {
+      "path": "Backend/static/apple-app-site-association",
+      "sizeBytes": 750,
+      "sha256": "3bb567023ad1a01476070e49f03106f4bd1015726133557d5f9710d9d992985e"
+    },
+    {
+      "path": "Backend/static/dashboard.html",
+      "sizeBytes": 8673,
+      "sha256": "99e89dfc1e334a33ea4eabce05f7d8be725578c0b13c6e6708c8be50c2f0d597"
+    },
+    {
+      "path": "Backend/static/privacy.html",
+      "sizeBytes": 6186,
+      "sha256": "5714df19a9b597eb0a66318b2ee6f8c3a0ad415c64ee9e8a87455b61592df36b"
+    },
+    {
+      "path": "Backend/static/support-assets/app-icon-108.png",
+      "sizeBytes": 13169,
+      "sha256": "d6a14fc115a2ad7cecfd3b86476c86d72684d89b0947fd6c5fe101ef665c4476"
+    },
+    {
+      "path": "Backend/static/support-assets/operation-flow.jpg",
+      "sizeBytes": 46070,
+      "sha256": "8441ee2558866d9f06d561d323771662f5319fe3e712b548b1c0066ebf3a3a7a"
+    },
+    {
+      "path": "Backend/static/support-assets/screenshot-home.jpg",
+      "sizeBytes": 23699,
+      "sha256": "1165eb45f6d89b9086a7c2698f89fd18a0031775039038b1c18189f5fad5a903"
+    },
+    {
+      "path": "Backend/static/support-assets/screenshot-record.jpg",
+      "sizeBytes": 19584,
+      "sha256": "247b97d6d3716d8e44f1ce05db0ea8aaa98cd43f9264751131a96539f129fd1f"
+    },
+    {
+      "path": "Backend/static/support-assets/screenshot-sync.jpg",
+      "sizeBytes": 25834,
+      "sha256": "1eb81a2b9516a345f734077626e2ac244e561020f0caa794f90548631d647eb0"
+    },
+    {
+      "path": "Backend/static/support.html",
+      "sizeBytes": 11902,
+      "sha256": "36b8150807075f4df9135512939b6e8edf016add44a2212eb8754da4dab52c52"
+    },
+    {
+      "path": "Backend/static/terms.html",
+      "sizeBytes": 4120,
+      "sha256": "83b771811cb1852a65b6239e6d6e9d4ef0675150b4c019482126890f265b6750"
+    }
+  ],
+  "bundleSha256": "a3bbe1c7f3ab58ceea92880ee829407deeade7bce06b2fc92c5cb4d655c31cc9"
+}

@@ -1,11 +1,14 @@
 import Foundation
 
 enum MockData {
+    private static let babyBirthDate = Calendar.current.date(byAdding: .day, value: -67, to: Date()) ?? Date()
+
     static let baby = Baby(
         id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
         name: "小奶瓶",
         daysSinceBirth: 68,
-        ageText: "2个月7天"
+        ageText: "2个月7天",
+        birthDate: babyBirthDate
     )
 
     static let summary = DailySummary(

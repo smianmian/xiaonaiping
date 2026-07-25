@@ -105,14 +105,14 @@ struct MilestoneView: View {
                     HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
                         Text(store.nextAutomaticMilestone == nil ? "成长" : "还剩")
                             .font(AppTypography.bodyLarge)
-                        Text("\(store.nextAutomaticMilestone?.daysRemaining ?? store.baby.daysSinceBirth)")
+                        Text("\(store.nextAutomaticMilestone?.daysRemaining ?? store.currentBabyDaysSinceBirth)")
                             .font(AppTypography.largeNumber)
                             .foregroundStyle(AppColors.coral)
                         Text("天")
                             .font(AppTypography.bodyLarge)
                     }
                     .foregroundStyle(AppColors.inkGreen)
-                    Text("按宝宝出生第 \(store.baby.daysSinceBirth) 天计算")
+                    Text("按宝宝出生第 \(store.currentBabyDaysSinceBirth) 天计算")
                         .font(AppTypography.body)
                         .foregroundStyle(AppColors.inkGreen)
                 }

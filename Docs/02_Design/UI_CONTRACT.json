@@ -137,7 +137,7 @@
     {
       "id": "onboarding",
       "label": "首次启动",
-      "goal": "Introduce the app before profile creation",
+      "goal": "Introduce the app before profile creation or main-page preview",
       "primary_action": "开始记录",
       "secondary_action": "先看看",
       "empty_state": "Welcome page one",
@@ -154,8 +154,8 @@
     {
       "id": "feeding_editor",
       "label": "喂养记录",
-      "goal": "Create or edit feeding record, adjust the next reminder deferral, and set one manual feeding reminder",
-      "primary_action": "保存喂养 / 保存闹钟",
+      "goal": "Create or edit feeding records, set one manual reminder, and manage user-selected automatic reminder habits",
+      "primary_action": "保存喂养 / 保存本次提醒",
       "empty_state": null,
       "error_state": "Invalid amount / Invalid reminder time / Notification denied"
     },
