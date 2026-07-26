@@ -707,6 +707,21 @@ struct BabyAvatarView: View {
     }
 }
 
+private struct ExportFileItem: Identifiable {
+    let url: URL
+    var id: String { url.absoluteString }
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
 private enum DataStatusKind {
     case account
     case privacy
@@ -737,6 +752,8 @@ private struct DataStatusSheet: View {
     @State private var phoneNumber = "+86"
     @State private var phoneCode = ""
     @State private var isPhoneCodeRequested = false
+    @State private var exportFileURL: ExportFileItem?
+    @State private var exportErrorMessage: String?
     @FocusState private var focusedPhoneLoginField: PhoneLoginField?
 
     var body: some View {
@@ -1018,6 +1035,34 @@ private struct DataStatusSheet: View {
             statusRow(icon: "bell", title: "通知", value: "系统权限", detail: "疫苗提醒使用 iOS 系统通知；拒绝后需要去系统设置开启。")
             statusRow(icon: "waveform.path.ecg", title: "崩溃日志", value: "Apple 原生", detail: "不得包含宝宝照片、生日、备注、对象 key 或记录明细。")
             statusRow(icon: "xmark.octagon", title: "未接入", value: "无第三方分析", detail: "第一版不接广告、社区或第三方数据分析 SDK。")
+
+            PrimaryWatercolorButton(title: "导出全部记录（CSV）", tint: AppColors.grass, foreground: AppColors.inkGreen) {
+                exportRecords()
+            }
+            Text("导出为表格文件，可以直接发给医生或自己留档。照片请在相册中单独保存。")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.inkSoft)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if let exportErrorMessage {
+                Text(exportErrorMessage)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.coral)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .sheet(item: $exportFileURL) { exportItem in
+            ShareSheet(activityItems: [exportItem.url])
+        }
+    }
+
+    private func exportRecords() {
+        exportErrorMessage = nil
+        do {
+            let url = try RecordExportService.exportCSV(store: store)
+            exportFileURL = ExportFileItem(url: url)
+        } catch {
+            exportErrorMessage = error.localizedDescription
         }
     }
 

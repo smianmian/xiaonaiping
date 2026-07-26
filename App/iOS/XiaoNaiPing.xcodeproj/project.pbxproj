@@ -24,6 +24,7 @@
 		2F27250455AB5B806BB154EC /* CloudSyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838A938A99E6E6295D2DEE1D /* CloudSyncController.swift */; };
 		33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF167A08D1CF3FC993C518E /* RecordRowView.swift */; };
 		3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */; };
+		3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11309ACBEDD768C59F5433D6 /* RecordExportService.swift */; };
 		4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */; };
 		4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */; };
 		4E116448BDE0520C56179427 /* XiaoNaiPingWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -106,6 +107,7 @@
 		058526A113C98D420C2FAA02 /* CloudSyncModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncModels.swift; sourceTree = "<group>"; };
 		085C85CB56FF2803580F5CAF /* DaySwitcherBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaySwitcherBar.swift; sourceTree = "<group>"; };
 		0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		11309ACBEDD768C59F5433D6 /* RecordExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordExportService.swift; sourceTree = "<group>"; };
 		11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryWatercolorButton.swift; sourceTree = "<group>"; };
 		13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingReminderLiveActivityController.swift; sourceTree = "<group>"; };
 		1952F92A4C46DF608722ABC4 /* Baby.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Baby.swift; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 				2570435BD160038259ADB5AD /* CloudSyncAPIClient.swift */,
 				838A938A99E6E6295D2DEE1D /* CloudSyncController.swift */,
 				058526A113C98D420C2FAA02 /* CloudSyncModels.swift */,
+				11309ACBEDD768C59F5433D6 /* RecordExportService.swift */,
 				327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */,
 				985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */,
 			);
@@ -568,6 +571,7 @@
 				7878259A00E09EE4667A88A1 /* ProfileView.swift in Sources */,
 				DA93ED3325C38B5191CC2CEC /* QuickLogService.swift in Sources */,
 				0DF1426E12EBA1396D4B189D /* QuickRecordSheet.swift in Sources */,
+				3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */,
 				33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */,
 				1A6CBC1E82364A80FED3E908 /* RootTabView.swift in Sources */,
 				F14147067E8A3AAE04141A66 /* ScreenScaffold.swift in Sources */,
