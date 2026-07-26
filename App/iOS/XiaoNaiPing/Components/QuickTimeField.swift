@@ -8,7 +8,8 @@ struct QuickTimeField: View {
     /// 快捷偏移（分钟，负值表示过去）。
     var offsets: [Int] = [0, -15, -30, -60]
     @State private var isExpanded = false
-    @State private var selectedOffset: Int? = 0
+    /// 只有用户主动点过 chip 才高亮；编辑旧记录时不能一进来就亮着“刚刚”。
+    @State private var selectedOffset: Int?
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {

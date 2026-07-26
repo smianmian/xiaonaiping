@@ -197,13 +197,6 @@ struct FeedingRecordView: View {
                             deleteCandidate = record
                         }
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            deleteCandidate = record
-                        } label: {
-                            Label("删除", systemImage: "trash")
-                        }
-                    }
 
                     if index < dayFeedingRecords.count - 1 {
                         Divider()
@@ -652,7 +645,6 @@ private struct FeedingEditorSheet: View {
     @State private var note: String
     @State private var skipsAutomaticReminder = false
     @State private var errorMessage: String?
-    @State private var showsTimePicker = false
     @State private var showsMoreDetails = false
     @State private var isSaving = false
 
@@ -696,48 +688,16 @@ private struct FeedingEditorSheet: View {
                             .pickerStyle(.segmented)
                             .tint(AppColors.peach)
 
-                            HStack {
+                            HStack(spacing: AppSpacing.small) {
                                 AssetWatercolorImage(name: "approvedFeedingBottle")
                                     .frame(width: 34, height: 40)
-
-                                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                                    Text(BabyRecordStore.reminderDateTimeString(from: occurredAt))
-                                        .font(AppTypography.cardTitle)
-                                        .foregroundStyle(AppColors.inkGreen)
-                                    Text("记录时间")
-                                        .font(AppTypography.caption)
-                                        .foregroundStyle(AppColors.inkSoft)
-                                }
-
-                                Spacer(minLength: 0)
-
-                                Button(showsTimePicker ? "收起" : "修改时间") {
-                                    withAnimation {
-                                        showsTimePicker.toggle()
-                                    }
-                                }
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppColors.blueInk)
-                            }
-
-                            if showsTimePicker {
-                                DatePicker("时间", selection: $occurredAt, displayedComponents: [.date, .hourAndMinute])
-                                    .font(AppTypography.readableBody)
-                                    .tint(AppColors.coral)
-                            }
-
-                            HStack(spacing: AppSpacing.small) {
-                                ForEach([("现在", 0), ("-5分钟", -5), ("-10分钟", -10), ("-30分钟", -30)], id: \.1) { item in
-                                    Button(item.0) {
-                                        occurredAt = Date().addingTimeInterval(TimeInterval(item.1 * 60))
-                                    }
+                                Text("记录时间")
                                     .font(AppTypography.caption)
-                                    .foregroundStyle(AppColors.blueInk)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 7)
-                                    .background(AppColors.milk, in: Capsule())
-                                }
+                                    .foregroundStyle(AppColors.inkSoft)
+                                Spacer(minLength: 0)
                             }
+
+                            QuickTimeField(date: $occurredAt, offsets: [0, -5, -10, -30])
                         }
                     }
 

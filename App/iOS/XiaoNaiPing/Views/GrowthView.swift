@@ -149,29 +149,22 @@ struct GrowthView: View {
         VStack(alignment: .leading, spacing: AppSpacing.regular) {
             SectionTitleView(title: "测量历史")
             ForEach(store.currentBabyGrowthRecords.reversed()) { record in
-                HStack(spacing: AppSpacing.small) {
-                    Button {
-                        openEditor(record)
-                    } label: {
-                        GrowthHistoryRow(record: record)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        deleteCandidate = record
-                    } label: {
-                        Image(systemName: "trash")
-                            .font(.system(size: 18, weight: .regular))
-                            .foregroundStyle(AppColors.coral)
-                            .frame(width: 44, height: 44)
-                            .background {
-                                Circle().fill(AppColors.blush.opacity(0.56))
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("删除成长记录")
+                Button {
+                    openEditor(record)
+                } label: {
+                    GrowthHistoryRow(record: record)
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.plain)
+                .contextMenu {
+                    Button("编辑") {
+                        openEditor(record)
+                    }
+                    Button("删除", role: .destructive) {
+                        deleteCandidate = record
+                    }
+                }
+                .accessibilityHint("长按可编辑或删除")
             }
         }
     }
@@ -424,17 +417,11 @@ struct MonthlyReportDetailView: View {
     }
 
     private var monthSwitcher: some View {
-        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
             HStack(spacing: AppSpacing.medium) {
-                Button {
+                monthArrowButton(symbol: "chevron.left", enabled: true) {
                     shiftMonth(-1)
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(AppColors.coral)
-                        .frame(width: 44, height: 44)
                 }
-                .buttonStyle(.plain)
                 .accessibilityLabel("上个月")
 
                 VStack(spacing: AppSpacing.tiny) {
@@ -447,27 +434,46 @@ struct MonthlyReportDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                Button {
+                monthArrowButton(symbol: "chevron.right", enabled: canMoveToNextMonth) {
                     shiftMonth(1)
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(canMoveToNextMonth ? AppColors.coral : AppColors.inkSoft.opacity(0.45))
-                        .frame(width: 44, height: 44)
                 }
-                .buttonStyle(.plain)
                 .disabled(!canMoveToNextMonth)
                 .accessibilityLabel("下个月")
             }
         }
     }
 
+    /// 月份切换箭头：cream 圆底次按钮，与 GrowthEditorSheet 的 stepper 按钮同款。
+    private func monthArrowButton(symbol: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(AppColors.coral.opacity(enabled ? 1 : 0.35))
+                .frame(width: 44, height: 44)
+                .background {
+                    Circle()
+                        .fill(AppColors.cream)
+                        .overlay {
+                            Circle().stroke(AppColors.softStroke.opacity(0.4), lineWidth: 1)
+                        }
+                        .frame(width: 38, height: 38)
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
     private var sourceSummary: some View {
-        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Text("原始记录来源")
-                    .font(AppTypography.cardTitle)
-                    .foregroundStyle(AppColors.inkGreen)
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.inkSoft)
+                    Text("原始记录来源")
+                        .font(AppTypography.cardTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+                }
                 Text("喂养、喝水、睡眠、排便、照片、成长指标、纪念日和疫苗提醒都来自原始记录。要修改内容，请回到对应页面编辑原始记录。")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
@@ -670,13 +676,18 @@ private struct MonthlyReportCard: View {
     let report: MonthlyReportSnapshot
 
     var body: some View {
-        WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 HStack {
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text("本月成长小报")
-                            .font(AppTypography.sectionTitle)
-                            .foregroundStyle(AppColors.inkGreen)
+                        HStack(spacing: AppSpacing.small) {
+                            Image(systemName: "chart.bar.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(AppColors.sage)
+                            Text("本月成长小报")
+                                .font(AppTypography.sectionTitle)
+                                .foregroundStyle(AppColors.inkGreen)
+                        }
                         Text("\(report.monthTitle.isEmpty ? "本月" : report.monthTitle) · 基于当前记录生成")
                             .font(AppTypography.caption)
                             .foregroundStyle(AppColors.inkSoft)
@@ -687,10 +698,10 @@ private struct MonthlyReportCard: View {
                 }
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.regular) {
-                    reportMetric(title: "喂养", value: "\(report.feedingCount)次 / \(report.milkAmountML)ml", tint: AppColors.cream)
-                    reportMetric(title: "睡眠", value: report.sleepDurationText, tint: AppColors.mistBlue)
-                    reportMetric(title: "排便", value: "\(report.diaperCount)次", tint: AppColors.grass)
-                    reportMetric(title: "照片", value: "\(report.photoCount)张", tint: AppColors.cream)
+                    reportMetric(title: "喂养", value: "\(report.feedingCount)次 / \(report.milkAmountML)ml", icon: "drop.fill", tint: AppColors.blush, color: AppColors.coral)
+                    reportMetric(title: "睡眠", value: report.sleepDurationText, icon: "moon.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
+                    reportMetric(title: "排便", value: "\(report.diaperCount)次", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
+                    reportMetric(title: "照片", value: "\(report.photoCount)张", icon: "photo.fill", tint: AppColors.cream, color: AppColors.coral)
                 }
 
                 Divider().opacity(0.25)
@@ -719,23 +730,22 @@ private struct MonthlyReportCard: View {
         return "最近记录：体重 \(display(weight))kg\(weightDelta)，身高 \(display(height))cm\(heightDelta)。"
     }
 
-    private func reportMetric(title: String, value: String, tint: Color) -> some View {
+    /// 指标小瓦片：与 growthCard 的 metricCard / vaccineBookStat 同一族（低饱和 tint 底 + 主题色数值）。
+    private func reportMetric(title: String, value: String, icon: String, tint: Color, color: Color) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-            Text(title)
+            Label(title, systemImage: icon)
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.inkGreen)
+                .lineLimit(1)
             Text(value)
                 .font(AppTypography.bodyLarge)
-                .foregroundStyle(title == "睡眠" ? AppColors.blueInk : AppColors.coral)
+                .foregroundStyle(color)
                 .lineLimit(2)
                 .minimumScaleFactor(0.78)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.regular)
-        .background {
-            RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
-                .fill(tint.opacity(0.62))
-        }
+        .background(tint.opacity(0.45), in: RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous))
     }
 
     private func deltaText(_ value: Double, unit: String) -> String {

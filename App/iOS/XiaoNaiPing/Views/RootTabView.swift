@@ -942,18 +942,16 @@ private struct WaterRecordView: View {
             }
 
             Spacer(minLength: 0)
-
-            Button {
-                deleteCandidate = record
-            } label: {
-                Image(systemName: "trash")
-                    .foregroundStyle(AppColors.coral)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("删除喝水记录")
         }
         .padding(.vertical, AppSpacing.tiny)
+        .contentShape(Rectangle())
+        // 删除入口收进长按菜单，列表不再常驻垃圾桶。
+        .contextMenu {
+            Button("删除", role: .destructive) {
+                deleteCandidate = record
+            }
+        }
+        .accessibilityHint("长按可删除")
     }
 }
 

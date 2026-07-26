@@ -54,34 +54,30 @@ struct DiaperRecordView: View {
                             diaperEmptyState
                         } else {
                             ForEach(dayDiaperRecords) { record in
-                                HStack(spacing: AppSpacing.small) {
+                                Button {
+                                    openEditor(record)
+                                } label: {
+                                    RecordRowView(
+                                        icon: record.icon,
+                                        time: record.time,
+                                        title: record.title,
+                                        detail: record.note ?? "",
+                                        tint: AppColors.cream
+                                    )
+                                    .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu {
                                     Button {
                                         openEditor(record)
                                     } label: {
-                                        RecordRowView(
-                                            icon: record.icon,
-                                            time: record.time,
-                                            title: record.title,
-                                            detail: record.note ?? "",
-                                            tint: AppColors.cream
-                                        )
-                                        .frame(maxWidth: .infinity)
+                                        Label("编辑", systemImage: "pencil")
                                     }
-                                    .buttonStyle(.plain)
-
-                                    Button {
+                                    Button(role: .destructive) {
                                         deleteCandidate = record
                                     } label: {
-                                        Image(systemName: "trash")
-                                            .font(.system(size: 18, weight: .regular))
-                                            .foregroundStyle(AppColors.coral)
-                                            .frame(width: 44, height: 44)
-                                            .background {
-                                                Circle().fill(AppColors.blush.opacity(0.56))
-                                            }
+                                        Label("删除", systemImage: "trash")
                                     }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel("删除排便记录")
                                 }
                             }
                         }
@@ -193,7 +189,6 @@ private struct DiaperEditorSheet: View {
     @State private var texture: String
     @State private var note: String
     @State private var errorMessage: String?
-    @State private var showsTimePicker = false
     @State private var showsMoreDetails = false
 
     private let kinds = ["大便", "小便"]
@@ -220,7 +215,7 @@ private struct DiaperEditorSheet: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    WatercolorCard(tint: AppColors.grass, cornerRadius: AppShapes.largeCardRadius) {
+                    WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
                             Text("这一次")
                                 .font(AppTypography.caption)
@@ -234,35 +229,16 @@ private struct DiaperEditorSheet: View {
                             .pickerStyle(.segmented)
                             .tint(AppColors.sage)
 
-                            HStack {
+                            HStack(spacing: AppSpacing.small) {
                                 AssetWatercolorImage(name: kind == "小便" ? AppAssets.peeDropIcon : AppAssets.diaperIcon, mode: .multiply)
                                     .frame(width: 34, height: 40)
-
-                                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                                    Text(record == nil && !showsTimePicker ? "刚刚" : BabyRecordStore.reminderDateTimeString(from: occurredAt))
-                                        .font(AppTypography.cardTitle)
-                                        .foregroundStyle(AppColors.inkGreen)
-                                    Text(record == nil && !showsTimePicker ? "会按现在的时间保存" : "记录时间")
-                                        .font(AppTypography.caption)
-                                        .foregroundStyle(AppColors.inkSoft)
-                                }
-
+                                Text("记录时间")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
                                 Spacer(minLength: 0)
-
-                                Button(showsTimePicker ? "收起" : "修改时间") {
-                                    withAnimation {
-                                        showsTimePicker.toggle()
-                                    }
-                                }
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppColors.blueInk)
                             }
 
-                            if showsTimePicker {
-                                DatePicker("时间", selection: $occurredAt, displayedComponents: [.date, .hourAndMinute])
-                                    .font(AppTypography.readableBody)
-                                    .tint(AppColors.sage)
-                            }
+                            QuickTimeField(date: $occurredAt)
                         }
                     }
 

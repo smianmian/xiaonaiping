@@ -104,7 +104,7 @@ struct SleepRecordView: View {
 
                     DaySwitcherBar(selectedDay: $selectedDay)
 
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
+                    WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(spacing: AppSpacing.medium) {
                             Text(isViewingToday ? "今日睡眠" : "当日睡眠")
                                 .font(AppTypography.body)
@@ -137,43 +137,42 @@ struct SleepRecordView: View {
                             sleepEmptyState
                         } else {
                             ForEach(daySleepRecords) { record in
-                                HStack(spacing: AppSpacing.small) {
-                                    Button {
-                                        openEditor(record)
-                                    } label: {
-                                        HStack(spacing: AppSpacing.medium) {
-                                            AssetWatercolorImage(name: record.icon, mode: .multiply)
-                                                .frame(width: 36, height: 36)
-                                            Text(timeRangeText(record))
-                                                .font(AppTypography.bodyLarge)
-                                                .foregroundStyle(AppColors.ink)
-                                            Spacer()
-                                            Text("\(record.type) \(record.duration)")
-                                                .font(AppTypography.body)
-                                                .foregroundStyle(record.isOngoing ? AppColors.coral : AppColors.ink)
-                                        }
-                                        .padding(.horizontal, AppSpacing.medium)
-                                        .padding(.vertical, 11)
-                                        .background {
-                                            CardBackground(tint: record.isOngoing ? AppColors.blush : AppColors.cream, cornerRadius: AppShapes.cardRadius)
-                                        }
+                                Button {
+                                    openEditor(record)
+                                } label: {
+                                    HStack(spacing: AppSpacing.medium) {
+                                        AssetWatercolorImage(name: record.icon, mode: .multiply)
+                                            .frame(width: 36, height: 36)
+                                        Text(timeRangeText(record))
+                                            .font(AppTypography.bodyLarge)
+                                            .foregroundStyle(AppColors.ink)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.75)
+                                            .layoutPriority(1)
+                                        Spacer(minLength: AppSpacing.small)
+                                        Text("\(record.type) \(record.duration)")
+                                            .font(AppTypography.body)
+                                            .foregroundStyle(record.isOngoing ? AppColors.coral : AppColors.ink)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.8)
                                     }
-                                    .buttonStyle(.plain)
-
-                                    Button {
-                                        deleteCandidate = record
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.system(size: 18, weight: .regular))
-                                            .foregroundStyle(AppColors.coral)
-                                            .frame(width: 44, height: 44)
-                                            .background {
-                                                Circle().fill(AppColors.blush.opacity(0.56))
-                                            }
+                                    .padding(.horizontal, AppSpacing.medium)
+                                    .padding(.vertical, 11)
+                                    .background {
+                                        CardBackground(tint: record.isOngoing ? AppColors.blush : AppColors.cream, cornerRadius: AppShapes.cardRadius)
                                     }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel("删除睡眠记录")
                                 }
+                                .buttonStyle(.plain)
+                                // 删除收进长按菜单，列表不再常驻垃圾桶。
+                                .contextMenu {
+                                    Button("编辑") {
+                                        openEditor(record)
+                                    }
+                                    Button("删除", role: .destructive) {
+                                        deleteCandidate = record
+                                    }
+                                }
+                                .accessibilityHint("长按可编辑或删除")
                             }
                         }
                     }
@@ -240,7 +239,7 @@ struct SleepRecordView: View {
               !Calendar.current.isDate(endAt, inSameDayAs: record.startAt) else {
             return "\(record.start) → \(record.end)"
         }
-        return "\(record.start) → 次日\(record.end)"
+        return "\(record.start) → 次日 \(record.end)"
     }
 
     private var deleteAlertBinding: Binding<Bool> {
@@ -313,7 +312,7 @@ private struct SleepEditorSheet: View {
             ?? fallbackStart
             ?? BabyRecordStore.date(fromTimeString: record?.start ?? BabyRecordStore.timeString(from: Date()))
         _startAt = State(initialValue: startDate)
-        _endAt = State(initialValue: Self.endDate(for: record, startDate: startDate))
+        _endAt = State(initialValue: Self.endDate(for: record, startDate: startDate, isBackfillDay: record == nil && fallbackStart != nil))
         _type = State(initialValue: record?.type ?? "小睡")
         _note = State(initialValue: record?.note ?? "")
     }
@@ -322,18 +321,10 @@ private struct SleepEditorSheet: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
+                    WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            DatePicker("开始", selection: $startAt, displayedComponents: [.date, .hourAndMinute])
-                                .font(AppTypography.readableBody)
-                            DatePicker("结束", selection: $endAt, displayedComponents: [.date, .hourAndMinute])
-                                .font(AppTypography.readableBody)
-                            Picker("类型", selection: $type) {
-                                ForEach(types, id: \.self) { type in
-                                    Text(type).tag(type)
-                                }
-                            }
-                            .pickerStyle(.segmented)
+                            SleepSpanField(startAt: $startAt, endAt: $endAt)
+                            SegmentedPill(items: types, selected: $type)
                         }
                     }
 
@@ -379,9 +370,17 @@ private struct SleepEditorSheet: View {
             }
             .background(PaperBackgroundView())
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                PrimaryWatercolorButton(title: "保存睡眠记录", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
+                Button {
                     save()
+                } label: {
+                    Text("保存睡眠记录")
+                        .font(AppTypography.bodyLarge.weight(.semibold))
+                        .foregroundStyle(AppColors.milk)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 13)
+                        .background(AppColors.blueInk, in: Capsule())
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, AppSpacing.large)
                 .padding(.vertical, AppSpacing.small)
                 .background(.ultraThinMaterial)
@@ -429,8 +428,13 @@ private struct SleepEditorSheet: View {
         }
     }
 
-    private static func endDate(for record: SleepRecord?, startDate: Date) -> Date {
+    private static func endDate(for record: SleepRecord?, startDate: Date, isBackfillDay: Bool) -> Date {
         guard let record, !record.isOngoing else {
+            // 补记历史日期：结束落在开始 1 小时后，保持在所选日期；
+            // 否则给出“≈现在”的结束，让 SleepSpanField 套用“刚醒·睡1小时”默认。
+            if isBackfillDay {
+                return Calendar.current.date(byAdding: .hour, value: 1, to: startDate) ?? startDate
+            }
             let fallback = Calendar.current.date(byAdding: .minute, value: 45, to: startDate) ?? Date()
             return Date() > startDate ? Date() : fallback
         }

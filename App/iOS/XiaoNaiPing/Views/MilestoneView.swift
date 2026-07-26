@@ -12,63 +12,8 @@ struct MilestoneView: View {
                 VStack(spacing: AppSpacing.large) {
                     nextMilestoneCard
                     automaticMilestoneSection
-                    SectionTitleView(title: "我的纪念日")
-
-                    HStack(alignment: .top, spacing: AppSpacing.medium) {
-                        AssetWatercolorImage(name: AppAssets.plantTimeline, mode: .multiply)
-                            .frame(width: 44)
-                        VStack(spacing: AppSpacing.medium) {
-                            if store.milestones.isEmpty {
-                                WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                                    Text("还没有手动添加的纪念日")
-                                        .font(AppTypography.bodyLarge)
-                                        .foregroundStyle(AppColors.inkGreen)
-                                        .frame(maxWidth: .infinity)
-                                }
-                            } else {
-                                ForEach(store.milestones) { item in
-                                    HStack(spacing: AppSpacing.small) {
-                                        Button {
-                                            openEditor(item)
-                                        } label: {
-                                            HStack(spacing: AppSpacing.medium) {
-                                                AssetWatercolorImage(name: item.icon, mode: .multiply)
-                                                    .frame(width: 46, height: 42)
-                                                Text(item.title)
-                                                    .font(AppTypography.bodyLarge)
-                                                    .foregroundStyle(AppColors.inkGreen)
-                                                Spacer()
-                                                Text(displayDate(for: item))
-                                                    .font(AppTypography.caption)
-                                                    .foregroundStyle(AppColors.inkGreen)
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-
-                                        Button {
-                                            deleteCandidate = item
-                                        } label: {
-                                            Image(systemName: "trash")
-                                                .font(.system(size: 16, weight: .regular))
-                                                .foregroundStyle(AppColors.coral)
-                                                .frame(width: 44, height: 44)
-                                                .background {
-                                                    Circle().fill(AppColors.blush.opacity(0.5))
-                                                }
-                                        }
-                                        .buttonStyle(.plain)
-                                        .accessibilityLabel("删除纪念日")
-                                    }
-                                    .padding(.vertical, 6)
-                                    Divider().opacity(0.28)
-                                }
-                            }
-                        }
-                    }
-
-                    PrimaryWatercolorButton(title: "+ 添加纪念日") {
-                        openEditor()
-                    }
+                    manualMilestoneSection
+                    addMilestoneButton
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.bottom, AppSpacing.bottomBarSpace)
@@ -78,7 +23,7 @@ struct MilestoneView: View {
             MilestoneEditorSheet(milestone: editingMilestone) { milestone in
                 store.upsert(milestone)
             }
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
         }
         .alert("删除这个纪念日？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -95,42 +40,58 @@ struct MilestoneView: View {
         }
     }
 
+    /// 倒计时主卡：低饱和奶白底 + 珊瑚色大数字，与成长页 growthCard 同一张“皮”。
     private var nextMilestoneCard: some View {
-        WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius) {
-            HStack {
-                VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                    Text(nextMilestoneTitle)
-                        .font(AppTypography.bodyLarge)
-                        .foregroundStyle(AppColors.inkGreen)
-                    HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                        Text(store.nextAutomaticMilestone == nil ? "成长" : "还剩")
-                            .font(AppTypography.bodyLarge)
-                        Text("\(store.nextAutomaticMilestone?.daysRemaining ?? store.currentBabyDaysSinceBirth)")
-                            .font(AppTypography.largeNumber)
-                            .foregroundStyle(AppColors.coral)
-                        Text("天")
-                            .font(AppTypography.bodyLarge)
-                    }
-                    .foregroundStyle(AppColors.inkGreen)
-                    Text("按宝宝出生第 \(store.currentBabyDaysSinceBirth) 天计算")
-                        .font(AppTypography.body)
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "gift.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(AppColors.coral)
+                    Text("下一个纪念日")
+                        .font(AppTypography.sectionTitle)
                         .foregroundStyle(AppColors.inkGreen)
                 }
-                Spacer()
-                AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
-                    .frame(width: 100, height: 88)
+
+                HStack(alignment: .center, spacing: AppSpacing.medium) {
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        Text(nextMilestoneTitle)
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.inkGreen)
+                            .fixedSize(horizontal: false, vertical: true)
+                        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
+                            Text(store.nextAutomaticMilestone == nil ? "成长" : "还剩")
+                                .font(AppTypography.bodyLarge)
+                            Text("\(store.nextAutomaticMilestone?.daysRemaining ?? store.currentBabyDaysSinceBirth)")
+                                .font(AppTypography.largeNumber)
+                                .foregroundStyle(AppColors.coral)
+                            Text("天")
+                                .font(AppTypography.bodyLarge)
+                        }
+                        .foregroundStyle(AppColors.inkGreen)
+                        Text("按宝宝出生第 \(store.currentBabyDaysSinceBirth) 天计算")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    Spacer(minLength: 0)
+                    AssetWatercolorImage(name: AppAssets.cakeIcon, mode: .multiply)
+                        .frame(width: 96, height: 84)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
+    /// 自动纪念节点：行卡样式与成长页测量历史一致（cream 行卡 + 名称主、日期辅）。
     private var automaticMilestoneSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.regular) {
             SectionTitleView(title: "自动纪念节点")
             ForEach(store.automaticMilestones) { milestone in
                 HStack(spacing: AppSpacing.medium) {
                     Image(systemName: milestone.isReached ? "checkmark.circle.fill" : "calendar")
+                        .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(milestone.isReached ? AppColors.sage : AppColors.coral)
-                        .frame(width: 28)
+                        .frame(width: 36, height: 36)
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                         Text(milestone.title.localizedText)
                             .font(AppTypography.bodyLarge)
@@ -145,12 +106,94 @@ struct MilestoneView: View {
                         .foregroundStyle(milestone.isReached ? AppColors.sage : AppColors.coral)
                 }
                 .padding(.horizontal, AppSpacing.medium)
-                .padding(.vertical, AppSpacing.regular)
+                .padding(.vertical, 11)
                 .background {
-                    CardBackground(tint: AppColors.cream, cornerRadius: AppShapes.smallRadius)
+                    CardBackground(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius)
                 }
             }
         }
+    }
+
+    /// 手动纪念日列表：行卡样式与成长页测量历史一致；
+    /// 点击行进入编辑，长按行弹出“编辑/删除”菜单（与喂养历史行同款，删除仍走确认弹窗）。
+    private var manualMilestoneSection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.regular) {
+            SectionTitleView(title: "我的纪念日")
+            if store.milestones.isEmpty {
+                WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius) {
+                    VStack(spacing: AppSpacing.small) {
+                        Text("还没有手动添加的纪念日")
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text("第一次翻身、第一次叫妈妈，都值得记下来")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            } else {
+                ForEach(store.milestones) { item in
+                    Button {
+                        openEditor(item)
+                    } label: {
+                        milestoneRow(item)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("打开编辑，长按可删除")
+                    .contextMenu {
+                        Button("编辑") {
+                            openEditor(item)
+                        }
+                        Button("删除", role: .destructive) {
+                            deleteCandidate = item
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func milestoneRow(_ item: Milestone) -> some View {
+        HStack(spacing: AppSpacing.medium) {
+            AssetWatercolorImage(name: item.icon, mode: .multiply)
+                .frame(width: 40, height: 36)
+            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                Text(item.title)
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .lineLimit(1)
+                Text(displayDate(for: item))
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.vertical, 11)
+        .background {
+            CardBackground(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius)
+        }
+    }
+
+    /// 主按钮：实心珊瑚胶囊 + 奶白字，与成长页“添加测量”同款。
+    private var addMilestoneButton: some View {
+        Button {
+            openEditor()
+        } label: {
+            HStack(spacing: AppSpacing.small) {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .bold))
+                Text("添加纪念日")
+                    .font(AppTypography.bodyLarge.weight(.semibold))
+            }
+            .foregroundStyle(AppColors.milk)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(AppColors.coral, in: Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     private var nextMilestoneTitle: String {
@@ -184,6 +227,8 @@ struct MilestoneView: View {
     }
 }
 
+/// 纪念日编辑表单：分行卡片式布局，与成长页 GrowthEditorSheet 同一套语言。
+/// 名称行 ＋ 日期行（收起显示日期文本，点击展开 .graphical 日历，仅日期无时间）＋ 备注卡 ＋ 底部珊瑚色保存胶囊。
 private struct MilestoneEditorSheet: View {
     let milestone: Milestone?
     let onSave: (Milestone) -> Bool
@@ -193,7 +238,14 @@ private struct MilestoneEditorSheet: View {
     @State private var date: Date
     @State private var note: String
     @State private var errorMessage: String?
-    @State private var showsMoreDetails = false
+    @State private var showsDatePicker = false
+
+    private static let displayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "yyyy年M月d日"
+        return formatter
+    }()
 
     init(milestone: Milestone?, onSave: @escaping (Milestone) -> Bool) {
         self.milestone = milestone
@@ -205,59 +257,38 @@ private struct MilestoneEditorSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppSpacing.large) {
-                WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            TextField("纪念日名称", text: $title)
-                                .textFieldStyle(.roundedBorder)
-                            DatePicker("日期", selection: $date, displayedComponents: [.date])
-                        }
-                    }
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.medium) {
+                    titleCard
+                    dateCard
+                    noteCard
 
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
-                        Button {
-                            withAnimation {
-                                showsMoreDetails.toggle()
-                            }
-                        } label: {
-                            HStack(spacing: AppSpacing.small) {
-                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
-                                Text("更多详情（可不填）")
-                                Spacer(minLength: 0)
-                                Text(showsMoreDetails ? "收起" : "添加备注")
-                                    .font(AppTypography.caption)
-                                    .foregroundStyle(AppColors.inkSoft)
-                            }
-                            .font(AppTypography.body)
-                            .foregroundStyle(AppColors.inkGreen)
-                            .padding(.horizontal, AppSpacing.medium)
-                            .padding(.vertical, AppSpacing.regular)
-                        }
-                        .buttonStyle(.plain)
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-
-                    if showsMoreDetails {
-                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                            TextField("备注，可不填", text: $note, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                    }
-
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.coral)
-                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-
-                PrimaryWatercolorButton(title: "保存纪念日") {
-                    save()
-                }
-                Spacer()
+                .padding(AppSpacing.large)
             }
-            .padding(AppSpacing.large)
             .background(PaperBackgroundView())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Button {
+                    save()
+                } label: {
+                    Text("保存纪念日")
+                        .font(AppTypography.bodyLarge.weight(.semibold))
+                        .foregroundStyle(AppColors.milk)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(AppColors.coral, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.vertical, AppSpacing.small)
+                .background(.ultraThinMaterial)
+            }
             .navigationTitle(milestone == nil ? "添加纪念日" : "编辑纪念日")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -266,9 +297,105 @@ private struct MilestoneEditorSheet: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("保存") {
+                        save()
+                    }
+                    .foregroundStyle(AppColors.coral)
+                }
             }
         }
     }
+
+    // MARK: - 行卡
+
+    private var titleCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            HStack(spacing: AppSpacing.small) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(AppColors.inkGreen)
+                    .frame(width: 26)
+                Text("名称")
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.inkGreen)
+                TextField("如：第一次翻身", text: $title)
+                    .font(AppTypography.readableBody)
+                    .foregroundStyle(AppColors.ink)
+                    .multilineTextAlignment(.trailing)
+                    .submitLabel(.done)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// 日期行卡：收起时显示日期文本＋chevron，点击内联展开 .graphical 日历；纪念日只需日期。
+    private var dateCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: 0) {
+            VStack(spacing: 0) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showsDatePicker.toggle()
+                    }
+                } label: {
+                    HStack(spacing: AppSpacing.small) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(AppColors.inkGreen)
+                            .frame(width: 26)
+                        Text("日期")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Spacer(minLength: AppSpacing.small)
+                        Text(Self.displayDateFormatter.string(from: date))
+                            .font(AppTypography.readableBody)
+                            .foregroundStyle(AppColors.ink)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(AppColors.inkSoft)
+                            .rotationEffect(.degrees(showsDatePicker ? 180 : 0))
+                    }
+                    .padding(AppSpacing.medium)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("纪念日日期")
+                .accessibilityValue(Self.displayDateFormatter.string(from: date))
+
+                if showsDatePicker {
+                    DatePicker("纪念日日期", selection: $date, displayedComponents: [.date])
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                        .tint(AppColors.coral)
+                        .padding(.horizontal, AppSpacing.small)
+                        .padding(.bottom, AppSpacing.small)
+                }
+            }
+        }
+    }
+
+    private var noteCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(AppColors.inkGreen)
+                        .frame(width: 26)
+                    Text("备注（可不填）")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.inkGreen)
+                }
+                TextField("如：当时的小故事", text: $note, axis: .vertical)
+                    .lineLimit(2...4)
+                    .font(AppTypography.readableBody)
+                    .foregroundStyle(AppColors.ink)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    // MARK: - 保存
 
     private func save() {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)

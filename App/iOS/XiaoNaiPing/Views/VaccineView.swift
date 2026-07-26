@@ -89,24 +89,24 @@ struct VaccineView: View {
                     .overlay(AppColors.inkGreen.opacity(0.12))
 
                 if let next = store.nextVaccine {
-                    HStack(alignment: .firstTextBaseline) {
+                    // 层级：疫苗名是主角，日期与倒计时是配角——
+                    // 不再让一个巨大的红色日期压过整张卡。
+                    HStack(alignment: .center, spacing: AppSpacing.medium) {
                         VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                             Text("下一针")
                                 .font(AppTypography.caption)
                                 .foregroundStyle(AppColors.inkSoft)
                             Text(next.title.localizedText)
-                                .font(AppTypography.bodyLarge)
+                                .font(AppTypography.sectionTitle)
                                 .foregroundStyle(AppColors.inkGreen)
+                            if !next.dueText.isEmpty {
+                                Text(AppLocalization.format("计划 %@", next.dueText))
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
                         }
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: AppSpacing.tiny) {
-                            Text(store.vaccineDueValue(next))
-                                .font(AppTypography.largeNumber)
-                                .foregroundStyle(AppColors.coral)
-                            Text(store.vaccineDueUnit(next).localizedText)
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppColors.inkSoft)
-                        }
+                        Spacer(minLength: 0)
+                        dueBadge(for: next)
                     }
                 } else {
                     Text(store.vaccineRecords.isEmpty ? "生成模板或新增记录，开始建立宝宝疫苗本。" : "当前没有待接种记录。")
@@ -119,37 +119,33 @@ struct VaccineView: View {
     }
 
     private var templateSection: some View {
-        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 HStack {
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                         Text("接种模板")
                             .font(AppTypography.cardTitle)
                             .foregroundStyle(AppColors.inkGreen)
-                        Text("按宝宝生日生成可编辑的计划日期。")
+                        Text("按宝宝生日生成可编辑的计划日期，仅作记录。")
                             .font(AppTypography.caption)
                             .foregroundStyle(AppColors.inkSoft)
                     }
                     Spacer()
-                    Text("仅作记录")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.blueInk)
                 }
 
-                Picker("模板地区", selection: $selectedTemplateRegion) {
-                    ForEach(templateRegions, id: \.self) { region in
-                        Text(region.localizedText).tag(region)
-                    }
-                }
-                .pickerStyle(.segmented)
+                SegmentedPill(items: templateRegions, selected: $selectedTemplateRegion)
 
-                PrimaryWatercolorButton(
-                    title: selectedTemplateRegion == BabyRecordStore.mainlandVaccineRegion ? "生成中国大陆模板" : "生成香港模板",
-                    tint: AppColors.cream,
-                    foreground: selectedTemplateRegion == BabyRecordStore.mainlandVaccineRegion ? AppColors.coral : AppColors.blueInk
-                ) {
+                Button {
                     generateSelectedTemplate()
+                } label: {
+                    Text(selectedTemplateRegion == BabyRecordStore.mainlandVaccineRegion ? "生成中国大陆模板" : "生成香港模板")
+                        .font(AppTypography.bodyLarge.weight(.semibold))
+                        .foregroundStyle(AppColors.milk)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(AppColors.coral, in: Capsule())
                 }
+                .buttonStyle(.plain)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -167,12 +163,13 @@ struct VaccineView: View {
                     .foregroundStyle(AppColors.inkSoft)
             }
 
-            Picker("记录筛选", selection: $selectedFilter) {
-                ForEach(VaccineBookFilter.allCases, id: \.self) { filter in
-                    Text(filter.rawValue.localizedText).tag(filter)
-                }
-            }
-            .pickerStyle(.segmented)
+            SegmentedPill(
+                items: VaccineBookFilter.allCases.map(\.rawValue),
+                selected: Binding(
+                    get: { selectedFilter.rawValue },
+                    set: { selectedFilter = VaccineBookFilter(rawValue: $0) ?? .all }
+                )
+            )
 
             if timelineRecords.isEmpty {
                 WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
@@ -223,6 +220,33 @@ struct VaccineView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+
+    /// 倒计时胶囊：今天/N天后用珊瑚底，已过期用暖黄底提醒补种。
+    private func dueBadge(for record: VaccineRecord) -> some View {
+        let days = store.vaccineDaysUntil(record)
+        let text: String
+        let background: Color
+        let foreground: Color
+        if days == 0 {
+            text = "今天"
+            background = AppColors.coral
+            foreground = AppColors.milk
+        } else if days > 0 {
+            text = "\(days)天后"
+            background = AppColors.coral
+            foreground = AppColors.milk
+        } else {
+            text = "已过\(-days)天"
+            background = AppColors.butter.opacity(0.8)
+            foreground = AppColors.ink
+        }
+        return Text(text)
+            .font(AppTypography.bodyLarge.weight(.semibold))
+            .foregroundStyle(foreground)
+            .padding(.horizontal, AppSpacing.regular)
+            .padding(.vertical, AppSpacing.small)
+            .background(background, in: Capsule())
     }
 
     private var administeredCount: Int {
@@ -404,37 +428,31 @@ private struct VaccineTimelineRow: View {
                     VaccineBookEntry(vaccine: vaccine)
                 }
                 .buttonStyle(.plain)
-
-                HStack(spacing: AppSpacing.small) {
-                    Button(action: onToggle) {
-                        Label(
-                            vaccine.isAdministered ? "改为待接种" : "记录已接种",
-                            systemImage: vaccine.isAdministered ? "arrow.uturn.left" : "checkmark.circle"
-                        )
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkGreen)
-                        .padding(.horizontal, AppSpacing.medium)
-                        .frame(height: 34)
-                        .background {
-                            Capsule().fill(AppColors.grass.opacity(0.56))
-                        }
+                // 删除收进长按菜单，列表不再常驻垃圾桶。
+                .contextMenu {
+                    Button("编辑") {
+                        onEdit()
                     }
-                    .buttonStyle(.plain)
-
-                    Spacer()
-
-                    Button(action: onDelete) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundStyle(AppColors.coral)
-                            .frame(width: 44, height: 44)
-                            .background {
-                                Circle().fill(AppColors.blush.opacity(0.56))
-                            }
+                    Button("删除", role: .destructive) {
+                        onDelete()
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("删除接种记录")
                 }
+                .accessibilityHint("长按可编辑或删除")
+
+                Button(action: onToggle) {
+                    Label(
+                        vaccine.isAdministered ? "改为待接种" : "记录已接种",
+                        systemImage: vaccine.isAdministered ? "arrow.uturn.left" : "checkmark.circle"
+                    )
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .padding(.horizontal, AppSpacing.medium)
+                    .frame(height: 34)
+                    .background {
+                        Capsule().fill(AppColors.grass.opacity(0.56))
+                    }
+                }
+                .buttonStyle(.plain)
             }
             .padding(.bottom, showsLineBelow ? AppSpacing.medium : 0)
         }
@@ -447,8 +465,15 @@ private struct VaccineBookEntry: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.medium) {
             HStack(alignment: .top, spacing: AppSpacing.medium) {
-                AssetWatercolorImage(name: vaccine.icon, mode: .multiply)
+                // 固定用疫苗语义图标；记录数据里的 icon 字段是历史遗留，
+                // 会出现相机等乱配图标。
+                Image(systemName: vaccine.isAdministered ? "checkmark.shield.fill" : "syringe.fill")
+                    .font(.system(size: 20, weight: .regular))
+                    .foregroundStyle(vaccine.isAdministered ? AppColors.sage : AppColors.coral)
                     .frame(width: 42, height: 42)
+                    .background {
+                        Circle().fill(AppColors.milk.opacity(0.85))
+                    }
                 VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                     Text(vaccine.title.localizedText)
                         .font(AppTypography.bodyLarge)
@@ -505,18 +530,15 @@ private struct VaccineBookEntry: View {
     }
 
     private var rowTint: Color {
-        switch vaccine.tintName {
-        case "blue": AppColors.mistBlue
-        case "green": AppColors.grass
-        default: AppColors.cream
-        }
+        // 低饱和：已接种淡草绿、其余奶油底；不再跟随记录里的 tintName。
+        vaccine.isAdministered ? AppColors.grass.opacity(0.5) : AppColors.cream
     }
 
     private var statusTint: Color {
         switch vaccine.displayStatus {
-        case VaccineRecord.bookedStatus: AppColors.mistBlue
+        case VaccineRecord.bookedStatus: AppColors.mistBlue.opacity(0.6)
         case VaccineRecord.administeredStatus: AppColors.grass
-        default: Color(red: 1.0, green: 0.900, blue: 0.760)
+        default: AppColors.butter.opacity(0.7)
         }
     }
 

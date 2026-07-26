@@ -110,35 +110,31 @@ struct HealthObservationView: View {
     }
 
     private func recordRow(_ record: HealthObservation) -> some View {
-        HStack(spacing: AppSpacing.small) {
+        Button {
+            openEditor(record)
+        } label: {
+            RecordRowView(
+                icon: nil,
+                systemIcon: emptyIcon,
+                time: "\(BabyRecordStore.displayDateString(from: record.occurredAt)) \(BabyRecordStore.timeString(from: record.occurredAt))",
+                title: record.summaryText,
+                detail: record.note ?? "",
+                tint: AppColors.cream
+            )
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
             Button {
                 openEditor(record)
             } label: {
-                RecordRowView(
-                    icon: nil,
-                    systemIcon: emptyIcon,
-                    time: "\(BabyRecordStore.displayDateString(from: record.occurredAt)) \(BabyRecordStore.timeString(from: record.occurredAt))",
-                    title: record.summaryText,
-                    detail: record.note ?? "",
-                    tint: AppColors.cream
-                )
-                .frame(maxWidth: .infinity)
+                Label("编辑", systemImage: "pencil")
             }
-            .buttonStyle(.plain)
-
-            Button {
+            Button(role: .destructive) {
                 deleteCandidate = record
             } label: {
-                Image(systemName: "trash")
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundStyle(AppColors.coral)
-                    .frame(width: 44, height: 44)
-                    .background {
-                        Circle().fill(AppColors.blush.opacity(0.56))
-                    }
+                Label("删除", systemImage: "trash")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("删除记录")
         }
     }
 
@@ -188,9 +184,7 @@ private struct HealthObservationEditorSheet: View {
                             .pickerStyle(.segmented)
                             .tint(AppColors.peach)
 
-                            DatePicker("时间", selection: $occurredAt, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
-                                .font(AppTypography.readableBody)
-                                .tint(AppColors.coral)
+                            QuickTimeField(date: $occurredAt)
 
                             kindFields
                         }
