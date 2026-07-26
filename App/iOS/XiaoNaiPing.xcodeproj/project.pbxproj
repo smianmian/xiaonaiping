@@ -39,6 +39,7 @@
 		7C73FB201C1558B37019DBBA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */; };
 		7D3EC060380FC5C8477255FE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D5A60428958DC54D107046F4 /* Localizable.strings */; };
 		7E3298480C5453C50031A36A /* CloudSyncAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2570435BD160038259ADB5AD /* CloudSyncAPIClient.swift */; };
+		8855E81770DA585D4F12A6D3 /* WHOGrowthReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA85BA18C531AA699BA97166 /* WHOGrowthReference.swift */; };
 		8BF2B8A04D3D083C7BDEF421 /* PaperBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */; };
 		8E3F69F227825C9677BD358C /* SleepRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F36625B424397290C39CC8B /* SleepRecordView.swift */; };
 		91B413B6A8D7B935E732BB32 /* AppNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */; };
@@ -170,6 +171,7 @@
 		ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyRecordStore.swift; sourceTree = "<group>"; };
 		EEE46A4DDE313FEAE7C8B56C /* VaccineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineView.swift; sourceTree = "<group>"; };
 		EF7F1E8851DB82D83B5F8459 /* ScreenScaffold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenScaffold.swift; sourceTree = "<group>"; };
+		FA85BA18C531AA699BA97166 /* WHOGrowthReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHOGrowthReference.swift; sourceTree = "<group>"; };
 		FB32AE135F59AF8AD95D335B /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
 		FBE03F876BF374BCE60D48DB /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -283,6 +285,7 @@
 				D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */,
 				D370C60F71E5A04BFAE44E30 /* VaccineRecord.swift */,
 				D331A6AA53B13F186F5135C0 /* WhiteNoisePlayer.swift */,
+				FA85BA18C531AA699BA97166 /* WHOGrowthReference.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -581,6 +584,7 @@
 				8E3F69F227825C9677BD358C /* SleepRecordView.swift in Sources */,
 				9304481E399CB645C3BAE1B5 /* VaccineRecord.swift in Sources */,
 				148E34DD12347FEFAD1E5FAA /* VaccineView.swift in Sources */,
+				8855E81770DA585D4F12A6D3 /* WHOGrowthReference.swift in Sources */,
 				A080608FFFB5F6F123AE03EA /* WatercolorCard.swift in Sources */,
 				4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */,
 				F9F5FD132F2BAD8D2DB9EC9A /* WechatOpenSDKShim.swift in Sources */,

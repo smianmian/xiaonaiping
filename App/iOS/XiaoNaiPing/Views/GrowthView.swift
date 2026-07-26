@@ -1,4 +1,5 @@
 import SwiftUI
+import Charts
 
 struct GrowthView: View {
     var onOpenMonthlyReport: (() -> Void)?
@@ -109,8 +110,18 @@ struct GrowthView: View {
                     SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
                         .padding(.horizontal, AppSpacing.small)
 
-                    GrowthChartView(records: store.currentBabyGrowthRecords, metric: selectedMetric)
-                        .frame(height: 248)
+                    GrowthChartView(
+                        records: store.currentBabyGrowthRecords,
+                        metric: selectedMetric,
+                        birthDate: store.baby.birthDate,
+                        babySex: store.baby.sex
+                    )
+                    .frame(height: 248)
+
+                    Text("阴影为 WHO 生长标准 P3–P97 参考带（\(store.baby.sex.contains("女") ? "女宝" : "男宝")），虚线为中位数；仅供参考，评估请咨询儿保医生。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     HStack(spacing: AppSpacing.regular) {
                         metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
@@ -457,54 +468,140 @@ struct MonthlyReportDetailView: View {
     }
 }
 
+/// 生长曲线：真实月龄横轴 + WHO P3–P97 参考带 + P50 中位线。
+/// 回答“我娃在什么水平”，而不是只画自身数值的孤立折线。
 private struct GrowthChartView: View {
     let records: [GrowthRecord]
     let metric: String
+    let birthDate: Date
+    let babySex: String
+
+    private struct DataPoint: Identifiable {
+        let id: UUID
+        let ageMonths: Double
+        let value: Double
+    }
 
     var body: some View {
-        GeometryReader { proxy in
-            let size = proxy.size
-            ZStack {
-                ForEach(0..<7, id: \.self) { index in
-                    Path { path in
-                        let y = CGFloat(index) / 6 * (size.height - 52) + 16
-                        path.move(to: CGPoint(x: 52, y: y))
-                        path.addLine(to: CGPoint(x: size.width - 14, y: y))
-                    }
-                    .stroke(AppColors.softStroke.opacity(0.32), style: StrokeStyle(lineWidth: 1, dash: [6, 8]))
+        if dataPoints.isEmpty {
+            Text("添加\(metric)记录后会在这里看到变化")
+                .font(AppTypography.body)
+                .foregroundStyle(AppColors.inkGreen)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            Chart {
+                ForEach(referencePoints, id: \.month) { point in
+                    AreaMark(
+                        x: .value("月龄", Double(point.month)),
+                        yStart: .value("P3", point.p3),
+                        yEnd: .value("P97", point.p97)
+                    )
+                    .foregroundStyle(lineColor.opacity(0.14))
+
+                    LineMark(
+                        x: .value("月龄", Double(point.month)),
+                        y: .value("P50", point.p50),
+                        series: .value("曲线", "P50")
+                    )
+                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 6]))
+                    .foregroundStyle(lineColor.opacity(0.45))
                 }
 
-                if values.isEmpty {
-                    Text("添加\(metric)记录后会在这里看到变化")
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.inkGreen)
-                } else {
-                    chartLine(values: values, range: chartRange, size: size, color: lineColor)
-                }
+                ForEach(dataPoints) { point in
+                    LineMark(
+                        x: .value("月龄", point.ageMonths),
+                        y: .value(metric, point.value),
+                        series: .value("曲线", "宝宝")
+                    )
+                    .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                    .foregroundStyle(lineColor)
 
-                VStack {
-                    Spacer()
-                    HStack {
-                        ForEach(plottedRecords) { record in
-                            Text(record.month)
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppColors.inkGreen)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    .padding(.leading, 52)
-                    .padding(.trailing, 10)
+                    PointMark(
+                        x: .value("月龄", point.ageMonths),
+                        y: .value(metric, point.value)
+                    )
+                    .symbolSize(70)
+                    .foregroundStyle(lineColor)
                 }
             }
+            .chartXScale(domain: 0...windowMaxMonth)
+            .chartYScale(domain: yDomain)
+            .chartXAxis {
+                AxisMarks(values: xAxisTicks) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
+                        .foregroundStyle(AppColors.softStroke.opacity(0.4))
+                    AxisValueLabel {
+                        if let month = value.as(Double.self) {
+                            Text("\(Int(month))月")
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.inkSoft)
+                        }
+                    }
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
+                        .foregroundStyle(AppColors.softStroke.opacity(0.4))
+                    AxisValueLabel {
+                        if let number = value.as(Double.self) {
+                            Text(number.formatted(.number.precision(.fractionLength(0...1))))
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppColors.inkSoft)
+                        }
+                    }
+                }
+            }
+            .accessibilityLabel("\(metric)生长曲线，含 WHO 参考带")
         }
     }
 
-    private var values: [Double] {
-        plottedRecords.map { value(for: $0) }
+    private var whoMetric: WHOGrowthReference.Metric {
+        switch metric {
+        case "身高": .height
+        case "头围": .head
+        default: .weight
+        }
     }
 
-    private var plottedRecords: [GrowthRecord] {
-        records.filter { value(for: $0) > 0 }
+    private var referencePoints: [WHOGrowthReference.Point] {
+        WHOGrowthReference.points(metric: whoMetric, sex: .init(babySex: babySex))
+            .filter { Double($0.month) <= windowMaxMonth }
+    }
+
+    private var dataPoints: [DataPoint] {
+        records.compactMap { record in
+            let value = value(for: record)
+            guard value > 0,
+                  let measuredDate = BabyRecordStore.date(fromDateString: record.measuredAt) else {
+                return nil
+            }
+            let days = Calendar.current.dateComponents([.day], from: birthDate, to: measuredDate).day ?? 0
+            return DataPoint(id: record.id, ageMonths: max(0, Double(days) / 30.4375), value: value)
+        }
+        .sorted { $0.ageMonths < $1.ageMonths }
+    }
+
+    /// 横轴窗口：至少看到 6 个月，随宝宝月龄扩展，上限 24 个月。
+    private var windowMaxMonth: Double {
+        let maxDataAge = dataPoints.map(\.ageMonths).max() ?? 0
+        return min(24, max(6, (maxDataAge + 1.5).rounded(.up)))
+    }
+
+    private var xAxisTicks: [Double] {
+        let step: Double = windowMaxMonth > 12 ? 6 : 2
+        return Array(stride(from: 0, through: windowMaxMonth, by: step))
+    }
+
+    private var yDomain: ClosedRange<Double> {
+        let referenceValues = referencePoints.flatMap { [$0.p3, $0.p97] }
+        let dataValues = dataPoints.map(\.value)
+        let allValues = referenceValues + dataValues
+        guard let minValue = allValues.min(), let maxValue = allValues.max() else {
+            return 0...10
+        }
+        let padding = max((maxValue - minValue) * 0.08, 0.5)
+        return (minValue - padding)...(maxValue + padding)
     }
 
     private func value(for record: GrowthRecord) -> Double {
@@ -518,25 +615,6 @@ private struct GrowthChartView: View {
         }
     }
 
-    private var chartRange: ClosedRange<Double> {
-        let fallback: ClosedRange<Double>
-        switch metric {
-        case "身高":
-            fallback = 45...75
-        case "头围":
-            fallback = 32...48
-        default:
-            fallback = 2...8
-        }
-
-        guard let minValue = values.min(), let maxValue = values.max(), minValue != maxValue else {
-            return fallback
-        }
-
-        let padding = Swift.max((maxValue - minValue) * 0.25, 1)
-        return (minValue - padding)...(maxValue + padding)
-    }
-
     private var lineColor: Color {
         switch metric {
         case "身高":
@@ -545,34 +623,6 @@ private struct GrowthChartView: View {
             AppColors.sage
         default:
             AppColors.coral
-        }
-    }
-
-    private func chartLine(values: [Double], range: ClosedRange<Double>, size: CGSize, color: Color) -> some View {
-        let points = values.enumerated().map { index, value in
-            let availableWidth = size.width - 76
-            let x = 52 + CGFloat(index) / CGFloat(max(values.count - 1, 1)) * availableWidth
-            let normalized = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
-            let y = (size.height - 58) - CGFloat(normalized) * (size.height - 90) + 14
-            return CGPoint(x: x, y: y)
-        }
-
-        return ZStack {
-            Path { path in
-                guard let first = points.first else { return }
-                path.move(to: first)
-                for point in points.dropFirst() {
-                    path.addLine(to: point)
-                }
-            }
-            .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-
-            ForEach(points.indices, id: \.self) { index in
-                Circle()
-                    .fill(color.opacity(0.78))
-                    .frame(width: 10, height: 10)
-                    .position(points[index])
-            }
         }
     }
 }
