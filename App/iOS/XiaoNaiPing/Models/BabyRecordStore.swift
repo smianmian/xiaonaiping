@@ -79,18 +79,33 @@ final class BabyRecordStore: ObservableObject {
 
     var automaticMilestones: [AutomaticMilestone] {
         Self.automaticMilestoneDefinitions.map { definition in
-            let date = Calendar.current.date(
-                byAdding: .day,
-                value: max(0, definition.dayNumber - 1),
-                to: baby.birthDate
-            ) ?? baby.birthDate
+            let date = Self.automaticMilestoneDate(rule: definition.rule, birthDate: baby.birthDate)
+            // 沿用“出生当天是第1天”的口径推导天数。
+            let dayNumber = max(1, (Calendar.current.dateComponents(
+                [.day],
+                from: Calendar.current.startOfDay(for: baby.birthDate),
+                to: Calendar.current.startOfDay(for: date)
+            ).day ?? 0) + 1)
             return AutomaticMilestone(
                 title: definition.title,
-                dayNumber: definition.dayNumber,
+                dayNumber: dayNumber,
                 date: date,
-                daysRemaining: max(0, definition.dayNumber - currentBabyDaysSinceBirth),
-                isReached: currentBabyDaysSinceBirth >= definition.dayNumber
+                daysRemaining: max(0, dayNumber - currentBabyDaysSinceBirth),
+                isReached: currentBabyDaysSinceBirth >= dayNumber
             )
+        }
+    }
+
+    private static func automaticMilestoneDate(rule: AutomaticMilestoneRule, birthDate: Date) -> Date {
+        switch rule {
+        case .days(let days):
+            // 民俗天数口径：满月第30天、百天第100天（出生当天算第1天）。
+            return Calendar.current.date(byAdding: .day, value: max(0, days - 1), to: birthDate) ?? birthDate
+        case .months(let months):
+            return Calendar.current.date(byAdding: .month, value: months, to: birthDate) ?? birthDate
+        case .years(let years):
+            // 周岁按日历年，闰年也落在生日当天。
+            return Calendar.current.date(byAdding: .year, value: years, to: birthDate) ?? birthDate
         }
     }
 
@@ -143,6 +158,42 @@ final class BabyRecordStore: ObservableObject {
 
     var ongoingSleep: SleepRecord? {
         sleepRecords.first { $0.isOngoing }
+    }
+
+    /// 进行中睡眠超过该时长即视为“忘了结束”，统计口径也按此封顶，
+    /// 避免一条忘关的记录让之后每天都显示“睡了一整天”。
+    static let staleOngoingSleepHours = 12
+
+    var staleOngoingSleep: SleepRecord? {
+        guard let ongoing = ongoingSleep else { return nil }
+        return Date() >= Self.ongoingSleepCapDate(ongoing) ? ongoing : nil
+    }
+
+    /// 把忘关的睡眠封口在开始后 12 小时。
+    @discardableResult
+    func capStaleOngoingSleep() -> Bool {
+        guard let stale = staleOngoingSleep,
+              let index = sleepRecords.firstIndex(where: { $0.id == stale.id }) else { return true }
+        let previous = sleepRecords
+        let endDate = Self.ongoingSleepCapDate(stale)
+        let minutes = max(1, Calendar.current.dateComponents([.minute], from: stale.startAt, to: endDate).minute ?? 1)
+        sleepRecords[index].end = Self.timeString(from: endDate)
+        sleepRecords[index].endAt = endDate
+        sleepRecords[index].durationMinutes = minutes
+        sleepRecords[index].duration = Self.durationText(from: minutes)
+        sleepRecords[index].isOngoing = false
+        sleepRecords[index].updatedAt = Date()
+        sleepRecords[index].syncStatus = .localOnly
+        guard saveState() else {
+            sleepRecords = previous
+            return false
+        }
+        return true
+    }
+
+    static func ongoingSleepCapDate(_ record: SleepRecord) -> Date {
+        Calendar.current.date(byAdding: .hour, value: staleOngoingSleepHours, to: record.startAt)
+            ?? record.startAt
     }
 
     var poopCount: Int {
@@ -1588,12 +1639,9 @@ final class BabyRecordStore: ObservableObject {
     static func isSleepRecord(_ record: SleepRecord, on day: Date) -> Bool {
         let dayStart = Calendar.current.startOfDay(for: day)
         let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
-        let endAt = record.endAt ?? Date()
-
-        if record.isOngoing {
-            return record.startAt < dayEnd
-        }
-
+        // 进行中记录按“现在”与 12 小时封顶取较早值，
+        // 忘关的旧记录不再命中之后的每一天。
+        let endAt = record.endAt ?? min(Date(), ongoingSleepCapDate(record))
         return record.startAt < dayEnd && endAt >= dayStart
     }
 
@@ -1604,7 +1652,7 @@ final class BabyRecordStore: ObservableObject {
     static func sleepMinutes(of record: SleepRecord, on day: Date) -> Int {
         let dayStart = Calendar.current.startOfDay(for: day)
         let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
-        let recordEnd = record.endAt ?? min(Date(), dayEnd)
+        let recordEnd = record.endAt ?? min(min(Date(), ongoingSleepCapDate(record)), dayEnd)
         let overlapStart = max(record.startAt, dayStart)
         let overlapEnd = min(recordEnd, dayEnd)
         return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
@@ -1641,9 +1689,21 @@ final class BabyRecordStore: ObservableObject {
             return AppLocalization.format("第%d天", days)
         }
 
-        let months = max(1, days / 30)
-        let remainingDays = days % 30
-        return AppLocalization.format("%d个月%d天", months, remainingDays)
+        // 按日历计算，而不是 30 天一个月：1月31日出生的宝宝
+        // 用 30 天步进会和家长/医生口中的月龄逐月偏移，周岁也会差天。
+        let start = Calendar.current.startOfDay(for: birthDate)
+        let today = Calendar.current.startOfDay(for: Date())
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: start, to: today)
+        let years = components.year ?? 0
+        let months = components.month ?? 0
+        let remainingDays = components.day ?? 0
+
+        if years >= 1 {
+            return months == 0
+                ? AppLocalization.format("%d岁", years)
+                : AppLocalization.format("%d岁%d个月", years, months)
+        }
+        return AppLocalization.format("%d个月%d天", max(1, months), remainingDays)
     }
 
     static func date(fromDisplayDateString value: String) -> Date? {
@@ -1713,13 +1773,19 @@ final class BabyRecordStore: ObservableObject {
         sex: "未设置"
     )
 
-    private static let automaticMilestoneDefinitions: [(title: String, dayNumber: Int)] = [
-        ("满月", 30),
-        ("百天", 100),
-        ("半岁", 183),
-        ("一周岁", 365),
-        ("两周岁", 730),
-        ("三周岁", 1095)
+    enum AutomaticMilestoneRule {
+        case days(Int)
+        case months(Int)
+        case years(Int)
+    }
+
+    private static let automaticMilestoneDefinitions: [(title: String, rule: AutomaticMilestoneRule)] = [
+        ("满月", .days(30)),
+        ("百天", .days(100)),
+        ("半岁", .months(6)),
+        ("一周岁", .years(1)),
+        ("两周岁", .years(2)),
+        ("三周岁", .years(3))
     ]
 
     private static let legacyMockBabyID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
@@ -1867,18 +1933,24 @@ private struct VaccineTemplate {
     var title: String
     var dayOffset: Int
 
+    // 剂次与月龄参照国家免疫规划（大陆）与香港母婴健康院常见计划整理，
+    // 覆盖一岁内全部规划内剂次；模板仅为提醒基准，实际以接种机构安排为准。
     static func templates(for region: String) -> [VaccineTemplate] {
         switch region {
         case BabyRecordStore.hongKongVaccineRegion:
             [
                 VaccineTemplate(title: "乙肝疫苗 第1针", dayOffset: 0),
+                VaccineTemplate(title: "卡介苗", dayOffset: 0),
                 VaccineTemplate(title: "乙肝疫苗 第2针", dayOffset: 30),
                 VaccineTemplate(title: "六联疫苗 第1针", dayOffset: 60),
                 VaccineTemplate(title: "肺炎球菌疫苗 第1针", dayOffset: 60),
                 VaccineTemplate(title: "轮状病毒疫苗 第1剂", dayOffset: 60),
                 VaccineTemplate(title: "六联疫苗 第2针", dayOffset: 120),
                 VaccineTemplate(title: "肺炎球菌疫苗 第2针", dayOffset: 120),
-                VaccineTemplate(title: "麻疹腮腺炎风疹疫苗 第1针", dayOffset: 365)
+                VaccineTemplate(title: "轮状病毒疫苗 第2剂", dayOffset: 120),
+                VaccineTemplate(title: "六联疫苗 第3针", dayOffset: 180),
+                VaccineTemplate(title: "麻疹腮腺炎风疹疫苗 第1针", dayOffset: 365),
+                VaccineTemplate(title: "肺炎球菌疫苗 加强针", dayOffset: 365)
             ]
         default:
             [
@@ -1889,7 +1961,13 @@ private struct VaccineTemplate {
                 VaccineTemplate(title: "百白破疫苗 第1针", dayOffset: 90),
                 VaccineTemplate(title: "脊灰疫苗 第2剂", dayOffset: 90),
                 VaccineTemplate(title: "百白破疫苗 第2针", dayOffset: 120),
-                VaccineTemplate(title: "麻腮风疫苗 第1针", dayOffset: 240)
+                VaccineTemplate(title: "脊灰疫苗 第3剂", dayOffset: 120),
+                VaccineTemplate(title: "百白破疫苗 第3针", dayOffset: 150),
+                VaccineTemplate(title: "乙肝疫苗 第3针", dayOffset: 180),
+                VaccineTemplate(title: "流脑A群疫苗 第1针", dayOffset: 180),
+                VaccineTemplate(title: "麻腮风疫苗 第1针", dayOffset: 240),
+                VaccineTemplate(title: "乙脑减毒活疫苗 第1针", dayOffset: 240),
+                VaccineTemplate(title: "流脑A群疫苗 第2针", dayOffset: 270)
             ]
         }
     }

@@ -23,10 +23,25 @@ enum AppColors {
     static let porcelain = adaptive(light: (0.988, 0.976, 0.957), dark: (0.110, 0.118, 0.125))
     static let hairline = adaptive(light: (0.922, 0.878, 0.831), dark: (0.280, 0.295, 0.300))
 
+    /// 快速记录弹层的睡眠淡紫 / 成长淡青（原先散落在视图里的硬编码 RGB）。
+    static let lavender = adaptive(light: (0.900, 0.880, 0.980), dark: (0.160, 0.150, 0.220))
+    static let celadon = adaptive(light: (0.870, 0.940, 0.940), dark: (0.120, 0.170, 0.170))
+
+    // UIKit 外观（TabBar 等）用的动态色，与上方 SwiftUI 色一一对应。
+    // 夜间模式下 TabBar 不能停留在奶白色。
+    static let milkUIColor = adaptiveUIColor(light: (1.000, 0.988, 0.960), dark: (0.135, 0.145, 0.152))
+    static let softStrokeUIColor = adaptiveUIColor(light: (0.790, 0.715, 0.620), dark: (0.310, 0.330, 0.330))
+    static let tabMutedUIColor = adaptiveUIColor(light: (0.440, 0.515, 0.410), dark: (0.690, 0.760, 0.680))
+    static let coralUIColor = UIColor(red: 0.875, green: 0.360, blue: 0.290, alpha: 1)
+
     private static func adaptive(light: (CGFloat, CGFloat, CGFloat), dark: (CGFloat, CGFloat, CGFloat)) -> Color {
-        Color(UIColor { trait in
+        Color(adaptiveUIColor(light: light, dark: dark))
+    }
+
+    private static func adaptiveUIColor(light: (CGFloat, CGFloat, CGFloat), dark: (CGFloat, CGFloat, CGFloat)) -> UIColor {
+        UIColor { trait in
             let value = trait.userInterfaceStyle == .dark ? dark : light
             return UIColor(red: value.0, green: value.1, blue: value.2, alpha: 1)
-        })
+        }
     }
 }

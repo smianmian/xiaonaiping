@@ -296,18 +296,18 @@ struct RootTabView: View {
     private static func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 1.000, green: 0.988, blue: 0.960, alpha: 1)
-        appearance.shadowColor = UIColor(red: 0.790, green: 0.715, blue: 0.620, alpha: 0.28)
+        appearance.backgroundColor = AppColors.milkUIColor
+        appearance.shadowColor = AppColors.softStrokeUIColor.withAlphaComponent(0.28)
 
         let itemAppearance = UITabBarItemAppearance()
         itemAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.440, green: 0.515, blue: 0.410, alpha: 1)
+            .foregroundColor: AppColors.tabMutedUIColor
         ]
         itemAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.875, green: 0.360, blue: 0.290, alpha: 1)
+            .foregroundColor: AppColors.coralUIColor
         ]
-        itemAppearance.normal.iconColor = UIColor(red: 0.440, green: 0.515, blue: 0.410, alpha: 1)
-        itemAppearance.selected.iconColor = UIColor(red: 0.875, green: 0.360, blue: 0.290, alpha: 1)
+        itemAppearance.normal.iconColor = AppColors.tabMutedUIColor
+        itemAppearance.selected.iconColor = AppColors.coralUIColor
 
         appearance.stackedLayoutAppearance = itemAppearance
         appearance.inlineLayoutAppearance = itemAppearance
@@ -315,8 +315,8 @@ struct RootTabView: View {
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
-        UITabBar.appearance().tintColor = UIColor(red: 0.875, green: 0.360, blue: 0.290, alpha: 1)
-        UITabBar.appearance().unselectedItemTintColor = UIColor(red: 0.440, green: 0.515, blue: 0.410, alpha: 1)
+        UITabBar.appearance().tintColor = AppColors.coralUIColor
+        UITabBar.appearance().unselectedItemTintColor = AppColors.tabMutedUIColor
     }
 
 #if DEBUG

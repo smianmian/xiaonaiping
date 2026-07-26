@@ -53,11 +53,11 @@ enum QuickRecordAction: CaseIterable, Identifiable {
     var tint: Color {
         switch self {
         case .feeding: AppColors.blush
-        case .sleep: Color(red: 0.90, green: 0.88, blue: 0.98)
+        case .sleep: AppColors.lavender
         case .diaper: AppColors.grass
         case .water: AppColors.mistBlue
         case .photo: AppColors.cream
-        case .growth: Color(red: 0.87, green: 0.94, blue: 0.94)
+        case .growth: AppColors.celadon
         case .milestone: AppColors.cream
         }
     }

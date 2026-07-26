@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 #if canImport(WechatOpenSDK)
 import WechatOpenSDK
 #endif
@@ -52,19 +53,19 @@ final class WeChatLoginService: NSObject {
     private var continuation: CheckedContinuation<String, Error>?
     private var expectedState: String?
 
+    /// 只判断“能不能用微信登录”，绝不初始化 SDK。
+    /// registerApp 必须等到用户主动点“微信登录”（requestAuthorizationCode）才调用——
+    /// 这个属性会在登录页渲染时被求值，提前注册即“用户同意前初始化第三方 SDK”。
     var isNativeLoginAvailable: Bool {
         guard CloudSyncConfiguration.isWeChatLoginConfigured,
-              let appID = CloudSyncConfiguration.weChatAppID,
-              let universalLink = CloudSyncConfiguration.weChatUniversalLink else {
-            return false
-        }
-
-        guard WXApi.registerApp(appID, universalLink: universalLink.absoluteString) else {
+              CloudSyncConfiguration.weChatAppID != nil,
+              CloudSyncConfiguration.weChatUniversalLink != nil else {
             return false
         }
 
         #if canImport(WechatOpenSDK)
-        return WXApi.isWXAppInstalled() && WXApi.isWXAppSupport()
+        guard let weixinURL = URL(string: "weixin://") else { return false }
+        return UIApplication.shared.canOpenURL(weixinURL)
         #else
         return false
         #endif

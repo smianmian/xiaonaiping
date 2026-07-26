@@ -31,7 +31,34 @@ struct SleepRecordView: View {
                 // 进行中卡片的实时时长每 30 秒自己走。
                 TimelineView(.periodic(from: .now, by: 30)) { _ in
                 VStack(spacing: AppSpacing.large) {
-                    if let ongoing = store.ongoingSleep {
+                    if let stale = store.staleOngoingSleep {
+                        WatercolorCard(tint: AppColors.butter.opacity(0.6), cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+                            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                                Label("这段睡眠已经超过 \(BabyRecordStore.staleOngoingSleepHours) 小时", systemImage: "exclamationmark.circle")
+                                    .font(AppTypography.cardTitle)
+                                    .foregroundStyle(AppColors.inkGreen)
+                                Text("从 \(stale.start) 开始一直没结束，是不是忘了关？统计已按 \(BabyRecordStore.staleOngoingSleepHours) 小时封顶。")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                HStack(spacing: AppSpacing.medium) {
+                                    Button("按 \(BabyRecordStore.staleOngoingSleepHours) 小时结束") {
+                                        store.capStaleOngoingSleep()
+                                    }
+                                    .font(AppTypography.body.weight(.semibold))
+                                    .foregroundStyle(AppColors.milk)
+                                    .padding(.horizontal, AppSpacing.regular)
+                                    .padding(.vertical, AppSpacing.small)
+                                    .background(AppColors.coral, in: Capsule())
+                                    Button("删除这条") {
+                                        deleteCandidate = stale
+                                    }
+                                    .font(AppTypography.body)
+                                    .foregroundStyle(AppColors.coral)
+                                }
+                            }
+                        }
+                    } else if let ongoing = store.ongoingSleep {
                         WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
                             HStack(spacing: AppSpacing.medium) {
                                 Image(systemName: "moon.zzz")

@@ -75,11 +75,13 @@ enum AppNotificationScheduler {
     }
 
     static func removeVaccineReminder(_ record: VaccineRecord) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [vaccineIdentifier(record)])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [vaccineIdentifier(record), vaccineAdvanceIdentifier(record)]
+        )
     }
 
     static func removeVaccineReminders(_ records: [VaccineRecord]) {
-        let identifiers = records.map { vaccineIdentifier($0) }
+        let identifiers = records.map { vaccineIdentifier($0) } + records.map { vaccineAdvanceIdentifier($0) }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
@@ -148,26 +150,46 @@ enum AppNotificationScheduler {
     }
 
     private static func addReminder(record: VaccineRecord, dueDate: Date, completion: @escaping (NotificationScheduleResult) -> Void) {
+        removeVaccineReminder(record)
+
+        // 到期当天 09:00 提醒。
+        let dayOfRequest = vaccineRequest(
+            identifier: vaccineIdentifier(record),
+            date: dueDate,
+            body: AppLocalization.format("%@ 今天有提醒，日期可按实际情况调整。", record.title.localizedText)
+        )
+
+        // 提前 3 天 09:00 再提醒一次，给预约留出时间。
+        var advanceRequest: UNNotificationRequest?
+        if let advanceDate = Calendar.current.date(byAdding: .day, value: -vaccineAdvanceLeadDays, to: dueDate),
+           advanceDate > Date() {
+            advanceRequest = vaccineRequest(
+                identifier: vaccineAdvanceIdentifier(record),
+                date: advanceDate,
+                body: AppLocalization.format("%@ 还有%d天到期，可以先和接种点确认时间。", record.title.localizedText, vaccineAdvanceLeadDays)
+            )
+        }
+
+        UNUserNotificationCenter.current().add(dayOfRequest) { error in
+            if let advanceRequest {
+                UNUserNotificationCenter.current().add(advanceRequest) { _ in }
+            }
+            complete(error == nil ? .scheduled : .failed, completion: completion)
+        }
+    }
+
+    private static func vaccineRequest(identifier: String, date: Date, body: String) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = "小奶瓶疫苗提醒".localizedText
-        content.body = AppLocalization.format("%@ 今天有提醒，日期可按实际情况调整。", record.title.localizedText)
+        content.body = body
         content.sound = .default
 
-        var components = Calendar.current.dateComponents([.year, .month, .day], from: dueDate)
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: date)
         components.hour = 9
         components.minute = 0
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(
-            identifier: vaccineIdentifier(record),
-            content: content,
-            trigger: trigger
-        )
-
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [vaccineIdentifier(record)])
-        UNUserNotificationCenter.current().add(request) { error in
-            complete(error == nil ? .scheduled : .failed, completion: completion)
-        }
+        return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
     }
 
     // 喝奶提醒是“N 小时后”的相对时间，必须用时间间隔触发器：
@@ -205,6 +227,12 @@ enum AppNotificationScheduler {
     private static func vaccineIdentifier(_ record: VaccineRecord) -> String {
         "xiaonaiping.vaccine.\(record.id.uuidString)"
     }
+
+    private static func vaccineAdvanceIdentifier(_ record: VaccineRecord) -> String {
+        "xiaonaiping.vaccine.advance.\(record.id.uuidString)"
+    }
+
+    private static let vaccineAdvanceLeadDays = 3
 
     private static func feedingReminderDates(for reminder: FeedingReminder, repeatIntervalMinutes: Int?) -> [Date] {
         guard reminder.remindAt > Date() else { return [] }
