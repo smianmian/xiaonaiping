@@ -73,7 +73,7 @@ struct VaccineView: View {
                         Text(AppLocalization.format("%@的疫苗本", store.baby.name))
                             .font(AppTypography.title)
                             .foregroundStyle(AppColors.inkGreen)
-                        Text(AppLocalization.format("已接种 %d / %d 针", administeredCount, store.vaccineRecords.count))
+                        Text(shieldSubtitle)
                             .font(AppTypography.body)
                             .foregroundStyle(AppColors.inkSoft)
                     }
@@ -82,8 +82,10 @@ struct VaccineView: View {
                         .frame(width: 104, height: 82)
                 }
 
-                ProgressView(value: vaccinationProgress)
-                    .tint(AppColors.coral)
+                // 集盾牌打卡册：每一针一枚小盾牌，点亮 = 已接种。
+                if !store.vaccineRecords.isEmpty {
+                    shieldCollectionGrid
+                }
 
                 Divider()
                     .overlay(AppColors.inkGreen.opacity(0.12))
@@ -118,7 +120,43 @@ struct VaccineView: View {
         }
     }
 
+    /// 已按某个地区生成过模板后，另一个地区的选项隐藏，
+    /// 模板卡收敛成一行紧凑说明 + “补全剂次”入口。
+    @ViewBuilder
     private var templateSection: some View {
+        if let region = generatedTemplateRegion {
+            WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.medium) {
+                    Image(systemName: "text.badge.checkmark")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundStyle(AppColors.sage)
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text(AppLocalization.format("接种模板 · %@", region.localizedText))
+                            .font(AppTypography.cardTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text("计划日期按宝宝生日生成，可在每条记录里修改。")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    Spacer(minLength: 0)
+                    Button("补全剂次") {
+                        selectedTemplateRegion = region
+                        generateSelectedTemplate()
+                    }
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.blueInk)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .onAppear {
+                selectedTemplateRegion = region
+            }
+        } else {
+            templatePickerCard
+        }
+    }
+
+    private var templatePickerCard: some View {
         WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 HStack {
@@ -149,6 +187,50 @@ struct VaccineView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    /// 已生成模板的地区（大陆优先）；没生成过则为 nil。
+    private var generatedTemplateRegion: String? {
+        let regions = Set(store.vaccineRecords.map { BabyRecordStore.normalizedVaccineRegion($0.region) })
+        if regions.contains(BabyRecordStore.mainlandVaccineRegion) {
+            return BabyRecordStore.mainlandVaccineRegion
+        }
+        if regions.contains(BabyRecordStore.hongKongVaccineRegion) {
+            return BabyRecordStore.hongKongVaccineRegion
+        }
+        return nil
+    }
+
+    private var shieldSubtitle: String {
+        store.vaccineRecords.isEmpty
+            ? "生成模板或新增记录，开始集小盾牌"
+            : AppLocalization.format("已集 %d / %d 枚小盾牌", administeredCount, store.vaccineRecords.count)
+    }
+
+    private var sortedShieldRecords: [VaccineRecord] {
+        store.vaccineRecords.sorted { ($0.dueDays ?? Int.max) < ($1.dueDays ?? Int.max) }
+    }
+
+    private var shieldCollectionGrid: some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.small), count: 7),
+            spacing: AppSpacing.small
+        ) {
+            ForEach(sortedShieldRecords) { record in
+                shieldBadge(for: record)
+            }
+        }
+    }
+
+    private func shieldBadge(for record: VaccineRecord) -> some View {
+        let administered = record.isAdministered
+        let overdue = !administered && store.vaccineDaysUntil(record) < 0
+        return Image(systemName: administered ? "checkmark.shield.fill" : (overdue ? "exclamationmark.shield.fill" : "shield"))
+            .font(.system(size: 21, weight: .regular))
+            .foregroundStyle(administered ? AppColors.sage : (overdue ? AppColors.peach : AppColors.inkSoft.opacity(0.4)))
+            .frame(maxWidth: .infinity)
+            .frame(height: 32)
+            .accessibilityLabel("\(record.title)，\(administered ? "已接种" : (overdue ? "已过计划日期" : "待接种"))")
     }
 
     private var timelineSection: some View {
@@ -404,12 +486,13 @@ private struct VaccineTimelineRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.medium) {
             VStack(spacing: 0) {
-                Circle()
-                    .fill(vaccine.isAdministered ? AppColors.grass : AppColors.coral)
-                    .frame(width: 14, height: 14)
-                    .overlay {
-                        Circle()
-                            .stroke(AppColors.paper, lineWidth: 3)
+                // 时间线节点也用小盾牌：亮起 = 已接种。
+                Image(systemName: vaccine.isAdministered ? "checkmark.shield.fill" : "shield")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(vaccine.isAdministered ? AppColors.sage : AppColors.coral.opacity(0.75))
+                    .frame(width: 22, height: 22)
+                    .background {
+                        Circle().fill(AppColors.paper)
                     }
                 if showsLineBelow {
                     Rectangle()
@@ -422,7 +505,10 @@ private struct VaccineTimelineRow: View {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
                 Text(ageLabel)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.inkSoft)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(AppColors.grass.opacity(0.4), in: Capsule())
 
                 Button(action: onEdit) {
                     VaccineBookEntry(vaccine: vaccine)
