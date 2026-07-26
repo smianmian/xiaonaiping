@@ -224,3 +224,39 @@ final class MilestoneDateTests: XCTestCase {
         }, Calendar.current.startOfDay(for: date))
     }
 }
+
+/// 睡眠口径统一防回归：跨月/跨午夜按重叠裁剪，不双计。
+final class SleepClippingTests: XCTestCase {
+    func testCrossMonthSleepIsClippedPerMonth() {
+        // 6月30日 23:00 → 7月1日 07:00：6月只算 60 分钟，7月只算 420 分钟。
+        var june = DateComponents(); june.year = 2026; june.month = 6; june.day = 30; june.hour = 23
+        var july = DateComponents(); july.year = 2026; july.month = 7; july.day = 1; july.hour = 7
+        let start = Calendar.current.date(from: june)!
+        let end = Calendar.current.date(from: july)!
+        let record = SleepRecord(
+            startAt: start, endAt: end,
+            start: "23:00", end: "07:00",
+            type: "夜睡", duration: "8小时", icon: "x",
+            durationMinutes: 480
+        )
+        let juneMinutes = BabyRecordStore.sleepMinutes(of: record, inMonthOf: start)
+        let julyMinutes = BabyRecordStore.sleepMinutes(of: record, inMonthOf: end)
+        XCTAssertEqual(juneMinutes, 60)
+        XCTAssertEqual(julyMinutes, 420)
+        XCTAssertEqual(juneMinutes + julyMinutes, 480)
+    }
+
+    func testStaleOngoingSleepCappedInStats() {
+        // 3 天前开始、忘了结束的记录：当天统计按 12 小时封顶，今天不计入。
+        let start = Calendar.current.date(byAdding: .day, value: -3, to: Date())!
+        let record = SleepRecord(
+            startAt: start, endAt: nil,
+            start: "21:00", end: "进行中",
+            type: "夜睡", duration: "进行中", icon: "x",
+            isOngoing: true
+        )
+        XCTAssertFalse(BabyRecordStore.isSleepRecord(record, on: Date()))
+        let startDayMinutes = BabyRecordStore.sleepMinutes(of: record, on: start)
+        XCTAssertLessThanOrEqual(startDayMinutes, BabyRecordStore.staleOngoingSleepHours * 60)
+    }
+}

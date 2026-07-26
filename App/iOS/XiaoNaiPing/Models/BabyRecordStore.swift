@@ -441,7 +441,11 @@ final class BabyRecordStore: ObservableObject {
         }
         let latest = monthlyGrowth.last
         let previous = monthlyGrowth.dropLast().last
-        let sleepMinutes = monthlySleep.compactMap(\.durationMinutes).reduce(0, +)
+        // 与“今日”口径一致：按与本月重叠的分钟数裁剪，
+        // 跨月夜睡不再在两个月里各计一次全额。
+        let sleepMinutes = monthlySleep
+            .map { Self.sleepMinutes(of: $0, inMonthOf: monthDate) }
+            .reduce(0, +)
 
         return MonthlyReportSnapshot(
             monthTitle: Self.reportMonthString(from: monthDate),
@@ -1665,8 +1669,18 @@ final class BabyRecordStore: ObservableObject {
     private static func isSameMonthSleepRecord(_ record: SleepRecord, monthDate: Date) -> Bool {
         let monthStart = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: monthDate)) ?? monthDate
         let nextMonthStart = Calendar.current.date(byAdding: .month, value: 1, to: monthStart) ?? monthDate
-        let endAt = record.endAt ?? Date()
+        // 进行中记录同样按 12 小时封顶，忘关的记录不会命中之后每个月。
+        let endAt = record.endAt ?? min(Date(), ongoingSleepCapDate(record))
         return record.startAt < nextMonthStart && endAt >= monthStart
+    }
+
+    static func sleepMinutes(of record: SleepRecord, inMonthOf monthDate: Date) -> Int {
+        let monthStart = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: monthDate)) ?? monthDate
+        let nextMonthStart = Calendar.current.date(byAdding: .month, value: 1, to: monthStart) ?? monthDate
+        let recordEnd = record.endAt ?? min(min(Date(), ongoingSleepCapDate(record)), nextMonthStart)
+        let overlapStart = max(record.startAt, monthStart)
+        let overlapEnd = min(recordEnd, nextMonthStart)
+        return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
     }
 
     private static func sleepSortDate(_ record: SleepRecord) -> Date {

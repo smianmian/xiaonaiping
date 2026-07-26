@@ -144,7 +144,7 @@ struct SleepRecordView: View {
                                         HStack(spacing: AppSpacing.medium) {
                                             AssetWatercolorImage(name: record.icon, mode: .multiply)
                                                 .frame(width: 36, height: 36)
-                                            Text("\(record.start) → \(record.end)")
+                                            Text(timeRangeText(record))
                                                 .font(AppTypography.bodyLarge)
                                                 .foregroundStyle(AppColors.ink)
                                             Spacer()
@@ -232,6 +232,15 @@ struct SleepRecordView: View {
     private func ongoingDurationText(_ record: SleepRecord) -> String {
         let minutes = max(0, Calendar.current.dateComponents([.minute], from: record.startAt, to: Date()).minute ?? 0)
         return BabyRecordStore.durationText(from: minutes)
+    }
+
+    /// 跨午夜的记录标注“次日”，避免“20:30 → 06:40”与当日总时长对不上时被当成算错。
+    private func timeRangeText(_ record: SleepRecord) -> String {
+        guard let endAt = record.endAt,
+              !Calendar.current.isDate(endAt, inSameDayAs: record.startAt) else {
+            return "\(record.start) → \(record.end)"
+        }
+        return "\(record.start) → 次日\(record.end)"
     }
 
     private var deleteAlertBinding: Binding<Bool> {
