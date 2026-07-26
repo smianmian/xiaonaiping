@@ -10,6 +10,8 @@ struct Milestone: Identifiable, Equatable, Codable {
     var note: String? = nil
     /// 纪念日的真实日期。新保存的记录必填；旧数据由 store 尽力回填。
     var occurredAt: Date? = nil
+    /// 家人共享 LWW 用的最后修改时间；旧数据缺省回退到 distantPast。
+    var updatedAt: Date = Date()
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -18,6 +20,7 @@ struct Milestone: Identifiable, Equatable, Codable {
         case icon
         case note
         case occurredAt
+        case updatedAt
     }
 }
 
@@ -30,6 +33,7 @@ extension Milestone {
         icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? ""
         note = try container.decodeIfPresent(String.self, forKey: .note)
         occurredAt = try container.decodeIfPresent(Date.self, forKey: .occurredAt)
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? .distantPast
     }
 }
 

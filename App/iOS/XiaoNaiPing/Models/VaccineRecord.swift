@@ -16,6 +16,8 @@ struct VaccineRecord: Identifiable, Equatable, Codable {
     var region: String? = nil
     var note: String? = nil
     var administeredAt: Date? = nil
+    /// 家人共享 LWW 用的最后修改时间；旧数据缺省回退到 distantPast。
+    var updatedAt: Date = Date()
 
     var isAdministered: Bool {
         status == Self.administeredStatus || status == Self.legacyCompletedStatus
@@ -36,6 +38,7 @@ struct VaccineRecord: Identifiable, Equatable, Codable {
         case region
         case note
         case administeredAt
+        case updatedAt
     }
 }
 
@@ -52,5 +55,6 @@ extension VaccineRecord {
         region = try container.decodeIfPresent(String.self, forKey: .region)
         note = try container.decodeIfPresent(String.self, forKey: .note)
         administeredAt = try container.decodeIfPresent(Date.self, forKey: .administeredAt)
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? .distantPast
     }
 }

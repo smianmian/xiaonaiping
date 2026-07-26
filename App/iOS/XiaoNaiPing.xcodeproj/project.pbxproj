@@ -31,6 +31,7 @@
 		52B56A3AE44424AAE287BDA6 /* WhiteNoisePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D331A6AA53B13F186F5135C0 /* WhiteNoisePlayer.swift */; };
 		56A1DF4E181FE8D54BF0D46C /* XiaoNaiPingShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D315629FD77515777DB966C /* XiaoNaiPingShared.swift */; };
 		5CA0A32C7D4B8DA410558854 /* BabyRecordStorePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B245E6A8AB01E97E89F7D55 /* BabyRecordStorePersistenceTests.swift */; };
+		5DC5115B345BF039B590D513 /* FamilySyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC89247E294755B419F3F4E0 /* FamilySyncEngine.swift */; };
 		653349C55CE087BE7F213C50 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F6FCCFED5808C93CB273B8C /* Localizable.strings */; };
 		6D1866E7072EC8D5D8A08D98 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA5406401F6B0DCAB9B4932C /* WebKit.framework */; };
 		6DECF636037A6A62D9CC5CB0 /* CloudAccountSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A360D672497C7D6D2D126760 /* CloudAccountSessionStore.swift */; };
@@ -54,6 +55,7 @@
 		BF2AF9006E03D7462BA5AF0E /* SegmentedPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9423C7088F74F67315CFFAA6 /* SegmentedPill.swift */; };
 		BFDB9200F73A506C32B15517 /* white_noise_dryer.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */; };
 		C14A3ECE673DFAC77BBDED69 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791351B6EE995D204D3BF2C /* AppLocalization.swift */; };
+		C1F941022B86C854D9221E47 /* FamilySync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC446FD570386672F6A5AC8 /* FamilySync.swift */; };
 		C498D18CD24F9328A97581AC /* CloudSyncModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058526A113C98D420C2FAA02 /* CloudSyncModels.swift */; };
 		CBF66084260E232F386E1786 /* AssetWatercolorImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24CD9A96CF3973AC7CF2CC5 /* AssetWatercolorImage.swift */; };
 		CE7DB93409E9D88F14212095 /* AppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */; };
@@ -128,6 +130,7 @@
 		47CE747390DA5D850A154CF2 /* XiaoNaiPingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiaoNaiPingApp.swift; sourceTree = "<group>"; };
 		4BF806768531E34A93C8CF2C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		51FFE1DFE6C7862FD672D7BF /* GrowthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthView.swift; sourceTree = "<group>"; };
+		5CC446FD570386672F6A5AC8 /* FamilySync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySync.swift; sourceTree = "<group>"; };
 		5F36625B424397290C39CC8B /* SleepRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRecordView.swift; sourceTree = "<group>"; };
 		606AE8CC76D08DC19404DE5A /* DiaperRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaperRecord.swift; sourceTree = "<group>"; };
 		627E676DD737818C286AD35F /* XiaoNaiPingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = XiaoNaiPingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -155,6 +158,7 @@
 		B7CBB8D388EB582D25BE9B62 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hant-HK.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		B80EFE791523D472A39871F2 /* XiaoNaiPingWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XiaoNaiPingWidgets.entitlements; sourceTree = "<group>"; };
 		BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassTabBar.swift; sourceTree = "<group>"; };
+		BC89247E294755B419F3F4E0 /* FamilySyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySyncEngine.swift; sourceTree = "<group>"; };
 		BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAssets.swift; sourceTree = "<group>"; };
 		C791351B6EE995D204D3BF2C /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
 		CECC716FF8EABAB5EB679136 /* WatercolorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatercolorCard.swift; sourceTree = "<group>"; };
@@ -274,6 +278,7 @@
 				8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */,
 				ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */,
 				606AE8CC76D08DC19404DE5A /* DiaperRecord.swift */,
+				5CC446FD570386672F6A5AC8 /* FamilySync.swift */,
 				1AFE2FD299FC259D24148966 /* FeedingRecord.swift */,
 				13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */,
 				20CE26483B31F89D43F85E8E /* GrowthRecord.swift */,
@@ -341,6 +346,7 @@
 				2570435BD160038259ADB5AD /* CloudSyncAPIClient.swift */,
 				838A938A99E6E6295D2DEE1D /* CloudSyncController.swift */,
 				058526A113C98D420C2FAA02 /* CloudSyncModels.swift */,
+				BC89247E294755B419F3F4E0 /* FamilySyncEngine.swift */,
 				11309ACBEDD768C59F5433D6 /* RecordExportService.swift */,
 				327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */,
 				985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */,
@@ -555,6 +561,8 @@
 				D5F93695C59B96BF2A49EA3D /* DaySwitcherBar.swift in Sources */,
 				194395CFEB808694D6C9A8AF /* DiaperRecord.swift in Sources */,
 				2789B2894670943DB6B8637F /* DiaperRecordView.swift in Sources */,
+				C1F941022B86C854D9221E47 /* FamilySync.swift in Sources */,
+				5DC5115B345BF039B590D513 /* FamilySyncEngine.swift in Sources */,
 				D01BA75DF5308E03E5A8FFAA /* FeedingRecord.swift in Sources */,
 				9866A0C87F4060DCEF3F110A /* FeedingRecordView.swift in Sources */,
 				79ED2B9DD8CD0DB19CA54741 /* FeedingReminderLiveActivityController.swift in Sources */,

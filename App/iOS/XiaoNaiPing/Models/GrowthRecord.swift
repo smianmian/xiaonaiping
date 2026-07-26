@@ -8,6 +8,8 @@ struct GrowthRecord: Identifiable, Equatable, Codable {
     var head: Double
     var measuredAt: String = ""
     var note: String? = nil
+    /// 家人共享 LWW 用的最后修改时间；旧数据缺省回退到 distantPast。
+    var updatedAt: Date = Date()
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -17,6 +19,7 @@ struct GrowthRecord: Identifiable, Equatable, Codable {
         case head
         case measuredAt
         case note
+        case updatedAt
     }
 }
 
@@ -30,5 +33,6 @@ extension GrowthRecord {
         head = try container.decodeIfPresent(Double.self, forKey: .head) ?? 0
         measuredAt = try container.decodeIfPresent(String.self, forKey: .measuredAt) ?? ""
         note = try container.decodeIfPresent(String.self, forKey: .note)
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? .distantPast
     }
 }

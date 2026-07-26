@@ -686,6 +686,7 @@ private struct DataStatusSheet: View {
     let kind: DataStatusKind
     @ObservedObject var cloudSync: CloudSyncController
     @EnvironmentObject private var store: BabyRecordStore
+    @EnvironmentObject private var familySync: FamilySyncEngine
     @Environment(\.dismiss) private var dismiss
     @State private var isCloudDeletePresented = false
     @State private var isSignOutPresented = false
@@ -695,6 +696,8 @@ private struct DataStatusSheet: View {
     @State private var isPhoneCodeRequested = false
     @State private var exportFileURL: ExportFileItem?
     @State private var exportErrorMessage: String?
+    @State private var familyInviteCodeInput = ""
+    @State private var familySyncMessage: String?
     @FocusState private var focusedPhoneLoginField: PhoneLoginField?
 
     var body: some View {
@@ -786,9 +789,100 @@ private struct DataStatusSheet: View {
                     weChatLoginSection
                 }
             }
+            if cloudSync.hasSession {
+                familySharingSection
+            }
             statusRow(icon: "arrow.clockwise", title: "换机恢复", value: "同一账号", detail: "在新手机用同一个手机号或微信登录后，可恢复服务器中的资料。")
             statusRow(icon: "trash", title: "删除账号", value: "App 内可用", detail: "删除账号会删除云端记录、照片和账号信息。")
             actionButtons
+        }
+    }
+
+    /// 家人共享：妈妈/爸爸/家人各自登录自己的账号，通过邀请码共享同一份记录。
+    private var familySharingSection: some View {
+        WatercolorCard(tint: AppColors.grass.opacity(0.55), cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Label("家人共享", systemImage: "person.2.fill")
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.inkGreen)
+
+                if let family = familySync.familyInfo {
+                    HStack {
+                        Text("邀请码")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.ink)
+                        Text(family.inviteCode)
+                            .font(AppTypography.bodyLarge.weight(.semibold).monospaced())
+                            .foregroundStyle(AppColors.coral)
+                        Button {
+                            UIPasteboard.general.string = family.inviteCode
+                            familySyncMessage = "邀请码已复制，发给家人即可。"
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                                .font(.system(size: 14))
+                                .foregroundStyle(AppColors.blueInk)
+                                .frame(width: 32, height: 32)
+                        }
+                        .buttonStyle(.plain)
+                        Spacer()
+                        Text("成员 \(family.memberCount)/6")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    Text("家人用自己的账号登录后，在这里输入邀请码即可看到并共同记录。喂养、睡眠、排便、喝水、成长、疫苗和纪念日会互相同步；照片仍归各自账号。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if familySync.isSyncing {
+                        Text("正在同步…")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.blueInk)
+                    } else if let status = familySync.statusText {
+                        Text(status)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    PrimaryWatercolorButton(title: "立即同步", tint: AppColors.cream, foreground: AppColors.inkGreen) {
+                        Task { await familySync.syncNow(store: store) }
+                    }
+                    .disabled(familySync.isSyncing)
+                } else {
+                    Text("和爸爸/家人共同记录：一人创建家庭拿到邀请码，其他人输入邀请码加入。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .fixedSize(horizontal: false, vertical: true)
+                    PrimaryWatercolorButton(title: "创建家庭", tint: AppColors.cream, foreground: AppColors.inkGreen) {
+                        Task {
+                            await familySync.createFamily()
+                        }
+                    }
+                    HStack(spacing: AppSpacing.small) {
+                        TextField("输入家人的邀请码", text: $familyInviteCodeInput)
+                            .textInputAutocapitalization(.characters)
+                            .autocorrectionDisabled()
+                            .textFieldStyle(.roundedBorder)
+                        Button("加入") {
+                            let code = familyInviteCodeInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !code.isEmpty else { return }
+                            Task {
+                                await familySync.joinFamily(inviteCode: code, store: store)
+                            }
+                        }
+                        .font(AppTypography.body.weight(.semibold))
+                        .foregroundStyle(AppColors.coral)
+                    }
+                }
+
+                if let message = familySync.errorMessage ?? familySyncMessage {
+                    Text(message)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(familySync.errorMessage == nil ? AppColors.inkSoft : AppColors.coral)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .task {
+            await familySync.refreshMembership()
         }
     }
 

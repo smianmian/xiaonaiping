@@ -22,6 +22,7 @@ struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var store: BabyRecordStore
     @StateObject private var cloudSync = CloudSyncController()
+    @StateObject private var familySync = FamilySyncEngine()
     @State private var selectedTab: AppTab
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
@@ -73,12 +74,17 @@ struct RootTabView: View {
         .preferredColorScheme(nightModeEnabled ? .dark : nil)
         .environmentObject(store)
         .environmentObject(cloudSync)
+        .environmentObject(familySync)
         .onAppear(perform: syncFeedingReminderLiveActivity)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 syncFeedingReminderLiveActivity()
                 Task {
                     await cloudSync.syncIfNeeded(store: store)
+                }
+                Task {
+                    await familySync.refreshMembership()
+                    await familySync.syncNow(store: store)
                 }
             }
             if phase == .background {
@@ -88,6 +94,7 @@ struct RootTabView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
             cloudSync.scheduleAutomaticSync(store: store)
+            familySync.scheduleAutomaticSync(store: store)
         }
         .onOpenURL { url in
             handleQuickLogURL(url)

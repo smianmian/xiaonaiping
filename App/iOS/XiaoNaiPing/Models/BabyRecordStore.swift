@@ -51,6 +51,8 @@ final class BabyRecordStore: ObservableObject {
     @Published var saveErrorMessage: String?
     @Published var loadErrorMessage: String?
     private(set) var isPersistenceBlocked = false
+    /// 本地删除的墓碑（家人共享用）：推送后保留 90 天，保证晚上线设备收到删除。
+    private(set) var familyTombstones: [FamilyTombstone] = []
 
     private let fileManager = FileManager.default
     private let userDefaults = UserDefaults.standard
@@ -593,6 +595,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteFeedingRecord(_ record: FeedingRecord) -> Bool {
         let previous = feedingRecords
+        recordFamilyTombstone(type: "feeding", id: record.id)
         feedingRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             feedingRecords = previous
@@ -622,6 +625,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteWaterRecord(_ record: WaterRecord) -> Bool {
         let previous = waterRecords
+        recordFamilyTombstone(type: "water", id: record.id)
         waterRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             waterRecords = previous
@@ -728,6 +732,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteSleepRecord(_ record: SleepRecord) -> Bool {
         let previous = sleepRecords
+        recordFamilyTombstone(type: "sleep", id: record.id)
         sleepRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             sleepRecords = previous
@@ -802,6 +807,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteDiaperRecord(_ record: DiaperRecord) -> Bool {
         let previous = diaperRecords
+        recordFamilyTombstone(type: "diaper", id: record.id)
         diaperRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             diaperRecords = previous
@@ -813,10 +819,12 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func upsert(_ record: GrowthRecord) -> Bool {
         let previous = growthRecords
-        if let index = growthRecords.firstIndex(where: { $0.id == record.id }) {
-            growthRecords[index] = record
+        var saved = record
+        saved.updatedAt = Date()
+        if let index = growthRecords.firstIndex(where: { $0.id == saved.id }) {
+            growthRecords[index] = saved
         } else {
-            growthRecords.append(record)
+            growthRecords.append(saved)
         }
         guard saveState() else {
             growthRecords = previous
@@ -828,6 +836,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteGrowthRecord(_ record: GrowthRecord) -> Bool {
         let previous = growthRecords
+        recordFamilyTombstone(type: "growth", id: record.id)
         growthRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             growthRecords = previous
@@ -840,6 +849,7 @@ final class BabyRecordStore: ObservableObject {
     func upsert(_ record: VaccineRecord) -> Bool {
         let previous = vaccineRecords
         var saved = record
+        saved.updatedAt = Date()
         saved.region = Self.normalizedVaccineRegion(record.region)
         if saved.status == VaccineRecord.legacyCompletedStatus {
             saved.status = VaccineRecord.administeredStatus
@@ -859,6 +869,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteVaccineRecord(_ record: VaccineRecord) -> Bool {
         let previous = vaccineRecords
+        recordFamilyTombstone(type: "vaccine", id: record.id)
         vaccineRecords.removeAll { $0.id == record.id }
         guard saveState() else {
             vaccineRecords = previous
@@ -892,10 +903,12 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func upsert(_ milestone: Milestone) -> Bool {
         let previous = milestones
-        if let index = milestones.firstIndex(where: { $0.id == milestone.id }) {
-            milestones[index] = milestone
+        var saved = milestone
+        saved.updatedAt = Date()
+        if let index = milestones.firstIndex(where: { $0.id == saved.id }) {
+            milestones[index] = saved
         } else {
-            milestones.insert(milestone, at: 0)
+            milestones.insert(saved, at: 0)
         }
         guard saveState() else {
             milestones = previous
@@ -907,6 +920,7 @@ final class BabyRecordStore: ObservableObject {
     @discardableResult
     func deleteMilestone(_ milestone: Milestone) -> Bool {
         let previous = milestones
+        recordFamilyTombstone(type: "milestone", id: milestone.id)
         milestones.removeAll { $0.id == milestone.id }
         guard saveState() else {
             milestones = previous
@@ -1383,6 +1397,7 @@ final class BabyRecordStore: ObservableObject {
         babyPhotos = state.babyPhotos
         quietCareModeEnabled = state.quietCareModeEnabled
         feedingLiveActivityEnabled = state.feedingLiveActivityEnabled
+        familyTombstones = state.familyTombstones
         photoCount = babyPhotos.count
         loadAvatarFromDisk()
     }
@@ -1472,7 +1487,8 @@ final class BabyRecordStore: ObservableObject {
             milestones: milestones,
             babyPhotos: babyPhotos,
             quietCareModeEnabled: quietCareModeEnabled,
-            feedingLiveActivityEnabled: feedingLiveActivityEnabled
+            feedingLiveActivityEnabled: feedingLiveActivityEnabled,
+            familyTombstones: familyTombstones
         )
 
         // 写盘挪到串行后台队列：主线程不再为每条记录做全量 JSON 编码 + 磁盘 IO。
@@ -1975,6 +1991,7 @@ private struct LocalAppState: Codable {
     var babyPhotos: [BabyPhoto]
     var quietCareModeEnabled: Bool
     var feedingLiveActivityEnabled: Bool
+    var familyTombstones: [FamilyTombstone]
 
     private enum CodingKeys: String, CodingKey {
         case hasCompletedOnboarding
@@ -1990,6 +2007,7 @@ private struct LocalAppState: Codable {
         case babyPhotos
         case quietCareModeEnabled
         case feedingLiveActivityEnabled
+        case familyTombstones
     }
 
     init(
@@ -2005,7 +2023,8 @@ private struct LocalAppState: Codable {
         milestones: [Milestone],
         babyPhotos: [BabyPhoto],
         quietCareModeEnabled: Bool = true,
-        feedingLiveActivityEnabled: Bool = true
+        feedingLiveActivityEnabled: Bool = true,
+        familyTombstones: [FamilyTombstone] = []
     ) {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
@@ -2020,6 +2039,7 @@ private struct LocalAppState: Codable {
         self.babyPhotos = babyPhotos
         self.quietCareModeEnabled = quietCareModeEnabled
         self.feedingLiveActivityEnabled = feedingLiveActivityEnabled
+        self.familyTombstones = familyTombstones
     }
 
     init(from decoder: Decoder) throws {
@@ -2036,6 +2056,7 @@ private struct LocalAppState: Codable {
         milestones = Self.tolerantArray(Milestone.self, in: container, forKey: .milestones)
         babyPhotos = Self.tolerantArray(BabyPhoto.self, in: container, forKey: .babyPhotos)
         quietCareModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .quietCareModeEnabled) ?? true
+        familyTombstones = try container.decodeIfPresent([FamilyTombstone].self, forKey: .familyTombstones) ?? []
         feedingLiveActivityEnabled = try container.decodeIfPresent(Bool.self, forKey: .feedingLiveActivityEnabled) ?? true
     }
 
@@ -2126,4 +2147,151 @@ private struct VaccineTemplate {
         }
     }
 
+}
+
+// MARK: - 家人共享（逐条增量同步）
+
+extension BabyRecordStore {
+    private static let familyPayloadEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.sortedKeys]
+        return encoder
+    }()
+
+    private static let familyPayloadDecoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+
+    nonisolated private static func millis(_ date: Date) -> Int {
+        Int(date.timeIntervalSince1970 * 1000)
+    }
+
+    func recordFamilyTombstone(type: String, id: UUID) {
+        familyTombstones.removeAll { $0.recordType == type && $0.recordId == id.uuidString }
+        familyTombstones.append(FamilyTombstone(recordType: type, recordId: id.uuidString, deletedAt: Date()))
+        // 只保留 90 天：晚于这个窗口才上线的设备走全量拉取，不依赖墓碑。
+        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: Date()) ?? Date()
+        familyTombstones.removeAll { $0.deletedAt < cutoff }
+    }
+
+    /// 收集 updatedAt 晚于水位线的记录与墓碑，编码成推送信封。
+    func familyDirtyEnvelopes(since watermark: Date) -> [FamilyRecordEnvelope] {
+        var envelopes: [FamilyRecordEnvelope] = []
+
+        func append<T: Codable & Identifiable>(_ records: [T], type: FamilyRecordType, updatedAt: (T) -> Date) where T.ID == UUID {
+            for record in records where updatedAt(record) > watermark {
+                guard let data = try? Self.familyPayloadEncoder.encode(record),
+                      let payload = String(data: data, encoding: .utf8) else { continue }
+                envelopes.append(
+                    FamilyRecordEnvelope(
+                        recordType: type.rawValue,
+                        recordId: record.id.uuidString,
+                        payload: payload,
+                        updatedAtMs: Self.millis(updatedAt(record)),
+                        deletedAtMs: nil,
+                        mine: nil
+                    )
+                )
+            }
+        }
+
+        append(feedingRecords, type: .feeding) { $0.updatedAt }
+        append(waterRecords, type: .water) { $0.updatedAt }
+        append(sleepRecords, type: .sleep) { $0.updatedAt }
+        append(diaperRecords, type: .diaper) { $0.updatedAt }
+        append(growthRecords, type: .growth) { $0.updatedAt }
+        append(vaccineRecords, type: .vaccine) { $0.updatedAt }
+        append(milestones, type: .milestone) { $0.updatedAt }
+
+        for tombstone in familyTombstones where tombstone.deletedAt > watermark {
+            envelopes.append(
+                FamilyRecordEnvelope(
+                    recordType: tombstone.recordType,
+                    recordId: tombstone.recordId,
+                    payload: "{}",
+                    updatedAtMs: Self.millis(tombstone.deletedAt),
+                    deletedAtMs: Self.millis(tombstone.deletedAt),
+                    mine: nil
+                )
+            )
+        }
+        return envelopes
+    }
+
+    /// 把家庭成员的变更合并进本地：逐条 LWW（updatedAt 新者胜），墓碑即删除。
+    /// 返回实际发生变化的条数；合并后统一保存一次。
+    @discardableResult
+    func applyFamilyChanges(_ envelopes: [FamilyRecordEnvelope]) -> Int {
+        var changed = 0
+
+        func merge<T: Codable & Identifiable>(
+            _ array: inout [T],
+            envelope: FamilyRecordEnvelope,
+            updatedAt: (T) -> Date,
+            normalize: (inout T) -> Void
+        ) where T.ID == UUID {
+            guard let recordID = UUID(uuidString: envelope.recordId) else { return }
+            let index = array.firstIndex { $0.id == recordID }
+
+            if let deletedAtMs = envelope.deletedAtMs {
+                if let index, Self.millis(updatedAt(array[index])) <= deletedAtMs {
+                    array.remove(at: index)
+                    changed += 1
+                }
+                return
+            }
+
+            guard let data = envelope.payload.data(using: .utf8),
+                  var incoming = try? Self.familyPayloadDecoder.decode(T.self, from: data) else { return }
+            normalize(&incoming)
+            if let index {
+                if Self.millis(updatedAt(array[index])) < envelope.updatedAtMs {
+                    array[index] = incoming
+                    changed += 1
+                }
+            } else {
+                // 本地曾删除且墓碑更新时间更晚：不复活。
+                let tombstone = familyTombstones.first {
+                    $0.recordType == envelope.recordType && $0.recordId == envelope.recordId
+                }
+                if let tombstone, Self.millis(tombstone.deletedAt) >= envelope.updatedAtMs {
+                    return
+                }
+                array.append(incoming)
+                changed += 1
+            }
+        }
+
+        for envelope in envelopes {
+            guard let type = FamilyRecordType(rawValue: envelope.recordType) else { continue }
+            switch type {
+            case .feeding:
+                merge(&feedingRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+            case .water:
+                merge(&waterRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+            case .sleep:
+                merge(&sleepRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+            case .diaper:
+                merge(&diaperRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+            case .growth:
+                merge(&growthRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+            case .vaccine:
+                merge(&vaccineRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+            case .milestone:
+                merge(&milestones, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+            }
+        }
+
+        if changed > 0 {
+            feedingRecords.sort { $0.occurredAt > $1.occurredAt }
+            diaperRecords.sort { $0.occurredAt > $1.occurredAt }
+            waterRecords.sort { $0.occurredAt > $1.occurredAt }
+            sleepRecords.sort { Self.sleepSortDate($0) > Self.sleepSortDate($1) }
+            saveState()
+        }
+        return changed
+    }
 }

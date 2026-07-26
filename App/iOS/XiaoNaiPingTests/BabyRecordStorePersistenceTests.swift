@@ -265,3 +265,92 @@ final class SleepClippingTests: XCTestCase {
         XCTAssertLessThanOrEqual(startDayMinutes, BabyRecordStore.staleOngoingSleepHours * 60)
     }
 }
+
+/// 家人共享合并逻辑：模拟两台设备的信封往返，不走网络。
+@MainActor
+final class FamilySyncMergeTests: XCTestCase {
+    private var dirA: URL!
+    private var dirB: URL!
+
+    override func setUpWithError() throws {
+        dirA = FileManager.default.temporaryDirectory.appendingPathComponent("xnp-fam-a-\(UUID().uuidString)", isDirectory: true)
+        dirB = FileManager.default.temporaryDirectory.appendingPathComponent("xnp-fam-b-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: dirA, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: dirB, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try? FileManager.default.removeItem(at: dirA)
+        try? FileManager.default.removeItem(at: dirB)
+    }
+
+    private func makePair() -> (BabyRecordStore, BabyRecordStore) {
+        let storeA = BabyRecordStore(storageDirectoryOverride: dirA)
+        let storeB = BabyRecordStore(storageDirectoryOverride: dirB)
+        storeA.createBabyProfile(name: "宝宝", birthDate: Date(), sex: "女宝")
+        storeB.createBabyProfile(name: "宝宝", birthDate: Date(), sex: "女宝")
+        return (storeA, storeB)
+    }
+
+    func testEnvelopesRoundTripToSecondStore() {
+        let (storeA, storeB) = makePair()
+        _ = storeA.upsert(FeedingRecord(time: "08:00", type: "奶粉", detail: "120ml", icon: "", amountML: 120))
+        _ = storeA.upsert(GrowthRecord(month: "满月", weight: 4.2, height: 54, head: 37, measuredAt: "2026.07.01"))
+
+        let envelopes = storeA.familyDirtyEnvelopes(since: .distantPast)
+        XCTAssertGreaterThanOrEqual(envelopes.count, 2)
+
+        let applied = storeB.applyFamilyChanges(envelopes)
+        XCTAssertEqual(applied, envelopes.count)
+        XCTAssertEqual(storeB.feedingRecords.count, 1)
+        XCTAssertEqual(storeB.feedingRecords.first?.amountML, 120)
+        XCTAssertEqual(storeB.growthRecords.count, 1)
+        // 合并进来的记录归属到本机宝宝档案。
+        XCTAssertEqual(storeB.feedingRecords.first?.babyId, storeB.baby.id)
+    }
+
+    func testLocalNewerRecordSurvivesStaleEnvelope() {
+        let (storeA, storeB) = makePair()
+        var record = FeedingRecord(time: "08:00", type: "奶粉", detail: "120ml", icon: "", amountML: 120)
+        _ = storeA.upsert(record)
+        let envelopes = storeA.familyDirtyEnvelopes(since: .distantPast)
+
+        // B 侧同一条记录有更新的本地版本。
+        record.amountML = 150
+        _ = storeB.upsert(record)
+        let newerLocal = storeB.feedingRecords.first!.updatedAt
+
+        let applied = storeB.applyFamilyChanges(envelopes.filter { $0.recordType == "feeding" })
+        XCTAssertEqual(applied, 0, "本地更新版本必须在 LWW 中获胜")
+        XCTAssertEqual(storeB.feedingRecords.first?.amountML, 150)
+        XCTAssertEqual(storeB.feedingRecords.first?.updatedAt, newerLocal)
+    }
+
+    func testTombstoneDeletesAndDoesNotResurrect() {
+        let (storeA, storeB) = makePair()
+        let record = FeedingRecord(time: "08:00", type: "奶粉", detail: "120ml", icon: "", amountML: 120)
+        _ = storeA.upsert(record)
+        _ = storeB.applyFamilyChanges(storeA.familyDirtyEnvelopes(since: .distantPast))
+        XCTAssertEqual(storeB.feedingRecords.count, 1)
+
+        // A 删除 → 墓碑信封 → B 应删除同一条。
+        let afterInsert = Date()
+        _ = storeA.deleteFeedingRecord(storeA.feedingRecords.first!)
+        let tombstones = storeA.familyDirtyEnvelopes(since: afterInsert).filter { $0.deletedAtMs != nil }
+        XCTAssertEqual(tombstones.count, 1)
+        _ = storeB.applyFamilyChanges(tombstones)
+        XCTAssertTrue(storeB.feedingRecords.isEmpty)
+
+        // B 本地删除后，旧版本的信封不得复活记录。
+        let staleEnvelope = FamilyRecordEnvelope(
+            recordType: "feeding",
+            recordId: record.id.uuidString,
+            payload: tombstones[0].payload,
+            updatedAtMs: 1,
+            deletedAtMs: nil,
+            mine: nil
+        )
+        _ = storeB.applyFamilyChanges([staleEnvelope])
+        XCTAssertTrue(storeB.feedingRecords.isEmpty, "墓碑必须阻止旧信封复活已删除记录")
+    }
+}

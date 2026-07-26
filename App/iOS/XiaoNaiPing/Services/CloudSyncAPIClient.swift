@@ -136,6 +136,36 @@ final class CloudSyncAPIClient {
         return try decode(CloudAccountDeletionResponse.self, from: data)
     }
 
+    // MARK: 家人共享
+
+    func fetchFamily(token: String) async throws -> FamilyInfo? {
+        let data = try await request(path: "/v1/family", method: "GET", token: token)
+        return try decode(FamilyInfoResponse.self, from: data).family
+    }
+
+    func createFamily(token: String) async throws -> FamilyInfo? {
+        let body = try JSONEncoder().encode([String: String]())
+        let data = try await request(path: "/v1/family", method: "POST", body: body, token: token)
+        return try decode(FamilyInfoResponse.self, from: data).family
+    }
+
+    func joinFamily(inviteCode: String, token: String) async throws -> FamilyInfo? {
+        let body = try JSONEncoder().encode(["inviteCode": inviteCode])
+        let data = try await request(path: "/v1/family/join", method: "POST", body: body, token: token)
+        return try decode(FamilyInfoResponse.self, from: data).family
+    }
+
+    func pushFamilyRecords(_ envelopes: [FamilyRecordEnvelope], token: String) async throws -> FamilyPushResponse {
+        let body = try JSONEncoder().encode(FamilyPushRequest(records: envelopes))
+        let data = try await request(path: "/v1/family/records", method: "PUT", body: body, token: token)
+        return try decode(FamilyPushResponse.self, from: data)
+    }
+
+    func pullFamilyRecords(since cursor: Int, token: String) async throws -> FamilyPullResponse {
+        let data = try await request(path: "/v1/family/records?since=\(cursor)", method: "GET", token: token)
+        return try decode(FamilyPullResponse.self, from: data)
+    }
+
     func trackAnalyticsEvent(name: String, properties: [String: String], token: String) async throws {
         let event = CloudAnalyticsEventRequest(
             eventId: UUID().uuidString,
