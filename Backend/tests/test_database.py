@@ -123,9 +123,38 @@ class DatabaseTest(unittest.TestCase):
         upsert_photo(db, "account", "photo", "image/jpeg", 10, "digest", "now")
 
         statements = [statement for statement, _ in fake_connection.statements]
-        self.assertEqual(len(statements), 3)
-        self.assertTrue(all("ON DUPLICATE KEY UPDATE" in statement for statement in statements))
+        upsert_statements = [statement for statement in statements if "INSERT INTO" in statement]
+        self.assertEqual(len(upsert_statements), 3)
+        self.assertTrue(all("ON DUPLICATE KEY UPDATE" in statement for statement in upsert_statements))
         self.assertTrue(all("?" not in statement for statement in statements))
+
+    def test_upsert_sync_archives_previous_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = Path(tempdir) / "xiaonaiping.sqlite3"
+            with connect_database(DatabaseSettings(backend="sqlite", sqlite_path=path)) as db:
+                ensure_schema(db)
+                db.execute(
+                    "INSERT INTO accounts(account_id, recovery_hash, created_at) VALUES (?, ?, ?)",
+                    ("account", "hash", "t0"),
+                )
+
+                upsert_sync(db, "account", b'{"v":1}', "t1")
+                upsert_sync(db, "account", b'{"v":2}', "t2")
+                # 相同 payload 不应产生重复归档
+                upsert_sync(db, "account", b'{"v":2}', "t3")
+
+                current = db.execute(
+                    "SELECT payload FROM syncs WHERE account_id = ?", ("account",)
+                ).fetchone()
+                versions = db.execute(
+                    "SELECT version, payload, updated_at FROM sync_versions WHERE account_id = ? ORDER BY version",
+                    ("account",),
+                ).fetchall()
+
+            self.assertEqual(bytes(current["payload"]), b'{"v":2}')
+            self.assertEqual(len(versions), 1)
+            self.assertEqual(bytes(versions[0]["payload"]), b'{"v":1}')
+            self.assertEqual(versions[0]["updated_at"], "t1")
 
     def test_mysql_legacy_backup_deleted_column_gets_a_default(self) -> None:
         class LegacyAuditDatabase:

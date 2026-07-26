@@ -140,6 +140,15 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 updated_at TEXT NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS sync_versions (
+                account_id TEXT NOT NULL REFERENCES accounts(account_id) ON DELETE CASCADE,
+                version INTEGER NOT NULL,
+                payload BLOB NOT NULL,
+                updated_at TEXT NOT NULL,
+                archived_at TEXT NOT NULL,
+                PRIMARY KEY (account_id, version)
+            );
+
             CREATE TABLE IF NOT EXISTS account_identities (
                 provider TEXT NOT NULL,
                 subject_hash TEXT NOT NULL,
@@ -208,6 +217,18 @@ def ensure_schema(db: DatabaseConnection) -> None:
             payload LONGBLOB NOT NULL,
             updated_at VARCHAR(40) NOT NULL,
             CONSTRAINT fk_syncs_account
+                FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS sync_versions (
+            account_id CHAR(36) NOT NULL,
+            version BIGINT NOT NULL,
+            payload LONGBLOB NOT NULL,
+            updated_at VARCHAR(40) NOT NULL,
+            archived_at VARCHAR(40) NOT NULL,
+            PRIMARY KEY (account_id, version),
+            CONSTRAINT fk_sync_versions_account
                 FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,

@@ -408,7 +408,40 @@ def upsert_phone_code(
     )
 
 
+# 覆盖前保留的历史版本数：客户端 bug 用坏数据覆盖唯一副本时，这是最后的救援手段。
+SYNC_VERSIONS_TO_KEEP = 30
+
+
+def archive_sync_version(db: DatabaseConnection, account_id: str, new_payload: bytes, archived_at: str) -> None:
+    row = db.execute(
+        "SELECT payload, updated_at FROM syncs WHERE account_id = ?",
+        (account_id,),
+    ).fetchone()
+    if row is None:
+        return
+    previous_payload = bytes(row["payload"])
+    if previous_payload == new_payload:
+        return
+    version_row = db.execute(
+        "SELECT COALESCE(MAX(version), 0) + 1 AS next_version FROM sync_versions WHERE account_id = ?",
+        (account_id,),
+    ).fetchone()
+    next_version = int(version_row["next_version"])
+    db.execute(
+        """
+        INSERT INTO sync_versions(account_id, version, payload, updated_at, archived_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (account_id, next_version, previous_payload, row["updated_at"], archived_at),
+    )
+    db.execute(
+        "DELETE FROM sync_versions WHERE account_id = ? AND version <= ?",
+        (account_id, next_version - SYNC_VERSIONS_TO_KEEP),
+    )
+
+
 def upsert_sync(db: DatabaseConnection, account_id: str, payload: bytes, updated_at: str) -> None:
+    archive_sync_version(db, account_id, payload, updated_at)
     if db.dialect == "mysql":
         db.execute(
             """
