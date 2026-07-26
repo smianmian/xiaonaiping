@@ -53,6 +53,7 @@
 		A1D93A5A7C959C0CE5C1B192 /* SleepRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */; };
 		A4E39787B837B452683DE5C2 /* PrimaryWatercolorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */; };
 		BA8BA48062C09F739B42A3FA /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C6209F33E5CD70DFBB904C /* AppSpacing.swift */; };
+		BD8B7E60E6F4FEB7BC47352B /* QuickTimeField.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4C58F1DEC9E465B945AE18 /* QuickTimeField.swift */; };
 		BF2AF9006E03D7462BA5AF0E /* SegmentedPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9423C7088F74F67315CFFAA6 /* SegmentedPill.swift */; };
 		BFDB9200F73A506C32B15517 /* white_noise_dryer.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1A936156FAB6B10B3575EFDB /* white_noise_dryer.mp3 */; };
 		C14A3ECE673DFAC77BBDED69 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791351B6EE995D204D3BF2C /* AppLocalization.swift */; };
@@ -164,6 +165,7 @@
 		BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassTabBar.swift; sourceTree = "<group>"; };
 		BC89247E294755B419F3F4E0 /* FamilySyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySyncEngine.swift; sourceTree = "<group>"; };
 		BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAssets.swift; sourceTree = "<group>"; };
+		BE4C58F1DEC9E465B945AE18 /* QuickTimeField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickTimeField.swift; sourceTree = "<group>"; };
 		C791351B6EE995D204D3BF2C /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
 		CECC716FF8EABAB5EB679136 /* WatercolorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatercolorCard.swift; sourceTree = "<group>"; };
 		D24CD9A96CF3973AC7CF2CC5 /* AssetWatercolorImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWatercolorImage.swift; sourceTree = "<group>"; };
@@ -368,6 +370,7 @@
 				BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */,
 				6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */,
 				11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */,
+				BE4C58F1DEC9E465B945AE18 /* QuickTimeField.swift */,
 				6CF167A08D1CF3FC993C518E /* RecordRowView.swift */,
 				EF7F1E8851DB82D83B5F8459 /* ScreenScaffold.swift */,
 				85DEC409D4B6FEFD1F1AB714 /* SectionTitleView.swift */,
@@ -586,6 +589,7 @@
 				7878259A00E09EE4667A88A1 /* ProfileView.swift in Sources */,
 				DA93ED3325C38B5191CC2CEC /* QuickLogService.swift in Sources */,
 				0DF1426E12EBA1396D4B189D /* QuickRecordSheet.swift in Sources */,
+				BD8B7E60E6F4FEB7BC47352B /* QuickTimeField.swift in Sources */,
 				3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */,
 				33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */,
 				1A6CBC1E82364A80FED3E908 /* RootTabView.swift in Sources */,
