@@ -381,7 +381,7 @@ final class BabyRecordStore: ObservableObject {
             return Calendar.current.isDate(measuredAt, equalTo: monthDate, toGranularity: .month)
         }
         let monthlyMilestones = milestones.filter { milestone in
-            guard let date = Self.date(fromDisplayDateString: milestone.date) else { return false }
+            guard let date = Self.milestoneDate(milestone) else { return false }
             return Calendar.current.isDate(date, equalTo: monthDate, toGranularity: .month)
         }
         let monthlyVaccines = vaccineRecords.filter { record in
@@ -1178,6 +1178,19 @@ final class BabyRecordStore: ObservableObject {
     }
 
     private func normalizeRecordsForCurrentBaby() {
+        // 旧版纪念日只存了显示字符串：尽力回填真实日期，
+        // 并把持久化字符串固定成带年份格式，避免“今天”永久冻结。
+        milestones = milestones.map { milestone in
+            guard milestone.occurredAt == nil,
+                  let resolved = Self.milestoneDate(milestone) else {
+                return milestone
+            }
+            var updated = milestone
+            updated.occurredAt = resolved
+            updated.date = Self.fullDisplayDateString(from: resolved)
+            return updated
+        }
+
         feedingRecords = feedingRecords.map { record in
             var normalized = record
             normalized.babyId = baby.id
@@ -1643,6 +1656,52 @@ final class BabyRecordStore: ObservableObject {
 
         formatter.locale = Locale(identifier: "zh_Hans_CN")
         return formatter.date(from: value)
+    }
+
+    /// 始终带年份的显示格式。持久化显示字符串必须用它，
+    /// 绝不能存“今天”这类相对文本（相对文本会随时间冻结失真）。
+    static func fullDisplayDateString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.dateFormat = "yyyy年M月d日"
+        return formatter.string(from: date)
+    }
+
+    /// 纪念日真实日期：优先 occurredAt，其次解析完整显示串，
+    /// 最后对旧版“M月d日”（无年份）按今年/去年尽力还原。
+    /// “今天/明天”这类冻结的相对文本无法还原，返回 nil。
+    static func milestoneDate(_ milestone: Milestone) -> Date? {
+        if let occurredAt = milestone.occurredAt {
+            return occurredAt
+        }
+        if let parsed = date(fromDisplayDateString: milestone.date) {
+            return parsed
+        }
+        return lenientDisplayDate(from: milestone.date)
+    }
+
+    private static func lenientDisplayDate(from value: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M月d日"
+        formatter.locale = .autoupdatingCurrent
+        var partial = formatter.date(from: value)
+        if partial == nil {
+            formatter.locale = Locale(identifier: "zh_Hans_CN")
+            partial = formatter.date(from: value)
+        }
+        guard let partial else { return nil }
+
+        let monthDay = Calendar.current.dateComponents([.month, .day], from: partial)
+        var full = DateComponents()
+        full.year = Calendar.current.component(.year, from: Date())
+        full.month = monthDay.month
+        full.day = monthDay.day
+        guard let candidate = Calendar.current.date(from: full) else { return nil }
+        // 旧格式只在“当年”使用；若补今年后落在未来，说明写入时是去年。
+        if candidate > Date() {
+            return Calendar.current.date(byAdding: .year, value: -1, to: candidate)
+        }
+        return candidate
     }
 
     private static let emptyBaby = Baby(

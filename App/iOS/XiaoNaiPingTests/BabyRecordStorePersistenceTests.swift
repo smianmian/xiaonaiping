@@ -182,3 +182,45 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
         XCTAssertEqual(store.totalSleepMinutes, 60, "跨午夜睡眠只应计入与今天重叠的部分")
     }
 }
+
+/// 纪念日日期修复（P0-4）防回归：真实日期必须可往返，旧显示字符串尽力回填。
+final class MilestoneDateTests: XCTestCase {
+    func testMilestoneDatePrefersOccurredAt() {
+        let realDate = Calendar.current.date(byAdding: .day, value: -40, to: Date())!
+        let milestone = Milestone(title: "第一次笑", date: "今天", icon: "x", occurredAt: realDate)
+        XCTAssertEqual(BabyRecordStore.milestoneDate(milestone), realDate)
+    }
+
+    func testLegacyFullStringBackfills() {
+        let milestone = Milestone(title: "满月", date: "2025年5月27日", icon: "x")
+        let resolved = BabyRecordStore.milestoneDate(milestone)
+        XCTAssertNotNil(resolved)
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: resolved!)
+        XCTAssertEqual(components.year, 2025)
+        XCTAssertEqual(components.month, 5)
+        XCTAssertEqual(components.day, 27)
+    }
+
+    func testLegacyYearlessStringResolvesToPast() {
+        // 旧版“当年格式”无年份：应回填为今年；若在未来则视为去年，绝不能落在未来。
+        let milestone = Milestone(title: "百天", date: "12月31日", icon: "x")
+        guard let resolved = BabyRecordStore.milestoneDate(milestone) else {
+            return XCTFail("无年份日期应能回填")
+        }
+        XCTAssertLessThanOrEqual(resolved, Date())
+    }
+
+    func testFrozenRelativeTextStaysNilButDisplayFallsBack() {
+        // “今天”这类冻结文本无法还原真实日期——必须返回 nil，而不是错误地当成今天。
+        let milestone = Milestone(title: "第一次抬头", date: "今天", icon: "x")
+        XCTAssertNil(BabyRecordStore.milestoneDate(milestone))
+    }
+
+    func testFullDisplayStringRoundTrips() {
+        let date = Calendar.current.date(from: DateComponents(year: 2026, month: 7, day: 26))!
+        let text = BabyRecordStore.fullDisplayDateString(from: date)
+        XCTAssertEqual(BabyRecordStore.date(fromDisplayDateString: text).map {
+            Calendar.current.startOfDay(for: $0)
+        }, Calendar.current.startOfDay(for: date))
+    }
+}

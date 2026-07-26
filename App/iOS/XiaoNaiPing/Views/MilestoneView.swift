@@ -38,7 +38,7 @@ struct MilestoneView: View {
                                                     .font(AppTypography.bodyLarge)
                                                     .foregroundStyle(AppColors.inkGreen)
                                                 Spacer()
-                                                Text(item.date)
+                                                Text(displayDate(for: item))
                                                     .font(AppTypography.caption)
                                                     .foregroundStyle(AppColors.inkGreen)
                                             }
@@ -174,6 +174,14 @@ struct MilestoneView: View {
         editingMilestone = milestone
         isEditorPresented = true
     }
+
+    /// 相对文案（今天/昨天）在渲染时实时计算，绝不落盘。
+    private func displayDate(for milestone: Milestone) -> String {
+        guard let date = BabyRecordStore.milestoneDate(milestone) else {
+            return milestone.date
+        }
+        return BabyRecordStore.displayDateString(from: date)
+    }
 }
 
 private struct MilestoneEditorSheet: View {
@@ -191,7 +199,7 @@ private struct MilestoneEditorSheet: View {
         self.milestone = milestone
         self.onSave = onSave
         _title = State(initialValue: milestone?.title ?? "")
-        _date = State(initialValue: milestone.flatMap { BabyRecordStore.date(fromDisplayDateString: $0.date) } ?? Date())
+        _date = State(initialValue: milestone.flatMap(BabyRecordStore.milestoneDate) ?? Date())
         _note = State(initialValue: milestone?.note ?? "")
     }
 
@@ -271,11 +279,12 @@ private struct MilestoneEditorSheet: View {
 
         var saved = milestone ?? Milestone(
             title: trimmedTitle,
-            date: BabyRecordStore.displayDateString(from: date),
+            date: BabyRecordStore.fullDisplayDateString(from: date),
             icon: AppAssets.milestoneMedalIcon
         )
         saved.title = trimmedTitle
-        saved.date = BabyRecordStore.displayDateString(from: date)
+        saved.date = BabyRecordStore.fullDisplayDateString(from: date)
+        saved.occurredAt = date
         saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
         if onSave(saved) {
             dismiss()
