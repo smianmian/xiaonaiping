@@ -11,17 +11,6 @@ enum MockData {
         birthDate: babyBirthDate
     )
 
-    static let summary = DailySummary(
-        daysSinceBirth: 68,
-        fullMoonDaysRemaining: 32,
-        nextVaccineDaysRemaining: 3,
-        feedingCount: 6,
-        milkAmountML: 630,
-        sleepDuration: "14小时20分",
-        diaperCount: 2,
-        photoCount: 3
-    )
-
     static let feedingRecords = [
         FeedingRecord(time: "08:30", type: "母乳", detail: "右侧15分钟", icon: AppAssets.bottleIcon, durationMinutes: 15, breastSide: "右侧"),
         FeedingRecord(time: "11:20", type: "奶粉", detail: "120ml", icon: AppAssets.bottleIcon, amountML: 120),

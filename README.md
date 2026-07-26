@@ -1,6 +1,6 @@
 # 小奶瓶 / 宝宝成长记录
 
-这是“小奶瓶 / 宝宝成长记录”的 AppLaunchOS 项目治理层和 iOS 客户端工作区。当前已创建 iOS SwiftUI 工程骨架，第一阶段只允许做高保真 SwiftUI UI 和本地 mock 数据，不允许接入后端、账号、照片权限、CloudKit、第三方 SDK 或真实用户数据。
+这是“小奶瓶 / 宝宝成长记录”的 AppLaunchOS 项目治理层和 iOS 客户端工作区。iOS 客户端已进入功能完整阶段：真实本地持久化（JSON 状态文件 + 备份轮转 + 容错解码）、手机号/微信账号、云端同步与照片原图备份（自有后端）、本地通知与灵动岛提醒、Widget、白噪音、WHO 生长参考曲线、CSV 数据导出。早期“仅 mock 数据”的禁令已随 Level 2.5 基线解除，仅 DEBUG 截图流程仍会用 `-XNPScreenshotData` 注入演示数据。
 
 ## 项目定位
 
@@ -14,11 +14,13 @@
 
 ## iOS 工程
 
-- 工程路径：`App/iOS/XiaoNaiPing.xcodeproj`
-- Scheme：`XiaoNaiPing`
+- 工程路径：`App/iOS/XiaoNaiPing.xcodeproj`（XcodeGen 生成，源为 `project.yml`；新增文件后运行 `xcodegen generate`）
+- Scheme：`XiaoNaiPing`；测试 target：`XiaoNaiPingTests`
 - App 显示名：小奶瓶
-- 当前实现：SwiftUI App 骨架、4 个底部 Tab、本地 mock 首页占位、DesignSystem 初始 token
-- 当前验证：iOS Simulator generic build 已通过
+- 当前实现：喂养/喝水/睡眠/排便/成长/疫苗/纪念日/相册/月报全量记录，
+  首页一键记录 + 撤销，历史日期回看与补录，喝奶自动提醒链 + 灵动岛，
+  WHO 百分位生长曲线，白噪音哄睡，CSV 导出，深浅色适配
+- 当前验证：模拟器构建 + 单元测试通过（数据安全防回归用例见 `App/iOS/XiaoNaiPingTests/`）
 
 命令行编译：
 
@@ -36,8 +38,8 @@ xcodebuild -project XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Deb
 - 已确认：疫苗提醒模板覆盖国内 + 香港，崩溃上报进入第一版。
 - 已确认：API 服务和对象存储区域必须在发布前按合规策略确认。
 - 已确认：崩溃上报使用 Apple 原生渠道。
-- 默认后端基线：如果后端被证明第一版必须做，只在公开仓库保留架构原则；具体云厂商、区域、域名、端口、目录和进程名放在私有部署文档。
-- 当前禁令：没有后端实现计划、API 设计、数据库/对象存储设计、账号删除方案、隐私审查和发布合规确认前，不允许实现上传、账号或服务器存储。
+- 后端现状：自有 API 服务已实现（手机验证码/微信登录、整包同步 + 服务端版本历史、照片原图上传/下载/删除、账号删除），代码在 `Backend/`；具体云厂商、区域、域名、端口、目录和进程名仍只放私有部署文档。
+- 客户端通过构建变量 `XNP_API_BASE_URL` 指向服务；未配置时账号功能降级为"暂未配置"。
 
 ## 公开仓库部署边界
 
@@ -85,8 +87,8 @@ xcodebuild -project XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Deb
 
 ## 明确不在当前阶段做
 
-- 不安装第三方依赖。
-- 不接入照片、健康、账号、云同步或后端接口。
+- 不接入 HealthKit、Apple Watch。
 - 不开始 macOS、Android、Web。
-- 不创建后台、管理端或数据库。
+- 不接广告、社区或第三方数据分析 SDK（唯一第三方依赖：微信 OpenSDK，仅登录用途，用户点击登录时才初始化）。
+- 不做多看护人共享（需先把整包同步改为逐条增量，见任务队列）。
 - 不把设计整图铺成背景冒充页面。

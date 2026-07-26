@@ -16,7 +16,6 @@ struct ProfileView: View {
     @State private var liveActivityMessage: String?
     @State private var isFeedingLiveActivityUpdating = false
     @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
-    @AppStorage("xnpFeedbackSoundEnabled") private var feedbackSoundEnabled = true
 
     init() {
         #if DEBUG
@@ -163,16 +162,6 @@ struct ProfileView: View {
     private var globalSettingsCard: some View {
         WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
             VStack(spacing: 0) {
-                Toggle(isOn: $feedbackSoundEnabled) {
-                    settingToggleLabel(icon: "speaker.wave.2", title: "操作提示音", detail: "记录成功时播放轻提示音", color: AppColors.inkGreen)
-                }
-                .toggleStyle(.switch)
-                .tint(AppColors.sage)
-                .padding(.horizontal, AppSpacing.roomy)
-                .padding(.vertical, AppSpacing.regular)
-
-                Divider().padding(.leading, 72).padding(.trailing, AppSpacing.roomy)
-
                 Toggle(isOn: $nightModeEnabled) {
                     settingToggleLabel(icon: "moon.stars", title: "夜间外观", detail: "夜里记录时切换为柔和深色界面", color: AppColors.blueInk)
                 }
@@ -241,54 +230,6 @@ struct ProfileView: View {
         UIApplication.shared.open(url)
     }
 
-    private var quietCareModeRow: some View {
-        Toggle(isOn: Binding(
-            get: { store.quietCareModeEnabled },
-            set: { store.setQuietCareModeEnabled($0) }
-        )) {
-            HStack(spacing: AppSpacing.regular) {
-                Image(systemName: "speaker.slash")
-                    .font(.system(size: 19, weight: .regular))
-                    .foregroundStyle(AppColors.sage)
-                    .frame(width: 30)
-                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                    Text("安静育儿模式")
-                        .font(AppTypography.bodyLarge)
-                        .foregroundStyle(AppColors.inkGreen)
-                    Text("默认开启，半夜记录时不播放 App 内声音。")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkSoft)
-                }
-            }
-        }
-        .toggleStyle(.switch)
-        .tint(AppColors.coral)
-        .padding(.horizontal, AppSpacing.medium)
-        .padding(.vertical, AppSpacing.small)
-    }
-
-    private var nightModeRow: some View {
-        Toggle(isOn: $nightModeEnabled) {
-            HStack(spacing: AppSpacing.regular) {
-                Image(systemName: "moon.stars")
-                    .font(.system(size: 19, weight: .regular))
-                    .foregroundStyle(AppColors.blueInk)
-                    .frame(width: 30)
-                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                    Text("夜间模式")
-                        .font(AppTypography.bodyLarge)
-                        .foregroundStyle(AppColors.inkGreen)
-                    Text("夜里记录时切换为柔和深色界面。")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.inkSoft)
-                }
-            }
-        }
-        .toggleStyle(.switch)
-        .tint(AppColors.blueInk)
-        .padding(.horizontal, AppSpacing.medium)
-        .padding(.vertical, AppSpacing.small)
-    }
 
     private var feedingLiveActivityRow: some View {
         VStack(spacing: 0) {

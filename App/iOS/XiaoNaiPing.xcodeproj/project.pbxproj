@@ -70,7 +70,6 @@
 		F6FCF155EC6D14D11194C62C /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DEC409D4B6FEFD1F1AB714 /* SectionTitleView.swift */; };
 		F7CF382B76F5786E6C6DABB5 /* XiaoNaiPingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CE747390DA5D850A154CF2 /* XiaoNaiPingApp.swift */; };
 		F9F5FD132F2BAD8D2DB9EC9A /* WechatOpenSDKShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985193720DA030778D1F15FC /* WechatOpenSDKShim.swift */; };
-		FAC14AC055EF88F0AFC0F567 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -164,7 +163,6 @@
 		D370C60F71E5A04BFAE44E30 /* VaccineRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineRecord.swift; sourceTree = "<group>"; };
 		D5A60428958DC54D107046F4 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = "zh-Hant-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRecord.swift; sourceTree = "<group>"; };
-		D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySummary.swift; sourceTree = "<group>"; };
 		E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneView.swift; sourceTree = "<group>"; };
 		E1CBBA794A3E7C3F88C3A59F /* AppTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypography.swift; sourceTree = "<group>"; };
 		E826BC1E85FF22072F47C1F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -275,7 +273,6 @@
 				1952F92A4C46DF608722ABC4 /* Baby.swift */,
 				8E7977E47AE5B265ADB52DCF /* BabyPhoto.swift */,
 				ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */,
-				D73A77A8BDFCB1E8256C3D6E /* DailySummary.swift */,
 				606AE8CC76D08DC19404DE5A /* DiaperRecord.swift */,
 				1AFE2FD299FC259D24148966 /* FeedingRecord.swift */,
 				13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */,
@@ -555,7 +552,6 @@
 				7E3298480C5453C50031A36A /* CloudSyncAPIClient.swift in Sources */,
 				2F27250455AB5B806BB154EC /* CloudSyncController.swift in Sources */,
 				C498D18CD24F9328A97581AC /* CloudSyncModels.swift in Sources */,
-				FAC14AC055EF88F0AFC0F567 /* DailySummary.swift in Sources */,
 				D5F93695C59B96BF2A49EA3D /* DaySwitcherBar.swift in Sources */,
 				194395CFEB808694D6C9A8AF /* DiaperRecord.swift in Sources */,
 				2789B2894670943DB6B8637F /* DiaperRecordView.swift in Sources */,
