@@ -22,9 +22,14 @@ struct TodayProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TodayTimelineEntry>) -> Void) {
         let now = Date()
-        let entry = TodayTimelineEntry(date: now, snapshot: XiaoNaiPingSharedStore.readSnapshot())
+        let snapshot = XiaoNaiPingSharedStore.readSnapshot()
+        var entries = [TodayTimelineEntry(date: now, snapshot: snapshot)]
+        // 跨零点补一个条目：让“今日”统计在午夜自动清零，而不是继续显示昨天的数字。
+        if let nextMidnight = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: now)) {
+            entries.append(TodayTimelineEntry(date: nextMidnight, snapshot: snapshot))
+        }
         let refreshDate = Calendar.current.date(byAdding: .minute, value: 15, to: now) ?? now
-        completion(Timeline(entries: [entry], policy: .after(refreshDate)))
+        completion(Timeline(entries: entries, policy: .after(refreshDate)))
     }
 }
 
@@ -129,7 +134,18 @@ struct XiaoNaiPingTodayWidgetView: View {
     }
 
     private var snapshot: SharedTodaySnapshot? {
-        entry.snapshot
+        guard let raw = entry.snapshot else { return nil }
+        // 快照还是当天生成的才显示“今日”数字；跨天后清零计数，
+        // 但保留上次喂奶时间等仍然有意义的信息。
+        guard !Calendar.current.isDate(raw.generatedAt, inSameDayAs: entry.date) else {
+            return raw
+        }
+        var reset = raw
+        reset.feedingCount = 0
+        reset.milkAmountML = 0
+        reset.poopCount = 0
+        reset.peeCount = 0
+        return reset
     }
 
     private var title: String {

@@ -1,6 +1,7 @@
 import PhotosUI
 import SwiftUI
 import UIKit
+import UserNotifications
 
 struct ProfileView: View {
     @EnvironmentObject private var store: BabyRecordStore
@@ -15,6 +16,7 @@ struct ProfileView: View {
     @State private var liveActivityMessage: String?
     @State private var isFeedingLiveActivityUpdating = false
     @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
+    @AppStorage("xnpFeedbackSoundEnabled") private var feedbackSoundEnabled = true
 
     init() {
         #if DEBUG
@@ -26,48 +28,14 @@ struct ProfileView: View {
         ScreenScaffold {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
+                    Text("设置")
+                        .font(AppTypography.heroTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     profileHeader
-                    WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
-                        VStack(spacing: 0) {
-                            Button {
-                                isBabyEditorPresented = true
-                            } label: {
-                                ProfileMenuRow(icon: "list.clipboard", title: "宝宝信息", value: "可编辑")
-                            }
-                            .buttonStyle(.plain)
-                            NavigationLink {
-                                VaccineView()
-                            } label: {
-                                ProfileMenuRow(icon: "list.bullet.clipboard", title: "宝宝疫苗本", value: "接种记录")
-                            }
-                            .buttonStyle(.plain)
-                            Button {
-                                isAccountStatusPresented = true
-                            } label: {
-                                ProfileMenuRow(icon: "person.crop.circle", title: "账号管理", value: cloudSync.hasSession ? "已登录" : "请登录")
-                            }
-                            .buttonStyle(.plain)
-                            Button {
-                                isPrivacyStatusPresented = true
-                            } label: {
-                                ProfileMenuRow(icon: "shield", title: "数据与隐私", value: "隐私说明")
-                            }
-                            .buttonStyle(.plain)
-                            quietCareModeRow
-                            nightModeRow
-                            feedingLiveActivityRow
-                            Button {
-                                isProfileDeletePresented = true
-                            } label: {
-                                ProfileMenuRow(icon: "person.crop.circle.badge.xmark", title: "删除宝宝档案", value: nil)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-
-                    AssetWatercolorImage(name: AppAssets.profileBirdBottle, mode: .multiply)
-                        .frame(height: 96)
-                        .padding(.top, AppSpacing.medium)
+                    primarySettingsCard
+                    globalSettingsCard
+                    dangerSettingsCard
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.top, AppSpacing.medium)
@@ -124,12 +92,15 @@ struct ProfileView: View {
     }
 
     private var profileHeader: some View {
+        Button {
+            isBabyEditorPresented = true
+        } label: {
         HStack(spacing: AppSpacing.large) {
             PhotosPicker(selection: $selectedAvatarItem, matching: .images) {
                 ZStack(alignment: .bottomTrailing) {
                     BabyAvatarView(
                         imageData: store.baby.avatarImageData,
-                        fallbackAssetName: AppAssets.profileBaby,
+                        fallbackAssetName: "approvedBabyAvatar",
                         size: 86
                     )
 
@@ -155,21 +126,119 @@ struct ProfileView: View {
                 Text(store.baby.name)
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
-                Text("\(store.currentBabyDaysSinceBirth)天")
-                    .font(AppTypography.largeNumber)
-                    .foregroundStyle(AppColors.coral)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                Text(store.currentBabyAgeText)
-                    .font(AppTypography.readableBody)
-                    .foregroundStyle(AppColors.inkSoft)
-                    .lineLimit(1)
             }
 
             Spacer()
-            AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
-                .frame(width: 62, height: 38)
+            Text("编辑资料")
+                .font(AppTypography.body)
+                .foregroundStyle(AppColors.inkGreen)
+            Image(systemName: "chevron.right")
+                .foregroundStyle(AppColors.inkSoft)
         }
+        .padding(AppSpacing.roomy)
+        .background { CardBackground(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var primarySettingsCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
+            VStack(spacing: 0) {
+                Button { isBabyEditorPresented = true } label: {
+                    ProfileMenuRow(icon: "face.smiling", title: "宝宝信息")
+                }
+                .buttonStyle(.plain)
+                Button { isAccountStatusPresented = true } label: {
+                    ProfileMenuRow(icon: "person.crop.circle", title: "账号管理")
+                }
+                .buttonStyle(.plain)
+                Button { isPrivacyStatusPresented = true } label: {
+                    ProfileMenuRow(icon: "lock.shield", title: "数据与隐私")
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var globalSettingsCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
+            VStack(spacing: 0) {
+                Toggle(isOn: $feedbackSoundEnabled) {
+                    settingToggleLabel(icon: "speaker.wave.2", title: "操作提示音", detail: "记录成功时播放轻提示音", color: AppColors.inkGreen)
+                }
+                .toggleStyle(.switch)
+                .tint(AppColors.sage)
+                .padding(.horizontal, AppSpacing.roomy)
+                .padding(.vertical, AppSpacing.regular)
+
+                Divider().padding(.leading, 72).padding(.trailing, AppSpacing.roomy)
+
+                Toggle(isOn: $nightModeEnabled) {
+                    settingToggleLabel(icon: "moon.stars", title: "夜间外观", detail: "夜里记录时切换为柔和深色界面", color: AppColors.blueInk)
+                }
+                .toggleStyle(.switch)
+                .tint(AppColors.blueInk)
+                .padding(.horizontal, AppSpacing.roomy)
+                .padding(.vertical, AppSpacing.regular)
+
+                Divider().padding(.leading, 72).padding(.trailing, AppSpacing.roomy)
+
+                Button { openNotificationSettings() } label: {
+                    settingToggleLabel(icon: "bell", title: "通知权限", detail: "管理系统通知与提醒权限", color: AppColors.peach)
+                        .overlay(alignment: .trailing) {
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(AppColors.inkSoft)
+                                .padding(.trailing, 3)
+                        }
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, AppSpacing.roomy)
+                .padding(.vertical, AppSpacing.regular)
+
+                Divider().padding(.leading, 72).padding(.trailing, AppSpacing.roomy)
+
+                feedingLiveActivityRow
+            }
+        }
+    }
+
+    private var dangerSettingsCard: some View {
+        Button { isProfileDeletePresented = true } label: {
+            HStack(spacing: AppSpacing.medium) {
+                Image(systemName: "trash")
+                    .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(AppColors.coral)
+                    .frame(width: 38, height: 38)
+                Text("删除宝宝档案")
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.coral)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(AppColors.inkSoft)
+            }
+            .padding(AppSpacing.roomy)
+            .background { CardBackground(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func settingToggleLabel(icon: String, title: String, detail: String, color: Color) -> some View {
+        HStack(spacing: AppSpacing.medium) {
+            Image(systemName: icon)
+                .font(.system(size: 22, weight: .regular))
+                .foregroundStyle(color)
+                .frame(width: 38, height: 38)
+            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                Text(title).font(AppTypography.bodyLarge).foregroundStyle(AppColors.inkGreen)
+                Text(detail).font(AppTypography.caption).foregroundStyle(AppColors.inkSoft)
+            }
+            Spacer()
+        }
+    }
+
+    private func openNotificationSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private var quietCareModeRow: some View {
@@ -247,31 +316,6 @@ struct ProfileView: View {
             .disabled(isFeedingLiveActivityUpdating)
             .padding(.horizontal, AppSpacing.medium)
             .padding(.vertical, AppSpacing.small)
-
-            #if DEBUG
-            Button {
-                testFeedingLiveActivity()
-            } label: {
-                HStack(spacing: AppSpacing.regular) {
-                    Image(systemName: "play.circle")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppColors.coral)
-                        .frame(width: 30)
-                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text("测试灵动岛")
-                            .font(AppTypography.bodyLarge)
-                            .foregroundStyle(AppColors.inkGreen)
-                        Text("创建一个3分钟后的临时喝奶提醒。")
-                            .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.inkSoft)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, AppSpacing.medium)
-                .padding(.vertical, AppSpacing.small)
-            }
-            .buttonStyle(.plain)
-            #endif
         }
     }
 
@@ -284,6 +328,9 @@ struct ProfileView: View {
             if isEnabled {
                 FeedingReminderLiveActivityController.sync(
                     reminder: store.nextFeedingReminder,
+                    repeatIntervalMinutes: store.nextFeedingReminder?.origin == .automatic
+                        ? store.feedingReminderPreference.intervalMinutes
+                        : nil,
                     babyName: store.baby.name,
                     babyAvatarData: store.baby.avatarImageData
                 ) { result in
@@ -323,48 +370,6 @@ struct ProfileView: View {
             liveActivityMessage = "灵动岛开关已打开。".localizedText + message.localizedText
         }
     }
-
-    #if DEBUG
-    private func testFeedingLiveActivity() {
-        #if canImport(ActivityKit)
-        if #available(iOS 16.2, *) {
-            store.setFeedingLiveActivityEnabled(true)
-            let reminder = FeedingReminder(
-                babyId: store.baby.id,
-                remindAt: Date().addingTimeInterval(3 * 60)
-            )
-            FeedingReminderLiveActivityController.sync(
-                reminder: reminder,
-                babyName: store.baby.name,
-                babyAvatarData: store.baby.avatarImageData
-            ) { result in
-                handleTestFeedingLiveActivityResult(result)
-            }
-        } else {
-            liveActivityMessage = "当前系统版本不支持灵动岛实时活动。"
-        }
-        #else
-        liveActivityMessage = "当前系统版本不支持灵动岛实时活动。"
-        #endif
-    }
-
-    @available(iOS 16.2, *)
-    private func handleTestFeedingLiveActivityResult(_ result: FeedingReminderLiveActivityResult) {
-        switch result {
-        case .startedOrUpdated:
-            liveActivityMessage = "已创建3分钟灵动岛测试提醒。"
-        case .ended:
-            liveActivityMessage = "灵动岛喝奶提醒已关闭。"
-        case .noReminder:
-            liveActivityMessage = "先保存一个喝奶闹钟，灵动岛和锁屏提醒就会出现。"
-        case .activitiesDisabled:
-            store.setFeedingLiveActivityEnabled(false)
-            liveActivityMessage = "系统没有允许实时活动。请到 iPhone 设置里允许小奶瓶实时活动。"
-        case .failed(let message):
-            liveActivityMessage = "灵动岛测试暂时没有显示。".localizedText + message.localizedText
-        }
-    }
-    #endif
 
     private var avatarErrorBinding: Binding<Bool> {
         Binding {
@@ -438,15 +443,7 @@ struct ProfileView: View {
     }
 
     private func refreshFeedingLiveActivityAvatar() {
-        #if canImport(ActivityKit)
-        if #available(iOS 16.2, *), store.feedingLiveActivityEnabled {
-            FeedingReminderLiveActivityController.sync(
-                reminder: store.nextFeedingReminder,
-                babyName: store.baby.name,
-                babyAvatarData: store.baby.avatarImageData
-            )
-        }
-        #endif
+        QuickLogService.syncLiveActivity(store: store)
     }
 
     private var accountPresentationDetents: Set<PresentationDetent> {
@@ -695,8 +692,9 @@ struct BabyAvatarView: View {
                     .scaledToFill()
             } else {
                 Image(fallbackAssetName)
+                    .renderingMode(.original)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
             }
         }
         .frame(width: size, height: size)
@@ -735,6 +733,7 @@ private struct DataStatusSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isCloudDeletePresented = false
     @State private var isSignOutPresented = false
+    @State private var isRestorePresented = false
     @State private var phoneNumber = "+86"
     @State private var phoneCode = ""
     @State private var isPhoneCodeRequested = false
@@ -777,6 +776,16 @@ private struct DataStatusSheet: View {
                 Button("取消", role: .cancel) {}
             } message: {
                 Text("只会移除此设备上的登录会话，不会删除账号中的记录。")
+            }
+            .alert("从云端恢复？", isPresented: $isRestorePresented) {
+                Button("恢复", role: .destructive) {
+                    Task {
+                        await cloudSync.restoreFromCloud(store: store)
+                    }
+                }
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("会用云端备份覆盖本机当前的记录和照片。恢复前会自动保留一份本机快照。")
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -985,6 +994,11 @@ private struct DataStatusSheet: View {
 
     private var actionButtons: some View {
         VStack(spacing: AppSpacing.small) {
+            PrimaryWatercolorButton(title: "从云端恢复", tint: AppColors.cream, foreground: AppColors.inkGreen) {
+                isRestorePresented = true
+            }
+            .disabled(cloudSync.isWorking || !cloudSync.hasSession)
+
             PrimaryWatercolorButton(title: "退出当前账号", tint: AppColors.mistBlue, foreground: AppColors.inkGreen) {
                 isSignOutPresented = true
             }

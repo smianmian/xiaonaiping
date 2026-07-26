@@ -30,6 +30,8 @@ struct FeedingRecord: Identifiable, Equatable, Codable {
     var icon: String
     var amountML: Int?
     var durationMinutes: Int?
+    /// 母乳哺乳侧："左侧" / "右侧"；nil 表示未记录（含旧数据）。
+    var breastSide: String?
     var note: String?
     var createdAt: Date
     var updatedAt: Date
@@ -47,6 +49,7 @@ struct FeedingRecord: Identifiable, Equatable, Codable {
         icon: String,
         amountML: Int? = nil,
         durationMinutes: Int? = nil,
+        breastSide: String? = nil,
         note: String? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
@@ -63,6 +66,7 @@ struct FeedingRecord: Identifiable, Equatable, Codable {
         self.icon = icon
         self.amountML = amountML
         self.durationMinutes = durationMinutes
+        self.breastSide = breastSide
         self.note = note
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -83,6 +87,7 @@ struct FeedingRecord: Identifiable, Equatable, Codable {
         icon = try container.decode(String.self, forKey: .icon)
         amountML = try container.decodeIfPresent(Int.self, forKey: .amountML)
         durationMinutes = try container.decodeIfPresent(Int.self, forKey: .durationMinutes)
+        breastSide = try container.decodeIfPresent(String.self, forKey: .breastSide)
         note = try container.decodeIfPresent(String.self, forKey: .note)
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? occurredAt
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
@@ -97,6 +102,7 @@ struct WaterRecord: Identifiable, Equatable, Codable {
     var babyId: UUID
     var occurredAt: Date
     var amountML: Int
+    var note: String?
     var createdAt: Date
     var updatedAt: Date
 
@@ -105,6 +111,7 @@ struct WaterRecord: Identifiable, Equatable, Codable {
         babyId: UUID = RecordCodingDefaults.babyId,
         occurredAt: Date = Date(),
         amountML: Int,
+        note: String? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -112,6 +119,7 @@ struct WaterRecord: Identifiable, Equatable, Codable {
         self.babyId = babyId
         self.occurredAt = occurredAt
         self.amountML = amountML
+        self.note = note
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -122,6 +130,7 @@ struct WaterRecord: Identifiable, Equatable, Codable {
         babyId = try container.decodeIfPresent(UUID.self, forKey: .babyId) ?? RecordCodingDefaults.babyId
         occurredAt = try container.decodeIfPresent(Date.self, forKey: .occurredAt) ?? Date()
         amountML = try container.decodeIfPresent(Int.self, forKey: .amountML) ?? 0
+        note = try container.decodeIfPresent(String.self, forKey: .note)
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? occurredAt
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
     }

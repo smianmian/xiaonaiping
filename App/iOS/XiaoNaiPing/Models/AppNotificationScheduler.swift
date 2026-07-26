@@ -9,7 +9,13 @@ enum NotificationScheduleResult {
 }
 
 enum AppNotificationScheduler {
-    static func scheduleFeedingReminder(_ reminder: FeedingReminder, completion: @escaping (NotificationScheduleResult) -> Void = { _ in }) {
+    /// - Parameter repeatIntervalMinutes: 自动提醒的重复间隔。传入后会按该间隔追加
+    ///   后续几条“备份提醒”——父母睡过头没记录时，提醒链不会就此断掉。
+    static func scheduleFeedingReminder(
+        _ reminder: FeedingReminder,
+        repeatIntervalMinutes: Int? = nil,
+        completion: @escaping (NotificationScheduleResult) -> Void = { _ in }
+    ) {
         guard reminder.remindAt > Date() else {
             removeFeedingReminder()
             complete(.removed, completion: completion)
@@ -19,11 +25,11 @@ enum AppNotificationScheduler {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
-                addFeedingReminder(reminder, completion: completion)
+                addFeedingReminder(reminder, repeatIntervalMinutes: repeatIntervalMinutes, completion: completion)
             case .notDetermined:
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
                     if granted {
-                        addFeedingReminder(reminder, completion: completion)
+                        addFeedingReminder(reminder, repeatIntervalMinutes: repeatIntervalMinutes, completion: completion)
                     } else {
                         complete(.denied, completion: completion)
                     }
@@ -77,8 +83,12 @@ enum AppNotificationScheduler {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
-    private static func addFeedingReminder(_ reminder: FeedingReminder, completion: @escaping (NotificationScheduleResult) -> Void) {
-        let reminderDates = feedingReminderDates(for: reminder)
+    private static func addFeedingReminder(
+        _ reminder: FeedingReminder,
+        repeatIntervalMinutes: Int?,
+        completion: @escaping (NotificationScheduleResult) -> Void
+    ) {
+        let reminderDates = feedingReminderDates(for: reminder, repeatIntervalMinutes: repeatIntervalMinutes)
         guard !reminderDates.isEmpty else {
             removeFeedingReminder()
             complete(.removed, completion: completion)
@@ -92,14 +102,16 @@ enum AppNotificationScheduler {
         var didFail = false
 
         for (index, remindAt) in reminderDates.enumerated() {
-            if let prepareAt = Calendar.current.date(byAdding: .minute, value: -feedingPrepareReminderLeadMinutes, to: remindAt),
-               prepareAt > Date() {
-                let request = notificationRequest(
-                    identifier: feedingPrepareReminderIdentifier(index),
-                    date: prepareAt,
-                    title: "准备泡奶啦".localizedText,
-                    body: "5分钟后到喝奶时间，先把奶准备好。".localizedText
-                )
+            // “提前5分钟泡奶”只挂在第一条上；后续是错过后的备份提醒，不再翻倍打扰。
+            if index == 0,
+               let prepareAt = Calendar.current.date(byAdding: .minute, value: -feedingPrepareReminderLeadMinutes, to: remindAt),
+               prepareAt > Date(),
+               let request = notificationRequest(
+                   identifier: feedingPrepareReminderIdentifier(index),
+                   date: prepareAt,
+                   title: "准备泡奶啦".localizedText,
+                   body: "5分钟后到喝奶时间，先把奶准备好。".localizedText
+               ) {
                 add(request, group: group) {
                     lock.lock()
                     didFail = true
@@ -107,20 +119,26 @@ enum AppNotificationScheduler {
                 }
             }
 
-            let body = reminder.origin == .automatic
-                ? "到你设定的喝奶时间了。".localizedText
-                : "到你设置的喝奶时间了。".localizedText
+            let body: String
+            if index == 0 {
+                body = reminder.origin == .automatic
+                    ? "到你设定的喝奶时间了。".localizedText
+                    : "到你设置的喝奶时间了。".localizedText
+            } else {
+                body = "上一顿还没记录，到下一次喝奶时间了。".localizedText
+            }
 
-            let request = notificationRequest(
+            if let request = notificationRequest(
                 identifier: feedingReminderIdentifier(index),
                 date: remindAt,
                 title: "小奶瓶喝奶提醒".localizedText,
                 body: body
-            )
-            add(request, group: group) {
-                lock.lock()
-                didFail = true
-                lock.unlock()
+            ) {
+                add(request, group: group) {
+                    lock.lock()
+                    didFail = true
+                    lock.unlock()
+                }
             }
         }
 
@@ -152,16 +170,19 @@ enum AppNotificationScheduler {
         }
     }
 
-    private static func notificationRequest(identifier: String, date: Date, title: String, body: String) -> UNNotificationRequest {
+    // 喝奶提醒是“N 小时后”的相对时间，必须用时间间隔触发器：
+    // 日历触发器会在跨时区时按新时区的墙钟漂移，且把秒截断成 0
+    // 会让“30 秒后”的提醒落到过去、显示已安排实际永不触发。
+    private static func notificationRequest(identifier: String, date: Date, title: String, body: String) -> UNNotificationRequest? {
+        let interval = date.timeIntervalSinceNow
+        guard interval > 1 else { return nil }
+
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
 
-        var components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        components.second = 0
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
         return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
     }
 
@@ -185,8 +206,23 @@ enum AppNotificationScheduler {
         "xiaonaiping.vaccine.\(record.id.uuidString)"
     }
 
-    private static func feedingReminderDates(for reminder: FeedingReminder) -> [Date] {
-        reminder.remindAt > Date() ? [reminder.remindAt] : []
+    private static func feedingReminderDates(for reminder: FeedingReminder, repeatIntervalMinutes: Int?) -> [Date] {
+        guard reminder.remindAt > Date() else { return [] }
+        guard let repeatIntervalMinutes, repeatIntervalMinutes > 0 else {
+            return [reminder.remindAt]
+        }
+
+        // 首条 + 按间隔追加的备份提醒，最多覆盖约 24 小时。
+        var dates = [reminder.remindAt]
+        var next = reminder.remindAt
+        let horizon = Date().addingTimeInterval(24 * 60 * 60)
+        while dates.count < feedingReminderChainCount,
+              let candidate = Calendar.current.date(byAdding: .minute, value: repeatIntervalMinutes, to: next),
+              candidate <= horizon {
+            dates.append(candidate)
+            next = candidate
+        }
+        return dates
     }
 
     private static func feedingReminderIdentifier(_ index: Int) -> String {
@@ -205,5 +241,6 @@ enum AppNotificationScheduler {
 
     private static let legacyFeedingReminderIdentifier = "xiaonaiping.feeding.next"
     private static let feedingReminderScheduleLimit = 24
+    private static let feedingReminderChainCount = 8
     private static let feedingPrepareReminderLeadMinutes = 5
 }

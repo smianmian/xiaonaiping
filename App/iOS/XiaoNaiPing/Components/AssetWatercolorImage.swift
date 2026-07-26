@@ -6,6 +6,7 @@ struct AssetWatercolorImage: View {
 
     var body: some View {
         Image(name)
+            .renderingMode(.original)
             .resizable()
             .scaledToFit()
             .allowsHitTesting(false)

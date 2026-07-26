@@ -1,47 +1,36 @@
 import SwiftUI
 
 struct SleepRecordView: View {
+    var autoPresentEditor = false
+
     @EnvironmentObject private var store: BabyRecordStore
     @State private var isEditorPresented = false
     @State private var editingRecord: SleepRecord?
     @State private var deleteCandidate: SleepRecord?
     @State private var isStatsPresented = false
+    @State private var didAutoPresentEditor = false
+    @State private var selectedDay = Date()
+
+    private var isViewingToday: Bool {
+        Calendar.current.isDateInToday(selectedDay)
+    }
+
+    private var daySleepRecords: [SleepRecord] {
+        store.sleepRecords(on: selectedDay)
+    }
+
+    private var daySleepMinutesTotal: Int {
+        store.sleepMinutes(on: selectedDay)
+    }
 
     var body: some View {
         ScreenScaffold(title: "睡眠记录", trailingTitle: "统计", showBackButton: true, trailingAction: {
             isStatsPresented = true
         }) {
             ScrollView(showsIndicators: false) {
+                // 进行中卡片的实时时长每 30 秒自己走。
+                TimelineView(.periodic(from: .now, by: 30)) { _ in
                 VStack(spacing: AppSpacing.large) {
-                    AssetWatercolorImage(name: AppAssets.sleepHero, mode: .multiply)
-                        .frame(height: 108)
-
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
-                        VStack(spacing: AppSpacing.medium) {
-                            Text("今日已结束睡眠")
-                                .font(AppTypography.body)
-                                .foregroundStyle(AppColors.ink)
-                            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                                Text(totalSleepHours)
-                                Text("小时")
-                                    .font(AppTypography.body)
-                                Text(totalSleepMinutes)
-                                Text("分")
-                                    .font(AppTypography.body)
-                            }
-                            .font(AppTypography.largeNumber)
-                            .foregroundStyle(AppColors.blueInk)
-
-                            Divider().opacity(0.35)
-
-                            HStack {
-                                sleepMiniStat("小睡", "\(store.todaySleepRecords.filter { !$0.isOngoing && $0.type == "小睡" }.count)次", icon: AppAssets.cloudBlue)
-                                Divider().frame(height: 58)
-                                sleepMiniStat("状态", store.ongoingSleep == nil ? "已记录" : "进行中", icon: AppAssets.moonIcon)
-                            }
-                        }
-                    }
-
                     if let ongoing = store.ongoingSleep {
                         WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
                             HStack(spacing: AppSpacing.medium) {
@@ -53,26 +42,74 @@ struct SleepRecordView: View {
                                         Circle().fill(AppColors.milk.opacity(0.72))
                                     }
                                 VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                                    Text("睡眠正在进行中")
+                                    Text("已睡 \(ongoingDurationText(ongoing))")
                                         .font(AppTypography.cardTitle)
                                         .foregroundStyle(AppColors.inkGreen)
-                                    Text("从 \(ongoing.start) 开始，醒来后可以结束或补录醒来时间。")
+                                    Text("从 \(ongoing.start) 开始")
                                         .font(AppTypography.caption)
                                         .foregroundStyle(AppColors.inkSoft)
-                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                                 Spacer(minLength: 0)
+                                Button("结束") {
+                                    store.finishOngoingSleepNow()
+                                }
+                                .font(AppTypography.body.weight(.semibold))
+                                .foregroundStyle(AppColors.milk)
+                                .padding(.horizontal, AppSpacing.regular)
+                                .padding(.vertical, AppSpacing.small)
+                                .background(AppColors.coral, in: Capsule())
+                            }
+                        }
+                    } else {
+                        HStack(spacing: AppSpacing.medium) {
+                            PrimaryWatercolorButton(
+                                title: "开始睡觉",
+                                tint: AppColors.mistBlue,
+                                foreground: AppColors.blueInk
+                            ) {
+                                store.startSleepNow()
+                            }
+                            PrimaryWatercolorButton(title: isViewingToday ? "补记" : "补记这一天", tint: AppColors.mistBlue.opacity(0.7), foreground: AppColors.blueInk) {
+                                openEditor()
                             }
                         }
                     }
 
-                    SectionTitleView(title: "今日睡眠时段")
+                    DaySwitcherBar(selectedDay: $selectedDay)
+
+                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
+                        VStack(spacing: AppSpacing.medium) {
+                            Text(isViewingToday ? "今日睡眠" : "当日睡眠")
+                                .font(AppTypography.body)
+                                .foregroundStyle(AppColors.ink)
+                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                Text("\(daySleepMinutesTotal / 60)")
+                                Text("小时")
+                                    .font(AppTypography.body)
+                                Text("\(daySleepMinutesTotal % 60)")
+                                Text("分")
+                                    .font(AppTypography.body)
+                            }
+                            .font(AppTypography.largeNumber)
+                            .foregroundStyle(AppColors.blueInk)
+
+                            Divider().opacity(0.35)
+
+                            HStack {
+                                sleepMiniStat("小睡", "\(daySleepRecords.filter { !$0.isOngoing && $0.type == "小睡" }.count)次", icon: AppAssets.cloudBlue)
+                                Divider().frame(height: 58)
+                                sleepMiniStat("状态", sleepStatusText, icon: AppAssets.moonIcon)
+                            }
+                        }
+                    }
+
+                    SectionTitleView(title: isViewingToday ? "今日睡眠时段" : "当日睡眠时段")
 
                     VStack(spacing: AppSpacing.regular) {
-                        if store.todaySleepRecords.isEmpty {
+                        if daySleepRecords.isEmpty {
                             sleepEmptyState
                         } else {
-                            ForEach(store.todaySleepRecords) { record in
+                            ForEach(daySleepRecords) { record in
                                 HStack(spacing: AppSpacing.small) {
                                     Button {
                                         openEditor(record)
@@ -114,31 +151,14 @@ struct SleepRecordView: View {
                         }
                     }
 
-                    if !store.todaySleepRecords.isEmpty {
-                        HStack(spacing: AppSpacing.medium) {
-                            PrimaryWatercolorButton(
-                                title: store.ongoingSleep == nil ? "开始睡觉" : "结束睡眠",
-                                tint: AppColors.mistBlue,
-                                foreground: AppColors.blueInk
-                            ) {
-                                if store.ongoingSleep == nil {
-                                    store.startSleepNow()
-                                } else {
-                                    store.finishOngoingSleepNow()
-                                }
-                            }
-                            PrimaryWatercolorButton(title: "补记", tint: AppColors.mistBlue.opacity(0.7), foreground: AppColors.blueInk) {
-                                openEditor()
-                            }
-                        }
-                    }
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.bottom, AppSpacing.bottomBarSpace)
+                }
             }
         }
         .sheet(isPresented: $isEditorPresented) {
-            SleepEditorSheet(record: editingRecord) { record in
+            SleepEditorSheet(record: editingRecord, defaultDay: isViewingToday ? nil : selectedDay) { record in
                 store.upsert(record)
             }
             .presentationDetents([.medium, .large])
@@ -153,6 +173,12 @@ struct SleepRecordView: View {
                 ]
             )
             .presentationDetents([.height(260)])
+        }
+        .onAppear {
+            if autoPresentEditor && !didAutoPresentEditor {
+                didAutoPresentEditor = true
+                openEditor()
+            }
         }
         .alert("删除这段睡眠？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -169,12 +195,16 @@ struct SleepRecordView: View {
         }
     }
 
-    private var totalSleepHours: String {
-        "\(store.totalSleepMinutes / 60)"
+    private var sleepStatusText: String {
+        if store.ongoingSleep != nil {
+            return "进行中"
+        }
+        return daySleepRecords.isEmpty ? "无记录" : "已记录"
     }
 
-    private var totalSleepMinutes: String {
-        "\(store.totalSleepMinutes % 60)"
+    private func ongoingDurationText(_ record: SleepRecord) -> String {
+        let minutes = max(0, Calendar.current.dateComponents([.minute], from: record.startAt, to: Date()).minute ?? 0)
+        return BabyRecordStore.durationText(from: minutes)
     }
 
     private var deleteAlertBinding: Binding<Bool> {
@@ -192,17 +222,9 @@ struct SleepRecordView: View {
             VStack(spacing: AppSpacing.medium) {
                 AssetWatercolorImage(name: AppAssets.moonIcon, mode: .multiply)
                     .frame(width: 54, height: 54)
-                Text("今天还没有睡眠记录")
+                Text(isViewingToday ? "今天还没有睡眠记录" : "这一天没有睡眠记录")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
-                HStack(spacing: AppSpacing.medium) {
-                    PrimaryWatercolorButton(title: "开始睡觉", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
-                        store.startSleepNow()
-                    }
-                    PrimaryWatercolorButton(title: "补记", tint: AppColors.mistBlue.opacity(0.7), foreground: AppColors.blueInk) {
-                        openEditor()
-                    }
-                }
             }
             .frame(maxWidth: .infinity)
         }
@@ -244,10 +266,16 @@ private struct SleepEditorSheet: View {
 
     private let types = ["小睡", "夜睡"]
 
-    init(record: SleepRecord?, onSave: @escaping (SleepRecord) -> Bool) {
+    init(record: SleepRecord?, defaultDay: Date? = nil, onSave: @escaping (SleepRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
-        let startDate = record?.startAt ?? BabyRecordStore.date(fromTimeString: record?.start ?? BabyRecordStore.timeString(from: Date()))
+        // 补记历史日期时，默认落在所选日期中午，避免存成“今天”。
+        let fallbackStart = defaultDay.flatMap {
+            Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: $0)
+        }
+        let startDate = record?.startAt
+            ?? fallbackStart
+            ?? BabyRecordStore.date(fromTimeString: record?.start ?? BabyRecordStore.timeString(from: Date()))
         _startAt = State(initialValue: startDate)
         _endAt = State(initialValue: Self.endDate(for: record, startDate: startDate))
         _type = State(initialValue: record?.type ?? "小睡")
@@ -310,13 +338,18 @@ private struct SleepEditorSheet: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    PrimaryWatercolorButton(title: "保存睡眠记录", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
-                        save()
-                    }
                 }
                 .padding(AppSpacing.large)
             }
             .background(PaperBackgroundView())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                PrimaryWatercolorButton(title: "保存睡眠记录", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
+                    save()
+                }
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.vertical, AppSpacing.small)
+                .background(.ultraThinMaterial)
+            }
             .navigationTitle(record == nil ? "补记睡眠" : "编辑睡眠")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -19,6 +19,9 @@ targets:
   XiaoNaiPing:
     type: application
     platform: iOS
+    scheme:
+      testTargets:
+        - XiaoNaiPingTests
     sources:
       - path: XiaoNaiPing
         excludes:
@@ -82,10 +85,10 @@ targets:
           CODE_SIGNING_ALLOWED[sdk=iphoneos*]: "YES"
           CODE_SIGNING_REQUIRED[sdk=iphoneos*]: "YES"
           CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Development
-          XNP_API_BASE_URL: ""
-          XNP_WECHAT_APP_ID: ""
-          XNP_WECHAT_URL_SCHEME: ""
-          XNP_WECHAT_UNIVERSAL_LINK: ""
+          XNP_API_BASE_URL: "https://api.mewpow.com/xiaonaiping"
+          XNP_WECHAT_APP_ID: "wxe919f9e41822223c"
+          XNP_WECHAT_URL_SCHEME: "wxe919f9e41822223c"
+          XNP_WECHAT_UNIVERSAL_LINK: "https://api.mewpow.com/xiaonaiping/wechat/"
           XNP_ASSOCIATED_DOMAIN: "applinks:api.mewpow.com"
         Release:
           CODE_SIGN_STYLE: Manual
@@ -97,6 +100,24 @@ targets:
           XNP_WECHAT_URL_SCHEME: "wxe919f9e41822223c"
           XNP_WECHAT_UNIVERSAL_LINK: "https://api.mewpow.com/xiaonaiping/wechat/"
           XNP_ASSOCIATED_DOMAIN: "applinks:api.mewpow.com"
+  XiaoNaiPingTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: XiaoNaiPingTests
+    dependencies:
+      - target: XiaoNaiPing
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mewpow.xiaonaiping.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/XiaoNaiPing.app/XiaoNaiPing"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+      configs:
+        Debug:
+          CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]: "NO"
+          CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]: "NO"
+          CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: ""
   XiaoNaiPingWidgets:
     type: app-extension
     platform: iOS

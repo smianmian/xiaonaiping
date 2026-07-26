@@ -3,86 +3,25 @@ import SwiftUI
 struct GrowthView: View {
     var onOpenMonthlyReport: (() -> Void)?
     var onOpenVaccineBook: (() -> Void)?
+    var autoPresentEditor = false
 
     @EnvironmentObject private var store: BabyRecordStore
     @State private var selectedMetric = "体重"
     @State private var isEditorPresented = false
     @State private var editingRecord: GrowthRecord?
     @State private var deleteCandidate: GrowthRecord?
+    @State private var didAutoPresentEditor = false
 
     var body: some View {
-        ScreenScaffold(title: "身高体重", trailingTitle: "记录", showBackButton: true, trailingAction: {
+        ScreenScaffold(title: "成长", trailingTitle: "记录", showBackButton: false, trailingAction: {
             openEditor()
         }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    if store.growthRecords.isEmpty {
-                        growthEmptyState
-                    } else {
-                        SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
-                            .padding(.horizontal, 28)
-
-                        GrowthChartView(records: store.growthRecords, metric: selectedMetric)
-                            .frame(height: 292)
-
-                        HStack(spacing: AppSpacing.regular) {
-                            metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
-                            metricCard(title: "身高", value: formatted(store.latestGrowthRecord?.height), unit: "cm", icon: "shield.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
-                            metricCard(title: "头围", value: formatted(store.latestGrowthRecord?.head), unit: "cm", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
-                        }
-
-                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.smallRadius, padding: AppSpacing.medium) {
-                            HStack {
-                                AssetWatercolorImage(name: AppAssets.teddyHero, mode: .multiply)
-                                    .frame(width: 36, height: 32)
-                                Text("最近一次记录：\(store.latestGrowthRecord?.measuredAt ?? "")")
-                                    .font(AppTypography.body)
-                                    .foregroundStyle(AppColors.inkGreen)
-                                Spacer()
-                            }
-                        }
-                    }
-
+                    growthCard
                     vaccineBookEntry
-                    MonthlyReportCard(report: store.monthlyReport)
-                    if let onOpenMonthlyReport {
-                        PrimaryWatercolorButton(title: "查看完整月报", tint: AppColors.blush, foreground: AppColors.coral) {
-                            onOpenMonthlyReport()
-                        }
-                    }
-
-                    if !store.growthRecords.isEmpty {
-                        VStack(spacing: AppSpacing.regular) {
-                            ForEach(store.growthRecords.reversed()) { record in
-                                HStack(spacing: AppSpacing.small) {
-                                    Button {
-                                        openEditor(record)
-                                    } label: {
-                                        GrowthHistoryRow(record: record)
-                                            .frame(maxWidth: .infinity)
-                                    }
-                                    .buttonStyle(.plain)
-
-                                    Button {
-                                        deleteCandidate = record
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.system(size: 18, weight: .regular))
-                                            .foregroundStyle(AppColors.coral)
-                                            .frame(width: 44, height: 44)
-                                            .background {
-                                                Circle().fill(AppColors.blush.opacity(0.56))
-                                            }
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel("删除成长记录")
-                                }
-                            }
-                        }
-
-                        PrimaryWatercolorButton(title: "+ 添加记录") {
-                            openEditor()
-                        }
+                    if !store.currentBabyGrowthRecords.isEmpty {
+                        historySection
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -90,10 +29,16 @@ struct GrowthView: View {
             }
         }
         .sheet(isPresented: $isEditorPresented) {
-            GrowthEditorSheet(record: editingRecord) { record in
+            GrowthEditorSheet(record: editingRecord, latest: store.latestGrowthRecord) { record in
                 store.upsert(record)
             }
             .presentationDetents([.medium, .large])
+        }
+        .onAppear {
+            if autoPresentEditor && !didAutoPresentEditor {
+                didAutoPresentEditor = true
+                openEditor()
+            }
         }
         .alert("删除这条成长记录？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -120,19 +65,102 @@ struct GrowthView: View {
         }
     }
 
-    private var growthEmptyState: some View {
-        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-            VStack(spacing: AppSpacing.medium) {
-                AssetWatercolorImage(name: AppAssets.quickGrowthIcon, mode: .multiply)
-                    .frame(width: 54, height: 54)
-                Text("还没有身高体重记录")
-                    .font(AppTypography.bodyLarge)
-                    .foregroundStyle(AppColors.inkGreen)
-                PrimaryWatercolorButton(title: "添加记录") {
-                    openEditor()
+    /// 身高体重主卡：空状态按参考稿（大插画 + 引导文案 + 珊瑚色胶囊按钮），
+    /// 有数据时在同一张卡里展示指标切换、趋势图和最新数值。
+    private var growthCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "ruler.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(AppColors.sage)
+                    Text("身高体重")
+                        .font(AppTypography.sectionTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+                }
+
+                if store.currentBabyGrowthRecords.isEmpty {
+                    VStack(spacing: AppSpacing.medium) {
+                        AssetWatercolorImage(name: "approvedGrowthMeasure")
+                            .frame(width: 170, height: 170)
+                            .padding(.top, AppSpacing.small)
+                        Text("还没有身高体重记录")
+                            .font(AppTypography.sectionTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text("记录第一次测量后，这里会生成成长趋势")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .multilineTextAlignment(.center)
+                        Button {
+                            openEditor()
+                        } label: {
+                            Text("添加测量")
+                                .font(AppTypography.bodyLarge.weight(.semibold))
+                                .foregroundStyle(AppColors.milk)
+                                .padding(.horizontal, 44)
+                                .padding(.vertical, 13)
+                                .background(AppColors.coral, in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.bottom, AppSpacing.small)
+                    }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
+                        .padding(.horizontal, AppSpacing.small)
+
+                    GrowthChartView(records: store.currentBabyGrowthRecords, metric: selectedMetric)
+                        .frame(height: 248)
+
+                    HStack(spacing: AppSpacing.regular) {
+                        metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
+                        metricCard(title: "身高", value: formatted(store.latestGrowthRecord?.height), unit: "cm", icon: "shield.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
+                        metricCard(title: "头围", value: formatted(store.latestGrowthRecord?.head), unit: "cm", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
+                    }
+
+                    HStack {
+                        Image(systemName: "clock")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundStyle(AppColors.inkSoft)
+                        Text("最近一次记录：\(store.latestGrowthRecord?.measuredAt ?? "")")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                        Spacer()
+                    }
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var historySection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.regular) {
+            SectionTitleView(title: "测量历史")
+            ForEach(store.currentBabyGrowthRecords.reversed()) { record in
+                HStack(spacing: AppSpacing.small) {
+                    Button {
+                        openEditor(record)
+                    } label: {
+                        GrowthHistoryRow(record: record)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        deleteCandidate = record
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 18, weight: .regular))
+                            .foregroundStyle(AppColors.coral)
+                            .frame(width: 44, height: 44)
+                            .background {
+                                Circle().fill(AppColors.blush.opacity(0.56))
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("删除成长记录")
+                }
+            }
         }
     }
 
@@ -156,60 +184,90 @@ struct GrowthView: View {
     }
 
     private var vaccineBookCard: some View {
-        WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                HStack(alignment: .top, spacing: AppSpacing.medium) {
-                    AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
-                        .frame(width: 54, height: 54)
+                HStack(alignment: .center, spacing: AppSpacing.medium) {
+                    ZStack {
+                        Image(systemName: "shield.fill")
+                            .font(.system(size: 34, weight: .regular))
+                            .foregroundStyle(AppColors.sage)
+                        Image(systemName: "plus")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(AppColors.milk)
+                    }
+                    .frame(width: 48, height: 48)
 
                     VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                         Text("宝宝疫苗本")
                             .font(AppTypography.sectionTitle)
                             .foregroundStyle(AppColors.inkGreen)
-                        Text(vaccineBookSubtitle)
-                            .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.inkSoft)
+                        vaccineSubtitleText
+                            .font(AppTypography.body)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     Spacer(minLength: 0)
                 }
 
-                HStack(spacing: AppSpacing.regular) {
-                    vaccineBookStat(
-                        title: "已接种",
-                        value: "\(administeredVaccineCount)",
-                        tint: AppColors.grass,
-                        color: AppColors.inkGreen
-                    )
-                    vaccineBookStat(
-                        title: "待接种",
-                        value: "\(pendingVaccineCount)",
-                        tint: AppColors.cream,
-                        color: AppColors.coral
-                    )
+                if !store.vaccineRecords.isEmpty {
+                    HStack(spacing: AppSpacing.regular) {
+                        vaccineBookStat(
+                            title: "已接种",
+                            value: "\(administeredVaccineCount)",
+                            icon: "checkmark.shield.fill",
+                            tint: AppColors.grass,
+                            color: AppColors.inkGreen
+                        )
+                        vaccineBookStat(
+                            title: "待接种",
+                            value: "\(pendingVaccineCount)",
+                            icon: "syringe.fill",
+                            tint: AppColors.blush,
+                            color: AppColors.coral
+                        )
+                    }
                 }
 
+                Divider().opacity(0.35)
+
                 HStack(spacing: AppSpacing.tiny) {
-                    Text("打开疫苗本".localizedText)
+                    Text(store.vaccineRecords.isEmpty ? "创建疫苗本".localizedText : "打开疫苗本".localizedText)
                         .font(AppTypography.body.weight(.semibold))
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .semibold))
                 }
-                .foregroundStyle(AppColors.blueInk)
+                .foregroundStyle(AppColors.inkGreen)
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(AppLocalization.format("宝宝疫苗本，已接种 %d 针，待接种 %d 针", administeredVaccineCount, pendingVaccineCount))
+        .accessibilityLabel(store.vaccineRecords.isEmpty ? "还没有建立宝宝疫苗本" : AppLocalization.format("宝宝疫苗本，已接种 %d 针，待接种 %d 针", administeredVaccineCount, pendingVaccineCount))
     }
 
-    private func vaccineBookStat(title: String, value: String, tint: Color, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+    /// “下一针：脊灰疫苗 · 2026.08.30”——疫苗名用主题绿，其余淡墨。
+    private var vaccineSubtitleText: Text {
+        guard !store.vaccineRecords.isEmpty else {
+            return Text("还没有建立宝宝疫苗本".localizedText)
+                .foregroundColor(AppColors.inkSoft)
+        }
+        guard let nextVaccine = store.nextVaccine else {
+            return Text("当前没有待接种记录。".localizedText)
+                .foregroundColor(AppColors.inkSoft)
+        }
+        return Text("下一针：".localizedText).foregroundColor(AppColors.inkSoft)
+            + Text(nextVaccine.title.localizedText).foregroundColor(AppColors.sage)
+            + Text(" · " + vaccineDueText(nextVaccine)).foregroundColor(AppColors.inkSoft)
+    }
+
+    private func vaccineBookStat(title: String, value: String, icon: String, tint: Color, color: Color) -> some View {
+        VStack(spacing: AppSpacing.small) {
+            Image(systemName: icon)
+                .font(.system(size: 24, weight: .regular))
+                .foregroundStyle(color)
             Text(title.localizedText)
-                .font(AppTypography.caption)
-                .foregroundStyle(AppColors.inkSoft)
+                .font(AppTypography.body)
+                .foregroundStyle(AppColors.ink)
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(value)
                     .font(AppTypography.largeNumber)
@@ -219,9 +277,9 @@ struct GrowthView: View {
                     .foregroundStyle(AppColors.ink)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppSpacing.medium)
-        .background(tint.opacity(0.72), in: RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous))
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.regular)
+        .background(tint.opacity(0.45), in: RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous))
     }
 
     private var administeredVaccineCount: Int {
@@ -234,7 +292,7 @@ struct GrowthView: View {
 
     private var vaccineBookSubtitle: String {
         guard !store.vaccineRecords.isEmpty else {
-            return "生成模板或新增记录，开始建立宝宝疫苗本。".localizedText
+            return "还没有建立宝宝疫苗本".localizedText
         }
 
         guard let nextVaccine = store.nextVaccine else {
@@ -245,6 +303,10 @@ struct GrowthView: View {
     }
 
     private func vaccineDueText(_ record: VaccineRecord) -> String {
+        // 参考稿显示具体日期（2026.08.30），有日期用日期，没有再退回“N天后”。
+        if !record.dueText.isEmpty {
+            return record.dueText
+        }
         let unit = store.vaccineDueUnit(record)
         if unit == "今天" {
             return unit.localizedText
@@ -273,9 +335,12 @@ struct GrowthView: View {
                     Text(value)
                         .font(AppTypography.largeNumber)
                         .foregroundStyle(color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.55)
                     Text(unit)
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.ink)
+                        .layoutPriority(1)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -604,7 +669,9 @@ private struct GrowthHistoryRow: View {
 
     var body: some View {
         HStack(spacing: AppSpacing.medium) {
-            AssetWatercolorImage(name: AppAssets.quickGrowthIcon, mode: .multiply)
+            Image(systemName: "ruler.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppColors.blueInk)
                 .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: AppSpacing.tiny) {
                 Text(record.measuredAt.isEmpty ? record.month : record.measuredAt)
@@ -646,80 +713,54 @@ private struct GrowthHistoryRow: View {
     }
 }
 
+/// 「记录身高体重」编辑表单：分行卡片式布局。
+/// 时间行（内联日期选择）＋ 体重/身高/头围三个 stepper 行 ＋ 备注卡 ＋ 底部珊瑚色保存胶囊。
+/// 三项数值都随 stepper 保存（有默认值即有效值），不再有“至少填一项”的报错分支。
 private struct GrowthEditorSheet: View {
     let record: GrowthRecord?
     let onSave: (GrowthRecord) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @State private var measuredAt: Date
-    @State private var weightText: String
-    @State private var heightText: String
-    @State private var headText: String
+    @State private var weight: Double
+    @State private var height: Double
+    @State private var head: Double
     @State private var note: String
     @State private var errorMessage: String?
-    @State private var showsMoreDetails = false
+    @State private var showsDatePicker = false
 
-    init(record: GrowthRecord?, onSave: @escaping (GrowthRecord) -> Bool) {
+    private static let weightRange: ClosedRange<Double> = 1.0...30.0
+    private static let heightRange: ClosedRange<Double> = 30.0...130.0
+    private static let headRange: ClosedRange<Double> = 25.0...60.0
+    private static let noteLimit = 100
+
+    private static let displayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "yyyy年M月d日"
+        return formatter
+    }()
+
+    /// 新建时用 `latest`（store 最近一条成长记录）的对应值当默认值；没有历史则退回固定默认。
+    init(record: GrowthRecord?, latest: GrowthRecord? = nil, onSave: @escaping (GrowthRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
         _measuredAt = State(initialValue: record.flatMap { BabyRecordStore.date(fromDateString: $0.measuredAt) } ?? Date())
-        _weightText = State(initialValue: Self.fieldText(for: record?.weight))
-        _heightText = State(initialValue: Self.fieldText(for: record?.height))
-        _headText = State(initialValue: Self.fieldText(for: record?.head))
+        _weight = State(initialValue: Self.initialValue(record?.weight, latest: latest?.weight, fallback: 4.0, in: Self.weightRange))
+        _height = State(initialValue: Self.initialValue(record?.height, latest: latest?.height, fallback: 55.0, in: Self.heightRange))
+        _head = State(initialValue: Self.initialValue(record?.head, latest: latest?.head, fallback: 37.0, in: Self.headRange))
         _note = State(initialValue: record?.note ?? "")
     }
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: AppSpacing.large) {
-                    WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            DatePicker("日期", selection: $measuredAt, displayedComponents: [.date])
-                                .font(AppTypography.readableBody)
-                            TextField("体重 kg，可不填", text: $weightText)
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.roundedBorder)
-                            TextField("身高 cm，可不填", text: $heightText)
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                    }
-
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.cardRadius, padding: 0) {
-                        Button {
-                            withAnimation {
-                                showsMoreDetails.toggle()
-                            }
-                        } label: {
-                            HStack(spacing: AppSpacing.small) {
-                                Image(systemName: showsMoreDetails ? "chevron.up" : "chevron.down")
-                                Text("更多详情（可不填）")
-                                Spacer(minLength: 0)
-                                Text(showsMoreDetails ? "收起" : "头围、备注")
-                                    .font(AppTypography.caption)
-                                    .foregroundStyle(AppColors.inkSoft)
-                            }
-                            .font(AppTypography.body)
-                            .foregroundStyle(AppColors.inkGreen)
-                            .padding(.horizontal, AppSpacing.medium)
-                            .padding(.vertical, AppSpacing.regular)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    if showsMoreDetails {
-                        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius) {
-                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                                TextField("头围 cm，可不填", text: $headText)
-                                    .keyboardType(.decimalPad)
-                                    .textFieldStyle(.roundedBorder)
-                                TextField("备注，可不填", text: $note, axis: .vertical)
-                                    .lineLimit(2...4)
-                                    .textFieldStyle(.roundedBorder)
-                            }
-                        }
-                    }
+                VStack(spacing: AppSpacing.medium) {
+                    dateCard
+                    stepperRow(icon: "scalemass", iconColor: AppColors.inkGreen, title: "体重", value: $weight, step: 0.1, range: Self.weightRange, unit: "kg")
+                    stepperRow(icon: "ruler", iconColor: AppColors.inkGreen, title: "身高", value: $height, step: 0.5, range: Self.heightRange, unit: "cm")
+                    stepperRow(icon: "face.smiling", iconColor: AppColors.peach, title: "头围", value: $head, step: 0.5, range: Self.headRange, unit: "cm")
+                    noteCard
 
                     if let errorMessage {
                         Text(errorMessage)
@@ -727,15 +768,27 @@ private struct GrowthEditorSheet: View {
                             .foregroundStyle(AppColors.coral)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
-
-                    PrimaryWatercolorButton(title: "保存成长记录") {
-                        save()
-                    }
                 }
                 .padding(AppSpacing.large)
             }
             .background(PaperBackgroundView())
-            .navigationTitle(record == nil ? "添加记录" : "编辑记录")
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Button {
+                    save()
+                } label: {
+                    Text("保存记录")
+                        .font(AppTypography.bodyLarge.weight(.semibold))
+                        .foregroundStyle(AppColors.milk)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(AppColors.coral, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.vertical, AppSpacing.small)
+                .background(.ultraThinMaterial)
+            }
+            .navigationTitle(record == nil ? "记录身高体重" : "编辑测量")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -743,54 +796,188 @@ private struct GrowthEditorSheet: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("保存") {
+                        save()
+                    }
+                    .foregroundStyle(AppColors.coral)
+                }
             }
         }
     }
 
+    // MARK: - 行卡
+
+    private var dateCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: 0) {
+            VStack(spacing: 0) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showsDatePicker.toggle()
+                    }
+                } label: {
+                    HStack(spacing: AppSpacing.small) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(AppColors.inkGreen)
+                            .frame(width: 26)
+                        Text("时间")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Spacer(minLength: AppSpacing.small)
+                        Text(Self.displayDateFormatter.string(from: measuredAt))
+                            .font(AppTypography.readableBody)
+                            .foregroundStyle(AppColors.ink)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(AppColors.inkSoft)
+                            .rotationEffect(.degrees(showsDatePicker ? 180 : 0))
+                    }
+                    .padding(AppSpacing.medium)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("测量时间")
+                .accessibilityValue(Self.displayDateFormatter.string(from: measuredAt))
+
+                if showsDatePicker {
+                    DatePicker("测量时间", selection: $measuredAt, in: ...Date(), displayedComponents: [.date])
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                        .tint(AppColors.coral)
+                        .padding(.horizontal, AppSpacing.small)
+                        .padding(.bottom, AppSpacing.small)
+                }
+            }
+        }
+    }
+
+    private func stepperRow(icon: String, iconColor: Color, title: String, value: Binding<Double>, step: Double, range: ClosedRange<Double>, unit: String) -> some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            HStack(spacing: AppSpacing.small) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(iconColor)
+                    .frame(width: 26)
+                Text(title)
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.inkGreen)
+
+                Spacer(minLength: AppSpacing.small)
+
+                stepButton(symbol: "minus", enabled: value.wrappedValue > range.lowerBound + 0.001) {
+                    adjust(value, by: -step, in: range)
+                }
+                .accessibilityLabel("减少\(title)")
+
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(String(format: "%.1f", value.wrappedValue))
+                        .font(AppTypography.largeNumber)
+                        .foregroundStyle(AppColors.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.55)
+                    Text(unit)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+                .frame(minWidth: 88)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(title)
+                .accessibilityValue("\(String(format: "%.1f", value.wrappedValue)) \(unit)")
+
+                stepButton(symbol: "plus", enabled: value.wrappedValue < range.upperBound - 0.001) {
+                    adjust(value, by: step, in: range)
+                }
+                .accessibilityLabel("增加\(title)")
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func stepButton(symbol: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(AppColors.coral.opacity(enabled ? 1 : 0.35))
+                .frame(width: 44, height: 44)
+                .background {
+                    Circle()
+                        .fill(AppColors.cream)
+                        .overlay {
+                            Circle().stroke(AppColors.softStroke.opacity(0.4), lineWidth: 1)
+                        }
+                        .frame(width: 38, height: 38)
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+    }
+
+    private var noteCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(AppColors.inkGreen)
+                        .frame(width: 26)
+                    Text("备注（可选）")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.inkGreen)
+                }
+                TextField("如：宝宝状态等", text: $note, axis: .vertical)
+                    .lineLimit(2...4)
+                    .font(AppTypography.readableBody)
+                    .foregroundStyle(AppColors.ink)
+                    .onChange(of: note) { _, newValue in
+                        if newValue.count > Self.noteLimit {
+                            note = String(newValue.prefix(Self.noteLimit))
+                        }
+                    }
+                Text("\(note.count)/\(Self.noteLimit)")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    // MARK: - 数值与保存
+
+    private func adjust(_ value: Binding<Double>, by step: Double, in range: ClosedRange<Double>) {
+        let next = ((value.wrappedValue + step) * 10).rounded() / 10
+        value.wrappedValue = min(max(next, range.lowerBound), range.upperBound)
+    }
+
+    /// 编辑时用记录值（>0 才算有效）；新建时用最近一条记录的对应值；再退回固定默认，并夹进合法范围。
+    private static func initialValue(_ recordValue: Double?, latest: Double?, fallback: Double, in range: ClosedRange<Double>) -> Double {
+        let base = [recordValue, latest].compactMap { $0 }.first { $0 > 0 } ?? fallback
+        let clamped = min(max(base, range.lowerBound), range.upperBound)
+        return (clamped * 10).rounded() / 10
+    }
+
     private func save() {
         errorMessage = nil
-        let weight = decimalValue(weightText)
-        let height = decimalValue(heightText)
-        let head = decimalValue(headText)
-
-        guard errorMessage == nil else { return }
-        guard weight != nil || height != nil else {
-            errorMessage = "至少填写体重或身高其中一项。"
-            return
-        }
-
         var saved = record ?? GrowthRecord(
             month: BabyRecordStore.monthString(from: measuredAt),
-            weight: weight ?? 0,
-            height: height ?? 0,
-            head: head ?? 0,
+            weight: weight,
+            height: height,
+            head: head,
             measuredAt: BabyRecordStore.dateString(from: measuredAt)
         )
         saved.month = BabyRecordStore.monthString(from: measuredAt)
-        saved.weight = weight ?? 0
-        saved.height = height ?? 0
-        saved.head = head ?? 0
+        saved.weight = weight
+        saved.height = height
+        saved.head = head
         saved.measuredAt = BabyRecordStore.dateString(from: measuredAt)
-        saved.note = note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note
+        let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        saved.note = trimmedNote.isEmpty ? nil : trimmedNote
         if onSave(saved) {
             dismiss()
         } else {
             errorMessage = "保存失败，请稍后再试。输入已保留。"
         }
-    }
-
-    private static func fieldText(for value: Double?) -> String {
-        guard let value, value > 0 else { return "" }
-        return value.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(value)) : String(format: "%.1f", value)
-    }
-
-    private func decimalValue(_ text: String) -> Double? {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
-        guard let value = Double(trimmed), value > 0 else {
-            errorMessage = "数值请填写大于 0 的数字，或留空。"
-            return nil
-        }
-        return value
     }
 }

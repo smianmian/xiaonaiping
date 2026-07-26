@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import UIKit
+import WidgetKit
 
 extension Notification.Name {
     static let babyRecordStoreDidSave = Notification.Name("babyRecordStoreDidSave")
@@ -39,12 +40,18 @@ final class BabyRecordStore: ObservableObject {
     @Published var quietCareModeEnabled = true
     @Published var feedingLiveActivityEnabled = true
     @Published var saveErrorMessage: String?
+    @Published var loadErrorMessage: String?
+    private(set) var isPersistenceBlocked = false
 
     private let fileManager = FileManager.default
     private let userDefaults = UserDefaults.standard
     private let stateFileName = "xiaonaiping-local-state.json"
+    private let backupStateFileName = "xiaonaiping-local-state.backup.json"
+    private let storageDirectoryOverride: URL?
+    private static let mockDataSeededDefaultsKey = "xnp.debug.mock-data-seeded"
 
-    init(seedMockData: Bool = false) {
+    init(seedMockData: Bool = false, storageDirectoryOverride: URL? = nil) {
+        self.storageDirectoryOverride = storageDirectoryOverride
         loadState()
         if seedMockData {
             applyMockData()
@@ -52,10 +59,12 @@ final class BabyRecordStore: ObservableObject {
 
         loadFeedingReminderPreference()
         normalizeRecordsForCurrentBaby()
+        removeLegacyBackupExclusionIfNeeded()
         writeSharedTodaySnapshot()
     }
 
     private func applyMockData() {
+        userDefaults.set(true, forKey: Self.mockDataSeededDefaultsKey)
         hasCompletedOnboarding = true
         baby = MockData.baby
         feedingRecords = MockData.feedingRecords
@@ -102,9 +111,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todayWaterRecords: [WaterRecord] {
-        waterRecords
-            .filter { Calendar.current.isDateInToday($0.occurredAt) }
-            .sorted { $0.occurredAt > $1.occurredAt }
+        waterRecords(on: Date())
     }
 
     var lastFeedingRecord: FeedingRecord? {
@@ -159,9 +166,37 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todayFeedingRecords: [FeedingRecord] {
+        feedingRecords(on: Date())
+    }
+
+    func feedingRecords(on day: Date) -> [FeedingRecord] {
         feedingRecords
-            .filter { Calendar.current.isDateInToday($0.occurredAt) }
+            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
             .sorted { $0.occurredAt > $1.occurredAt }
+    }
+
+    func waterRecords(on day: Date) -> [WaterRecord] {
+        waterRecords
+            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
+            .sorted { $0.occurredAt > $1.occurredAt }
+    }
+
+    func sleepRecords(on day: Date) -> [SleepRecord] {
+        sleepRecords
+            .filter { Self.isSleepRecord($0, on: day) }
+            .sorted { Self.sleepSortDate($0) > Self.sleepSortDate($1) }
+    }
+
+    func diaperRecords(on day: Date) -> [DiaperRecord] {
+        diaperRecords
+            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
+            .sorted { $0.occurredAt > $1.occurredAt }
+    }
+
+    func sleepMinutes(on day: Date) -> Int {
+        sleepRecords(on: day)
+            .map { Self.sleepMinutes(of: $0, on: day) }
+            .reduce(0, +)
     }
 
     var nextFeedingReminder: FeedingReminder? {
@@ -173,15 +208,16 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todaySleepRecords: [SleepRecord] {
-        sleepRecords
-            .filter(Self.isTodaySleepRecord)
-            .sorted { Self.sleepSortDate($0) > Self.sleepSortDate($1) }
+        sleepRecords(on: Date())
     }
 
     var todayDiaperRecords: [DiaperRecord] {
-        diaperRecords
-            .filter { Calendar.current.isDateInToday($0.occurredAt) }
-            .sorted { $0.occurredAt > $1.occurredAt }
+        diaperRecords(on: Date())
+    }
+
+    /// 最近一次喂养（不限日期），供“同上次”一键记录取默认值。
+    var latestFeedingRecordEver: FeedingRecord? {
+        feedingRecords.max { $0.occurredAt < $1.occurredAt }
     }
 
     var recentHomeRecords: [HomeRecentRecord] {
@@ -192,7 +228,7 @@ final class BabyRecordStore: ObservableObject {
                 time: record.time,
                 icon: record.icon,
                 title: "喂养 · \(record.type)",
-                detail: record.detail
+                detail: feedingResultText(for: record)
             )
         }
         let sleep = todaySleepRecords.map { record in
@@ -248,6 +284,36 @@ final class BabyRecordStore: ObservableObject {
             .first
     }
 
+    private func feedingResultText(for record: FeedingRecord) -> String {
+        if let amount = record.amountML, amount > 0 {
+            return "\(amount)ml"
+        }
+        if let duration = record.durationMinutes, duration > 0 {
+            return "\(duration)分钟"
+        }
+        return record.detail == "快速记录" ? "已记录" : record.detail
+    }
+
+    /// Growth records are legacy data without a babyId. Keep only dated records
+    /// that can belong to the current baby's lifetime so stale demo/history
+    /// entries cannot appear on the formal growth page.
+    var currentBabyGrowthRecords: [GrowthRecord] {
+        let birthDate = Calendar.current.startOfDay(for: baby.birthDate)
+        let today = Calendar.current.startOfDay(for: Date())
+        return growthRecords
+            .filter { record in
+                guard let measuredAt = Self.date(fromDateString: record.measuredAt) else {
+                    return false
+                }
+                let date = Calendar.current.startOfDay(for: measuredAt)
+                return date >= birthDate && date <= today
+            }
+            .sorted {
+                (Self.date(fromDateString: $0.measuredAt) ?? .distantPast)
+                    < (Self.date(fromDateString: $1.measuredAt) ?? .distantPast)
+            }
+    }
+
     func vaccineDaysUntil(_ record: VaccineRecord) -> Int {
         guard let dueDate = Self.date(fromDateString: record.dueText) else {
             return Int.max
@@ -261,14 +327,19 @@ final class BabyRecordStore: ObservableObject {
 
     func vaccineDueValue(_ record: VaccineRecord) -> String {
         let days = vaccineDaysUntil(record)
-        guard days != Int.max else { return "--" }
-        return "\(abs(days))"
+        guard days != Int.max else { return "未设置" }
+        // A pending item with a past plan date is not "N days ago". Show the
+        // concrete plan date so the user can decide whether to edit or mark it.
+        return days < 0 ? (record.dueText.isEmpty ? "--" : record.dueText) : "\(days)"
     }
 
     func vaccineDueUnit(_ record: VaccineRecord) -> String {
         let days = vaccineDaysUntil(record)
+        if days == Int.max {
+            return ""
+        }
         if days < 0 {
-            return "天前"
+            return ""
         }
         if days == 0 {
             return "今天"
@@ -291,7 +362,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var latestGrowthRecord: GrowthRecord? {
-        growthRecords.last
+        currentBabyGrowthRecords.last
     }
 
     var monthlyReport: MonthlyReportSnapshot {
@@ -303,7 +374,7 @@ final class BabyRecordStore: ObservableObject {
         let monthlySleep = sleepRecords.filter { Self.isSameMonthSleepRecord($0, monthDate: monthDate) }
         let monthlyDiapers = diaperRecords.filter { Self.isSameMonth($0.occurredAt, monthDate: monthDate) }
         let monthlyPhotos = babyPhotos.filter { Calendar.current.isDate($0.capturedAt, equalTo: monthDate, toGranularity: .month) }
-        let monthlyGrowth = growthRecords.filter { record in
+        let monthlyGrowth = currentBabyGrowthRecords.filter { record in
             guard let measuredAt = Self.date(fromDateString: record.measuredAt) else {
                 return Calendar.current.isDate(monthDate, equalTo: Date(), toGranularity: .month)
             }
@@ -387,6 +458,12 @@ final class BabyRecordStore: ObservableObject {
 
     @discardableResult
     func upsert(_ record: FeedingRecord) -> Bool {
+        if record.type == "奶粉" || record.type == "瓶喂" {
+            guard let amount = record.amountML, amount > 0 else {
+                saveErrorMessage = "奶量必须填写大于 0 的数字。"
+                return false
+            }
+        }
         let previous = feedingRecords
         let saved = prepared(record)
         if let index = feedingRecords.firstIndex(where: { $0.id == saved.id }) {
@@ -854,7 +931,7 @@ final class BabyRecordStore: ObservableObject {
         let fileName = "\(UUID().uuidString).jpg"
         let destinationURL = photosDirectory.appendingPathComponent(fileName)
         try sanitizedJPEGData(from: data).write(to: destinationURL, options: [.atomic])
-        try markExcludedFromSync(destinationURL)
+        try markIncludedInBackup(destinationURL)
 
         let photo = BabyPhoto(
             capturedAt: capturedAt,
@@ -937,26 +1014,59 @@ final class BabyRecordStore: ObservableObject {
         feedingReminder = nil
         loadFeedingReminderPreference()
         normalizeRecordsForCurrentBaby()
+        // 云端恢复成功意味着我们重新拿到了一份完整可信的状态，
+        // 可以解除因本地文件损坏而进入的安全模式（损坏文件已另存保留）。
+        isPersistenceBlocked = false
+        loadErrorMessage = nil
         saveState()
     }
 
     func localPhotoSyncAssets() -> [LocalPhotoSyncAsset] {
         babyPhotos.compactMap { photo in
+            // 只上传还没备份成功的照片，已备份/待删除的不重复传。
+            switch photo.syncStatus {
+            case .backedUp, .cloudDeletePending:
+                return nil
+            case .localOnly, .pending, .failed:
+                break
+            }
             let url = photoURL(for: photo)
             guard fileManager.fileExists(atPath: url.path) else { return nil }
             return LocalPhotoSyncAsset(photo: photo, fileURL: url)
         }
     }
 
+    /// 供同步覆盖保护使用：本地记录总量（不含宝宝档案本身）。
+    var localSyncableRecordCount: Int {
+        feedingRecords.count
+            + waterRecords.count
+            + sleepRecords.count
+            + diaperRecords.count
+            + growthRecords.count
+            + vaccineRecords.count
+            + milestones.count
+            + babyPhotos.count
+    }
+
+    /// 云端恢复会整体覆盖本地状态；恢复前把当前状态文件另存一份快照，
+    /// 让“恢复选错了”永远有退路。
+    func snapshotStateFileBeforeRestore() {
+        guard fileManager.fileExists(atPath: stateURL.path) else { return }
+        let stamp = Int(Date().timeIntervalSince1970)
+        let snapshotURL = applicationSupportDirectory.appendingPathComponent("\(stateFileName).pre-restore-\(stamp)")
+        try? fileManager.copyItem(at: stateURL, to: snapshotURL)
+    }
+
     func restoreCloudPhotoData(for photo: BabyPhoto, data: Data) throws {
         let destinationURL = try ensurePhotosDirectory().appendingPathComponent(photo.localFileName)
         try data.write(to: destinationURL, options: [.atomic])
-        try markExcludedFromSync(destinationURL)
+        try markIncludedInBackup(destinationURL)
         markCloudPhotoSynced(photo)
     }
 
     func markCloudPhotoSynced(_ photo: BabyPhoto) {
-        guard let index = babyPhotos.firstIndex(where: { $0.id == photo.id }) else { return }
+        guard let index = babyPhotos.firstIndex(where: { $0.id == photo.id }),
+              babyPhotos[index].syncStatus != .backedUp else { return }
         babyPhotos[index].syncStatus = .backedUp
         saveState()
     }
@@ -967,33 +1077,50 @@ final class BabyRecordStore: ObservableObject {
         saveState()
     }
 
-    func markCloudSyncCompleted() {
-        feedingRecords = feedingRecords.map { record in
+    /// 返回是否有任何状态被更新。没有变化时不落盘、不发保存通知，
+    /// 避免“同步完成→保存→通知→再同步”的自激循环。
+    @discardableResult
+    func markCloudSyncCompleted() -> Bool {
+        let updatedFeeding = feedingRecords.map { record in
             var updated = record
             updated.syncStatus = .synced
             return updated
         }
-        waterRecords = waterRecords.map { record in
+        let updatedWater = waterRecords.map { record in
             var normalized = record
             normalized.babyId = baby.id
             return normalized
         }
-        sleepRecords = sleepRecords.map { record in
+        let updatedSleep = sleepRecords.map { record in
             var updated = record
             updated.syncStatus = .synced
             return updated
         }
-        diaperRecords = diaperRecords.map { record in
+        let updatedDiaper = diaperRecords.map { record in
             var updated = record
             updated.syncStatus = .synced
             return updated
         }
-        babyPhotos = babyPhotos.map { photo in
+        let updatedPhotos = babyPhotos.map { photo in
             var updated = photo
             updated.syncStatus = .backedUp
             return updated
         }
+
+        let changed = updatedFeeding != feedingRecords
+            || updatedWater != waterRecords
+            || updatedSleep != sleepRecords
+            || updatedDiaper != diaperRecords
+            || updatedPhotos != babyPhotos
+        guard changed else { return false }
+
+        feedingRecords = updatedFeeding
+        waterRecords = updatedWater
+        sleepRecords = updatedSleep
+        diaperRecords = updatedDiaper
+        babyPhotos = updatedPhotos
         saveState()
+        return true
     }
 
     func markCloudAccountDeletedLocally() {
@@ -1086,13 +1213,39 @@ final class BabyRecordStore: ObservableObject {
     }
 
     private func loadState() {
-        guard let data = try? Data(contentsOf: stateURL),
-              let state = try? JSONDecoder().decode(LocalAppState.self, from: data) else {
+        let stateFileExists = fileManager.fileExists(atPath: stateURL.path)
+        let backupFileExists = fileManager.fileExists(atPath: backupStateURL.path)
+        guard stateFileExists || backupFileExists else {
             photoCount = babyPhotos.count
             return
         }
 
-        baby = state.baby
+        if let state = decodeState(at: stateURL) {
+            apply(state)
+        } else if let backupState = decodeState(at: backupStateURL) {
+            preserveCorruptStateFile()
+            apply(backupState)
+            loadErrorMessage = "上次的数据文件读取异常，已从最近一次备份恢复。请检查记录是否完整。"
+        } else {
+            // 文件存在但两份都无法解码：进入安全模式。保留原文件，禁止任何写入，
+            // 绝不能以“空状态”覆盖用户已有的记录。
+            preserveCorruptStateFile()
+            isPersistenceBlocked = true
+            loadErrorMessage = "本地数据文件读取异常。为保护已有记录，本次已暂停保存功能，请不要新增记录并尝试重启 App；若持续出现请联系我们协助恢复。"
+            photoCount = babyPhotos.count
+            return
+        }
+
+        // 仅当本机曾注入过截图用 mock 数据时才清理遗留 mock 档案。
+        // 绝不允许仅凭 UUID 命中就删除用户数据。
+        if baby.id == Self.legacyMockBabyID, userDefaults.bool(forKey: Self.mockDataSeededDefaultsKey) {
+            resetToEmptyProfile()
+            userDefaults.removeObject(forKey: Self.mockDataSeededDefaultsKey)
+        }
+    }
+
+    private func apply(_ state: LocalAppState) {
+        baby = state.baby ?? Self.emptyBaby
         hasCompletedOnboarding = state.hasCompletedOnboarding
         feedingRecords = state.feedingRecords
         waterRecords = state.waterRecords
@@ -1106,10 +1259,18 @@ final class BabyRecordStore: ObservableObject {
         quietCareModeEnabled = state.quietCareModeEnabled
         feedingLiveActivityEnabled = state.feedingLiveActivityEnabled
         photoCount = babyPhotos.count
+    }
 
-        if baby.id == Self.legacyMockBabyID {
-            resetToEmptyProfile()
-        }
+    private func decodeState(at url: URL) -> LocalAppState? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(LocalAppState.self, from: data)
+    }
+
+    private func preserveCorruptStateFile() {
+        guard fileManager.fileExists(atPath: stateURL.path) else { return }
+        let stamp = Int(Date().timeIntervalSince1970)
+        let corruptURL = applicationSupportDirectory.appendingPathComponent("\(stateFileName).corrupt-\(stamp)")
+        try? fileManager.copyItem(at: stateURL, to: corruptURL)
     }
 
     private func loadFeedingReminderPreference() {
@@ -1154,11 +1315,31 @@ final class BabyRecordStore: ObservableObject {
             feedingLiveActivityEnabled: feedingLiveActivityEnabled
         )
 
+        guard !isPersistenceBlocked else {
+            saveErrorMessage = "本地数据文件读取异常，为保护已有记录已暂停保存。请重启 App；若持续出现请联系我们。"
+            return false
+        }
+
         do {
             let data = try JSONEncoder().encode(state)
             try ensureApplicationSupportDirectory()
-            try data.write(to: stateURL, options: [.atomic])
-            try markExcludedFromSync(stateURL)
+            // 三段式写入：先写临时文件，替换时把上一版轮转为备份，
+            // 任意一步失败都不会破坏当前生效的状态文件。
+            let stagingURL = applicationSupportDirectory.appendingPathComponent("\(stateFileName).new")
+            try data.write(to: stagingURL, options: [.atomic])
+            if fileManager.fileExists(atPath: stateURL.path) {
+                try? fileManager.removeItem(at: backupStateURL)
+                _ = try fileManager.replaceItemAt(
+                    stateURL,
+                    withItemAt: stagingURL,
+                    backupItemName: backupStateFileName,
+                    options: .withoutDeletingBackupItem
+                )
+            } else {
+                try fileManager.moveItem(at: stagingURL, to: stateURL)
+            }
+            try? markIncludedInBackup(stateURL)
+            try? markIncludedInBackup(backupStateURL)
             writeSharedTodaySnapshot()
             saveErrorMessage = nil
             NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
@@ -1173,7 +1354,14 @@ final class BabyRecordStore: ObservableObject {
         applicationSupportDirectory.appendingPathComponent(stateFileName)
     }
 
+    private var backupStateURL: URL {
+        applicationSupportDirectory.appendingPathComponent(backupStateFileName)
+    }
+
     private var applicationSupportDirectory: URL {
+        if let storageDirectoryOverride {
+            return storageDirectoryOverride
+        }
         let baseURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return baseURL.appendingPathComponent("XiaoNaiPing", isDirectory: true)
@@ -1185,13 +1373,13 @@ final class BabyRecordStore: ObservableObject {
 
     private func ensureApplicationSupportDirectory() throws {
         try fileManager.createDirectory(at: applicationSupportDirectory, withIntermediateDirectories: true)
-        try markExcludedFromSync(applicationSupportDirectory)
+        try markIncludedInBackup(applicationSupportDirectory)
     }
 
     private func ensurePhotosDirectory() throws -> URL {
         try ensureApplicationSupportDirectory()
         try fileManager.createDirectory(at: photosDirectory, withIntermediateDirectories: true)
-        try markExcludedFromSync(photosDirectory)
+        try markIncludedInBackup(photosDirectory)
         return photosDirectory
     }
 
@@ -1217,11 +1405,31 @@ final class BabyRecordStore: ObservableObject {
         return resized.jpegData(compressionQuality: 0.84)
     }
 
-    private func markExcludedFromSync(_ url: URL) throws {
+    // 婴儿记录是不可重建数据，必须允许随 iCloud/整机备份迁移。
+    // 该方法同时会清掉历史版本设置过的排除标记。
+    private func markIncludedInBackup(_ url: URL) throws {
+        guard fileManager.fileExists(atPath: url.path) else { return }
         var resourceValues = URLResourceValues()
-        resourceValues.isExcludedFromBackup = true
+        resourceValues.isExcludedFromBackup = false
         var mutableURL = url
         try mutableURL.setResourceValues(resourceValues)
+    }
+
+    /// 历史版本曾把状态文件、照片目录和每张照片都排除在备份之外；
+    /// 这里做一次性迁移，把已存在文件的排除标记全部清掉。
+    private func removeLegacyBackupExclusionIfNeeded() {
+        let migrationKey = "xnp.migration.backup-exclusion-removed"
+        guard !userDefaults.bool(forKey: migrationKey) else { return }
+        try? markIncludedInBackup(applicationSupportDirectory)
+        try? markIncludedInBackup(stateURL)
+        try? markIncludedInBackup(backupStateURL)
+        try? markIncludedInBackup(photosDirectory)
+        if let files = try? fileManager.contentsOfDirectory(at: photosDirectory, includingPropertiesForKeys: nil) {
+            for file in files {
+                try? markIncludedInBackup(file)
+            }
+        }
+        userDefaults.set(true, forKey: migrationKey)
     }
 
     private static func delta(_ latest: Double?, _ previous: Double?) -> Double? {
@@ -1347,6 +1555,9 @@ final class BabyRecordStore: ObservableObject {
 
     private func writeSharedTodaySnapshot() {
         try? XiaoNaiPingSharedStore.writeSnapshot(makeSharedTodaySnapshot())
+        // 主动通知 WidgetKit 刷新，否则桌面小组件最长要等 15 分钟
+        // 才会显示刚记完的这一笔——而“距上次喂奶”正是它的核心价值。
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     static func date(fromTimeString time: String) -> Date {
@@ -1358,23 +1569,31 @@ final class BabyRecordStore: ObservableObject {
     }
 
     private static func isTodaySleepRecord(_ record: SleepRecord) -> Bool {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-        let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date()
+        isSleepRecord(record, on: Date())
+    }
+
+    static func isSleepRecord(_ record: SleepRecord, on day: Date) -> Bool {
+        let dayStart = Calendar.current.startOfDay(for: day)
+        let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
         let endAt = record.endAt ?? Date()
 
         if record.isOngoing {
-            return record.startAt < startOfTomorrow
+            return record.startAt < dayEnd
         }
 
-        return record.startAt < startOfTomorrow && endAt >= startOfToday
+        return record.startAt < dayEnd && endAt >= dayStart
     }
 
     private static func sleepMinutesDuringToday(_ record: SleepRecord) -> Int {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-        let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date()
-        let recordEnd = record.endAt ?? min(Date(), startOfTomorrow)
-        let overlapStart = max(record.startAt, startOfToday)
-        let overlapEnd = min(recordEnd, startOfTomorrow)
+        sleepMinutes(of: record, on: Date())
+    }
+
+    static func sleepMinutes(of record: SleepRecord, on day: Date) -> Int {
+        let dayStart = Calendar.current.startOfDay(for: day)
+        let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
+        let recordEnd = record.endAt ?? min(Date(), dayEnd)
+        let overlapStart = max(record.startAt, dayStart)
+        let overlapEnd = min(recordEnd, dayEnd)
         return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
     }
 
@@ -1453,9 +1672,19 @@ final class BabyRecordStore: ObservableObject {
     }
 }
 
+/// 单个元素解码失败时跳过该元素而不是让整个数组（乃至整份状态）解码失败。
+/// 婴儿记录不可重建：一条坏记录绝不能导致全部数据被视为不存在。
+struct FailableDecodable<T: Decodable>: Decodable {
+    let value: T?
+
+    init(from decoder: Decoder) {
+        value = try? T(from: decoder)
+    }
+}
+
 private struct LocalAppState: Codable {
     var hasCompletedOnboarding: Bool
-    var baby: Baby
+    var baby: Baby?
     var feedingRecords: [FeedingRecord]
     var waterRecords: [WaterRecord]
     var feedingReminder: FeedingReminder?
@@ -1517,18 +1746,35 @@ private struct LocalAppState: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         hasCompletedOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? false
-        baby = try container.decode(Baby.self, forKey: .baby)
-        feedingRecords = try container.decode([FeedingRecord].self, forKey: .feedingRecords)
-        waterRecords = try container.decodeIfPresent([WaterRecord].self, forKey: .waterRecords) ?? []
-        feedingReminder = try container.decodeIfPresent(FeedingReminder.self, forKey: .feedingReminder)
-        sleepRecords = try container.decode([SleepRecord].self, forKey: .sleepRecords)
-        diaperRecords = try container.decode([DiaperRecord].self, forKey: .diaperRecords)
-        growthRecords = try container.decode([GrowthRecord].self, forKey: .growthRecords)
-        vaccineRecords = try container.decode([VaccineRecord].self, forKey: .vaccineRecords)
-        milestones = try container.decode([Milestone].self, forKey: .milestones)
-        babyPhotos = try container.decode([BabyPhoto].self, forKey: .babyPhotos)
+        baby = Self.tolerantValue(Baby.self, in: container, forKey: .baby)
+        feedingRecords = Self.tolerantArray(FeedingRecord.self, in: container, forKey: .feedingRecords)
+        waterRecords = Self.tolerantArray(WaterRecord.self, in: container, forKey: .waterRecords)
+        feedingReminder = Self.tolerantValue(FeedingReminder.self, in: container, forKey: .feedingReminder)
+        sleepRecords = Self.tolerantArray(SleepRecord.self, in: container, forKey: .sleepRecords)
+        diaperRecords = Self.tolerantArray(DiaperRecord.self, in: container, forKey: .diaperRecords)
+        growthRecords = Self.tolerantArray(GrowthRecord.self, in: container, forKey: .growthRecords)
+        vaccineRecords = Self.tolerantArray(VaccineRecord.self, in: container, forKey: .vaccineRecords)
+        milestones = Self.tolerantArray(Milestone.self, in: container, forKey: .milestones)
+        babyPhotos = Self.tolerantArray(BabyPhoto.self, in: container, forKey: .babyPhotos)
         quietCareModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .quietCareModeEnabled) ?? true
         feedingLiveActivityEnabled = try container.decodeIfPresent(Bool.self, forKey: .feedingLiveActivityEnabled) ?? true
+    }
+
+    private static func tolerantArray<T: Decodable>(
+        _ type: T.Type,
+        in container: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys
+    ) -> [T] {
+        let wrapped = (try? container.decodeIfPresent([FailableDecodable<T>].self, forKey: key)) ?? nil
+        return wrapped?.compactMap(\.value) ?? []
+    }
+
+    private static func tolerantValue<T: Decodable>(
+        _ type: T.Type,
+        in container: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys
+    ) -> T? {
+        ((try? container.decodeIfPresent(FailableDecodable<T>.self, forKey: key)) ?? nil)?.value
     }
 }
 

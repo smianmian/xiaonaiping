@@ -20,6 +20,8 @@ enum AppColors {
     static let inkGreen = adaptive(light: (0.220, 0.350, 0.230), dark: (0.730, 0.860, 0.740))
     static let tabMuted = adaptive(light: (0.440, 0.515, 0.410), dark: (0.690, 0.760, 0.680))
     static let softStroke = adaptive(light: (0.790, 0.715, 0.620), dark: (0.310, 0.330, 0.330))
+    static let porcelain = adaptive(light: (0.988, 0.976, 0.957), dark: (0.110, 0.118, 0.125))
+    static let hairline = adaptive(light: (0.922, 0.878, 0.831), dark: (0.280, 0.295, 0.300))
 
     private static func adaptive(light: (CGFloat, CGFloat, CGFloat), dark: (CGFloat, CGFloat, CGFloat)) -> Color {
         Color(UIColor { trait in

@@ -7,6 +7,8 @@ final class CloudSyncController: ObservableObject {
     @Published private(set) var isSyncing = false
     @Published private(set) var statusTitle = "未登录"
     @Published private(set) var statusDetail = "登录后即可安全保存宝宝资料、记录和照片。"
+    /// 本地为空但云端有备份时置位：暂停自动上传，等用户在设置页显式选择恢复或覆盖。
+    @Published private(set) var needsRestoreDecision = false
 
     private let sessionStore = CloudAccountSessionStore()
     private var scheduledSyncTask: Task<Void, Never>?
@@ -111,6 +113,7 @@ final class CloudSyncController: ObservableObject {
 
     func syncIfNeeded(store: BabyRecordStore) async {
         guard hasSession, store.hasCompletedOnboarding, !isSyncing else { return }
+        guard !store.isPersistenceBlocked else { return }
         guard let session = sessionStore.session else { return }
 
         isSyncing = true
@@ -120,6 +123,19 @@ final class CloudSyncController: ObservableObject {
 
         do {
             let client = try makeClient()
+
+            // 覆盖保护：本地没有任何记录时，先确认云端是否已有备份。
+            // 云端有而本地空，多半是恢复失败或本地状态出问题——
+            // 此时绝不能自动用空数据覆盖云端唯一副本。
+            if store.localSyncableRecordCount == 0,
+               let cloudCount = try? await cloudRecordCount(client: client, token: session.sessionToken),
+               cloudCount > 0 {
+                needsRestoreDecision = true
+                statusTitle = "云端已有记录"
+                statusDetail = "本机没有记录，云端保存着 \(cloudCount) 条。为防误覆盖已暂停自动上传，请到「我的」页面选择「从云端恢复」。"
+                return
+            }
+
             try await uploadEverything(store: store, client: client, token: session.sessionToken)
             statusTitle = "已保存"
             statusDetail = "资料和照片已保存到服务器。"
@@ -127,6 +143,49 @@ final class CloudSyncController: ObservableObject {
             statusTitle = "等待连接"
             statusDetail = "网络恢复后会再次保存。"
         }
+    }
+
+    /// 用户主动从云端恢复。恢复前先把本地状态另存快照，恢复失败不影响本地数据。
+    func restoreFromCloud(store: BabyRecordStore) async -> Bool {
+        guard let session = sessionStore.session else {
+            statusTitle = "未登录"
+            statusDetail = "登录后才能从云端恢复。"
+            return false
+        }
+
+        isWorking = true
+        statusTitle = "正在恢复"
+        statusDetail = "正在从云端取回宝宝资料、记录和照片。"
+        defer { isWorking = false }
+
+        do {
+            let client = try makeClient()
+            store.snapshotStateFileBeforeRestore()
+            try await restoreRemoteData(store: store, client: client, token: session.sessionToken)
+            needsRestoreDecision = false
+            statusTitle = "已恢复"
+            statusDetail = "已从云端恢复宝宝资料与记录。"
+            return true
+        } catch {
+            statusTitle = "恢复失败"
+            statusDetail = "请检查网络后再试一次，本地数据未受影响。"
+            return false
+        }
+    }
+
+    private func cloudRecordCount(client: CloudSyncAPIClient, token: String) async throws -> Int {
+        let data = try await client.downloadSync(token: token)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let payload = try decoder.decode(CloudSyncPayload.self, from: data)
+        return payload.feedingRecords.count
+            + payload.waterRecords.count
+            + payload.sleepRecords.count
+            + payload.diaperRecords.count
+            + payload.growthRecords.count
+            + payload.vaccineRecords.count
+            + payload.milestones.count
+            + payload.babyPhotos.count
     }
 
     func deleteCloudPhoto(_ photo: BabyPhoto) async -> Bool {
@@ -213,11 +272,21 @@ final class CloudSyncController: ObservableObject {
         let syncData = try await client.downloadSync(token: token)
         try store.restoreCloudSyncData(syncData)
 
+        // 单张照片下载失败不让整个恢复失败：记录和其余照片先落地，
+        // 失败的照片保持未同步状态，等下次同步重试。
         let availablePhotos = try await client.listPhotos(token: token)
         let availablePhotoIDs = Set(availablePhotos.map(\.photoId))
+        var failedPhotoCount = 0
         for photo in store.babyPhotos where availablePhotoIDs.contains(photo.id.uuidString) {
-            let data = try await client.downloadPhoto(id: photo.id, token: token)
-            try store.restoreCloudPhotoData(for: photo, data: data)
+            do {
+                let data = try await client.downloadPhoto(id: photo.id, token: token)
+                try store.restoreCloudPhotoData(for: photo, data: data)
+            } catch {
+                failedPhotoCount += 1
+            }
+        }
+        if failedPhotoCount > 0 {
+            statusDetail = "记录已恢复，\(failedPhotoCount) 张照片未能下载，稍后会自动重试。"
         }
     }
 
@@ -228,8 +297,11 @@ final class CloudSyncController: ObservableObject {
             try await client.uploadPhoto(id: asset.photo.id, data: data, token: token)
             store.markCloudPhotoSynced(asset.photo)
         }
-        store.markCloudSyncCompleted()
-        _ = try await client.uploadSync(store.encodedCloudSyncData(), token: token)
+        // 只有同步状态确实发生变化时才需要把最新状态再传一次；
+        // 无变化则不再上传，避免无限自激循环。
+        if store.markCloudSyncCompleted() {
+            _ = try await client.uploadSync(store.encodedCloudSyncData(), token: token)
+        }
     }
 
     private func perform(_ workingTitle: String, _ workingDetail: String, operation: () async throws -> Void) async {

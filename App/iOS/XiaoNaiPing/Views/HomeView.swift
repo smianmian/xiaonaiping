@@ -5,503 +5,455 @@ struct HomeView: View {
     let onOpenAlbum: () -> Void
     let onQuickRecord: () -> Void
     @EnvironmentObject private var store: BabyRecordStore
-    @StateObject private var whiteNoisePlayer = WhiteNoisePlayer()
+    @State private var quickOutcome: QuickLogOutcome?
+    @State private var quickFeedbackTrigger = 0
+    @State private var undoDismissTask: Task<Void, Never>?
 
     var body: some View {
         ScreenScaffold {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: AppSpacing.large) {
-                    homeHeader
-                    hero
-                    currentCareContext
-                    PrimaryWatercolorButton(title: "记录一件照护", action: onQuickRecord)
-                    SectionTitleView(title: "今日记录")
-                    todayGrid
-                    if !store.hasTodayRecords {
-                        todayEmptyState
+                // 每 30 秒重算一次，让“距上次”和进行中睡眠的时长自己走。
+                TimelineView(.periodic(from: .now, by: 30)) { _ in
+                    VStack(alignment: .leading, spacing: AppLayout.sectionSpacing) {
+                        header
+                        currentState
+                        quickActionsSection
+                        overviewSection
+                        recentRecords
                     }
-                    recentRecordsSection
-                    reminderCards
-                    whiteNoiseModule
                 }
                 .padding(.horizontal, AppSpacing.page)
-                .padding(.top, AppSpacing.medium)
+                .padding(.top, AppLayout.homeTopAdjustment)
                 .padding(.bottom, AppSpacing.bottomBarSpace)
             }
         }
+        .sensoryFeedback(.success, trigger: quickFeedbackTrigger)
     }
 
-    private var homeHeader: some View {
-        HStack(spacing: AppSpacing.regular) {
-            BabyAvatarView(
-                imageData: store.baby.avatarImageData,
-                fallbackAssetName: AppAssets.babyAvatar,
-                size: 54
-            )
-
-            Text(store.baby.name)
-                .font(AppTypography.title)
-                .foregroundStyle(AppColors.inkGreen)
-
-            Spacer()
-
-            Button {
-                onRoute(.vaccine)
-            } label: {
-                AssetWatercolorImage(name: AppAssets.bellIcon, mode: .multiply)
-                    .frame(width: 36, height: 36)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var hero: some View {
-        ZStack {
-            HStack(alignment: .bottom) {
-                AssetWatercolorImage(name: AppAssets.homeBottleHero, mode: .multiply)
-                    .frame(width: 62, height: 98)
-                Spacer()
-                AssetWatercolorImage(name: AppAssets.teddyHero, mode: .multiply)
-                    .frame(width: 84, height: 96)
-            }
-            .padding(.horizontal, 10)
-            .padding(.top, 8)
-
-            AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
-                .frame(width: 76, height: 44)
-                .offset(x: 84, y: -46)
-
-            VStack(spacing: AppSpacing.tiny) {
-                Text("宝宝今天")
-                    .font(AppTypography.sectionTitle)
-                    .foregroundStyle(AppColors.inkGreen)
-                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                    Text("第")
-                        .font(AppTypography.heroUnit)
-                    Text("\(store.currentBabyDaysSinceBirth)")
-                        .font(AppTypography.heroNumber)
+    private var header: some View {
+        Button(action: onOpenAlbum) {
+            HStack(spacing: AppSpacing.medium) {
+                BabyAvatarView(
+                    imageData: store.baby.avatarImageData,
+                    fallbackAssetName: "approvedBabyAvatar",
+                    size: AppLayout.headerAvatar
+                )
+                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                    Text(store.baby.name)
+                        .font(AppTypography.homeBabyName)
+                        .foregroundStyle(AppColors.inkGreen)
+                    Text("第\(store.currentBabyDaysSinceBirth)天")
+                        .font(AppTypography.homeDay)
                         .foregroundStyle(AppColors.coral)
-                    Text("天")
-                        .font(AppTypography.heroUnit)
                 }
-                .foregroundStyle(AppColors.inkGreen)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(AppColors.inkSoft)
             }
-            .padding(.top, 4)
-        }
-        .frame(height: 132)
-    }
-
-    private var currentCareContext: some View {
-        Button {
-            onRoute(.feeding)
-        } label: {
-            WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-                HStack(spacing: AppSpacing.regular) {
-                    AssetWatercolorImage(name: AppAssets.bottleIcon, mode: .multiply)
-                        .frame(width: 40, height: 48)
-
-                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text("最近一次喂养")
-                            .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.inkSoft)
-                        Text(currentCareContextText)
-                            .font(AppTypography.cardTitle)
-                            .foregroundStyle(AppColors.inkGreen)
-                            .lineLimit(2)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(AppColors.inkSoft)
-                }
-                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-            }
+            .frame(height: 90)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("最近一次喂养，\(currentCareContextText)")
-        .accessibilityHint("查看喂养记录")
+        .accessibilityLabel("\(store.baby.name)，第\(store.currentBabyDaysSinceBirth)天，打开相册")
     }
 
-    private var currentCareContextText: String {
-        guard let record = store.lastFeedingRecord else {
-            return "今天还没有喂养记录"
+    private var currentState: some View {
+        Button { onRoute(.feeding) } label: {
+            HStack(spacing: 0) {
+                stateColumn(label: "最近喂养", value: latestFeedingText, artwork: "approvedFeedingBottle")
+                stateDivider
+                stateColumn(label: "距上次", value: store.lastFeedingRecord == nil ? "暂无" : store.lastFeedingIntervalText, systemIcon: "clock")
+                stateDivider
+                stateColumn(
+                    label: "下一次提醒",
+                    value: nextReminderText,
+                    systemIcon: "bell",
+                    subValue: nextReminderSubText,
+                    valueFont: AppTypography.homePrimaryData
+                )
+            }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: AppLayout.stateCardHeight)
+            .background { CardBackground(tint: AppColors.milk, cornerRadius: AppLayout.statusCardRadius) }
         }
-        return "\(record.time) · \(record.detail) · 距上次 \(store.lastFeedingIntervalText)"
+        .buttonStyle(.plain)
     }
 
-    private var reminderCards: some View {
-        HStack(spacing: AppSpacing.medium) {
-            Button {
-                onRoute(.milestone)
-            } label: {
-                WatercolorCard(tint: AppColors.blush, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
-                    VStack(alignment: .leading, spacing: AppSpacing.small) {
-                        Text((store.nextAutomaticMilestone?.title ?? "成长纪念日").localizedText)
-                            .font(AppTypography.cardTitle)
-                        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                            Text(store.nextAutomaticMilestone.map { "\($0.daysRemaining)" } ?? "\(store.currentBabyDaysSinceBirth)")
-                                .font(AppTypography.largeNumber)
-                                .foregroundStyle(AppColors.coral)
-                            Text((store.nextAutomaticMilestone == nil ? "成长天数" : "天后").localizedText)
-                                .font(AppTypography.bodyLarge)
-                        }
-                    }
-                    .foregroundStyle(AppColors.ink)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    private var stateDivider: some View {
+        Rectangle()
+            .fill(AppColors.softStroke.opacity(0.26))
+            .frame(width: 1, height: 74)
+    }
+
+    @ViewBuilder
+    private func stateColumn(
+        label: String,
+        value: String,
+        artwork: String? = nil,
+        systemIcon: String? = nil,
+        subValue: String? = nil,
+        valueFont: Font = AppTypography.stateValue
+    ) -> some View {
+        VStack(spacing: AppSpacing.small) {
+            Group {
+                if let artwork {
+                    AssetWatercolorImage(name: artwork)
+                } else if let systemIcon {
+                    Image(systemName: systemIcon)
+                        .font(.system(size: 25, weight: .regular))
+                        .foregroundStyle(AppColors.inkGreen)
+                        .padding(11)
+                        .background(AppColors.cream, in: Circle())
                 }
             }
-            .buttonStyle(.plain)
+            .frame(width: AppLayout.stateArtworkWidth, height: AppLayout.stateArtworkHeight)
 
-            Button {
-                onRoute(.vaccine)
-            } label: {
-                WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
-                    VStack(alignment: .leading, spacing: AppSpacing.small) {
-                        Text(store.nextVaccine?.title ?? "下一次疫苗")
-                            .font(AppTypography.cardTitle)
-                        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
-                            Text(store.nextVaccine.map(store.vaccineDueValue) ?? "--")
-                                .font(AppTypography.largeNumber)
-                                .foregroundStyle(AppColors.blueInk)
-                            Text((store.nextVaccine.map(store.vaccineDueUnit) ?? "暂无").localizedText)
-                                .font(AppTypography.bodyLarge)
-                        }
-                    }
-                    .foregroundStyle(AppColors.ink)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var todayGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.medium) {
-            HomeStatCard(
-                icon: AppAssets.bottleIcon,
-                title: "记喂养",
-                value: feedingCardValue,
-                tint: AppColors.cream,
-                isQuietMode: store.quietCareModeEnabled
-            ) { onRoute(.feeding) }
-
-            HomeStatCard(
-                systemIcon: "drop.fill",
-                title: "记喝水",
-                value: "\(store.todayWaterRecords.count)次 / \(store.waterAmountML)ml",
-                tint: AppColors.mistBlue,
-                isQuietMode: store.quietCareModeEnabled
-            ) { onRoute(.water) }
-
-            HomeStatCard(
-                icon: AppAssets.moonIcon,
-                title: "睡眠记录",
-                value: sleepCardValue,
-                tint: AppColors.mistBlue,
-                isQuietMode: store.quietCareModeEnabled
-            ) { onRoute(.sleep) }
-
-            HomeStatCard(
-                icon: AppAssets.diaperIcon,
-                title: "记排便",
-                value: "\(store.poopCount)次",
-                tint: AppColors.grass,
-                isQuietMode: store.quietCareModeEnabled
-            ) { onRoute(.diaper) }
-
-            HomeStatCard(
-                icon: AppAssets.cameraIcon,
-                title: "加照片",
-                value: "\(store.todayPhotoCount)张",
-                tint: AppColors.cream,
-                isQuietMode: store.quietCareModeEnabled
-            ) { onOpenAlbum() }
-        }
-    }
-
-    private var feedingCardValue: String {
-        guard store.feedingCount > 0 else {
-            return "\(store.feedingCount)次 / \(store.milkAmountML)ml"
-        }
-        return "\(store.feedingCount)次 / \(store.milkAmountML)ml\n距上次 \(store.lastFeedingIntervalText)"
-    }
-
-    private var sleepCardValue: String {
-        guard let ongoing = store.ongoingSleep else {
-            return store.sleepDurationText
-        }
-
-        return "从 \(ongoing.start) 开始"
-    }
-
-    private var todayEmptyState: some View {
-        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-            VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Text("今天还没有记录")
-                    .font(AppTypography.cardTitle)
-                    .foregroundStyle(AppColors.inkGreen)
-                Text("先记一件小事吧，喂养、睡眠、排便或照片都可以。")
+            Text(label)
+                .font(AppTypography.stateLabel)
+                .foregroundStyle(AppColors.ink)
+                .lineLimit(1)
+            Text(value)
+                .font(valueFont)
+                .foregroundStyle(AppColors.coral)
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
+                .multilineTextAlignment(.center)
+            if let subValue {
+                Text(subValue)
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.inkSoft)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .accessibilityElement(children: .combine)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, AppSpacing.small)
     }
 
-    private var recentRecordsSection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.regular) {
-            SectionTitleView(title: "最近记录")
+    private var quickActionsSection: some View {
+        VStack(spacing: AppSpacing.small) {
+            HStack(spacing: AppSpacing.medium) {
+                QuickActionButton(
+                    title: "喂奶",
+                    subtitle: feedingQuickSubtitle,
+                    assetName: "approvedFeedingBottle"
+                ) {
+                    performQuick(QuickLogService.logFeedingLikeLast(store: store))
+                }
+                QuickActionButton(
+                    title: "大便",
+                    subtitle: "记一次 · 刚刚",
+                    assetName: "approvedDiaper"
+                ) {
+                    performQuick(QuickLogService.logDiaper(store: store))
+                }
+                QuickActionButton(
+                    title: store.ongoingSleep == nil ? "睡觉" : "醒了",
+                    subtitle: sleepQuickSubtitle,
+                    assetName: "approvedSleepMoon"
+                ) {
+                    performQuick(QuickLogService.toggleSleep(store: store))
+                }
+            }
+            if let quickOutcome {
+                quickUndoStrip(for: quickOutcome)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
 
+    private var feedingQuickSubtitle: String {
+        guard let last = store.latestFeedingRecordEver else { return "去记录" }
+        if let amount = last.amountML, amount > 0 {
+            return "同上次 · \(amount)ml"
+        }
+        if let duration = last.durationMinutes, duration > 0 {
+            return "同上次 · \(duration)分钟"
+        }
+        return "同上次 · \(last.type)"
+    }
+
+    private var sleepQuickSubtitle: String {
+        guard let ongoing = store.ongoingSleep else { return "开始计时" }
+        let minutes = max(0, Calendar.current.dateComponents([.minute], from: ongoing.startAt, to: Date()).minute ?? 0)
+        return "已睡 \(BabyRecordStore.durationText(from: minutes))"
+    }
+
+    private func performQuick(_ outcome: QuickLogOutcome) {
+        switch outcome {
+        case .needsFeedingEditor:
+            onRoute(.feedingForm)
+        case .failed:
+            break
+        default:
+            quickFeedbackTrigger += 1
+            withAnimation(.easeOut(duration: 0.2)) {
+                quickOutcome = outcome
+            }
+            undoDismissTask?.cancel()
+            undoDismissTask = Task {
+                try? await Task.sleep(nanoseconds: 6_000_000_000)
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeIn(duration: 0.2)) {
+                    quickOutcome = nil
+                }
+            }
+        }
+    }
+
+    private func quickUndoStrip(for outcome: QuickLogOutcome) -> some View {
+        HStack(spacing: AppSpacing.small) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(AppColors.inkGreen)
+            Text(quickOutcomeText(outcome))
+                .font(AppTypography.homeSecondary)
+                .foregroundStyle(AppColors.ink)
+                .lineLimit(1)
+            Spacer(minLength: 0)
+            if quickOutcomeSupportsUndo(outcome) {
+                Button("撤销") {
+                    QuickLogService.undo(outcome, store: store)
+                    undoDismissTask?.cancel()
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        quickOutcome = nil
+                    }
+                }
+                .font(AppTypography.homeSecondary.weight(.semibold))
+                .foregroundStyle(AppColors.coral)
+            }
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .frame(height: 44)
+        .frame(maxWidth: .infinity)
+        .background { CardBackground(tint: AppColors.cream, cornerRadius: AppLayout.cardRadius) }
+    }
+
+    private func quickOutcomeText(_ outcome: QuickLogOutcome) -> String {
+        switch outcome {
+        case .feedingSaved(let record):
+            return "已记喂奶 · \(record.type)\(record.detail.isEmpty ? "" : " \(record.detail)")"
+        case .diaperSaved:
+            return "已记大便 · 刚刚"
+        case .sleepStarted:
+            return "睡眠计时已开始"
+        case .sleepEnded(let minutes):
+            return "已记睡眠 · \(BabyRecordStore.durationText(from: minutes))"
+        case .needsFeedingEditor, .failed:
+            return ""
+        }
+    }
+
+    private func quickOutcomeSupportsUndo(_ outcome: QuickLogOutcome) -> Bool {
+        switch outcome {
+        case .feedingSaved, .diaperSaved, .sleepStarted:
+            return true
+        case .sleepEnded, .needsFeedingEditor, .failed:
+            return false
+        }
+    }
+
+    private var overviewSection: some View {
+        VStack(alignment: .leading, spacing: AppLayout.titleToContentSpacing) {
+            Text("今日概览")
+                .font(AppTypography.homeSectionTitle)
+                .foregroundStyle(AppColors.inkGreen)
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: AppSpacing.medium), GridItem(.flexible())], spacing: AppSpacing.medium) {
+                HomeStatCard(title: "喂养", value: "\(store.feedingCount)次 / \(store.milkAmountML)ml", assetName: "approvedFeedingBottle", valueColor: AppColors.coral) { onRoute(.feeding) }
+                HomeStatCard(title: "睡眠", value: store.sleepDurationText, assetName: "approvedSleepMoon", valueColor: AppColors.blueInk) { onRoute(.sleep) }
+                HomeStatCard(title: "排便", value: "\(store.poopCount)次", assetName: "approvedDiaper", valueColor: AppColors.inkGreen) { onRoute(.diaper) }
+                HomeStatCard(title: "喝水", value: "\(store.todayWaterRecords.count)次 / \(store.waterAmountML)ml", assetName: "approvedWaterDrop", valueColor: AppColors.blueInk) { onRoute(.water) }
+            }
+        }
+    }
+
+    private var recentRecords: some View {
+        VStack(alignment: .leading, spacing: AppLayout.titleToContentSpacing) {
+            Text("最近记录")
+                .font(AppTypography.homeSectionTitle)
+                .foregroundStyle(AppColors.inkGreen)
             if store.recentHomeRecords.isEmpty {
-                WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-                    Text("记录后会在这里慢慢排成一条小时间线。")
-                        .font(AppTypography.caption)
+                WatercolorCard(tint: AppColors.milk, cornerRadius: AppLayout.cardRadius, padding: AppSpacing.roomy) {
+                    Text("还没有记录")
+                        .font(AppTypography.homeSecondary)
                         .foregroundStyle(AppColors.inkSoft)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
-                VStack(spacing: AppSpacing.small) {
-                    ForEach(store.recentHomeRecords.prefix(3)) { record in
-                        RecordRowView(
-                            icon: record.icon,
-                            systemIcon: record.systemIcon,
-                            time: record.time,
-                            title: record.title,
-                            detail: record.detail,
-                            tint: AppColors.cream
-                        )
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("\(record.time)，\(record.title)，\(record.detail)")
-                    }
+                HomeRecentListCard(records: Array(store.recentHomeRecords.prefix(3))) {
+                    onRoute(.feeding)
                 }
             }
         }
     }
 
-    private var whiteNoiseModule: some View {
-        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
-            VStack(alignment: .leading, spacing: AppSpacing.regular) {
-                HStack(alignment: .center, spacing: AppSpacing.medium) {
-                    ZStack {
-                        AssetWatercolorImage(name: AppAssets.cloudBlue, mode: .multiply)
-                            .frame(width: 72, height: 46)
-                            .offset(x: 12, y: -8)
-                        AssetWatercolorImage(name: AppAssets.moonIcon, mode: .multiply)
-                            .frame(width: 54, height: 54)
-                            .offset(x: -12, y: 8)
-                    }
-                    .frame(width: 82, height: 64)
-
-                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text("睡前小声音")
-                            .font(AppTypography.sectionTitle)
-                            .foregroundStyle(AppColors.inkGreen)
-                        Text(whiteNoiseStatusText)
-                            .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.inkSoft)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: AppSpacing.small)
-
-                    Button {
-                        if !store.quietCareModeEnabled {
-                            whiteNoisePlayer.toggle()
-                        }
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill((whiteNoisePlayer.isPlaying ? AppColors.blush : AppColors.mistBlue).opacity(0.9))
-                                .overlay {
-                                    Circle()
-                                        .stroke(.white.opacity(0.72), lineWidth: 1)
-                                }
-                                .shadow(color: AppColors.softStroke.opacity(0.24), radius: 10, y: 5)
-                            Image(systemName: whiteNoisePlayer.isPreparing ? "hourglass" : (whiteNoisePlayer.isPlaying ? "pause.fill" : "play.fill"))
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(whiteNoisePlayer.isPlaying ? AppColors.coral : AppColors.blueInk)
-                                .offset(x: whiteNoisePlayer.isPlaying ? 0 : 1)
-                        }
-                        .frame(width: 46, height: 46)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(store.quietCareModeEnabled)
-                    .accessibilityLabel(whiteNoisePlayer.isPlaying || whiteNoisePlayer.isPreparing ? "暂停白噪音" : "播放白噪音")
-                }
-
-                HStack(spacing: AppSpacing.regular) {
-                    Menu {
-                        ForEach(WhiteNoiseSound.allCases) { sound in
-                            Button {
-                                whiteNoisePlayer.selectedSound = sound
-                            } label: {
-                                Label(sound.title, systemImage: sound.systemImage)
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: AppSpacing.small) {
-                            Image(systemName: whiteNoisePlayer.selectedSound.systemImage)
-                                .font(.system(size: 14, weight: .semibold))
-                            Text(whiteNoisePlayer.selectedSound.title)
-                                .font(AppTypography.body)
-                            Spacer(minLength: 0)
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 12, weight: .semibold))
-                        }
-                        .foregroundStyle(AppColors.inkGreen)
-                        .padding(.horizontal, AppSpacing.regular)
-                        .frame(height: 44)
-                        .background {
-                            RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
-                                .fill(AppColors.milk.opacity(0.56))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
-                                        .stroke(AppColors.softStroke.opacity(0.24), lineWidth: 1)
-                                }
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(store.quietCareModeEnabled)
-
-                    WhiteNoiseVolumeDots(volume: $whiteNoisePlayer.volume)
-                        .opacity(store.quietCareModeEnabled ? 0.46 : 1)
-                }
-            }
+    /// 参考稿规格：时间 + 奶量/时长，不带类型名。奶量优先，
+    /// 无奶量用时长，都没有只显示时间。
+    private var latestFeedingText: String {
+        guard let record = store.lastFeedingRecord else { return "暂无记录" }
+        if let amount = record.amountML, amount > 0 {
+            return "\(record.time) · \(amount)ml"
         }
-        .onChange(of: store.quietCareModeEnabled) { _, isEnabled in
-            if isEnabled {
-                whiteNoisePlayer.stop()
-            }
+        if let duration = record.durationMinutes, duration > 0 {
+            return "\(record.time) · \(duration)分钟"
         }
+        return record.time
     }
 
-    private var whiteNoiseStatusText: String {
-        if store.quietCareModeEnabled {
-            return "安静育儿模式已开启，不会播放声音"
-        }
+    private var nextReminderText: String {
+        guard let reminder = store.nextFeedingReminder else { return "未安排" }
+        return BabyRecordStore.timeString(from: reminder.remindAt)
+    }
 
-        if whiteNoisePlayer.isPreparing {
-            return "\(whiteNoisePlayer.selectedSound.title)准备中"
+    /// 仅当提醒来自自动间隔且自动提醒开启时，显示“每N小时提醒”副行；
+    /// 非整小时显示一位小数（如“每2.5小时提醒”）。
+    private var nextReminderSubText: String? {
+        guard let reminder = store.nextFeedingReminder,
+              reminder.origin == .automatic,
+              store.feedingReminderPreference.isAutoReminderEnabled,
+              let intervalMinutes = store.feedingReminderPreference.intervalMinutes else {
+            return nil
         }
-
-        if whiteNoisePlayer.isPlaying {
-            return "\(whiteNoisePlayer.selectedSound.title)轻轻播放中"
-        }
-
-        return "点一下，慢慢安静下来"
+        let hours = Double(intervalMinutes) / 60
+        let hoursText = intervalMinutes % 60 == 0
+            ? "\(intervalMinutes / 60)"
+            : String(format: "%.1f", hours)
+        return "每\(hoursText)小时提醒"
     }
 }
 
-private struct WhiteNoiseVolumeDots: View {
-    @Binding var volume: Double
-
-    private let levels: [Double] = [0.14, 0.26, 0.38, 0.52, 0.66]
-
-    var body: some View {
-        HStack(spacing: AppSpacing.regular) {
-            Text("音量")
-                .font(AppTypography.caption)
-                .foregroundStyle(AppColors.inkGreen)
-
-            HStack(spacing: AppSpacing.small) {
-                ForEach(levels.indices, id: \.self) { index in
-                    Button {
-                        volume = levels[index]
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(index <= selectedIndex ? AppColors.blueInk.opacity(0.72) : AppColors.milk.opacity(0.72))
-                                .frame(width: CGFloat(9 + index * 2), height: CGFloat(9 + index * 2))
-                                .overlay {
-                                    Circle()
-                                        .stroke(AppColors.softStroke.opacity(0.28), lineWidth: 1)
-                                }
-                        }
-                        .frame(width: 30, height: 34)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("白噪音音量 \(index + 1)")
-                }
-            }
-
-            Spacer()
-
-            Text(volumeLabel)
-                .font(AppTypography.caption)
-                .foregroundStyle(AppColors.inkSoft)
-        }
-        .padding(.horizontal, AppSpacing.regular)
-        .padding(.vertical, AppSpacing.small)
-        .background {
-            RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
-                .fill(AppColors.mistBlue.opacity(0.30))
-        }
-    }
-
-    private var selectedIndex: Int {
-        levels.enumerated().min { abs($0.element - volume) < abs($1.element - volume) }?.offset ?? 2
-    }
-
-    private var volumeLabel: String {
-        switch selectedIndex {
-        case 0...1:
-            "轻轻的"
-        case 2:
-            "刚刚好"
-        default:
-            "稍明显"
-        }
-    }
-}
-
-private struct HomeStatCard: View {
-    var icon: String? = nil
-    var systemIcon: String? = nil
+private struct QuickActionButton: View {
     let title: String
-    let value: String
-    let tint: Color
-    var isQuietMode = false
+    let subtitle: String
+    let assetName: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            WatercolorCard(tint: tint, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-                HStack(spacing: AppSpacing.regular) {
-                    Group {
-                        if let icon {
-                            AssetWatercolorImage(name: icon, mode: .multiply)
-                        } else if let systemIcon {
-                            Image(systemName: systemIcon)
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundStyle(AppColors.blueInk)
-                        }
-                    }
-                    .frame(width: 50, height: 50)
-                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
-                        Text(title)
-                            .font(isQuietMode ? AppTypography.quietBody : AppTypography.body)
-                            .foregroundStyle(AppColors.ink)
-                        Text(value)
-                            .font(isQuietMode ? AppTypography.quietBodyLarge : AppTypography.bodyLarge)
-                            .foregroundStyle(title.contains("睡眠") ? AppColors.blueInk : AppColors.coral)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.78)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 62)
+            VStack(spacing: AppSpacing.tiny) {
+                AssetWatercolorImage(name: assetName)
+                    .frame(width: 40, height: 40)
+                Text(title)
+                    .font(AppTypography.homeCardTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .lineLimit(1)
+                Text(subtitle)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
+            .padding(.vertical, AppSpacing.medium)
+            .padding(.horizontal, AppSpacing.tiny)
+            .frame(maxWidth: .infinity, minHeight: 96)
+            .background { CardBackground(tint: AppColors.cream, cornerRadius: AppLayout.cardRadius) }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title)，\(value)")
-        .accessibilityIdentifier("home_stat_\(title)")
+        .accessibilityLabel("\(title)，\(subtitle)")
+        .accessibilityHint("一键记录，无需填表")
+    }
+}
+
+private struct HomeStatCard: View {
+    let title: String
+    let value: String
+    let assetName: String
+    let valueColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: -2) {
+                AssetWatercolorImage(name: assetName)
+                    .frame(width: AppLayout.overviewArtwork, height: AppLayout.overviewArtwork)
+                VStack(alignment: .leading, spacing: AppSpacing.small) {
+                    Text(title)
+                        .font(AppTypography.homeCardTitle)
+                        .foregroundStyle(AppColors.inkGreen)
+                    Text(value)
+                        .font(AppTypography.homePrimaryData)
+                        .foregroundStyle(valueColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.60)
+                        .layoutPriority(1)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, AppSpacing.regular)
+            .padding(.vertical, AppSpacing.medium)
+            .frame(maxWidth: .infinity, minHeight: AppLayout.overviewCardHeight, alignment: .leading)
+            .background { CardBackground(tint: AppColors.milk, cornerRadius: AppLayout.cardRadius) }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct HomeRecentListCard: View {
+    let records: [HomeRecentRecord]
+    let onSeeMore: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(records.enumerated()), id: \.element.id) { index, record in
+                recentRow(record)
+                if index < records.count - 1 {
+                    Divider().padding(.leading, 16)
+                }
+            }
+            Button(action: onSeeMore) {
+                HStack {
+                    Spacer()
+                    Text("查看更多记录")
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .font(AppTypography.homeSecondary)
+                .foregroundStyle(AppColors.inkGreen)
+                .frame(height: 44)
+                .padding(.horizontal, AppSpacing.medium)
+            }
+            .buttonStyle(.plain)
+        }
+        .background { CardBackground(tint: AppColors.milk, cornerRadius: AppLayout.cardRadius) }
+    }
+
+    private func recentRow(_ record: HomeRecentRecord) -> some View {
+        HStack(spacing: AppSpacing.small) {
+            Text(record.time)
+                .font(AppTypography.homeListText)
+                .foregroundStyle(AppColors.inkGreen)
+                .lineLimit(1)
+                .layoutPriority(1)
+                .frame(minWidth: 78, alignment: .leading)
+            recordArtwork(for: record.title)
+                .frame(width: AppLayout.recentArtwork, height: AppLayout.recentArtwork)
+            Text(record.title)
+                .font(AppTypography.homeListText)
+                .foregroundStyle(AppColors.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+            Spacer(minLength: AppSpacing.tiny)
+            Text(record.detail == "快速记录" ? "已记录" : record.detail)
+                .font(AppTypography.homeListText)
+                .foregroundStyle(AppColors.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .frame(minHeight: 58)
+    }
+
+    @ViewBuilder
+    private func recordArtwork(for title: String) -> some View {
+        if title.contains("喂养") {
+            AssetWatercolorImage(name: "approvedFeedingBottle")
+        } else if title.contains("睡眠") {
+            AssetWatercolorImage(name: "approvedSleepMoon")
+        } else if title.contains("大便") || title.contains("排便") {
+            AssetWatercolorImage(name: "approvedDiaper")
+        } else if title.contains("喝水") {
+            AssetWatercolorImage(name: "approvedWaterDrop")
+        } else {
+            Image(systemName: "circle.fill").foregroundStyle(AppColors.inkSoft)
+        }
     }
 }

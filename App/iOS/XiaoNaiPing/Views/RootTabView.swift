@@ -4,11 +4,16 @@ import UIKit
 enum AppRoute: Hashable {
     case album
     case feeding
+    case feedingForm
     case water
+    case waterForm
     case sleep
+    case sleepForm
     case diaper
+    case diaperForm
     case milestone
     case growth
+    case growthForm
     case vaccine
     case monthlyReport
 }
@@ -22,8 +27,8 @@ struct RootTabView: View {
     @State private var growthPath: [AppRoute] = []
     @State private var isQuickRecordPresented = false
     @State private var pendingQuickRecordRoute: AppRoute?
-    @State private var isCreatingBabyProfile = false
-    @State private var isPreviewingMainPage = false
+    @State private var isRegistering = false
+    @State private var isReadyToCreateProfile = false
     @AppStorage("xnpNightModeEnabled") private var nightModeEnabled = false
 
     init() {
@@ -33,6 +38,7 @@ struct RootTabView: View {
         let seedMockData = arguments.contains("-XNPScreenshotData")
         _store = StateObject(wrappedValue: BabyRecordStore(seedMockData: seedMockData))
         _selectedTab = State(initialValue: Self.initialTab(from: arguments))
+        _isQuickRecordPresented = State(initialValue: arguments.contains("-XNPScreenshotQuickRecord"))
 #else
         _store = StateObject(wrappedValue: BabyRecordStore())
         _selectedTab = State(initialValue: .home)
@@ -43,23 +49,22 @@ struct RootTabView: View {
         ZStack {
             if store.hasCompletedOnboarding {
                 if shouldShowLaunchLogin {
-                    LaunchLoginView(cloudSync: cloudSync, store: store)
+                    LaunchLoginView(cloudSync: cloudSync, store: store, onContinueToProfile: {})
                 } else {
                     tabContent
                 }
-            } else if isCreatingBabyProfile {
+            } else if isReadyToCreateProfile {
                 OnboardingView { name, birthDate, sex in
                     store.createBabyProfile(name: name, birthDate: birthDate, sex: sex)
                 }
-            } else if isPreviewingMainPage {
-                tabContent
+            } else if isRegistering {
+                LaunchLoginView(cloudSync: cloudSync, store: store) {
+                    isReadyToCreateProfile = true
+                }
             } else {
                 WelcomeIntroView(
                     onStart: {
-                        isCreatingBabyProfile = true
-                    },
-                    onPreview: {
-                        isPreviewingMainPage = true
+                        isRegistering = true
                     }
                 )
             }
@@ -86,6 +91,13 @@ struct RootTabView: View {
             }
         } message: {
             Text(store.saveErrorMessage ?? "请稍后再试。")
+        }
+        .alert("数据读取异常", isPresented: loadErrorAlertBinding) {
+            Button("知道了") {
+                store.loadErrorMessage = nil
+            }
+        } message: {
+            Text(store.loadErrorMessage ?? "")
         }
     }
 
@@ -124,6 +136,7 @@ struct RootTabView: View {
                         routeView(route) {
                             homePath.append(.monthlyReport)
                         }
+                        .toolbar(.hidden, for: .tabBar)
                     }
                 }
                 .tabItem {
@@ -144,6 +157,7 @@ struct RootTabView: View {
                         routeView(route) {
                             growthPath.append(.monthlyReport)
                         }
+                        .toolbar(.hidden, for: .tabBar)
                     }
                 }
                 .tabItem {
@@ -175,7 +189,9 @@ struct RootTabView: View {
             QuickRecordSheet { action in
                 openQuickRecord(action)
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.fraction(0.61)])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(24)
         }
     }
 
@@ -194,12 +210,12 @@ struct RootTabView: View {
     private func openQuickRecord(_ action: QuickRecordAction) {
         let route: AppRoute
         switch action {
-        case .feeding: route = .feeding
-        case .water: route = .water
-        case .sleep: route = .sleep
-        case .diaper: route = .diaper
+        case .feeding: route = .feedingForm
+        case .water: route = .waterForm
+        case .sleep: route = .sleepForm
+        case .diaper: route = .diaperForm
         case .photo: route = .album
-        case .growth: route = .growth
+        case .growth: route = .growthForm
         case .milestone: route = .milestone
         }
 
@@ -223,20 +239,18 @@ struct RootTabView: View {
         }
     }
 
-    private func syncFeedingReminderLiveActivity() {
-        #if canImport(ActivityKit)
-        if #available(iOS 16.2, *) {
-            guard store.feedingLiveActivityEnabled else {
-                FeedingReminderLiveActivityController.endAll()
-                return
+    private var loadErrorAlertBinding: Binding<Bool> {
+        Binding {
+            store.loadErrorMessage != nil
+        } set: { isPresented in
+            if !isPresented {
+                store.loadErrorMessage = nil
             }
-            FeedingReminderLiveActivityController.sync(
-                reminder: store.nextFeedingReminder,
-                babyName: store.baby.name,
-                babyAvatarData: store.baby.avatarImageData
-            )
         }
-        #endif
+    }
+
+    private func syncFeedingReminderLiveActivity() {
+        QuickLogService.syncLiveActivity(store: store)
     }
 
     @ViewBuilder
@@ -252,16 +266,26 @@ struct RootTabView: View {
             AlbumView()
         case .feeding:
             FeedingRecordView()
+        case .feedingForm:
+            FeedingRecordView(autoPresentEditor: true)
         case .water:
             WaterRecordView()
+        case .waterForm:
+            WaterRecordView(autoPresentEditor: true)
         case .sleep:
             SleepRecordView()
+        case .sleepForm:
+            SleepRecordView(autoPresentEditor: true)
         case .diaper:
             DiaperRecordView()
+        case .diaperForm:
+            DiaperRecordView(autoPresentEditor: true)
         case .milestone:
             MilestoneView()
         case .growth:
             GrowthView(onOpenMonthlyReport: onMonthlyReport)
+        case .growthForm:
+            GrowthView(onOpenMonthlyReport: onMonthlyReport, autoPresentEditor: true)
         case .vaccine:
             VaccineView()
         case .monthlyReport:
@@ -324,6 +348,7 @@ private struct LaunchLoginView: View {
 
     @ObservedObject var cloudSync: CloudSyncController
     @ObservedObject var store: BabyRecordStore
+    let onContinueToProfile: () -> Void
 
     @State private var phoneNumber = "+86"
     @State private var phoneCode = ""
@@ -333,25 +358,38 @@ private struct LaunchLoginView: View {
     var body: some View {
         ScreenScaffold {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: AppSpacing.roomy) {
+                VStack(spacing: AppSpacing.large) {
                     hero
 
-                    if cloudSync.isServiceConfigured {
+                    if cloudSync.hasSession {
+                        signedInCard
+                    } else if cloudSync.isServiceConfigured {
                         phoneLoginCard
-                        if shouldShowStatusLine {
-                            statusLine
-                        }
+
+                        orDivider
 
                         if cloudSync.isWeChatLoginConfigured {
                             weChatLoginButton
                         }
+
+                        if shouldShowStatusLine {
+                            statusLine
+                        }
+
+                        termsLine
+                            .padding(.top, AppSpacing.small)
                     } else {
                         serviceUnavailableCard
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
-                .padding(.top, AppSpacing.large)
+                .padding(.top, AppSpacing.roomy)
                 .padding(.bottom, AppSpacing.xlarge)
+            }
+            .onChange(of: cloudSync.hasSession) { _, hasSession in
+                if hasSession {
+                    onContinueToProfile()
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
@@ -365,41 +403,117 @@ private struct LaunchLoginView: View {
     }
 
     private var hero: some View {
-        VStack(spacing: AppSpacing.small) {
+        VStack(spacing: AppSpacing.regular) {
             AssetWatercolorImage(name: AppAssets.homeBottleHero, mode: .multiply)
-                .frame(width: 72, height: 94)
+                .frame(width: 108, height: 140)
 
-            VStack(spacing: AppSpacing.tiny) {
-                Text("登录小奶瓶")
+            VStack(spacing: AppSpacing.small) {
+                Text("欢迎来到小奶瓶")
                     .font(AppTypography.title)
                     .foregroundStyle(AppColors.inkGreen)
                     .multilineTextAlignment(.center)
-                Text("登录后即可安全保存宝宝的每一次成长记录。")
-                    .font(AppTypography.caption)
+                Text("登录后，宝宝的记录和照片会安全保存在你的账号里")
+                    .font(AppTypography.body)
                     .foregroundStyle(AppColors.inkSoft)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .padding(.bottom, AppSpacing.small)
+    }
+
+    /// 替代系统默认描边样式的自绘输入框，与水彩卡片风格统一。
+    private func loginField(
+        icon: String,
+        placeholder: String,
+        text: Binding<String>,
+        keyboard: UIKeyboardType,
+        field: PhoneLoginField
+    ) -> some View {
+        HStack(spacing: AppSpacing.small) {
+            Image(systemName: icon)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundStyle(AppColors.sage)
+                .frame(width: 24)
+            TextField(placeholder, text: text)
+                .textInputAutocapitalization(.never)
+                .keyboardType(keyboard)
+                .font(AppTypography.bodyLarge)
+                .foregroundStyle(AppColors.ink)
+                .focused($focusedPhoneLoginField, equals: field)
+        }
+        .padding(.horizontal, AppSpacing.regular)
+        .frame(height: 52)
+        .background(AppColors.cream, in: RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous)
+                .stroke(
+                    focusedPhoneLoginField == field ? AppColors.coral.opacity(0.55) : AppColors.softStroke.opacity(0.30),
+                    lineWidth: 1.5
+                )
+        }
+    }
+
+    private var orDivider: some View {
+        HStack(spacing: AppSpacing.regular) {
+            Rectangle()
+                .fill(AppColors.softStroke.opacity(0.35))
+                .frame(height: 1)
+            Text("或")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.inkSoft)
+            Rectangle()
+                .fill(AppColors.softStroke.opacity(0.35))
+                .frame(height: 1)
+        }
+        .padding(.horizontal, AppSpacing.small)
+    }
+
+    private var termsLine: some View {
+        HStack(spacing: 0) {
+            Text("登录即代表同意")
+                .foregroundStyle(AppColors.inkSoft)
+            Link("《用户协议》", destination: URL(string: "https://api.mewpow.com/xiaonaiping/terms")!)
+                .foregroundStyle(AppColors.inkGreen)
+            Text("与")
+                .foregroundStyle(AppColors.inkSoft)
+            Link("《隐私政策》", destination: URL(string: "https://api.mewpow.com/xiaonaiping/privacy")!)
+                .foregroundStyle(AppColors.inkGreen)
+        }
+        .font(AppTypography.caption)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var signedInCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                Label("已登录", systemImage: "checkmark.circle.fill")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                Text("确认账号后，继续创建宝宝资料。")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                PrimaryWatercolorButton(title: "继续创建宝宝资料", action: onContinueToProfile)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     private var phoneLoginCard: some View {
-        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
-            VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label("手机号登录", systemImage: "iphone")
-                    .font(AppTypography.sectionTitle)
-                    .foregroundStyle(AppColors.inkGreen)
-
-                TextField("手机号", text: $phoneNumber)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.phonePad)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focusedPhoneLoginField, equals: .phoneNumber)
-                    .onChange(of: phoneNumber) { _, _ in
-                        guard isPhoneCodeRequested else { return }
-                        isPhoneCodeRequested = false
-                        phoneCode = ""
-                    }
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.regular) {
+                loginField(
+                    icon: "iphone",
+                    placeholder: "手机号",
+                    text: $phoneNumber,
+                    keyboard: .phonePad,
+                    field: .phoneNumber
+                )
+                .onChange(of: phoneNumber) { _, _ in
+                    guard isPhoneCodeRequested else { return }
+                    isPhoneCodeRequested = false
+                    phoneCode = ""
+                }
 
                 if let phoneValidationMessage {
                     Text(phoneValidationMessage)
@@ -407,34 +521,19 @@ private struct LaunchLoginView: View {
                         .foregroundStyle(AppColors.coral)
                 }
 
-                Button("获取验证码") {
-                    focusedPhoneLoginField = nil
-                    isPhoneCodeRequested = true
-                    Task {
-                        await cloudSync.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
-                    }
-                }
-                .font(AppTypography.bodyLarge)
-                .foregroundStyle(AppColors.coral)
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 44)
-                .overlay {
-                    Capsule()
-                        .stroke(AppColors.coral.opacity(0.35), lineWidth: 1)
-                }
-                .buttonStyle(.plain)
-                .disabled(cloudSync.isWorking || !canRequestPhoneCode)
-
                 if isPhoneCodeRequested {
-                    TextField("6 位验证码", text: $phoneCode)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(.roundedBorder)
-                        .focused($focusedPhoneLoginField, equals: .verificationCode)
-                        .onChange(of: phoneCode) { _, code in
-                            if CloudSyncController.validateSmsCode(code) {
-                                focusedPhoneLoginField = nil
-                            }
+                    loginField(
+                        icon: "key",
+                        placeholder: "6 位验证码",
+                        text: $phoneCode,
+                        keyboard: .numberPad,
+                        field: .verificationCode
+                    )
+                    .onChange(of: phoneCode) { _, code in
+                        if CloudSyncController.validateSmsCode(code) {
+                            focusedPhoneLoginField = nil
                         }
+                    }
 
                     if let codeValidationMessage {
                         Text(codeValidationMessage)
@@ -442,35 +541,84 @@ private struct LaunchLoginView: View {
                             .foregroundStyle(AppColors.coral)
                     }
 
-                    PrimaryWatercolorButton(title: "手机号登录", tint: AppColors.blush, foreground: AppColors.coral) {
+                    HStack {
+                        Text("验证码已发送")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                        Spacer()
+                        Button("重新获取") {
+                            requestPhoneCode()
+                        }
+                        .font(AppTypography.caption.weight(.semibold))
+                        .foregroundStyle(AppColors.inkGreen)
+                        .disabled(cloudSync.isWorking || !canRequestPhoneCode)
+                    }
+
+                    solidActionButton(
+                        title: "验证并登录",
+                        enabled: !cloudSync.isWorking && canVerifyPhoneCode
+                    ) {
                         focusedPhoneLoginField = nil
                         Task {
                             await cloudSync.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode, store: store)
                         }
                     }
-                    .disabled(cloudSync.isWorking || !canVerifyPhoneCode)
-                    .opacity(cloudSync.isWorking || !canVerifyPhoneCode ? 0.55 : 1)
+                } else {
+                    solidActionButton(
+                        title: "获取验证码",
+                        enabled: !cloudSync.isWorking && canRequestPhoneCode
+                    ) {
+                        requestPhoneCode()
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
+    /// 与成长页“添加测量”一致的珊瑚色实心主按钮。
+    private func solidActionButton(title: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title.localizedText)
+                .font(AppTypography.bodyLarge.weight(.semibold))
+                .foregroundStyle(AppColors.milk)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(AppColors.coral.opacity(enabled ? 1 : 0.35), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+    }
+
+    private func requestPhoneCode() {
+        focusedPhoneLoginField = nil
+        isPhoneCodeRequested = true
+        Task {
+            await cloudSync.requestPhoneCode(phoneNumber: normalizedPhoneNumber)
+        }
+    }
+
     private var statusLine: some View {
         HStack(alignment: .firstTextBaseline, spacing: AppSpacing.small) {
             Image(systemName: cloudSync.isWorking ? "arrow.triangle.2.circlepath" : "info.circle")
-                .foregroundStyle(AppColors.blueInk)
+                .font(.system(size: 13, weight: .regular))
+                .foregroundStyle(AppColors.inkSoft)
             Text("\(cloudSync.statusTitle.localizedText)：\(cloudSync.statusDetail.localizedText)")
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+        .multilineTextAlignment(.center)
     }
 
+    // 空闲态（未登录/已登录）不显示状态行——好处已在页头说明；
+    // 只有进行中或异常状态（发送验证码、等待连接、失败）才值得占一行。
     private var shouldShowStatusLine: Bool {
-        cloudSync.isWorking || cloudSync.statusTitle != "未开启"
+        cloudSync.isWorking || !["未登录", "已登录"].contains(cloudSync.statusTitle)
     }
+
+    private static let weChatGreen = Color(red: 0.027, green: 0.757, blue: 0.376)
 
     private var weChatLoginButton: some View {
         Button {
@@ -478,19 +626,20 @@ private struct LaunchLoginView: View {
                 await cloudSync.loginWithWeChat(store: store)
             }
         } label: {
-            Label("微信登录", systemImage: "message")
-                .font(AppTypography.body)
-                .foregroundStyle(AppColors.inkGreen)
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 44)
-                .overlay {
-                    Capsule()
-                        .stroke(AppColors.sage.opacity(0.42), lineWidth: 1)
-                }
+            HStack(spacing: AppSpacing.small) {
+                Image(systemName: "message.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                Text("微信登录")
+                    .font(AppTypography.bodyLarge.weight(.semibold))
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(Self.weChatGreen, in: Capsule())
         }
         .buttonStyle(.plain)
         .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
-        .opacity(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured ? 0.55 : 1)
+        .opacity(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured ? 0.5 : 1)
         .accessibilityHint(weChatLoginDetail)
     }
 
@@ -551,75 +700,444 @@ private struct LaunchLoginView: View {
 }
 
 private struct WaterRecordView: View {
+    var autoPresentEditor = false
+
     @EnvironmentObject private var store: BabyRecordStore
-    @State private var occurredAt = Date()
-    @State private var amountML = 60
+    @State private var isEditorPresented = false
+    @State private var didAutoPresentEditor = false
+    @State private var selectedDay = Date()
+    @State private var deleteCandidate: WaterRecord?
+
+    private var isViewingToday: Bool {
+        Calendar.current.isDateInToday(selectedDay)
+    }
+
+    private var dayWaterRecords: [WaterRecord] {
+        store.waterRecords(on: selectedDay)
+    }
+
+    private var dayWaterAmountML: Int {
+        dayWaterRecords.reduce(0) { $0 + $1.amountML }
+    }
 
     var body: some View {
         ScreenScaffold(title: "喝水记录", showBackButton: true) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    WatercolorCard(tint: AppColors.mistBlue, cornerRadius: AppShapes.largeCardRadius) {
-                        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                            Label("记录喝水", systemImage: "drop.fill")
-                                .font(AppTypography.sectionTitle)
-                                .foregroundStyle(AppColors.inkGreen)
-                            DatePicker("时间", selection: $occurredAt, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
-                                .tint(AppColors.blueInk)
-                            Stepper(value: $amountML, in: 10...600, step: 10) {
-                                HStack {
-                                    Text("饮水量")
-                                    Spacer()
-                                    Text("\(amountML)ml")
-                                        .foregroundStyle(AppColors.blueInk)
-                                }
-                                .font(AppTypography.bodyLarge)
-                                .foregroundStyle(AppColors.ink)
-                            }
-                            PrimaryWatercolorButton(title: "保存喝水记录", tint: AppColors.mistBlue, foreground: AppColors.blueInk) {
-                                guard store.upsert(WaterRecord(occurredAt: occurredAt, amountML: amountML)) else { return }
-                                occurredAt = Date()
-                                amountML = 60
-                            }
-                        }
-                    }
+                    recordWaterButton
 
-                    VStack(alignment: .leading, spacing: AppSpacing.regular) {
-                        SectionTitleView(title: "今天喝水")
-                        if store.todayWaterRecords.isEmpty {
-                            WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
-                                Text("今天还没有喝水记录。")
-                                    .font(AppTypography.body)
-                                    .foregroundStyle(AppColors.inkSoft)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        } else {
-                            ForEach(store.todayWaterRecords) { record in
-                                HStack {
-                                    Label("\(record.amountML)ml", systemImage: "drop.fill")
-                                        .font(AppTypography.bodyLarge)
-                                        .foregroundStyle(AppColors.inkGreen)
-                                    Spacer()
-                                    Text(BabyRecordStore.timeString(from: record.occurredAt))
-                                        .font(AppTypography.body)
-                                        .foregroundStyle(AppColors.inkSoft)
-                                    Button(role: .destructive) {
-                                        store.deleteWaterRecord(record)
-                                    } label: {
-                                        Image(systemName: "trash")
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                .padding(AppSpacing.medium)
-                                .background(AppColors.cream, in: RoundedRectangle(cornerRadius: AppShapes.cardRadius, style: .continuous))
-                            }
-                        }
-                    }
+                    DaySwitcherBar(selectedDay: $selectedDay)
+
+                    daySummaryCard
+
+                    historyCard
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.vertical, AppSpacing.medium)
                 .padding(.bottom, AppSpacing.bottomBarSpace)
             }
+        }
+        .sheet(isPresented: $isEditorPresented) {
+            WaterEditorSheet(defaultDay: isViewingToday ? nil : selectedDay) { record in
+                store.upsert(record)
+            }
+            .presentationDetents([.medium, .large])
+        }
+        .alert("删除这条喝水记录？", isPresented: Binding {
+            deleteCandidate != nil
+        } set: { isPresented in
+            if !isPresented { deleteCandidate = nil }
+        }) {
+            Button("删除", role: .destructive) {
+                if let deleteCandidate {
+                    store.deleteWaterRecord(deleteCandidate)
+                }
+                deleteCandidate = nil
+            }
+            Button("取消", role: .cancel) {
+                deleteCandidate = nil
+            }
+        } message: {
+            Text("删除后，当日喝水次数和总量会一起更新。")
+        }
+        .onAppear {
+            if autoPresentEditor && !didAutoPresentEditor {
+                didAutoPresentEditor = true
+                isEditorPresented = true
+            }
+        }
+    }
+
+    /// 顶部主按钮：蓝色实心胶囊 + 白色水滴，是本页唯一的“开始记录”入口。
+    private var recordWaterButton: some View {
+        Button {
+            isEditorPresented = true
+        } label: {
+            HStack(spacing: AppSpacing.small) {
+                Image(systemName: "drop.fill")
+                    .font(.system(size: 17, weight: .semibold))
+                Text(isViewingToday ? "记录喝水" : "补记这一天")
+                    .font(AppTypography.bodyLarge.weight(.semibold))
+            }
+            .foregroundStyle(AppColors.milk)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(AppColors.blueInk, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(isViewingToday ? "记录一次今天的喝水" : "为当前选中的日期补记喝水")
+    }
+
+    /// 今日/当日喝水汇总大卡：水彩水滴插画 + 大号次数与总量。
+    private var daySummaryCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+            VStack(spacing: AppSpacing.medium) {
+                Text(isViewingToday ? "今日喝水" : "当日喝水")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                AssetWatercolorImage(name: "approvedWaterDrop")
+                    .frame(
+                        width: dayWaterRecords.isEmpty ? 130 : 90,
+                        height: dayWaterRecords.isEmpty ? 130 : 90
+                    )
+
+                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.tiny) {
+                    Text("\(dayWaterRecords.count)")
+                        .font(AppTypography.largeNumber)
+                        .foregroundStyle(AppColors.blueInk)
+                    Text("次")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.ink)
+                    Text("/")
+                        .font(AppTypography.bodyLarge)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .padding(.horizontal, AppSpacing.tiny)
+                    Text("\(dayWaterAmountML)")
+                        .font(AppTypography.largeNumber)
+                        .foregroundStyle(AppColors.blueInk)
+                    Text("ml")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.ink)
+                }
+
+                if dayWaterRecords.isEmpty {
+                    VStack(spacing: AppSpacing.tiny) {
+                        Text(isViewingToday ? "今天还没有喝水记录" : "这一天没有喝水记录")
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text("点击上方按钮，记录第一次喝水")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    .padding(.bottom, AppSpacing.small)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            AppLocalization.format(
+                isViewingToday ? "今日喝水 %d 次，共 %d 毫升" : "当日喝水 %d 次，共 %d 毫升",
+                dayWaterRecords.count,
+                dayWaterAmountML
+            )
+        )
+    }
+
+    /// 喝水历史卡：空状态给淡色剪贴板占位，有记录时逐行展示时间、水量和删除入口。
+    private var historyCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+            VStack(alignment: .leading, spacing: AppSpacing.regular) {
+                Text("喝水历史")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(AppColors.inkGreen)
+
+                if dayWaterRecords.isEmpty {
+                    VStack(spacing: AppSpacing.regular) {
+                        Image(systemName: "list.clipboard")
+                            .font(.system(size: 42, weight: .light))
+                            .foregroundStyle(AppColors.inkSoft.opacity(0.55))
+                            .padding(.top, AppSpacing.small)
+                        Text("暂无记录")
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .padding(.bottom, AppSpacing.small)
+                    }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(dayWaterRecords) { record in
+                            historyRow(record)
+                            if record.id != dayWaterRecords.last?.id {
+                                Divider().opacity(0.4)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func historyRow(_ record: WaterRecord) -> some View {
+        HStack(alignment: .center, spacing: AppSpacing.regular) {
+            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                HStack(spacing: AppSpacing.regular) {
+                    Text(BabyRecordStore.timeString(from: record.occurredAt))
+                        .font(AppTypography.bodyLarge)
+                        .foregroundStyle(AppColors.inkGreen)
+                    HStack(spacing: AppSpacing.tiny) {
+                        Image(systemName: "drop.fill")
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(AppColors.blueInk.opacity(0.82))
+                        Text("\(record.amountML)ml")
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.blueInk)
+                    }
+                }
+                if let note = record.note, !note.isEmpty {
+                    Text(note)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .lineLimit(2)
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                deleteCandidate = record
+            } label: {
+                Image(systemName: "trash")
+                    .foregroundStyle(AppColors.coral)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("删除喝水记录")
+        }
+        .padding(.vertical, AppSpacing.tiny)
+    }
+}
+
+private struct WaterEditorSheet: View {
+    let onSave: (WaterRecord) -> Bool
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var occurredAt: Date
+    @State private var amountML = 60
+    @State private var note = ""
+    @State private var isTimePickerExpanded = false
+    @State private var errorMessage: String?
+
+    private static let noteLimit = 100
+    private static let amountRange = 10...600
+    private static let amountStep = 10
+
+    private static let occurredAtFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.dateFormat = "yyyy年M月d日 HH:mm"
+        return formatter
+    }()
+
+    init(defaultDay: Date? = nil, onSave: @escaping (WaterRecord) -> Bool) {
+        self.onSave = onSave
+        let fallback = defaultDay.flatMap {
+            Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: $0)
+        }
+        _occurredAt = State(initialValue: fallback ?? Date())
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.medium) {
+                    timeCard
+                    amountCard
+                    noteCard
+
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(AppSpacing.large)
+            }
+            .background(PaperBackgroundView())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                saveButton
+                    .padding(.horizontal, AppSpacing.large)
+                    .padding(.vertical, AppSpacing.small)
+                    .background(.ultraThinMaterial)
+            }
+            .navigationTitle("记录喝水")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("取消") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("保存") { save() }
+                        .font(AppTypography.body.weight(.semibold))
+                        .foregroundStyle(AppColors.blueInk)
+                }
+            }
+        }
+    }
+
+    /// 「时间」行卡：默认收起只显示格式化时间，点击展开内联选择器。
+    private var timeCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(spacing: AppSpacing.small) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        isTimePickerExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: AppSpacing.small) {
+                        Text("时间")
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.ink)
+                        Spacer(minLength: 0)
+                        Text(Self.occurredAtFormatter.string(from: occurredAt))
+                            .font(AppTypography.readableBody)
+                            .foregroundStyle(AppColors.blueInk)
+                        Image(systemName: isTimePickerExpanded ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(isTimePickerExpanded ? "收起时间选择器" : "展开时间选择器")
+
+                if isTimePickerExpanded {
+                    Divider().opacity(0.4)
+                    DatePicker(
+                        "喝水时间",
+                        selection: $occurredAt,
+                        in: ...Date(),
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                    .tint(AppColors.blueInk)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// 「饮水量」行卡：自绘 − / ＋ 圆形按钮，中间大号数字。
+    private var amountCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            HStack(spacing: AppSpacing.small) {
+                Text("饮水量")
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.ink)
+
+                Spacer(minLength: 0)
+
+                stepButton(systemName: "minus", enabled: amountML > Self.amountRange.lowerBound) {
+                    amountML = max(Self.amountRange.lowerBound, amountML - Self.amountStep)
+                }
+                .accessibilityLabel("减少 10 毫升")
+
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text("\(amountML)")
+                        .font(AppTypography.largeNumber)
+                        .foregroundStyle(AppColors.blueInk)
+                        .lineLimit(1)
+                    Text("ml")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.ink)
+                }
+                .frame(minWidth: 92)
+                .accessibilityLabel(AppLocalization.format("饮水量 %d 毫升", amountML))
+
+                stepButton(systemName: "plus", enabled: amountML < Self.amountRange.upperBound) {
+                    amountML = min(Self.amountRange.upperBound, amountML + Self.amountStep)
+                }
+                .accessibilityLabel("增加 10 毫升")
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func stepButton(systemName: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(enabled ? AppColors.blueInk : AppColors.inkSoft.opacity(0.35))
+                .frame(width: 44, height: 44)
+                .background {
+                    Circle()
+                        .fill(AppColors.mistBlue.opacity(enabled ? 0.6 : 0.3))
+                        .overlay {
+                            Circle()
+                                .stroke(AppColors.blueInk.opacity(enabled ? 0.26 : 0.1), lineWidth: 1)
+                        }
+                }
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+    }
+
+    /// 「备注（可选）」卡：多行输入 + 右下角字数，超过 100 字自动截断。
+    private var noteCard: some View {
+        WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                Text("备注（可选）")
+                    .font(AppTypography.bodyLarge)
+                    .foregroundStyle(AppColors.ink)
+                TextField("如：温水、奶中等", text: $note, axis: .vertical)
+                    .lineLimit(2...4)
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.ink)
+                    .onChange(of: note) { _, newValue in
+                        if newValue.count > Self.noteLimit {
+                            note = String(newValue.prefix(Self.noteLimit))
+                        }
+                    }
+                Text("\(note.count)/\(Self.noteLimit)")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.inkSoft)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// 底部主按钮：与列表页「记录喝水」同款的蓝色实心胶囊。
+    private var saveButton: some View {
+        Button {
+            save()
+        } label: {
+            Text("保存记录")
+                .font(AppTypography.bodyLarge.weight(.semibold))
+                .foregroundStyle(AppColors.milk)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(AppColors.blueInk, in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func save() {
+        let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        let saved = WaterRecord(
+            occurredAt: occurredAt,
+            amountML: amountML,
+            note: trimmedNote.isEmpty ? nil : String(trimmedNote.prefix(Self.noteLimit))
+        )
+        if onSave(saved) {
+            dismiss()
+        } else {
+            errorMessage = "保存失败，请稍后再试。"
         }
     }
 }
@@ -836,7 +1354,6 @@ private struct RecordSummaryMetric: View {
 
 private struct WelcomeIntroView: View {
     let onStart: () -> Void
-    let onPreview: () -> Void
 
     @State private var page = 0
 
@@ -892,13 +1409,15 @@ private struct WelcomeIntroView: View {
                 Spacer(minLength: AppSpacing.large)
 
                 VStack(spacing: AppSpacing.small) {
-                    welcomeButton(title: "开始记录", filled: true, action: onStart)
-
                     welcomeButton(
-                        title: "先看看",
-                        filled: false,
-                        action: page == pages.count - 1 ? onPreview : advance
+                        title: page == pages.count - 1 ? "注册或登录" : "下一步",
+                        filled: true,
+                        action: page == pages.count - 1 ? onStart : advance
                     )
+
+                    if page == pages.count - 1 {
+                        welcomeButton(title: "已有账号，登录", filled: false, action: onStart)
+                    }
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.bottom, AppSpacing.xlarge)
@@ -966,8 +1485,8 @@ private struct WelcomeIntroView: View {
         .buttonStyle(.plain)
         .accessibilityHint(
             filled
-                ? "进入宝宝档案创建"
-                : page == pages.count - 1 ? "跳过建档，进入主页面" : "查看下一页欢迎引导"
+                ? "先完成注册或登录，再创建宝宝档案"
+                : page == pages.count - 1 ? "登录已有账号" : "查看下一页欢迎引导"
         )
     }
 

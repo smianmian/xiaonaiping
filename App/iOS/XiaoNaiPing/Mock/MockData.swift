@@ -23,11 +23,11 @@ enum MockData {
     )
 
     static let feedingRecords = [
-        FeedingRecord(time: "08:30", type: "母乳", detail: "右侧15分钟", icon: AppAssets.bottleIcon, durationMinutes: 15),
+        FeedingRecord(time: "08:30", type: "母乳", detail: "右侧15分钟", icon: AppAssets.bottleIcon, durationMinutes: 15, breastSide: "右侧"),
         FeedingRecord(time: "11:20", type: "奶粉", detail: "120ml", icon: AppAssets.bottleIcon, amountML: 120),
-        FeedingRecord(time: "14:10", type: "母乳", detail: "左侧18分钟", icon: AppAssets.bottleIcon, durationMinutes: 18),
+        FeedingRecord(time: "14:10", type: "母乳", detail: "左侧18分钟", icon: AppAssets.bottleIcon, durationMinutes: 18, breastSide: "左侧"),
         FeedingRecord(time: "16:30", type: "奶粉", detail: "150ml", icon: AppAssets.bottleIcon, amountML: 150),
-        FeedingRecord(time: "19:20", type: "母乳", detail: "右侧12分钟", icon: AppAssets.bottleIcon, durationMinutes: 12),
+        FeedingRecord(time: "19:20", type: "母乳", detail: "右侧12分钟", icon: AppAssets.bottleIcon, durationMinutes: 12, breastSide: "右侧"),
         FeedingRecord(time: "22:00", type: "奶粉", detail: "150ml", icon: AppAssets.bottleIcon, amountML: 150)
     ]
 
@@ -61,11 +61,16 @@ enum MockData {
         VaccineRecord(title: "乙肝第3针", status: "已完成", tintName: "green", icon: AppAssets.cameraIcon, dueText: "2025.05.01", dueDays: nil, region: "国内")
     ]
 
+    // 相对生日生成日期，避免写死年份后被 currentBabyGrowthRecords 的
+    // “出生日～今天”过滤条件淘汰（宝宝生日是相对今天推算的）。
+    private static func growthMeasuredAt(daysAfterBirth: Int) -> String {
+        let date = Calendar.current.date(byAdding: .day, value: daysAfterBirth, to: babyBirthDate) ?? babyBirthDate
+        return BabyRecordStore.dateString(from: date)
+    }
+
     static let growthRecords = [
-        GrowthRecord(month: "1月", weight: 2.6, height: 51, head: 36.0, measuredAt: "2025.01.27"),
-        GrowthRecord(month: "2月", weight: 3.4, height: 54, head: 37.0, measuredAt: "2025.02.27"),
-        GrowthRecord(month: "3月", weight: 4.4, height: 58, head: 38.0, measuredAt: "2025.03.27"),
-        GrowthRecord(month: "4月", weight: 5.3, height: 62, head: 39.0, measuredAt: "2025.04.27"),
-        GrowthRecord(month: "5月", weight: 6.3, height: 64, head: 41.0, measuredAt: "2025.05.27")
+        GrowthRecord(month: "出生", weight: 3.2, height: 50, head: 34.0, measuredAt: growthMeasuredAt(daysAfterBirth: 0)),
+        GrowthRecord(month: "满月", weight: 4.2, height: 54.5, head: 37.0, measuredAt: growthMeasuredAt(daysAfterBirth: 30)),
+        GrowthRecord(month: "2月", weight: 5.1, height: 58, head: 38.5, measuredAt: growthMeasuredAt(daysAfterBirth: 60))
     ]
 }

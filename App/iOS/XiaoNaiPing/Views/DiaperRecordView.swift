@@ -1,11 +1,31 @@
 import SwiftUI
 
 struct DiaperRecordView: View {
+    var autoPresentEditor = false
+
     @EnvironmentObject private var store: BabyRecordStore
     @State private var isEditorPresented = false
     @State private var editingRecord: DiaperRecord?
     @State private var deleteCandidate: DiaperRecord?
     @State private var isStatsPresented = false
+    @State private var didAutoPresentEditor = false
+    @State private var selectedDay = Date()
+
+    private var isViewingToday: Bool {
+        Calendar.current.isDateInToday(selectedDay)
+    }
+
+    private var dayDiaperRecords: [DiaperRecord] {
+        store.diaperRecords(on: selectedDay)
+    }
+
+    private var dayPoopCount: Int {
+        dayDiaperRecords.filter { $0.kind == "大便" }.count
+    }
+
+    private var dayPeeCount: Int {
+        dayDiaperRecords.filter { $0.kind == "小便" }.count
+    }
 
     var body: some View {
         ScreenScaffold(title: "排便记录", trailingTitle: "统计", showBackButton: true, trailingAction: {
@@ -13,24 +33,27 @@ struct DiaperRecordView: View {
         }) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.large) {
-                    AssetWatercolorImage(name: AppAssets.diaperHero, mode: .multiply)
-                        .frame(height: 118)
+                    PrimaryWatercolorButton(title: isViewingToday ? "+ 记录一次" : "补记这一天", tint: AppColors.grass, foreground: AppColors.inkGreen) {
+                        openEditor()
+                    }
+
+                    DaySwitcherBar(selectedDay: $selectedDay)
 
                     WatercolorCard(tint: AppColors.grass, cornerRadius: AppShapes.largeCardRadius) {
                         HStack {
-                            diaperSummary("今日便便", "\(store.poopCount)", "次", icon: AppAssets.diaperSmallIcon, color: AppColors.coral)
+                            diaperSummary(isViewingToday ? "今日便便" : "当日便便", "\(dayPoopCount)", "次", icon: AppAssets.diaperSmallIcon, color: AppColors.coral)
                             Divider().frame(height: 72)
-                            diaperSummary("小便", "\(store.peeCount)", "次", icon: AppAssets.peeDropIcon, color: AppColors.blueInk)
+                            diaperSummary("小便", "\(dayPeeCount)", "次", icon: AppAssets.peeDropIcon, color: AppColors.blueInk)
                             Divider().frame(height: 72)
-                            diaperSummary("最近一次", store.todayDiaperRecords.first?.time ?? "--", "", icon: AppAssets.quickGrowthIcon, color: AppColors.sage)
+                            diaperSummary("最近一次", dayDiaperRecords.first?.time ?? "--", "", icon: AppAssets.quickGrowthIcon, color: AppColors.sage)
                         }
                     }
 
                     VStack(spacing: AppSpacing.regular) {
-                        if store.todayDiaperRecords.isEmpty {
+                        if dayDiaperRecords.isEmpty {
                             diaperEmptyState
                         } else {
-                            ForEach(store.todayDiaperRecords) { record in
+                            ForEach(dayDiaperRecords) { record in
                                 HStack(spacing: AppSpacing.small) {
                                     Button {
                                         openEditor(record)
@@ -64,18 +87,13 @@ struct DiaperRecordView: View {
                         }
                     }
 
-                    if !store.todayDiaperRecords.isEmpty {
-                        PrimaryWatercolorButton(title: "+ 记录一次", tint: AppColors.grass, foreground: AppColors.inkGreen) {
-                            openEditor()
-                        }
-                    }
                 }
                 .padding(.horizontal, AppSpacing.page)
                 .padding(.bottom, AppSpacing.bottomBarSpace)
             }
         }
         .sheet(isPresented: $isEditorPresented) {
-            DiaperEditorSheet(record: editingRecord) { record in
+            DiaperEditorSheet(record: editingRecord, defaultDay: isViewingToday ? nil : selectedDay) { record in
                 store.upsert(record)
             }
             .presentationDetents([.medium, .large])
@@ -90,6 +108,12 @@ struct DiaperRecordView: View {
                 ]
             )
             .presentationDetents([.height(260)])
+        }
+        .onAppear {
+            if autoPresentEditor && !didAutoPresentEditor {
+                didAutoPresentEditor = true
+                openEditor()
+            }
         }
         .alert("删除这条排便记录？", isPresented: deleteAlertBinding) {
             Button("删除", role: .destructive) {
@@ -121,7 +145,7 @@ struct DiaperRecordView: View {
             VStack(spacing: AppSpacing.medium) {
                 AssetWatercolorImage(name: AppAssets.diaperIcon, mode: .multiply)
                     .frame(width: 54, height: 54)
-                Text("今天还没有排便记录")
+                Text(isViewingToday ? "今天还没有排便记录" : "这一天没有排便记录")
                     .font(AppTypography.bodyLarge)
                     .foregroundStyle(AppColors.inkGreen)
                 PrimaryWatercolorButton(title: "记录一次", tint: AppColors.grass, foreground: AppColors.inkGreen) {
@@ -176,10 +200,16 @@ private struct DiaperEditorSheet: View {
     private let colors = ["未选择", "金黄色", "黄色", "绿色", "棕色"]
     private let textures = ["未选择", "糊状", "软便", "水样", "颗粒"]
 
-    init(record: DiaperRecord?, onSave: @escaping (DiaperRecord) -> Bool) {
+    init(record: DiaperRecord?, defaultDay: Date? = nil, onSave: @escaping (DiaperRecord) -> Bool) {
         self.record = record
         self.onSave = onSave
-        _occurredAt = State(initialValue: record?.occurredAt ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
+        // 补记历史日期时，默认落在所选日期中午，避免存成“今天”。
+        let fallbackDate = defaultDay.flatMap {
+            Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: $0)
+        }
+        _occurredAt = State(initialValue: record?.occurredAt
+            ?? fallbackDate
+            ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
         _kind = State(initialValue: record?.kind ?? "大便")
         _color = State(initialValue: record?.color ?? "未选择")
         _texture = State(initialValue: record?.texture ?? "未选择")
@@ -269,13 +299,18 @@ private struct DiaperEditorSheet: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    PrimaryWatercolorButton(title: record == nil ? "刚换好，记录一下" : "保存修改", tint: AppColors.grass, foreground: AppColors.inkGreen) {
-                        save()
-                    }
                 }
                 .padding(AppSpacing.large)
             }
             .background(PaperBackgroundView())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                PrimaryWatercolorButton(title: record == nil ? "刚换好，记录一下" : "保存修改", tint: AppColors.grass, foreground: AppColors.inkGreen) {
+                    save()
+                }
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.vertical, AppSpacing.small)
+                .background(.ultraThinMaterial)
+            }
             .navigationTitle(record == nil ? "记录排便" : "编辑排便")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

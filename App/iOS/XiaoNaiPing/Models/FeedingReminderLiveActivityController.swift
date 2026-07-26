@@ -45,10 +45,14 @@ enum FeedingReminderLiveActivityController {
                 staleDate: Calendar.current.date(byAdding: .minute, value: 10, to: reminder.remindAt)
             )
 
-            if let activity = Activity<FeedingReminderActivityAttributes>.activities.first {
+            // attributes 不可变：换了提醒就必须结束旧活动重新请求，
+            // 否则活动身上挂着旧 reminderID，后续对不上号。
+            if let activity = Activity<FeedingReminderActivityAttributes>.activities.first,
+               activity.attributes.reminderID == reminder.id.uuidString {
                 await activity.update(content)
                 complete(.startedOrUpdated, completion: completion)
             } else {
+                await endAllActivities()
                 let attributes = FeedingReminderActivityAttributes(reminderID: reminder.id.uuidString)
                 if await requestActivity(attributes: attributes, content: content) {
                     complete(.startedOrUpdated, completion: completion)
