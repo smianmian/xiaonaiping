@@ -57,4 +57,5 @@ enum FamilyRecordType: String, CaseIterable {
     case growth
     case vaccine
     case milestone
+    case health
 }

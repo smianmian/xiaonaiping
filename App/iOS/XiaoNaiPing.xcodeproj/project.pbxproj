@@ -41,6 +41,7 @@
 		7D3EC060380FC5C8477255FE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D5A60428958DC54D107046F4 /* Localizable.strings */; };
 		7E3298480C5453C50031A36A /* CloudSyncAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2570435BD160038259ADB5AD /* CloudSyncAPIClient.swift */; };
 		8855E81770DA585D4F12A6D3 /* WHOGrowthReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA85BA18C531AA699BA97166 /* WHOGrowthReference.swift */; };
+		8A9EBBBAAB0966218580F910 /* HealthObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E04EF91FA9A6B673B042AD4 /* HealthObservation.swift */; };
 		8BF2B8A04D3D083C7BDEF421 /* PaperBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */; };
 		8E3F69F227825C9677BD358C /* SleepRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F36625B424397290C39CC8B /* SleepRecordView.swift */; };
 		91B413B6A8D7B935E732BB32 /* AppNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19F536A6A5E474E9355135B /* AppNotificationScheduler.swift */; };
@@ -67,6 +68,7 @@
 		D879214BC4BC859B3317B1A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E9593E94E8AF2693515F35B /* Assets.xcassets */; };
 		DA93ED3325C38B5191CC2CEC /* QuickLogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2768DCBF6994B7DD1A9D2FD0 /* QuickLogService.swift */; };
 		DB060DB3B7880529CFE1888B /* WechatOpenSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 087668830CF12AAAE107173E /* WechatOpenSDK */; };
+		E268CCCAC3DC785E77411B3E /* HealthObservationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803D4552586CB6F718283957 /* HealthObservationView.swift */; };
 		E66BE173F3E34BEB1596EB68 /* AppShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E8A4AA606229BA5FFF6ABE /* AppShapes.swift */; };
 		F14147067E8A3AAE04141A66 /* ScreenScaffold.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7F1E8851DB82D83B5F8459 /* ScreenScaffold.swift */; };
 		F6FCF155EC6D14D11194C62C /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85DEC409D4B6FEFD1F1AB714 /* SectionTitleView.swift */; };
@@ -129,6 +131,7 @@
 		47656212072FE3DB6D875124 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		47CE747390DA5D850A154CF2 /* XiaoNaiPingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiaoNaiPingApp.swift; sourceTree = "<group>"; };
 		4BF806768531E34A93C8CF2C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		4E04EF91FA9A6B673B042AD4 /* HealthObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthObservation.swift; sourceTree = "<group>"; };
 		51FFE1DFE6C7862FD672D7BF /* GrowthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthView.swift; sourceTree = "<group>"; };
 		5CC446FD570386672F6A5AC8 /* FamilySync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySync.swift; sourceTree = "<group>"; };
 		5F36625B424397290C39CC8B /* SleepRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRecordView.swift; sourceTree = "<group>"; };
@@ -139,6 +142,7 @@
 		6DF879B87F0EA3BC6385E6FB /* PaperBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperBackgroundView.swift; sourceTree = "<group>"; };
 		77FA32F3B517D2B9C493D0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		78EAAEEA9DBE685849A2DC74 /* XiaoNaiPing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XiaoNaiPing.entitlements; sourceTree = "<group>"; };
+		803D4552586CB6F718283957 /* HealthObservationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthObservationView.swift; sourceTree = "<group>"; };
 		812E06DD3A6CFFB21085251F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		81C2F6EB80A7A29272675554 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
 		838A938A99E6E6295D2DEE1D /* CloudSyncController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncController.swift; sourceTree = "<group>"; };
@@ -222,6 +226,7 @@
 				9288BA6A519F0205772786E1 /* DiaperRecordView.swift */,
 				3D8304016F32720F0412951B /* FeedingRecordView.swift */,
 				51FFE1DFE6C7862FD672D7BF /* GrowthView.swift */,
+				803D4552586CB6F718283957 /* HealthObservationView.swift */,
 				0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */,
 				E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */,
 				4BF806768531E34A93C8CF2C /* ProfileView.swift */,
@@ -282,6 +287,7 @@
 				1AFE2FD299FC259D24148966 /* FeedingRecord.swift */,
 				13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */,
 				20CE26483B31F89D43F85E8E /* GrowthRecord.swift */,
+				4E04EF91FA9A6B673B042AD4 /* HealthObservation.swift */,
 				A0F4DE3B31644AC7C6F08771 /* Milestone.swift */,
 				2768DCBF6994B7DD1A9D2FD0 /* QuickLogService.swift */,
 				D5F174AFA03BFF6FA0F47EFD /* SleepRecord.swift */,
@@ -568,6 +574,8 @@
 				79ED2B9DD8CD0DB19CA54741 /* FeedingReminderLiveActivityController.swift in Sources */,
 				03C9A29BE10178FE92BAC0F7 /* GrowthRecord.swift in Sources */,
 				9C158873ECEF575C44B22AD0 /* GrowthView.swift in Sources */,
+				8A9EBBBAAB0966218580F910 /* HealthObservation.swift in Sources */,
+				E268CCCAC3DC785E77411B3E /* HealthObservationView.swift in Sources */,
 				1B057166B341948E60BA0B4E /* HomeView.swift in Sources */,
 				3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */,
 				11616CE7292AA76173CC623F /* Milestone.swift in Sources */,

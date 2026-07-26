@@ -21,6 +21,7 @@ struct GrowthView: View {
                 VStack(spacing: AppSpacing.large) {
                     growthCard
                     vaccineBookEntry
+                    healthObservationEntry
                     if !store.currentBabyGrowthRecords.isEmpty {
                         historySection
                     }
@@ -173,6 +174,44 @@ struct GrowthView: View {
                 }
             }
         }
+    }
+
+    /// 健康观察入口：黄疸/体温/用药，摘要显示最近一条。
+    private var healthObservationEntry: some View {
+        NavigationLink {
+            HealthObservationView()
+        } label: {
+            WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) {
+                HStack(spacing: AppSpacing.medium) {
+                    Image(systemName: "stethoscope")
+                        .font(.system(size: 26, weight: .regular))
+                        .foregroundStyle(AppColors.coral)
+                        .frame(width: 48, height: 48)
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text("健康观察")
+                            .font(AppTypography.sectionTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text(healthEntrySubtitle)
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.inkSoft)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var healthEntrySubtitle: String {
+        guard let latest = store.healthObservations.first else {
+            return "黄疸 · 体温 · 维D用药"
+        }
+        return "最近：\(latest.kind) \(latest.summaryText)"
     }
 
     @ViewBuilder

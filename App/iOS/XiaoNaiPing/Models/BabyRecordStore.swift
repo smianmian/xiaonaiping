@@ -44,6 +44,7 @@ final class BabyRecordStore: ObservableObject {
     @Published var growthRecords: [GrowthRecord] = []
     @Published var vaccineRecords: [VaccineRecord] = []
     @Published var milestones: [Milestone] = []
+    @Published var healthObservations: [HealthObservation] = []
     @Published var babyPhotos: [BabyPhoto] = []
     @Published var photoCount = 0
     @Published var quietCareModeEnabled = true
@@ -918,6 +919,37 @@ final class BabyRecordStore: ObservableObject {
     }
 
     @discardableResult
+    func upsert(_ record: HealthObservation) -> Bool {
+        let previous = healthObservations
+        var saved = record
+        saved.babyId = baby.id
+        saved.updatedAt = Date()
+        if let index = healthObservations.firstIndex(where: { $0.id == saved.id }) {
+            healthObservations[index] = saved
+        } else {
+            healthObservations.insert(saved, at: 0)
+        }
+        healthObservations.sort { $0.occurredAt > $1.occurredAt }
+        guard saveState() else {
+            healthObservations = previous
+            return false
+        }
+        return true
+    }
+
+    @discardableResult
+    func deleteHealthObservation(_ record: HealthObservation) -> Bool {
+        let previous = healthObservations
+        recordFamilyTombstone(type: "health", id: record.id)
+        healthObservations.removeAll { $0.id == record.id }
+        guard saveState() else {
+            healthObservations = previous
+            return false
+        }
+        return true
+    }
+
+    @discardableResult
     func deleteMilestone(_ milestone: Milestone) -> Bool {
         let previous = milestones
         recordFamilyTombstone(type: "milestone", id: milestone.id)
@@ -997,6 +1029,7 @@ final class BabyRecordStore: ObservableObject {
         growthRecords.removeAll()
         vaccineRecords.removeAll()
         milestones.removeAll()
+        healthObservations.removeAll()
         for photo in babyPhotos {
             try? fileManager.removeItem(at: photoURL(for: photo))
         }
@@ -1398,6 +1431,7 @@ final class BabyRecordStore: ObservableObject {
         quietCareModeEnabled = state.quietCareModeEnabled
         feedingLiveActivityEnabled = state.feedingLiveActivityEnabled
         familyTombstones = state.familyTombstones
+        healthObservations = state.healthObservations
         photoCount = babyPhotos.count
         loadAvatarFromDisk()
     }
@@ -1488,7 +1522,8 @@ final class BabyRecordStore: ObservableObject {
             babyPhotos: babyPhotos,
             quietCareModeEnabled: quietCareModeEnabled,
             feedingLiveActivityEnabled: feedingLiveActivityEnabled,
-            familyTombstones: familyTombstones
+            familyTombstones: familyTombstones,
+            healthObservations: healthObservations
         )
 
         // 写盘挪到串行后台队列：主线程不再为每条记录做全量 JSON 编码 + 磁盘 IO。
@@ -1992,6 +2027,7 @@ private struct LocalAppState: Codable {
     var quietCareModeEnabled: Bool
     var feedingLiveActivityEnabled: Bool
     var familyTombstones: [FamilyTombstone]
+    var healthObservations: [HealthObservation]
 
     private enum CodingKeys: String, CodingKey {
         case hasCompletedOnboarding
@@ -2008,6 +2044,7 @@ private struct LocalAppState: Codable {
         case quietCareModeEnabled
         case feedingLiveActivityEnabled
         case familyTombstones
+        case healthObservations
     }
 
     init(
@@ -2024,7 +2061,8 @@ private struct LocalAppState: Codable {
         babyPhotos: [BabyPhoto],
         quietCareModeEnabled: Bool = true,
         feedingLiveActivityEnabled: Bool = true,
-        familyTombstones: [FamilyTombstone] = []
+        familyTombstones: [FamilyTombstone] = [],
+        healthObservations: [HealthObservation] = []
     ) {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
@@ -2040,6 +2078,7 @@ private struct LocalAppState: Codable {
         self.quietCareModeEnabled = quietCareModeEnabled
         self.feedingLiveActivityEnabled = feedingLiveActivityEnabled
         self.familyTombstones = familyTombstones
+        self.healthObservations = healthObservations
     }
 
     init(from decoder: Decoder) throws {
@@ -2057,6 +2096,7 @@ private struct LocalAppState: Codable {
         babyPhotos = Self.tolerantArray(BabyPhoto.self, in: container, forKey: .babyPhotos)
         quietCareModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .quietCareModeEnabled) ?? true
         familyTombstones = try container.decodeIfPresent([FamilyTombstone].self, forKey: .familyTombstones) ?? []
+        healthObservations = try container.decodeIfPresent([HealthObservation].self, forKey: .healthObservations) ?? []
         feedingLiveActivityEnabled = try container.decodeIfPresent(Bool.self, forKey: .feedingLiveActivityEnabled) ?? true
     }
 
@@ -2205,6 +2245,7 @@ extension BabyRecordStore {
         append(growthRecords, type: .growth) { $0.updatedAt }
         append(vaccineRecords, type: .vaccine) { $0.updatedAt }
         append(milestones, type: .milestone) { $0.updatedAt }
+        append(healthObservations, type: .health) { $0.updatedAt }
 
         for tombstone in familyTombstones where tombstone.deletedAt > watermark {
             envelopes.append(
@@ -2282,6 +2323,8 @@ extension BabyRecordStore {
                 merge(&vaccineRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
             case .milestone:
                 merge(&milestones, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+            case .health:
+                merge(&healthObservations, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
             }
         }
 
@@ -2289,6 +2332,7 @@ extension BabyRecordStore {
             feedingRecords.sort { $0.occurredAt > $1.occurredAt }
             diaperRecords.sort { $0.occurredAt > $1.occurredAt }
             waterRecords.sort { $0.occurredAt > $1.occurredAt }
+            healthObservations.sort { $0.occurredAt > $1.occurredAt }
             sleepRecords.sort { Self.sleepSortDate($0) > Self.sleepSortDate($1) }
             saveState()
         }

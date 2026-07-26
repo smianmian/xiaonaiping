@@ -125,6 +125,25 @@ enum RecordExportService {
         ))
 
         sections.append(csvSection(
+            title: "健康观察",
+            header: ["日期", "时间", "类型", "数值", "部位", "药品", "剂量", "备注"],
+            rows: store.healthObservations
+                .sorted { $0.occurredAt < $1.occurredAt }
+                .map { record in
+                    [
+                        BabyRecordStore.dateString(from: record.occurredAt),
+                        BabyRecordStore.timeString(from: record.occurredAt),
+                        record.kind,
+                        record.value.map { String(format: "%.1f", $0) } ?? "",
+                        record.zone ?? "",
+                        record.medicationName ?? "",
+                        record.dose ?? "",
+                        record.note ?? ""
+                    ]
+                }
+        ))
+
+        sections.append(csvSection(
             title: "纪念日",
             header: ["名称", "日期", "备注"],
             rows: store.milestones.map { milestone in

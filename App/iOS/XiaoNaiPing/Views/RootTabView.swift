@@ -15,6 +15,7 @@ enum AppRoute: Hashable {
     case growth
     case growthForm
     case vaccine
+    case health
     case monthlyReport
 }
 
@@ -321,6 +322,8 @@ struct RootTabView: View {
             GrowthView(onOpenMonthlyReport: onMonthlyReport, autoPresentEditor: true)
         case .vaccine:
             VaccineView()
+        case .health:
+            HealthObservationView()
         case .monthlyReport:
             MonthlyReportDetailView()
         }
