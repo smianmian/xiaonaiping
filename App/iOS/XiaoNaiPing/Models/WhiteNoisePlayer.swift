@@ -51,6 +51,9 @@ enum WhiteNoiseSound: String, CaseIterable, Hashable, Identifiable {
 }
 
 final class WhiteNoisePlayer: ObservableObject {
+    /// 全 App 共享一个播放器：哄睡时离开页面、切 tab 都不能断声。
+    static let shared = WhiteNoisePlayer()
+
     @Published private(set) var isPlaying = false
     @Published private(set) var isPreparing = false
     @Published var selectedSound: WhiteNoiseSound = .rain {

@@ -20,6 +20,7 @@ struct HomeView: View {
                         quickActionsSection
                         overviewSection
                         recentRecords
+                        WhiteNoiseCard()
                     }
                 }
                 .padding(.horizontal, AppSpacing.page)
@@ -455,5 +456,95 @@ private struct HomeRecentListCard: View {
         } else {
             Image(systemName: "circle.fill").foregroundStyle(AppColors.inkSoft)
         }
+    }
+}
+
+/// 睡前小声音：白噪音引擎的哄睡入口。
+/// 播放器是全局共享实例，退出页面、切 tab、锁屏都持续播放。
+private struct WhiteNoiseCard: View {
+    @ObservedObject private var player = WhiteNoisePlayer.shared
+
+    var body: some View {
+        WatercolorCard(tint: AppColors.lavender, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.medium) {
+                    VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                        Text("睡前小声音")
+                            .font(AppTypography.cardTitle)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Text(statusText)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    Spacer(minLength: 0)
+                    Button {
+                        player.toggle()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill((player.isPlaying ? AppColors.blush : AppColors.milk).opacity(0.92))
+                                .frame(width: 52, height: 52)
+                            Image(systemName: player.isPreparing ? "hourglass" : (player.isPlaying ? "pause.fill" : "play.fill"))
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(player.isPlaying ? AppColors.coral : AppColors.blueInk)
+                                .offset(x: player.isPlaying || player.isPreparing ? 0 : 1)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(player.isPlaying || player.isPreparing ? "暂停白噪音" : "播放白噪音")
+                }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: AppSpacing.small) {
+                        ForEach(WhiteNoiseSound.allCases) { sound in
+                            Button {
+                                player.selectedSound = sound
+                                if !player.isPlaying && !player.isPreparing {
+                                    player.play()
+                                }
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: sound.systemImage)
+                                        .font(.system(size: 12, weight: .regular))
+                                    Text(sound.title)
+                                        .font(AppTypography.caption)
+                                }
+                                .foregroundStyle(sound == player.selectedSound ? AppColors.milk : AppColors.inkGreen)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    sound == player.selectedSound ? AppColors.inkGreen : AppColors.milk.opacity(0.85),
+                                    in: Capsule()
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("\(sound.title)，\(sound.subtitle)")
+                            .accessibilityAddTraits(sound == player.selectedSound ? .isSelected : [])
+                        }
+                    }
+                }
+
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "speaker.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(AppColors.inkSoft)
+                    Slider(value: $player.volume, in: 0...1)
+                        .tint(AppColors.blueInk)
+                    Image(systemName: "speaker.wave.3.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(AppColors.inkSoft)
+                }
+            }
+        }
+    }
+
+    private var statusText: String {
+        if player.isPreparing {
+            return "正在准备 \(player.selectedSound.title)…"
+        }
+        if player.isPlaying {
+            return "正在播放 \(player.selectedSound.title) · \(player.selectedSound.subtitle)"
+        }
+        return "\(player.selectedSound.title) · \(player.selectedSound.subtitle)，锁屏后继续播放"
     }
 }
