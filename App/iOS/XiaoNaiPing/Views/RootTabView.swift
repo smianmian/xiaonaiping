@@ -85,6 +85,9 @@ struct RootTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
             cloudSync.scheduleAutomaticSync(store: store)
         }
+        .onOpenURL { url in
+            handleQuickLogURL(url)
+        }
         .alert("保存失败", isPresented: saveErrorAlertBinding) {
             Button("知道了") {
                 store.clearSaveError()
@@ -192,6 +195,25 @@ struct RootTabView: View {
             .presentationDetents([.fraction(0.61)])
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(24)
+        }
+    }
+
+    /// Widget/锁屏深链：xnp://quicklog/feeding|diaper|sleep
+    /// 点击即落库（复用首页一键记录的静默路径），并回到首页看到结果与撤销条。
+    private func handleQuickLogURL(_ url: URL) {
+        guard url.scheme == "xnp", url.host == "quicklog",
+              store.hasCompletedOnboarding else { return }
+        selectedTab = .home
+        homePath = []
+        switch url.pathComponents.dropFirst().first {
+        case "feeding":
+            _ = QuickLogService.logFeedingLikeLast(store: store)
+        case "diaper":
+            _ = QuickLogService.logDiaper(store: store)
+        case "sleep":
+            _ = QuickLogService.toggleSleep(store: store)
+        default:
+            break
         }
     }
 

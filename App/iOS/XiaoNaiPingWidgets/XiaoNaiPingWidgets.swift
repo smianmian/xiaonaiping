@@ -39,17 +39,23 @@ struct XiaoNaiPingTodayWidgetView: View {
     let entry: TodayTimelineEntry
 
     var body: some View {
+        // 深链一键记录：小尺寸/锁屏整体点按直达“记一次喂奶”，
+        // 中尺寸在 mediumBody 里按区块分别链接喂奶/睡眠。
         switch family {
         case .systemMedium:
             mediumBody
         case .accessoryCircular:
             accessoryCircularBody
+                .widgetURL(URL(string: "xnp://quicklog/feeding"))
         case .accessoryRectangular:
             accessoryRectangularBody
+                .widgetURL(URL(string: "xnp://quicklog/feeding"))
         case .accessoryInline:
             Text(inlineText)
+                .widgetURL(URL(string: "xnp://quicklog/feeding"))
         default:
             smallBody
+                .widgetURL(URL(string: "xnp://quicklog/feeding"))
         }
     }
 
@@ -84,9 +90,16 @@ struct XiaoNaiPingTodayWidgetView: View {
                     .foregroundStyle(.secondary)
             }
             HStack(spacing: 14) {
-                metric("喂养", "\(snapshot?.feedingCount ?? 0)次", "\(snapshot?.milkAmountML ?? 0)ml")
-                metric("睡眠", sleepStatus, sleepDetail)
-                metric("排便", "\(diaperCount)次", reminderText)
+                // 每个区块深链到对应的一键记录：点喂养直接记一次奶。
+                Link(destination: URL(string: "xnp://quicklog/feeding")!) {
+                    metric("喂养", "\(snapshot?.feedingCount ?? 0)次", "\(snapshot?.milkAmountML ?? 0)ml")
+                }
+                Link(destination: URL(string: "xnp://quicklog/sleep")!) {
+                    metric("睡眠", sleepStatus, sleepDetail)
+                }
+                Link(destination: URL(string: "xnp://quicklog/diaper")!) {
+                    metric("排便", "\(diaperCount)次", reminderText)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

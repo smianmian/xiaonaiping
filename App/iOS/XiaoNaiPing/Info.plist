@@ -32,6 +32,16 @@
 				<string>$(XNP_WECHAT_URL_SCHEME)</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.mewpow.xiaonaiping.quicklog</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>xnp</string>
+			</array>
+		</dict>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
