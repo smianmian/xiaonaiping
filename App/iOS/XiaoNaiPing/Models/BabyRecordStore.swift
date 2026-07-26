@@ -19,6 +19,7 @@ enum AutomaticFeedingReminderUpdate {
     case failed
 }
 
+@MainActor
 final class BabyRecordStore: ObservableObject {
     static let mainlandVaccineRegion = "中国大陆"
     static let hongKongVaccineRegion = "香港"
@@ -26,12 +27,20 @@ final class BabyRecordStore: ObservableObject {
 
     @Published var hasCompletedOnboarding = false
     @Published var baby = BabyRecordStore.emptyBaby
-    @Published var feedingRecords: [FeedingRecord] = []
-    @Published var waterRecords: [WaterRecord] = []
+    @Published var feedingRecords: [FeedingRecord] = [] {
+        didSet { invalidateTodaySlices() }
+    }
+    @Published var waterRecords: [WaterRecord] = [] {
+        didSet { invalidateTodaySlices() }
+    }
     @Published var feedingReminder: FeedingReminder?
     @Published private(set) var feedingReminderPreference = FeedingReminderPreference()
-    @Published var sleepRecords: [SleepRecord] = []
-    @Published var diaperRecords: [DiaperRecord] = []
+    @Published var sleepRecords: [SleepRecord] = [] {
+        didSet { invalidateTodaySlices() }
+    }
+    @Published var diaperRecords: [DiaperRecord] = [] {
+        didSet { invalidateTodaySlices() }
+    }
     @Published var growthRecords: [GrowthRecord] = []
     @Published var vaccineRecords: [VaccineRecord] = []
     @Published var milestones: [Milestone] = []
@@ -47,8 +56,54 @@ final class BabyRecordStore: ObservableObject {
     private let userDefaults = UserDefaults.standard
     private let stateFileName = "xiaonaiping-local-state.json"
     private let backupStateFileName = "xiaonaiping-local-state.backup.json"
+    private let avatarFileName = "baby-avatar.jpg"
     private let storageDirectoryOverride: URL?
     private static let mockDataSeededDefaultsKey = "xnp.debug.mock-data-seeded"
+
+    /// 写盘专用串行队列：保证写入顺序与保存顺序一致，主线程零磁盘 IO。
+    private let persistenceQueue = DispatchQueue(label: "com.mewpow.xiaonaiping.persistence", qos: .utility)
+    /// 上一次落盘的头像数据，用于跳过未变化的头像写入。
+    private var lastPersistedAvatarData: Data?
+
+    /// 今日切片缓存：todayXxx 在 SwiftUI body 里被高频读取，
+    /// 无缓存时每次求值都是全表 filter + sort，一年数据量后必然掉帧。
+    /// 记录数组任何变动（didSet）或跨天后自动失效。
+    private struct TodaySlices {
+        var dayKey: String
+        var feeding: [FeedingRecord]
+        var sortedFeedingAscending: [FeedingRecord]
+        var water: [WaterRecord]
+        var sleep: [SleepRecord]
+        var diaper: [DiaperRecord]
+    }
+    private var todaySlices: TodaySlices?
+
+    private func invalidateTodaySlices() {
+        todaySlices = nil
+    }
+
+    private func currentTodaySlices() -> TodaySlices {
+        let key = Self.dayKey(for: Date())
+        if let cached = todaySlices, cached.dayKey == key {
+            return cached
+        }
+        let now = Date()
+        let slices = TodaySlices(
+            dayKey: key,
+            feeding: feedingRecords(on: now),
+            sortedFeedingAscending: feedingRecords.sorted { $0.occurredAt < $1.occurredAt },
+            water: waterRecords(on: now),
+            sleep: sleepRecords(on: now),
+            diaper: diaperRecords(on: now)
+        )
+        todaySlices = slices
+        return slices
+    }
+
+    nonisolated private static func dayKey(for date: Date) -> String {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return "\(components.year ?? 0)-\(components.month ?? 0)-\(components.day ?? 0)"
+    }
 
     init(seedMockData: Bool = false, storageDirectoryOverride: URL? = nil) {
         self.storageDirectoryOverride = storageDirectoryOverride
@@ -96,7 +151,7 @@ final class BabyRecordStore: ObservableObject {
         }
     }
 
-    private static func automaticMilestoneDate(rule: AutomaticMilestoneRule, birthDate: Date) -> Date {
+    nonisolated private static func automaticMilestoneDate(rule: AutomaticMilestoneRule, birthDate: Date) -> Date {
         switch rule {
         case .days(let days):
             // 民俗天数口径：满月第30天、百天第100天（出生当天算第1天）。
@@ -126,7 +181,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todayWaterRecords: [WaterRecord] {
-        waterRecords(on: Date())
+        currentTodaySlices().water
     }
 
     var lastFeedingRecord: FeedingRecord? {
@@ -191,7 +246,7 @@ final class BabyRecordStore: ObservableObject {
         return true
     }
 
-    static func ongoingSleepCapDate(_ record: SleepRecord) -> Date {
+    nonisolated static func ongoingSleepCapDate(_ record: SleepRecord) -> Date {
         Calendar.current.date(byAdding: .hour, value: staleOngoingSleepHours, to: record.startAt)
             ?? record.startAt
     }
@@ -217,7 +272,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todayFeedingRecords: [FeedingRecord] {
-        feedingRecords(on: Date())
+        currentTodaySlices().feeding
     }
 
     func feedingRecords(on day: Date) -> [FeedingRecord] {
@@ -259,11 +314,11 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var todaySleepRecords: [SleepRecord] {
-        sleepRecords(on: Date())
+        currentTodaySlices().sleep
     }
 
     var todayDiaperRecords: [DiaperRecord] {
-        diaperRecords(on: Date())
+        currentTodaySlices().diaper
     }
 
     /// 最近一次喂养（不限日期），供“同上次”一键记录取默认值。
@@ -494,13 +549,15 @@ final class BabyRecordStore: ObservableObject {
     }
 
     func feedingIntervalText(before record: FeedingRecord) -> String {
-        let records = feedingRecords.sorted { $0.occurredAt > $1.occurredAt }
+        // 用缓存的升序列表：这个方法在列表每一行 cell 里都会被调用，
+        // 原实现每行都对全表做一次 O(n log n) 排序。
+        let records = currentTodaySlices().sortedFeedingAscending.reversed()
         guard let index = records.firstIndex(where: { $0.id == record.id }),
-              records.indices.contains(index + 1) else {
+              records.indices.contains(records.index(after: index)) else {
             return "首次记录".localizedText
         }
 
-        let previous = records[index + 1]
+        let previous = records[records.index(after: index)]
         let minutes = Calendar.current.dateComponents(
             [.minute],
             from: Self.feedingEndDate(previous),
@@ -970,7 +1027,7 @@ final class BabyRecordStore: ObservableObject {
         return newRecords
     }
 
-    static func normalizedVaccineRegion(_ region: String?) -> String {
+    nonisolated static func normalizedVaccineRegion(_ region: String?) -> String {
         switch region?.trimmingCharacters(in: .whitespacesAndNewlines) {
         case mainlandVaccineRegion, "大陆", "国内", "Mainland China":
             mainlandVaccineRegion
@@ -1327,6 +1384,24 @@ final class BabyRecordStore: ObservableObject {
         quietCareModeEnabled = state.quietCareModeEnabled
         feedingLiveActivityEnabled = state.feedingLiveActivityEnabled
         photoCount = babyPhotos.count
+        loadAvatarFromDisk()
+    }
+
+    /// 头像已从状态 JSON 拆到独立文件。
+    /// 旧版状态文件里内联的头像（legacy）保持不动，下次保存时会自动迁出。
+    private func loadAvatarFromDisk() {
+        if let inlineAvatar = baby.avatarImageData {
+            // 旧格式：头像还在 JSON 里。置空 lastPersisted 让首次保存写出文件。
+            lastPersistedAvatarData = nil
+            _ = inlineAvatar
+            return
+        }
+        if let fileData = try? Data(contentsOf: avatarFileURL) {
+            baby.avatarImageData = fileData
+            lastPersistedAvatarData = fileData
+        } else {
+            lastPersistedAvatarData = nil
+        }
     }
 
     private func decodeState(at url: URL) -> LocalAppState? {
@@ -1367,9 +1442,26 @@ final class BabyRecordStore: ObservableObject {
 
     @discardableResult
     private func saveState() -> Bool {
+        guard !isPersistenceBlocked else {
+            saveErrorMessage = "本地数据文件读取异常，为保护已有记录已暂停保存。请重启 App；若持续出现请联系我们。"
+            return false
+        }
+
+        // 头像不再内联进状态 JSON（每次保存都 base64 重编码 50-80KB），
+        // 改为独立文件，仅在变化时写。
+        var babyForDisk = baby
+        babyForDisk.avatarImageData = nil
+        let avatarToPersist: Data??
+        if lastPersistedAvatarData != baby.avatarImageData {
+            avatarToPersist = .some(baby.avatarImageData)
+            lastPersistedAvatarData = baby.avatarImageData
+        } else {
+            avatarToPersist = nil
+        }
+
         let state = LocalAppState(
             hasCompletedOnboarding: hasCompletedOnboarding,
-            baby: baby,
+            baby: babyForDisk,
             feedingRecords: feedingRecords,
             waterRecords: waterRecords,
             feedingReminder: feedingReminder,
@@ -1383,38 +1475,82 @@ final class BabyRecordStore: ObservableObject {
             feedingLiveActivityEnabled: feedingLiveActivityEnabled
         )
 
-        guard !isPersistenceBlocked else {
-            saveErrorMessage = "本地数据文件读取异常，为保护已有记录已暂停保存。请重启 App；若持续出现请联系我们。"
-            return false
+        // 写盘挪到串行后台队列：主线程不再为每条记录做全量 JSON 编码 + 磁盘 IO。
+        // 队列串行保证写入顺序 == 保存顺序；失败回到主线程提示并停止后续写入，
+        // 三段式轮转保证磁盘上始终有一份完整可用的状态文件。
+        let context = Self.PersistenceContext(
+            stateURL: stateURL,
+            backupStateURL: backupStateURL,
+            stagingURL: applicationSupportDirectory.appendingPathComponent("\(stateFileName).new"),
+            avatarURL: avatarFileURL,
+            directoryURL: applicationSupportDirectory
+        )
+        persistenceQueue.async { [weak self] in
+            let result = Self.performPersistentWrite(state: state, avatar: avatarToPersist, context: context)
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success:
+                    break
+                case .failure:
+                    self.saveErrorMessage = "保存失败，请检查设备存储空间后重试。"
+                    self.isPersistenceBlocked = true
+                }
+            }
         }
 
+        saveErrorMessage = nil
+        writeSharedTodaySnapshot()
+        NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
+        return true
+    }
+
+    /// 等待所有已入队的写盘完成。App 退后台与测试断言前调用，保证落盘。
+    func flushPersistence() {
+        persistenceQueue.sync {}
+    }
+
+    private struct PersistenceContext {
+        let stateURL: URL
+        let backupStateURL: URL
+        let stagingURL: URL
+        let avatarURL: URL
+        let directoryURL: URL
+    }
+
+    /// 在后台队列执行的纯写盘逻辑：不触碰任何主线程状态。
+    nonisolated private static func performPersistentWrite(
+        state: LocalAppState,
+        avatar: Data??,
+        context: PersistenceContext
+    ) -> Result<Void, Error> {
+        let fileManager = FileManager.default
         do {
             let data = try JSONEncoder().encode(state)
-            try ensureApplicationSupportDirectory()
-            // 三段式写入：先写临时文件，替换时把上一版轮转为备份，
-            // 任意一步失败都不会破坏当前生效的状态文件。
-            let stagingURL = applicationSupportDirectory.appendingPathComponent("\(stateFileName).new")
-            try data.write(to: stagingURL, options: [.atomic])
-            if fileManager.fileExists(atPath: stateURL.path) {
-                try? fileManager.removeItem(at: backupStateURL)
+            try fileManager.createDirectory(at: context.directoryURL, withIntermediateDirectories: true)
+            try data.write(to: context.stagingURL, options: [.atomic])
+            if fileManager.fileExists(atPath: context.stateURL.path) {
+                try? fileManager.removeItem(at: context.backupStateURL)
                 _ = try fileManager.replaceItemAt(
-                    stateURL,
-                    withItemAt: stagingURL,
-                    backupItemName: backupStateFileName,
+                    context.stateURL,
+                    withItemAt: context.stagingURL,
+                    backupItemName: context.backupStateURL.lastPathComponent,
                     options: .withoutDeletingBackupItem
                 )
             } else {
-                try fileManager.moveItem(at: stagingURL, to: stateURL)
+                try fileManager.moveItem(at: context.stagingURL, to: context.stateURL)
             }
-            try? markIncludedInBackup(stateURL)
-            try? markIncludedInBackup(backupStateURL)
-            writeSharedTodaySnapshot()
-            saveErrorMessage = nil
-            NotificationCenter.default.post(name: .babyRecordStoreDidSave, object: self)
-            return true
+
+            if let avatarChange = avatar {
+                if let avatarData = avatarChange {
+                    try avatarData.write(to: context.avatarURL, options: [.atomic])
+                } else {
+                    try? fileManager.removeItem(at: context.avatarURL)
+                }
+            }
+            return .success(())
         } catch {
-            saveErrorMessage = "保存失败，请检查网络或设备存储空间后重试。"
-            return false
+            return .failure(error)
         }
     }
 
@@ -1424,6 +1560,10 @@ final class BabyRecordStore: ObservableObject {
 
     private var backupStateURL: URL {
         applicationSupportDirectory.appendingPathComponent(backupStateFileName)
+    }
+
+    private var avatarFileURL: URL {
+        applicationSupportDirectory.appendingPathComponent(avatarFileName)
     }
 
     private var applicationSupportDirectory: URL {
@@ -1500,37 +1640,37 @@ final class BabyRecordStore: ObservableObject {
         userDefaults.set(true, forKey: migrationKey)
     }
 
-    private static func delta(_ latest: Double?, _ previous: Double?) -> Double? {
+    nonisolated private static func delta(_ latest: Double?, _ previous: Double?) -> Double? {
         guard let latest, let previous else { return nil }
         return latest - previous
     }
 
-    static func timeString(from date: Date) -> String {
+    nonisolated static func timeString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
 
-    static func dateString(from date: Date) -> String {
+    nonisolated static func dateString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy.MM.dd"
         return formatter.string(from: date)
     }
 
-    static func date(fromDateString value: String) -> Date? {
+    nonisolated static func date(fromDateString value: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy.MM.dd"
         return formatter.date(from: value)
     }
 
-    static func reminderDateTimeString(from date: Date) -> String {
+    nonisolated static func reminderDateTimeString(from date: Date) -> String {
         "\(displayDateString(from: date)) \(timeString(from: date))"
     }
 
-    static func displayDateString(from date: Date) -> String {
+    nonisolated static func displayDateString(from date: Date) -> String {
         if Calendar.current.isDateInToday(date) {
             return "今天".localizedText
         }
@@ -1547,21 +1687,21 @@ final class BabyRecordStore: ObservableObject {
         return formatter.string(from: date)
     }
 
-    static func monthString(from date: Date) -> String {
+    nonisolated static func monthString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "M月"
         return formatter.string(from: date)
     }
 
-    static func reportMonthString(from date: Date) -> String {
+    nonisolated static func reportMonthString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "yyyy年M月"
         return formatter.string(from: date)
     }
 
-    static func durationText(from minutes: Int) -> String {
+    nonisolated static func durationText(from minutes: Int) -> String {
         guard minutes > 0 else { return AppLocalization.format("%d分钟", 0) }
         let hours = minutes / 60
         let remainingMinutes = minutes % 60
@@ -1577,7 +1717,7 @@ final class BabyRecordStore: ObservableObject {
         return AppLocalization.format("%d小时%d分", hours, remainingMinutes)
     }
 
-    private static func feedingEndDate(_ record: FeedingRecord) -> Date {
+    nonisolated private static func feedingEndDate(_ record: FeedingRecord) -> Date {
         guard let durationMinutes = record.durationMinutes, durationMinutes > 0,
               let endDate = Calendar.current.date(byAdding: .minute, value: durationMinutes, to: record.occurredAt) else {
             return record.occurredAt
@@ -1586,7 +1726,7 @@ final class BabyRecordStore: ObservableObject {
         return endDate
     }
 
-    private static func elapsedText(since date: Date, now: Date) -> String {
+    nonisolated private static func elapsedText(since date: Date, now: Date) -> String {
         let minutes = max(0, Calendar.current.dateComponents([.minute], from: date, to: now).minute ?? 0)
         if minutes < 1 {
             return "刚刚".localizedText
@@ -1628,7 +1768,7 @@ final class BabyRecordStore: ObservableObject {
         WidgetCenter.shared.reloadAllTimelines()
     }
 
-    static func date(fromTimeString time: String) -> Date {
+    nonisolated static func date(fromTimeString time: String) -> Date {
         var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
         let parts = time.split(separator: ":").compactMap { Int($0) }
         components.hour = parts.first ?? 0
@@ -1636,11 +1776,11 @@ final class BabyRecordStore: ObservableObject {
         return Calendar.current.date(from: components) ?? Date()
     }
 
-    private static func isTodaySleepRecord(_ record: SleepRecord) -> Bool {
+    nonisolated private static func isTodaySleepRecord(_ record: SleepRecord) -> Bool {
         isSleepRecord(record, on: Date())
     }
 
-    static func isSleepRecord(_ record: SleepRecord, on day: Date) -> Bool {
+    nonisolated static func isSleepRecord(_ record: SleepRecord, on day: Date) -> Bool {
         let dayStart = Calendar.current.startOfDay(for: day)
         let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
         // 进行中记录按“现在”与 12 小时封顶取较早值，
@@ -1649,11 +1789,11 @@ final class BabyRecordStore: ObservableObject {
         return record.startAt < dayEnd && endAt >= dayStart
     }
 
-    private static func sleepMinutesDuringToday(_ record: SleepRecord) -> Int {
+    nonisolated private static func sleepMinutesDuringToday(_ record: SleepRecord) -> Int {
         sleepMinutes(of: record, on: Date())
     }
 
-    static func sleepMinutes(of record: SleepRecord, on day: Date) -> Int {
+    nonisolated static func sleepMinutes(of record: SleepRecord, on day: Date) -> Int {
         let dayStart = Calendar.current.startOfDay(for: day)
         let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? day
         let recordEnd = record.endAt ?? min(min(Date(), ongoingSleepCapDate(record)), dayEnd)
@@ -1662,11 +1802,11 @@ final class BabyRecordStore: ObservableObject {
         return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
     }
 
-    private static func isSameMonth(_ date: Date, monthDate: Date) -> Bool {
+    nonisolated private static func isSameMonth(_ date: Date, monthDate: Date) -> Bool {
         return Calendar.current.isDate(date, equalTo: monthDate, toGranularity: .month)
     }
 
-    private static func isSameMonthSleepRecord(_ record: SleepRecord, monthDate: Date) -> Bool {
+    nonisolated private static func isSameMonthSleepRecord(_ record: SleepRecord, monthDate: Date) -> Bool {
         let monthStart = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: monthDate)) ?? monthDate
         let nextMonthStart = Calendar.current.date(byAdding: .month, value: 1, to: monthStart) ?? monthDate
         // 进行中记录同样按 12 小时封顶，忘关的记录不会命中之后每个月。
@@ -1674,7 +1814,7 @@ final class BabyRecordStore: ObservableObject {
         return record.startAt < nextMonthStart && endAt >= monthStart
     }
 
-    static func sleepMinutes(of record: SleepRecord, inMonthOf monthDate: Date) -> Int {
+    nonisolated static func sleepMinutes(of record: SleepRecord, inMonthOf monthDate: Date) -> Int {
         let monthStart = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: monthDate)) ?? monthDate
         let nextMonthStart = Calendar.current.date(byAdding: .month, value: 1, to: monthStart) ?? monthDate
         let recordEnd = record.endAt ?? min(min(Date(), ongoingSleepCapDate(record)), nextMonthStart)
@@ -1683,21 +1823,21 @@ final class BabyRecordStore: ObservableObject {
         return max(0, Calendar.current.dateComponents([.minute], from: overlapStart, to: overlapEnd).minute ?? 0)
     }
 
-    private static func sleepSortDate(_ record: SleepRecord) -> Date {
+    nonisolated private static func sleepSortDate(_ record: SleepRecord) -> Date {
         record.endAt ?? record.startAt
     }
 
-    private static func sortableDate(_ value: Date?, timeString: String) -> Date {
+    nonisolated private static func sortableDate(_ value: Date?, timeString: String) -> Date {
         value ?? date(fromTimeString: timeString)
     }
 
-    static func daysSinceBirth(from birthDate: Date) -> Int {
+    nonisolated static func daysSinceBirth(from birthDate: Date) -> Int {
         let start = Calendar.current.startOfDay(for: birthDate)
         let today = Calendar.current.startOfDay(for: Date())
         return max(0, (Calendar.current.dateComponents([.day], from: start, to: today).day ?? 0) + 1)
     }
 
-    static func ageText(from birthDate: Date) -> String {
+    nonisolated static func ageText(from birthDate: Date) -> String {
         let days = daysSinceBirth(from: birthDate)
         if days <= 31 {
             return AppLocalization.format("第%d天", days)
@@ -1720,7 +1860,7 @@ final class BabyRecordStore: ObservableObject {
         return AppLocalization.format("%d个月%d天", max(1, months), remainingDays)
     }
 
-    static func date(fromDisplayDateString value: String) -> Date? {
+    nonisolated static func date(fromDisplayDateString value: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "yyyy年M月d日"
@@ -1734,7 +1874,7 @@ final class BabyRecordStore: ObservableObject {
 
     /// 始终带年份的显示格式。持久化显示字符串必须用它，
     /// 绝不能存“今天”这类相对文本（相对文本会随时间冻结失真）。
-    static func fullDisplayDateString(from date: Date) -> String {
+    nonisolated static func fullDisplayDateString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "yyyy年M月d日"
@@ -1744,7 +1884,7 @@ final class BabyRecordStore: ObservableObject {
     /// 纪念日真实日期：优先 occurredAt，其次解析完整显示串，
     /// 最后对旧版“M月d日”（无年份）按今年/去年尽力还原。
     /// “今天/明天”这类冻结的相对文本无法还原，返回 nil。
-    static func milestoneDate(_ milestone: Milestone) -> Date? {
+    nonisolated static func milestoneDate(_ milestone: Milestone) -> Date? {
         if let occurredAt = milestone.occurredAt {
             return occurredAt
         }
@@ -1754,7 +1894,7 @@ final class BabyRecordStore: ObservableObject {
         return lenientDisplayDate(from: milestone.date)
     }
 
-    private static func lenientDisplayDate(from value: String) -> Date? {
+    nonisolated private static func lenientDisplayDate(from value: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "M月d日"
         formatter.locale = .autoupdatingCurrent
@@ -1899,7 +2039,7 @@ private struct LocalAppState: Codable {
         feedingLiveActivityEnabled = try container.decodeIfPresent(Bool.self, forKey: .feedingLiveActivityEnabled) ?? true
     }
 
-    private static func tolerantArray<T: Decodable>(
+    nonisolated private static func tolerantArray<T: Decodable>(
         _ type: T.Type,
         in container: KeyedDecodingContainer<CodingKeys>,
         forKey key: CodingKeys
@@ -1908,7 +2048,7 @@ private struct LocalAppState: Codable {
         return wrapped?.compactMap(\.value) ?? []
     }
 
-    private static func tolerantValue<T: Decodable>(
+    nonisolated private static func tolerantValue<T: Decodable>(
         _ type: T.Type,
         in container: KeyedDecodingContainer<CodingKeys>,
         forKey key: CodingKeys
@@ -1949,7 +2089,7 @@ private struct VaccineTemplate {
 
     // 剂次与月龄参照国家免疫规划（大陆）与香港母婴健康院常见计划整理，
     // 覆盖一岁内全部规划内剂次；模板仅为提醒基准，实际以接种机构安排为准。
-    static func templates(for region: String) -> [VaccineTemplate] {
+    nonisolated static func templates(for region: String) -> [VaccineTemplate] {
         switch region {
         case BabyRecordStore.hongKongVaccineRegion:
             [

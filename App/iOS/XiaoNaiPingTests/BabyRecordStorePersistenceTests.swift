@@ -3,6 +3,7 @@ import XCTest
 
 /// 数据安全防回归用例：这些测试对应真实的“全损”故障链，
 /// 任何一条失败都意味着用户可能永久丢失育儿记录。
+@MainActor
 final class BabyRecordStorePersistenceTests: XCTestCase {
     private var tempDirectory: URL!
     private let mockSeededKey = "xnp.debug.mock-data-seeded"
@@ -41,6 +42,8 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
                 FeedingRecord(time: "0\(index + 1):30", type: "奶粉", detail: "120ml", icon: "", amountML: 120)
             )
         }
+        // 写盘是后台队列异步的，测试断言磁盘状态前必须先等待落盘。
+        store.flushPersistence()
         return store
     }
 
@@ -184,6 +187,7 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
 }
 
 /// 纪念日日期修复（P0-4）防回归：真实日期必须可往返，旧显示字符串尽力回填。
+@MainActor
 final class MilestoneDateTests: XCTestCase {
     func testMilestoneDatePrefersOccurredAt() {
         let realDate = Calendar.current.date(byAdding: .day, value: -40, to: Date())!
@@ -226,6 +230,7 @@ final class MilestoneDateTests: XCTestCase {
 }
 
 /// 睡眠口径统一防回归：跨月/跨午夜按重叠裁剪，不双计。
+@MainActor
 final class SleepClippingTests: XCTestCase {
     func testCrossMonthSleepIsClippedPerMonth() {
         // 6月30日 23:00 → 7月1日 07:00：6月只算 60 分钟，7月只算 420 分钟。

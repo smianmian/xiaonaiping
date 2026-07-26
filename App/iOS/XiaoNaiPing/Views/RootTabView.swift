@@ -81,6 +81,10 @@ struct RootTabView: View {
                     await cloudSync.syncIfNeeded(store: store)
                 }
             }
+            if phase == .background {
+                // 写盘是后台队列异步的；退后台前同步等待，保证已保存的记录都落盘。
+                store.flushPersistence()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .babyRecordStoreDidSave)) { _ in
             cloudSync.scheduleAutomaticSync(store: store)
