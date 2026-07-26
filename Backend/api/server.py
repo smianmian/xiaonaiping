@@ -17,7 +17,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 import urllib.error
 import urllib.request
 
@@ -411,6 +411,89 @@ def upsert_phone_code(
 # 覆盖前保留的历史版本数：客户端 bug 用坏数据覆盖唯一副本时，这是最后的救援手段。
 SYNC_VERSIONS_TO_KEEP = 30
 
+# ---- 家人共享（多看护人逐条增量同步）----
+# 与整包 blob 备份并存：blob 是单账号灾备，family_records 是家庭内
+# 按记录 LWW（updated_at_ms 新者胜）的协作通道，seq 游标增量拉取。
+FAMILY_INVITE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+FAMILY_INVITE_CODE_LENGTH = 6
+FAMILY_MAX_MEMBERS = 6
+FAMILY_RECORD_TYPES = {"baby", "feeding", "water", "sleep", "diaper", "growth", "vaccine", "milestone"}
+FAMILY_BATCH_LIMIT = 500
+FAMILY_RECORD_PAYLOAD_LIMIT = 64 * 1024
+FAMILY_PULL_LIMIT = 500
+
+
+def generate_family_invite_code() -> str:
+    return "".join(secrets.choice(FAMILY_INVITE_CODE_ALPHABET) for _ in range(FAMILY_INVITE_CODE_LENGTH))
+
+
+def family_membership(db: DatabaseConnection, account_id: str):
+    return db.execute(
+        """
+        SELECT m.family_id AS family_id, m.role AS role,
+               f.invite_code AS invite_code, f.owner_account_id AS owner_account_id
+        FROM family_members m
+        JOIN families f ON f.family_id = m.family_id
+        WHERE m.account_id = ?
+        """,
+        (account_id,),
+    ).fetchone()
+
+
+def family_member_count(db: DatabaseConnection, family_id: str) -> int:
+    row = db.execute(
+        "SELECT COUNT(*) AS member_count FROM family_members WHERE family_id = ?",
+        (family_id,),
+    ).fetchone()
+    return int(row["member_count"])
+
+
+def family_membership_response(db: DatabaseConnection, membership) -> dict:
+    return {
+        "family": {
+            "familyId": membership["family_id"],
+            "role": membership["role"],
+            "inviteCode": membership["invite_code"],
+            "memberCount": family_member_count(db, membership["family_id"]),
+        }
+    }
+
+
+def upsert_family_record(
+    db: DatabaseConnection,
+    family_id: str,
+    author_account_id: str,
+    record_type: str,
+    record_id: str,
+    payload: bytes,
+    updated_at_ms: int,
+    deleted_at_ms: int | None,
+) -> bool:
+    """LWW：仅当来件不早于已存版本时替换；替换用删+插拿新 seq。返回是否接受。"""
+    row = db.execute(
+        """
+        SELECT updated_at_ms FROM family_records
+        WHERE family_id = ? AND record_type = ? AND record_id = ?
+        """,
+        (family_id, record_type, record_id),
+    ).fetchone()
+    if row is not None and int(row["updated_at_ms"]) > updated_at_ms:
+        return False
+    if row is not None:
+        db.execute(
+            "DELETE FROM family_records WHERE family_id = ? AND record_type = ? AND record_id = ?",
+            (family_id, record_type, record_id),
+        )
+    db.execute(
+        """
+        INSERT INTO family_records(
+            family_id, record_type, record_id, payload, updated_at_ms, deleted_at_ms, author_account_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (family_id, record_type, record_id, payload, updated_at_ms, deleted_at_ms, author_account_id),
+    )
+    return True
+
 
 def archive_sync_version(db: DatabaseConnection, account_id: str, new_payload: bytes, archived_at: str) -> None:
     row = db.execute(
@@ -570,6 +653,10 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             self.handle_get_account(account_id)
         elif path == "/v1/sync":
             self.handle_get_sync(account_id)
+        elif path == "/v1/family":
+            self.handle_get_family(account_id)
+        elif path == "/v1/family/records":
+            self.handle_get_family_records(account_id)
         elif path == "/v1/photos":
             self.handle_list_photos(account_id)
         elif path.startswith("/v1/photos/"):
@@ -593,6 +680,14 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             account_id = self.require_account()
             if account_id is not None:
                 self.handle_post_analytics_events(account_id)
+        elif path == "/v1/family":
+            account_id = self.require_account()
+            if account_id is not None:
+                self.handle_create_family(account_id)
+        elif path == "/v1/family/join":
+            account_id = self.require_account()
+            if account_id is not None:
+                self.handle_join_family(account_id)
         else:
             self.write_error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在。")
 
@@ -604,6 +699,8 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/v1/sync":
             self.handle_put_sync(account_id)
+        elif path == "/v1/family/records":
+            self.handle_put_family_records(account_id)
         elif path.startswith("/v1/photos/"):
             self.handle_put_photo(account_id, path.removeprefix("/v1/photos/"))
         else:
@@ -768,6 +865,198 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             self.write_error(HTTPStatus.UNAUTHORIZED, "account_deleted", "账号不存在或已删除。")
             return
         self.write_json({"accountId": row["account_id"], "createdAt": row["created_at"]})
+
+    def handle_get_family(self, account_id: str) -> None:
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_json({"family": None})
+                return
+            response = family_membership_response(db, membership)
+        self.write_json(response)
+
+    def handle_create_family(self, account_id: str) -> None:
+        with connect(self.config) as db:
+            existing = family_membership(db, account_id)
+            if existing is not None:
+                # 幂等：已在家庭里则直接返回现有信息。
+                response = family_membership_response(db, existing)
+                self.write_json(response)
+                return
+
+            family_id = str(uuid.uuid4())
+            invite_code = generate_family_invite_code()
+            for _ in range(8):
+                collision = db.execute(
+                    "SELECT family_id FROM families WHERE invite_code = ?",
+                    (invite_code,),
+                ).fetchone()
+                if collision is None:
+                    break
+                invite_code = generate_family_invite_code()
+
+            now = utc_now()
+            db.execute(
+                "INSERT INTO families(family_id, owner_account_id, invite_code, created_at) VALUES (?, ?, ?, ?)",
+                (family_id, account_id, invite_code, now),
+            )
+            db.execute(
+                "INSERT INTO family_members(family_id, account_id, role, created_at) VALUES (?, ?, ?, ?)",
+                (family_id, account_id, "owner", now),
+            )
+            db.commit()
+
+        self.write_json(
+            {"family": {"familyId": family_id, "role": "owner", "inviteCode": invite_code, "memberCount": 1}},
+            status=HTTPStatus.CREATED,
+        )
+
+    def handle_join_family(self, account_id: str) -> None:
+        body = self.read_json(MAX_SYNC_BYTES)
+        if not isinstance(body, dict):
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
+            return
+        invite_code = body.get("inviteCode")
+        if not isinstance(invite_code, str):
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_invite_code", "邀请码格式不正确。")
+            return
+        invite_code = invite_code.strip().upper()
+        if not re.fullmatch(r"^[A-Z0-9]{4,16}$", invite_code):
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_invite_code", "邀请码格式不正确。")
+            return
+
+        with connect(self.config) as db:
+            family_row = db.execute(
+                "SELECT family_id FROM families WHERE invite_code = ?",
+                (invite_code,),
+            ).fetchone()
+            if family_row is None:
+                self.write_error(HTTPStatus.NOT_FOUND, "invite_code_not_found", "邀请码不存在或已失效。")
+                return
+            family_id = family_row["family_id"]
+
+            existing = family_membership(db, account_id)
+            if existing is not None:
+                if existing["family_id"] == family_id:
+                    response = family_membership_response(db, existing)
+                    self.write_json(response)
+                    return
+                self.write_error(HTTPStatus.CONFLICT, "already_in_family", "当前账号已在另一个家庭中。")
+                return
+
+            if family_member_count(db, family_id) >= FAMILY_MAX_MEMBERS:
+                self.write_error(HTTPStatus.CONFLICT, "family_full", "这个家庭的成员数已达上限。")
+                return
+
+            db.execute(
+                "INSERT INTO family_members(family_id, account_id, role, created_at) VALUES (?, ?, ?, ?)",
+                (family_id, account_id, "member", utc_now()),
+            )
+            membership = family_membership(db, account_id)
+            response = family_membership_response(db, membership)
+            db.commit()
+        self.write_json(response, status=HTTPStatus.CREATED)
+
+    def handle_put_family_records(self, account_id: str) -> None:
+        body = self.read_json(MAX_SYNC_BYTES)
+        if not isinstance(body, dict) or not isinstance(body.get("records"), list):
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_records", "请求体必须包含 records 数组。")
+            return
+        records = body["records"]
+        if len(records) > FAMILY_BATCH_LIMIT:
+            self.write_error(HTTPStatus.BAD_REQUEST, "batch_too_large", f"单批最多 {FAMILY_BATCH_LIMIT} 条。")
+            return
+
+        parsed = []
+        for item in records:
+            if not isinstance(item, dict):
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_records", "记录必须是 JSON 对象。")
+                return
+            record_type = item.get("recordType")
+            record_id = item.get("recordId")
+            payload = item.get("payload")
+            updated_at_ms = item.get("updatedAtMs")
+            deleted_at_ms = item.get("deletedAtMs")
+            if record_type not in FAMILY_RECORD_TYPES:
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_type", "不支持的记录类型。")
+                return
+            if not isinstance(record_id, str) or not self.is_safe_id(record_id):
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_id", "记录 ID 不合法。")
+                return
+            if not isinstance(payload, str) or len(payload.encode("utf-8")) > FAMILY_RECORD_PAYLOAD_LIMIT:
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_payload", "记录 payload 缺失或过大。")
+                return
+            if not isinstance(updated_at_ms, int) or updated_at_ms <= 0:
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_updated_at", "updatedAtMs 必须是正整数毫秒。")
+                return
+            if deleted_at_ms is not None and (not isinstance(deleted_at_ms, int) or deleted_at_ms <= 0):
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_deleted_at", "deletedAtMs 必须是正整数毫秒。")
+                return
+            parsed.append((record_type, record_id, payload.encode("utf-8"), updated_at_ms, deleted_at_ms))
+
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_error(HTTPStatus.FORBIDDEN, "not_in_family", "还没有加入家庭。")
+                return
+            family_id = membership["family_id"]
+            accepted = 0
+            stale = 0
+            for record_type, record_id, payload, updated_at_ms, deleted_at_ms in parsed:
+                if upsert_family_record(
+                    db, family_id, account_id, record_type, record_id, payload, updated_at_ms, deleted_at_ms
+                ):
+                    accepted += 1
+                else:
+                    stale += 1
+            cursor_row = db.execute(
+                "SELECT COALESCE(MAX(seq), 0) AS cursor_seq FROM family_records WHERE family_id = ?",
+                (family_id,),
+            ).fetchone()
+            db.commit()
+
+        self.write_json({"accepted": accepted, "staleSkipped": stale, "cursor": int(cursor_row["cursor_seq"])})
+
+    def handle_get_family_records(self, account_id: str) -> None:
+        query = parse_qs(urlparse(self.path).query)
+        since_raw = (query.get("since") or ["0"])[0]
+        try:
+            since = int(since_raw)
+        except ValueError:
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_cursor", "since 游标必须是整数。")
+            return
+
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_error(HTTPStatus.FORBIDDEN, "not_in_family", "还没有加入家庭。")
+                return
+            rows = db.execute(
+                """
+                SELECT seq, record_type, record_id, payload, updated_at_ms, deleted_at_ms, author_account_id
+                FROM family_records
+                WHERE family_id = ? AND seq > ?
+                ORDER BY seq ASC
+                LIMIT ?
+                """,
+                (membership["family_id"], since, FAMILY_PULL_LIMIT),
+            ).fetchall()
+
+        changes = []
+        cursor = since
+        for row in rows:
+            cursor = int(row["seq"])
+            changes.append(
+                {
+                    "recordType": row["record_type"],
+                    "recordId": row["record_id"],
+                    "payload": bytes(row["payload"]).decode("utf-8"),
+                    "updatedAtMs": int(row["updated_at_ms"]),
+                    "deletedAtMs": int(row["deleted_at_ms"]) if row["deleted_at_ms"] is not None else None,
+                    "mine": row["author_account_id"] == account_id,
+                }
+            )
+        self.write_json({"records": changes, "cursor": cursor, "hasMore": len(rows) == FAMILY_PULL_LIMIT})
 
     def handle_put_sync(self, account_id: str) -> None:
         payload = self.read_body(MAX_SYNC_BYTES)

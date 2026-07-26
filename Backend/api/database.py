@@ -195,6 +195,38 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 ON analytics_events(event_name, occurred_at);
             CREATE INDEX IF NOT EXISTS idx_analytics_events_actor_time
                 ON analytics_events(account_hash, occurred_at);
+
+            CREATE TABLE IF NOT EXISTS families (
+                family_id TEXT PRIMARY KEY,
+                owner_account_id TEXT NOT NULL,
+                invite_code TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS family_members (
+                family_id TEXT NOT NULL,
+                account_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                PRIMARY KEY (family_id, account_id)
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_family_members_account
+                ON family_members(account_id);
+
+            CREATE TABLE IF NOT EXISTS family_records (
+                seq INTEGER PRIMARY KEY AUTOINCREMENT,
+                family_id TEXT NOT NULL,
+                record_type TEXT NOT NULL,
+                record_id TEXT NOT NULL,
+                payload BLOB NOT NULL,
+                updated_at_ms INTEGER NOT NULL,
+                deleted_at_ms INTEGER NULL,
+                author_account_id TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_family_records_identity
+                ON family_records(family_id, record_type, record_id);
+            CREATE INDEX IF NOT EXISTS idx_family_records_cursor
+                ON family_records(family_id, seq);
             """
         )
         ensure_deletion_audit_sync_deleted_column(db)
@@ -285,6 +317,46 @@ def ensure_schema(db: DatabaseConnection) -> None:
             properties_json TEXT NOT NULL,
             INDEX idx_analytics_events_name_time (event_name, occurred_at),
             INDEX idx_analytics_events_actor_time (account_hash, occurred_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS families (
+            family_id CHAR(36) PRIMARY KEY,
+            owner_account_id CHAR(36) NOT NULL,
+            invite_code VARCHAR(16) NOT NULL UNIQUE,
+            created_at VARCHAR(40) NOT NULL,
+            CONSTRAINT fk_families_owner
+                FOREIGN KEY (owner_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS family_members (
+            family_id CHAR(36) NOT NULL,
+            account_id CHAR(36) NOT NULL,
+            role VARCHAR(16) NOT NULL,
+            created_at VARCHAR(40) NOT NULL,
+            PRIMARY KEY (family_id, account_id),
+            UNIQUE INDEX idx_family_members_account (account_id),
+            CONSTRAINT fk_family_members_family
+                FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE,
+            CONSTRAINT fk_family_members_account
+                FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS family_records (
+            seq BIGINT PRIMARY KEY AUTO_INCREMENT,
+            family_id CHAR(36) NOT NULL,
+            record_type VARCHAR(32) NOT NULL,
+            record_id VARCHAR(80) NOT NULL,
+            payload MEDIUMBLOB NOT NULL,
+            updated_at_ms BIGINT NOT NULL,
+            deleted_at_ms BIGINT NULL,
+            author_account_id CHAR(36) NOT NULL,
+            UNIQUE INDEX idx_family_records_identity (family_id, record_type, record_id),
+            INDEX idx_family_records_cursor (family_id, seq),
+            CONSTRAINT fk_family_records_family
+                FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,
     ]
