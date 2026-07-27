@@ -1,19 +1,19 @@
 {
-  "startedAt": "2026-07-03T23:48:28+00:00",
-  "completedAt": "2026-07-03T23:48:28+00:00",
-  "appPath": "/private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app",
+  "startedAt": "2026-07-27T04:42:27+00:00",
+  "completedAt": "2026-07-27T04:42:27+00:00",
+  "appPath": "/private/tmp/XiaoNaiPing-1.3.1.xcarchive/Products/Applications/XiaoNaiPing.app",
   "passed": true,
   "failedRequiredChecks": [],
   "checks": {
     "appBundleExists": {
       "passed": true,
       "required": true,
-      "evidence": "/private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app"
+      "evidence": "/private/tmp/XiaoNaiPing-1.3.1.xcarchive/Products/Applications/XiaoNaiPing.app"
     },
     "infoPlistPresent": {
       "passed": true,
       "required": true,
-      "evidence": "/private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/Info.plist"
+      "evidence": "/private/tmp/XiaoNaiPing-1.3.1.xcarchive/Products/Applications/XiaoNaiPing.app/Info.plist"
     },
     "bundleIdentifierMatches": {
       "passed": true,
@@ -63,12 +63,12 @@
     "zhHantHKLocalizationBundled": {
       "passed": true,
       "required": true,
-      "evidence": "/private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/zh-Hant-HK.lproj"
+      "evidence": "/private/tmp/XiaoNaiPing-1.3.1.xcarchive/Products/Applications/XiaoNaiPing.app/zh-Hant-HK.lproj"
     },
     "privacyManifestBundled": {
       "passed": true,
       "required": true,
-      "evidence": "/private/tmp/XiaoNaiPing-WeChat-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app/PrivacyInfo.xcprivacy"
+      "evidence": "/private/tmp/XiaoNaiPing-1.3.1.xcarchive/Products/Applications/XiaoNaiPing.app/PrivacyInfo.xcprivacy"
     },
     "privacyManifestTrackingDisabled": {
       "passed": true,

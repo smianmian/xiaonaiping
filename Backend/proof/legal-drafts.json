@@ -1,0 +1,359 @@
+{
+  "startedAt": "2026-07-27T04:42:43+00:00",
+  "completedAt": "2026-07-27T04:42:43+00:00",
+  "containsSecrets": false,
+  "passed": true,
+  "failedRequiredChecks": [],
+  "checks": {
+    "privacyCurrentDate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 日期：2026-06-24"
+    },
+    "privacyCompanyEntity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 深圳市闪现生活科技有限公司"
+    },
+    "privacyMainlandFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 第一版计划先上中国大陆 App Store"
+    },
+    "privacyHongKongSecond": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 香港为第二批"
+    },
+    "privacyAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 恢复密钥、手机号和微信登录"
+    },
+    "privacyStatusDisplayBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示"
+    },
+    "privacyManualReminderDeferral": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 提醒顺延由你手动选择"
+    },
+    "privacyReminderDeferralGranularity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 5 分钟一档"
+    },
+    "privacyReminderDeferralOptions": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains +5、+10、+15、+20、+25、+30 分钟"
+    },
+    "privacyReminderDeferralCalculation": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 本顿结束时间 + 固定间隔 + 顺延分钟"
+    },
+    "privacyReminderNoDurationFallback": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 本顿发生时间"
+    },
+    "privacyReminderNoPersistentField": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 不新增持久化字段"
+    },
+    "privacyNoAutomaticFeedingInference": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 不根据奶量、月龄、传感器或健康数据自动推算喂养时间"
+    },
+    "privacyUserEnteredStatusSource": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 这些状态展示只反映用户主动记录的数据"
+    },
+    "privacyNoHealthPressureFeedingAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 不生成健康建议、压力提醒、喂养建议或医疗判断"
+    },
+    "privacyNoHealthKitOrSensors": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md contains 不接入 HealthKit、传感器、医院系统或第三方健康数据源"
+    },
+    "termsCurrentDate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 日期：2026-06-24"
+    },
+    "termsCompanyEntity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 深圳市闪现生活科技有限公司"
+    },
+    "termsAccountMethods": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 恢复密钥、手机号验证码和微信授权登录"
+    },
+    "termsSyncOriginalPhotos": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 用户主动加入 App 的照片原图"
+    },
+    "termsDeletion": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 删除云端账号与同步"
+    },
+    "termsMedicalBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不提供诊断、治疗、预测、处方或专业疫苗建议"
+    },
+    "termsStatusDisplayBoundary": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示"
+    },
+    "termsManualReminderDeferral": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 提醒顺延由你手动选择"
+    },
+    "termsReminderDeferralGranularity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 5 分钟一档"
+    },
+    "termsReminderDeferralOptions": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains +5、+10、+15、+20、+25、+30 分钟"
+    },
+    "termsReminderDeferralCalculation": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 本顿结束时间 + 固定间隔 + 顺延分钟"
+    },
+    "termsReminderNoDurationFallback": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 本顿发生时间"
+    },
+    "termsReminderNoPersistentField": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不新增持久化字段"
+    },
+    "termsNoAutomaticFeedingInference": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不根据奶量、月龄、传感器或健康数据自动推算喂养时间"
+    },
+    "termsUserEnteredStatusSource": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 这些状态展示只反映用户主动记录的数据"
+    },
+    "termsNoHealthPressureFeedingAdvice": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不生成健康建议、压力提醒、喂养建议或医疗判断"
+    },
+    "termsNoHealthKitOrSensors": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md contains 不接入 HealthKit、传感器、医院系统或第三方健康数据源"
+    },
+    "publicationHandoffCurrentDate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 日期：2026-06-29"
+    },
+    "publicationHandoffPrivacyURL": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains https://api.mewpow.com/xiaonaiping/privacy"
+    },
+    "publicationHandoffTermsURL": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains https://api.mewpow.com/xiaonaiping/terms"
+    },
+    "publicationHandoffSupportURL": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains https://api.mewpow.com/xiaonaiping/support"
+    },
+    "publicationHandoffCompanyEntity": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 深圳市闪现生活科技有限公司"
+    },
+    "publicationHandoffPrivacyEmail": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 隐私联系邮箱"
+    },
+    "publicationHandoffSupportEmail": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 支持邮箱"
+    },
+    "publicationHandoffServiceProviders": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 短信服务商、微信开放平台、Apple TestFlight / App Store Connect、华为云 OBS"
+    },
+    "publicationHandoffDeletionSLA": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 删除 SLA"
+    },
+    "publicationHandoffFilingNumber": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 拿到真实 App 备案 / ICP 编号后再更新"
+    },
+    "publicationHandoffNoPlaceholders": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 不得写占位邮箱、测试邮箱、个人邮箱或未确认的隐私联系邮箱"
+    },
+    "publicationHandoffNoPretendEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 不得声称短信服务商、微信开放平台、OBS、备案、TestFlight 或 App Store Connect 人工证据已完成"
+    },
+    "publicationHandoffNoMedicalClaims": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 不得把小奶瓶描述为医疗器械、诊断工具、治疗工具、健康建议工具、压力评估工具或自动喂养建议工具"
+    },
+    "publicationHandoffRecheckCommands": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains check_public_pages.py"
+    },
+    "publicationHandoffUrlConsistencyChecklist": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains ## 公开 URL 一致性清单"
+    },
+    "publicationHandoffUrlConsistencyFillSheet": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_CONNECT_FILL_SHEET_20260629.md"
+    },
+    "publicationHandoffUrlConsistencyCopyPaste": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_CONNECT_COPY_PASTE_20260629.md"
+    },
+    "publicationHandoffUrlConsistencyMetadata": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_METADATA.md"
+    },
+    "publicationHandoffUrlConsistencyPrivacyLabel": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_PRIVACY_LABEL.json"
+    },
+    "publicationHandoffUrlConsistencyPrivacyAnswers": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_PRIVACY_ANSWERS_20260629.md"
+    },
+    "publicationHandoffUrlConsistencyVersionSettings": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_VERSION_RELEASE_SETTINGS_20260629.md"
+    },
+    "publicationHandoffUrlConsistencyFiling": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains MAINLAND_FILING_MATERIALS.md"
+    },
+    "publicationHandoffUrlConsistencyExternalHandoff": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260629.md"
+    },
+    "publicationHandoffUrlConsistencySubmissionPacket": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains APP_STORE_SUBMISSION_PACKET.md"
+    },
+    "publicationHandoffUrlConsistencyStaticPages": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains Backend/static/privacy.html"
+    },
+    "publicationHandoffUrlConsistencyTermsStaticPage": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains Backend/static/terms.html"
+    },
+    "publicationHandoffUrlConsistencySupportStaticPage": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains Backend/static/support.html"
+    },
+    "publicationHandoffUrlConsistencyEvidence": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains RealDevice/RD-19-public-urls.png"
+    },
+    "publicationHandoffUrlConsistencyNoPartialUpdate": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains 不要只改一处 URL"
+    },
+    "publicationHandoffUrlConsistencyRecheckAppStore": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md contains check_app_store_connect_materials.py"
+    },
+    "privacyOutdatedHongKongUsFirst": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md has no outdated marker"
+    },
+    "privacyOutdatedMainlandExcluded": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md has no outdated marker"
+    },
+    "termsOutdatedRecoveryOnly": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md has no outdated marker"
+    },
+    "termsMissingCompanyEntityPlaceholder": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/TERMS_OF_USE_DRAFT.md has no outdated marker"
+    },
+    "publicationNoPlaceholderEmail": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md has no outdated marker"
+    },
+    "publicationNoFakeFilingNumber": {
+      "passed": true,
+      "required": true,
+      "evidence": "Docs/08_Release/LEGAL_PUBLICATION_HANDOFF_20260629.md has no outdated marker"
+    },
+    "publicUrlConsistencyAcrossLaunchMaterials": {
+      "passed": true,
+      "required": true,
+      "evidence": "all launch materials use the expected public URLs"
+    }
+  }
+}
