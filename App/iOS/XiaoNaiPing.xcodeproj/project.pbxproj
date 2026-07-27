@@ -25,6 +25,7 @@
 		33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF167A08D1CF3FC993C518E /* RecordRowView.swift */; };
 		3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */; };
 		3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11309ACBEDD768C59F5433D6 /* RecordExportService.swift */; };
+		42681BF3A29069C0C9A55325 /* RecordCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86A2314F72553D943A6663E /* RecordCenterView.swift */; };
 		4796A9C5CB54AACFB8C82740 /* WeChatLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327002207260A3AC6DE8CA23 /* WeChatLoginService.swift */; };
 		4D7BB850B95237B9C01CBAFD /* BabyRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED11FE64BBE88023C9ED494B /* BabyRecordStore.swift */; };
 		4E116448BDE0520C56179427 /* XiaoNaiPingWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8D2C46E75CDEBD6C6BAB876A /* XiaoNaiPingWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -162,6 +163,7 @@
 		AA5406401F6B0DCAB9B4932C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		B7CBB8D388EB582D25BE9B62 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hant-HK.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		B80EFE791523D472A39871F2 /* XiaoNaiPingWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XiaoNaiPingWidgets.entitlements; sourceTree = "<group>"; };
+		B86A2314F72553D943A6663E /* RecordCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordCenterView.swift; sourceTree = "<group>"; };
 		BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassTabBar.swift; sourceTree = "<group>"; };
 		BC89247E294755B419F3F4E0 /* FamilySyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySyncEngine.swift; sourceTree = "<group>"; };
 		BCD97A9F770F8102D1DD49B0 /* AppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAssets.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 				E092C8D5EFBC8BD038D388E2 /* MilestoneView.swift */,
 				4BF806768531E34A93C8CF2C /* ProfileView.swift */,
 				81C2F6EB80A7A29272675554 /* QuickRecordSheet.swift */,
+				B86A2314F72553D943A6663E /* RecordCenterView.swift */,
 				3CE835FDA746BD464694C365 /* RootTabView.swift */,
 				5F36625B424397290C39CC8B /* SleepRecordView.swift */,
 				EEE46A4DDE313FEAE7C8B56C /* VaccineView.swift */,
@@ -590,6 +593,7 @@
 				DA93ED3325C38B5191CC2CEC /* QuickLogService.swift in Sources */,
 				0DF1426E12EBA1396D4B189D /* QuickRecordSheet.swift in Sources */,
 				BD8B7E60E6F4FEB7BC47352B /* QuickTimeField.swift in Sources */,
+				42681BF3A29069C0C9A55325 /* RecordCenterView.swift in Sources */,
 				3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */,
 				33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */,
 				1A6CBC1E82364A80FED3E908 /* RootTabView.swift in Sources */,

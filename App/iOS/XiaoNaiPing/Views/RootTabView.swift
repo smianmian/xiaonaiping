@@ -27,6 +27,7 @@ struct RootTabView: View {
     @State private var selectedTab: AppTab
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
+    @State private var recordPath: [AppRoute] = []
     @State private var isQuickRecordPresented = false
     @State private var pendingQuickRecordRoute: AppRoute?
     @State private var isRegistering = false
@@ -180,8 +181,14 @@ struct RootTabView: View {
                 }
                 .tag(AppTab.growth)
 
-                NavigationStack {
-                    Color.clear
+                NavigationStack(path: $recordPath) {
+                    RecordCenterView(onRoute: { recordPath.append($0) })
+                        .navigationDestination(for: AppRoute.self) { route in
+                            routeView(route) {
+                                recordPath.append(.monthlyReport)
+                            }
+                            .toolbar(.hidden, for: .tabBar)
+                        }
                 }
                 .tabItem {
                     tabLabel(.record)
@@ -229,15 +236,13 @@ struct RootTabView: View {
         }
     }
 
+    // 「记录」tab 现在是真实页面，不再拦截成弹层；
+    // 快速记录浮层保留给首页入口与截图流程。
     private var tabSelection: Binding<AppTab> {
         Binding {
             selectedTab
         } set: { tab in
-            if tab == .record {
-                isQuickRecordPresented = true
-            } else {
-                selectedTab = tab
-            }
+            selectedTab = tab
         }
     }
 
