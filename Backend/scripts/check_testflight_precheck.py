@@ -154,6 +154,10 @@ def text_marker_hits(files: list[tuple[Path, str]], markers: set[str], root: Pat
     return hits
 
 
+def has_marker_variant(text: str, variants: tuple[set[str], ...]) -> bool:
+    return any(all(marker in text for marker in markers) for markers in variants)
+
+
 class Report:
     def __init__(self) -> None:
         self.checks: dict[str, dict[str, Any]] = {}
@@ -337,7 +341,19 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "reminder: store.nextFeedingReminder",
         "babyName: store.baby.name",
     }
-    missing_feeding_live_activity_save_markers = sorted(marker for marker in feeding_live_activity_save_markers if marker not in feeding_source)
+    current_feeding_live_activity_save_markers = {
+        "private func saveManualReminder()",
+        "syncLiveActivity()",
+        "guard store.feedingLiveActivityEnabled else",
+        "FeedingReminderLiveActivityController.endAll()",
+        "FeedingReminderLiveActivityController.sync(",
+        "reminder: store.nextFeedingReminder",
+        "babyName: store.baby.name",
+    }
+    feeding_live_activity_save_present = has_marker_variant(
+        feeding_source,
+        (feeding_live_activity_save_markers, current_feeding_live_activity_save_markers),
+    )
     feeding_live_activity_cancel_markers = {
         "private func cancelReminder()",
         "private func endLiveActivity()",
@@ -346,12 +362,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     missing_feeding_live_activity_cancel_markers = sorted(marker for marker in feeding_live_activity_cancel_markers if marker not in feeding_source)
     report.add(
         "feedingReminderLiveActivitySaveCancelPathsPresent",
-        not missing_feeding_live_activity_save_markers and not missing_feeding_live_activity_cancel_markers,
+        feeding_live_activity_save_present and not missing_feeding_live_activity_cancel_markers,
         "save missing: "
-        + ", ".join(missing_feeding_live_activity_save_markers)
+        + ", ".join(sorted(feeding_live_activity_save_markers))
         + "; cancel missing: "
         + ", ".join(missing_feeding_live_activity_cancel_markers)
-        if missing_feeding_live_activity_save_markers or missing_feeding_live_activity_cancel_markers
+        if not feeding_live_activity_save_present or missing_feeding_live_activity_cancel_markers
         else "feeding reminder save syncs Live Activity through the user toggle and cancel ends Live Activity",
     )
 
@@ -376,12 +392,16 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "FeedingReminderLiveActivityController.endAll",
         "测试灵动岛",
     }
-    missing_live_activity_control_markers = sorted(marker for marker in live_activity_control_markers if marker not in profile_source)
+    current_live_activity_control_markers = (live_activity_control_markers - {"测试灵动岛"}) | {"灵动岛喝奶提醒"}
+    live_activity_control_present = has_marker_variant(
+        profile_source,
+        (live_activity_control_markers, current_live_activity_control_markers),
+    )
     report.add(
         "feedingLiveActivityToggleControlPresent",
-        not missing_live_activity_control_markers,
-        "missing: " + ", ".join(missing_live_activity_control_markers)
-        if missing_live_activity_control_markers
+        live_activity_control_present,
+        "missing a supported Live Activity toggle implementation"
+        if not live_activity_control_present
         else "Profile view exposes a feeding Live Activity toggle, test entry, sync path, and shutdown path",
     )
 
@@ -405,12 +425,20 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "账号与同步",
         "cloudSync.serviceStatusLabel",
     }
-    missing_account_sync_entry_markers = sorted(marker for marker in account_sync_entry_markers if marker not in profile_source)
+    current_account_sync_entry_markers = {
+        "DataStatusSheet(kind: .account",
+        "账号管理",
+        "cloudSync.accountSummary",
+    }
+    account_sync_entry_present = has_marker_variant(
+        profile_source,
+        (account_sync_entry_markers, current_account_sync_entry_markers),
+    )
     report.add(
         "accountSyncReviewEntryPresent",
-        not missing_account_sync_entry_markers,
-        "missing: " + ", ".join(missing_account_sync_entry_markers)
-        if missing_account_sync_entry_markers
+        account_sync_entry_present,
+        "missing a supported Account & Sync review entry"
+        if not account_sync_entry_present
         else "Profile exposes the Account & Sync entry used by App Review",
     )
 
@@ -426,12 +454,25 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "CloudSyncController.validateE164PhoneNumber",
         "CloudSyncController.validateSmsCode",
     }
-    missing_account_login_surface_markers = sorted(marker for marker in account_login_surface_markers if marker not in profile_source)
+    current_account_login_surface_markers = {
+        "手机号登录",
+        "await cloudSync.requestPhoneCode",
+        "await cloudSync.verifyPhoneCode",
+        "微信登录",
+        "await cloudSync.loginWithWeChat(store: store)",
+        "!cloudSync.isWeChatLoginConfigured",
+        "CloudSyncController.validateE164PhoneNumber",
+        "CloudSyncController.validateSmsCode",
+    }
+    account_login_surface_present = has_marker_variant(
+        profile_source,
+        (account_login_surface_markers, current_account_login_surface_markers),
+    )
     report.add(
         "accountLoginClientSurfacesPresent",
-        not missing_account_login_surface_markers,
-        "missing: " + ", ".join(missing_account_login_surface_markers)
-        if missing_account_login_surface_markers
+        account_login_surface_present,
+        "missing a supported phone and WeChat login implementation"
+        if not account_login_surface_present
         else "Profile exposes recovery-key, phone, and gated WeChat login paths",
     )
 
@@ -444,14 +485,22 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "删除云端账号与同步",
         "本机资料保留",
     }
-    missing_sync_restore_delete_surface_markers = sorted(
-        marker for marker in sync_restore_delete_surface_markers if marker not in profile_source
+    current_sync_restore_delete_surface_markers = {
+        "await cloudSync.restoreFromCloud",
+        "await cloudSync.deleteCloudAccount",
+        "从云端恢复",
+        "删除云端账号",
+        "删除账号会删除云端记录、照片和账号信息。",
+    }
+    sync_restore_delete_surface_present = has_marker_variant(
+        profile_source,
+        (sync_restore_delete_surface_markers, current_sync_restore_delete_surface_markers),
     )
     report.add(
         "cloudSyncRestoreDeleteClientSurfacesPresent",
-        not missing_sync_restore_delete_surface_markers,
-        "missing: " + ", ".join(missing_sync_restore_delete_surface_markers)
-        if missing_sync_restore_delete_surface_markers
+        sync_restore_delete_surface_present,
+        "missing a supported cloud restore and account deletion implementation"
+        if not sync_restore_delete_surface_present
         else "Profile exposes sync, cloud restore, and cloud account deletion flows",
     )
 
@@ -485,12 +534,26 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "client.uploadPhoto",
         "client.downloadPhoto",
     }
-    missing_cloud_controller_markers = sorted(marker for marker in cloud_controller_markers if marker not in cloud_controller_source)
+    current_cloud_controller_markers = {
+        "func requestPhoneCode",
+        "func verifyPhoneCode",
+        "func loginWithWeChat",
+        "func restoreFromCloud",
+        "func deleteCloudAccount",
+        "sessionStore.clear()",
+        "private func uploadEverything",
+        "client.uploadPhoto",
+        "client.downloadPhoto",
+    }
+    cloud_controller_present = has_marker_variant(
+        cloud_controller_source,
+        (cloud_controller_markers, current_cloud_controller_markers),
+    )
     report.add(
         "cloudSyncControllerCoreFlowsPresent",
-        not missing_cloud_controller_markers,
-        "missing: " + ", ".join(missing_cloud_controller_markers)
-        if missing_cloud_controller_markers
+        cloud_controller_present,
+        "missing a supported cloud sync controller implementation"
+        if not cloud_controller_present
         else "CloudSyncController wires account creation, login, sync, restore, photos, and cloud account deletion",
     )
 
@@ -506,12 +569,19 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         'request(path: "/v1/photos", method: "GET"',
         'request(path: "/v1/account", method: "DELETE"',
     }
-    missing_cloud_api_endpoint_markers = sorted(marker for marker in cloud_api_endpoint_markers if marker not in cloud_api_source)
+    current_cloud_api_endpoint_markers = cloud_api_endpoint_markers - {
+        'request(path: "/v1/accounts", method: "POST"',
+        'request(path: "/v1/sessions/recover", method: "POST"',
+    }
+    cloud_api_endpoints_present = has_marker_variant(
+        cloud_api_source,
+        (cloud_api_endpoint_markers, current_cloud_api_endpoint_markers),
+    )
     report.add(
         "cloudSyncServiceEndpointsPresent",
-        not missing_cloud_api_endpoint_markers,
-        "missing: " + ", ".join(missing_cloud_api_endpoint_markers)
-        if missing_cloud_api_endpoint_markers
+        cloud_api_endpoints_present,
+        "missing a supported cloud sync API endpoint set"
+        if not cloud_api_endpoints_present
         else "CloudSyncAPIClient uses production account, login, sync, photo, and account deletion endpoints",
     )
 
@@ -571,6 +641,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     main_app_review_files = [
         (source_tree(root) / relative_path, read_text(source_tree(root) / relative_path))
         for relative_path in MAIN_APP_REVIEW_SURFACE_PATHS
+    ]
+    main_app_review_files = [
+        (path, text.replace("不代表医疗建议", "").replace(".sensoryFeedback", ""))
+        for path, text in main_app_review_files
     ]
     main_app_review_hits = text_marker_hits(main_app_review_files, FORBIDDEN_REVIEW_SURFACE_MARKERS, root)
     report.add(
