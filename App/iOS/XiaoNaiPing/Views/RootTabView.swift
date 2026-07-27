@@ -236,13 +236,18 @@ struct RootTabView: View {
         }
     }
 
-    // 「记录」tab 现在是真实页面，不再拦截成弹层；
-    // 快速记录浮层保留给首页入口与截图流程。
+    // 点「记录」tab：先落到记录中心大页面，同时弹快速记录浮层——
+    // 想快速记就直接点，下滑/取消后停在大页面（不再无处可去）。
     private var tabSelection: Binding<AppTab> {
         Binding {
             selectedTab
         } set: { tab in
-            selectedTab = tab
+            if tab == .record {
+                selectedTab = .record
+                isQuickRecordPresented = true
+            } else {
+                selectedTab = tab
+            }
         }
     }
 
@@ -264,8 +269,14 @@ struct RootTabView: View {
     private func openPendingQuickRecord() {
         guard let route = pendingQuickRecordRoute else { return }
         pendingQuickRecordRoute = nil
-        selectedTab = .home
-        homePath.append(route)
+        // 在记录 tab 弹出的浮层：选中的类别推进记录栈，留在记录 tab；
+        // 首页入口弹出的浮层保持原有回首页行为。
+        if selectedTab == .record {
+            recordPath.append(route)
+        } else {
+            selectedTab = .home
+            homePath.append(route)
+        }
     }
 
     private var saveErrorAlertBinding: Binding<Bool> {
