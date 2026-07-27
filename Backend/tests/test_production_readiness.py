@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_production_readiness.py"
-CURRENT_TS = "2026-06-29T00:00:00+00:00"
+CURRENT_TS = "2026-07-27T00:00:00+00:00"
 
 
 def write(path: Path, value: str) -> None:
@@ -686,8 +686,8 @@ class ProductionReadinessTest(unittest.TestCase):
                 stable_path = root / stable_relative
                 proof = json.loads(stable_path.read_text(encoding="utf-8"))
                 current_proof = dict(proof)
-                current_proof["startedAt"] = CURRENT_TS
-                current_proof["completedAt"] = CURRENT_TS
+                current_proof["startedAt"] = "2026-06-29T00:00:00+00:00"
+                current_proof["completedAt"] = "2026-06-29T00:00:00+00:00"
                 proof["startedAt"] = old_timestamp
                 proof["completedAt"] = old_timestamp
                 write(stable_path, json.dumps(proof))
@@ -703,8 +703,8 @@ class ProductionReadinessTest(unittest.TestCase):
 
             self.assertTrue(report["checks"]["deploymentProofCurrent"]["passed"])
             self.assertTrue(report["checks"]["storageBackendProofCurrent"]["passed"])
-            self.assertIn(CURRENT_TS, report["checks"]["deploymentProofCurrent"]["evidence"])
-            self.assertIn(CURRENT_TS, report["checks"]["storageBackendProofCurrent"]["evidence"])
+            self.assertIn("2026-06-29T00:00:00+00:00", report["checks"]["deploymentProofCurrent"]["evidence"])
+            self.assertIn("2026-06-29T00:00:00+00:00", report["checks"]["storageBackendProofCurrent"]["evidence"])
 
     def test_auth_debug_mode_is_rejected_for_production(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

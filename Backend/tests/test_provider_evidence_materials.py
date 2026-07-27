@@ -93,13 +93,13 @@ App Store 证据归档到 `07-sms-provider.png`，必须能看到短信签名、
 
 ## 真实短信实发执行包
 
-结构化执行包见 `Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json`。该 JSON 只用于上线当天按顺序核对短信服务商截图、provider 配置 proof、真实实发 proof 和稳定 alias 同步；它不是证据、不是短信密钥容器，也不能作为提交许可。
+结构化执行包见 `Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json`。该 JSON 只用于上线当天按顺序核对短信服务商截图、provider 配置 proof、真实实发 proof 和稳定 alias 同步；它不是证据、不是短信密钥容器，也不能作为提交许可。
 
-1. `Backend/proof/auth-providers-20260630T-current.json` 只证明 provider 配置存在，不能替代真实实发。
-2. `Backend/proof/auth-providers-sms-live-20260630T-current.json` 必须由 `verify_auth_providers.py --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE` 单独生成。
+1. `Backend/proof/auth-providers-20260704T-current.json` 只证明 provider 配置存在，不能替代真实实发。
+2. `Backend/proof/auth-providers-sms-live-20260704T-current.json` 必须由 `verify_auth_providers.py --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE` 单独生成。
 3. `07-sms-provider.png` 或 `.pdf` 必须来自短信服务商后台，保留服务商、签名、账号登录/验证模板、模板审核状态、发送区域、发送成功状态和脱敏手机号片段。
 4. 模板必须只用于账号登录/验证，不含营销、不含医疗、不含育儿建议。
-5. 只有 provider 配置 proof 和 sms-live proof 都通过，并且 `07-sms-provider.*` 已归档后，才能把 `auth-providers-sms-live-20260630T-current.json` 同步到稳定 alias `auth-providers.json`。
+5. 只有 provider 配置 proof 和 sms-live proof 都通过，并且 `07-sms-provider.*` 已归档后，才能把 `auth-providers-sms-live-20260704T-current.json` 同步到稳定 alias `auth-providers.json`。
 6. 全流程不得写入 AccessKey、SecretKey、webhook secret、`XNP_SMS_SECRET`、完整手机号、验证码、token、请求签名或私有后台路径。
 """.lstrip()
 
@@ -202,8 +202,8 @@ def valid_external_handoff() -> str:
 证据文件：
 
 - `Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png`
-- `Backend/proof/universal-links-20260630T-current.json`
-- `Backend/proof/wechat-client-configuration-20260630T-current.json`
+- `Backend/proof/universal-links-20260704T-current.json`
+- `Backend/proof/wechat-client-configuration-20260704T-current.json`
 
 Apple 新组织 Team ID 获批后，AASA 中的 App ID 使用 `新 Team ID.com.mewpow.xiaonaiping`，不能继续使用旧 Team ID。`https://api.mewpow.com/.well-known/apple-app-site-association` 可访问，返回 `application/json`。AASA 覆盖 `applinks` 和 `/xiaonaiping/wechat/`。Associated Domains 包含 `applinks:api.mewpow.com`。微信开放平台后台 Universal Link 与 iOS Release 包中的 `XNPWeChatUniversalLink` 完全一致。真机微信登录回调从微信回到 App。D-U-N-S 后拿到新 Team ID，必须先更新 AASA、Associated Domains 和 Release 包。
 
@@ -223,24 +223,24 @@ Apple 新组织 Team ID 获批后，AASA 中的 App ID 使用 `新 Team ID.com.m
 
 ```bash
 XNP_DEPLOY_HOST=root@YOUR_SERVER Backend/deploy/deploy-huawei-baota.sh
-python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260630T-current.json
-python3 Backend/scripts/verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api-20260630T-current.json
-python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json
-python3 Backend/scripts/verify_auth_providers.py --live-check --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete
-python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-sms-live-20260630T-current.json --allow-incomplete
-python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --remote-proof Backend/proof/remote-api-20260630T-current.json --storage-proof Backend/proof/storage-backend-20260630T-current.json --auth-providers-proof Backend/proof/auth-providers-sms-live-20260630T-current.json --require-huawei-obs --require-screenshots --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260630T-current.json --allow-incomplete
-cp Backend/proof/huawei-baota-deploy-20260630T-current.json Backend/proof/huawei-baota-deploy-current.json
-cp Backend/proof/huawei-baota-deploy-20260630T-current.json Backend/proof/huawei-baota-deploy.json
-cp Backend/proof/remote-api-20260630T-current.json Backend/proof/remote-api.json
-cp Backend/proof/storage-backend-20260630T-current.json Backend/proof/storage-backend-current.json
-cp Backend/proof/storage-backend-20260630T-current.json Backend/proof/storage-backend.json
-cp Backend/proof/auth-providers-sms-live-20260630T-current.json Backend/proof/auth-providers.json
-cp Backend/proof/ios-app-bundle-20260630T-current-ios265.json Backend/proof/ios-app-bundle.json
-cp Backend/proof/app-store-evidence-20260630T-current.json Backend/proof/app-store-evidence.json
-cp Backend/proof/production-readiness-20260630T-current.json Backend/proof/production-readiness.json
+python3 Backend/scripts/collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json
+python3 Backend/scripts/verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api-20260704T-current.json
+python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json
+python3 Backend/scripts/verify_auth_providers.py --live-check --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete
+python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/auth-providers-sms-live-20260704T-current.json --allow-incomplete
+python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --remote-proof Backend/proof/remote-api-20260704T-current.json --storage-proof Backend/proof/storage-backend-20260704T-current.json --auth-providers-proof Backend/proof/auth-providers-sms-live-20260704T-current.json --require-huawei-obs --require-screenshots --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete
+cp Backend/proof/huawei-baota-deploy-20260704T-current.json Backend/proof/huawei-baota-deploy-current.json
+cp Backend/proof/huawei-baota-deploy-20260704T-current.json Backend/proof/huawei-baota-deploy.json
+cp Backend/proof/remote-api-20260704T-current.json Backend/proof/remote-api.json
+cp Backend/proof/storage-backend-20260704T-current.json Backend/proof/storage-backend-current.json
+cp Backend/proof/storage-backend-20260704T-current.json Backend/proof/storage-backend.json
+cp Backend/proof/auth-providers-sms-live-20260704T-current.json Backend/proof/auth-providers.json
+cp Backend/proof/ios-app-bundle-20260704T-current-ios265.json Backend/proof/ios-app-bundle.json
+cp Backend/proof/app-store-evidence-20260704T-current.json Backend/proof/app-store-evidence.json
+cp Backend/proof/production-readiness-20260704T-current.json Backend/proof/production-readiness.json
 ```
 
-`Backend/proof/auth-providers-20260630T-current.json` 保留配置 proof 和微信 provider 检查；`Backend/proof/auth-providers-sms-live-20260630T-current.json` 保留真实实发 proof。只有两份 auth provider proof 都通过，且 `07-sms-provider.png` / `.pdf` / `.json` 已归档后，才能把 sms-live proof 同步到稳定 alias。`Backend/proof/auth-providers.json` 必须来自 `Backend/proof/auth-providers-sms-live-20260630T-current.json`，不能来自未实发短信的配置 proof。
+`Backend/proof/auth-providers-20260704T-current.json` 保留配置 proof 和微信 provider 检查；`Backend/proof/auth-providers-sms-live-20260704T-current.json` 保留真实实发 proof。只有两份 auth provider proof 都通过，且 `07-sms-provider.png` / `.pdf` / `.json` 已归档后，才能把 sms-live proof 同步到稳定 alias。`Backend/proof/auth-providers.json` 必须来自 `Backend/proof/auth-providers-sms-live-20260704T-current.json`，不能来自未实发短信的配置 proof。
 
 同轮 current proof 变绿后，必须同步到稳定 alias，至少包括 `Backend/proof/huawei-baota-deploy.json`、`Backend/proof/remote-api.json`、`Backend/proof/storage-backend.json`、`Backend/proof/auth-providers.json`、`Backend/proof/ios-app-bundle.json`、`Backend/proof/app-store-evidence.json` 和 `Backend/proof/production-readiness.json`。
 
@@ -248,7 +248,7 @@ cp Backend/proof/production-readiness-20260630T-current.json Backend/proof/produ
 
 ## Current proof 日期滚动规则
 
-`YYYYMMDDT-current` 必须以实际执行当天日期生成。今天是 2026-06-30 时，新的部署、远端 API、storage、auth providers、iOS app bundle、App Store evidence 和 production readiness 输出都应使用 `20260630T-current`；不得继续把 `20260627T-current` 当成 fresh proof。
+`YYYYMMDDT-current` 必须以实际执行当天日期生成。今天是 2026-07-04 时，新的部署、远端 API、storage、auth providers、iOS app bundle、App Store evidence 和 production readiness 输出都应使用 `20260704T-current`；不得继续把 `20260627T-current` 当成 fresh proof。
 
 跨日执行时按这个顺序处理：
 
@@ -266,16 +266,16 @@ cp Backend/proof/production-readiness-20260630T-current.json Backend/proof/produ
 | 证据 / proof | 必须保留 | 必须遮挡 | 复跑或复核命令 |
 |---|---|---|---|
 | `07-sms-provider.png` | 短信服务商、签名、账号登录/验证验证码模板、模板审核状态、发送区域、发送成功状态、脱敏手机号片段；模板不含营销、不含医疗、不含育儿建议 | `AccessKey`、Secret、`XNP_SMS_SECRET`、完整手机号、验证码 | `verify_auth_providers.py --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE` |
-| `08-wechat-open-platform.png` | AppID、Bundle ID、URL Scheme、Universal Link、移动应用审核/配置状态 | `AppSecret`、管理员账号、完整手机号、验证码、token | `check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260630T-current.json` |
-| `08b-wechat-universal-link-aasa.png` / `Backend/proof/universal-links-20260630T-current.json` / `Backend/proof/wechat-client-configuration-20260630T-current.json` | Team ID、Bundle ID、AASA endpoint、`applinks:api.mewpow.com`、`/xiaonaiping/wechat/`、`XNPWeChatUniversalLink` | Apple ID 邮箱、完整手机号、`AppSecret`、验证码、token | `check_universal_links.py --output Backend/proof/universal-links-20260630T-current.json` |
-| `09-obs-policy.png` / `Backend/proof/storage-backend-20260630T-current.json` | OBS bucket/prefix、区域、私有访问、加密、生命周期、删除验证 | `AK/SK`、`HUAWEI_OBS_SECRET_ACCESS_KEY`、完整对象 key、真实宝宝照片、内部私有路径 | `verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json` |
-| `Backend/proof/huawei-baota-deploy-20260630T-current.json` | 服务状态、部署路径、HTTPS base URL、internal 阻断结果、进程/环境字段是否脱敏 | root 密码、SSH key、私有 env 原文、token、恢复密钥 | `collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260630T-current.json` |
-| `Backend/proof/remote-api-20260630T-current.json` | 生产 API HTTPS 健康检查、公开接口行为、版本/时间戳 | token、恢复密钥、验证码、完整手机号 | `verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api-20260630T-current.json` |
-| `Backend/proof/auth-providers-20260630T-current.json` | 手机号 provider、微信 provider、debug code 拒绝、配置 proof | `AppSecret`、`XNP_SMS_SECRET`、完整手机号、验证码、token | `verify_auth_providers.py --live-check --output Backend/proof/auth-providers-20260630T-current.json` |
-| `Backend/proof/auth-providers-sms-live-20260630T-current.json` | 手机号 provider、微信 provider、debug code 拒绝、真实实发 proof 和真实短信实发结论 | `AppSecret`、`XNP_SMS_SECRET`、完整手机号、验证码、token | `verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --output Backend/proof/auth-providers-sms-live-20260630T-current.json` |
-| `Backend/proof/production-readiness-20260630T-current.json` | `deploymentProofCurrent`、`storageBackendProofCurrent`、`authProvidersProofPassed`、`appStoreManualEvidenceReady` 和最终 `passed` | root 密码、SSH key、`AccessKey`、`AK/SK`、`AppSecret`、完整手机号、验证码 | `check_production_readiness.py --output Backend/proof/production-readiness-20260630T-current.json` |
-| `01-company-account.png` / `02-mainland-availability.png` / `03-app-filing` / `04-privacy-label.png` | 公司主体、中国大陆可售区、APP 备案或适用判断、隐私标签填写结果 | Apple ID 邮箱、电话、付款信息、证件细节、D-U-N-S 完整值 | `check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260630T-current.json` |
-| 稳定 alias：`Backend/proof/huawei-baota-deploy.json`、`Backend/proof/remote-api.json`、`Backend/proof/storage-backend.json`、`Backend/proof/auth-providers.json`、`Backend/proof/app-store-evidence.json`、`Backend/proof/production-readiness.json` | 必须和同轮 `20260630T-current` proof 同步 | 不保留旧红项、不混入旧日期 proof | `check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json` 后再跑提交包和总 readiness |
+| `08-wechat-open-platform.png` | AppID、Bundle ID、URL Scheme、Universal Link、移动应用审核/配置状态 | `AppSecret`、管理员账号、完整手机号、验证码、token | `check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-current.json` |
+| `08b-wechat-universal-link-aasa.png` / `Backend/proof/universal-links-20260704T-current.json` / `Backend/proof/wechat-client-configuration-20260704T-current.json` | Team ID、Bundle ID、AASA endpoint、`applinks:api.mewpow.com`、`/xiaonaiping/wechat/`、`XNPWeChatUniversalLink` | Apple ID 邮箱、完整手机号、`AppSecret`、验证码、token | `check_universal_links.py --output Backend/proof/universal-links-20260704T-current.json` |
+| `09-obs-policy.png` / `Backend/proof/storage-backend-20260704T-current.json` | OBS bucket/prefix、区域、私有访问、加密、生命周期、删除验证 | `AK/SK`、`HUAWEI_OBS_SECRET_ACCESS_KEY`、完整对象 key、真实宝宝照片、内部私有路径 | `verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json` |
+| `Backend/proof/huawei-baota-deploy-20260704T-current.json` | 服务状态、部署路径、HTTPS base URL、internal 阻断结果、进程/环境字段是否脱敏 | root 密码、SSH key、私有 env 原文、token、恢复密钥 | `collect_deployment_proof.py --output Backend/proof/huawei-baota-deploy-20260704T-current.json` |
+| `Backend/proof/remote-api-20260704T-current.json` | 生产 API HTTPS 健康检查、公开接口行为、版本/时间戳 | token、恢复密钥、验证码、完整手机号 | `verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api-20260704T-current.json` |
+| `Backend/proof/auth-providers-20260704T-current.json` | 手机号 provider、微信 provider、debug code 拒绝、配置 proof | `AppSecret`、`XNP_SMS_SECRET`、完整手机号、验证码、token | `verify_auth_providers.py --live-check --output Backend/proof/auth-providers-20260704T-current.json` |
+| `Backend/proof/auth-providers-sms-live-20260704T-current.json` | 手机号 provider、微信 provider、debug code 拒绝、真实实发 proof 和真实短信实发结论 | `AppSecret`、`XNP_SMS_SECRET`、完整手机号、验证码、token | `verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --output Backend/proof/auth-providers-sms-live-20260704T-current.json` |
+| `Backend/proof/production-readiness-20260704T-current.json` | `deploymentProofCurrent`、`storageBackendProofCurrent`、`authProvidersProofPassed`、`appStoreManualEvidenceReady` 和最终 `passed` | root 密码、SSH key、`AccessKey`、`AK/SK`、`AppSecret`、完整手机号、验证码 | `check_production_readiness.py --output Backend/proof/production-readiness-20260704T-current.json` |
+| `01-company-account.png` / `02-mainland-availability.png` / `03-app-filing` / `04-privacy-label.png` | 公司主体、中国大陆可售区、APP 备案或适用判断、隐私标签填写结果 | Apple ID 邮箱、电话、付款信息、证件细节、D-U-N-S 完整值 | `check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence-20260704T-current.json` |
+| 稳定 alias：`Backend/proof/huawei-baota-deploy.json`、`Backend/proof/remote-api.json`、`Backend/proof/storage-backend.json`、`Backend/proof/auth-providers.json`、`Backend/proof/app-store-evidence.json`、`Backend/proof/production-readiness.json` | 必须和同轮 `20260704T-current` proof 同步 | 不保留旧红项、不混入旧日期 proof | `check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json` 后再跑提交包和总 readiness |
 
 ## 外部平台上线当天执行记录模板
 
@@ -285,15 +285,15 @@ cp Backend/proof/production-readiness-20260630T-current.json Backend/proof/produ
 - [ ] 08b-wechat-universal-link-aasa.png 已归档。
 - [ ] 微信 AppID、URL Scheme、Universal Link 已与 Release 包和服务端 env 对齐。
 - [ ] AASA、Associated Domains、Release 包和微信开放平台 Universal Link 已同轮核对。
-- [ ] auth-providers-20260630T-current.json 已证明微信 provider。
-- [ ] auth-providers-sms-live-20260630T-current.json 已证明真实短信实发。
+- [ ] auth-providers-20260704T-current.json 已证明微信 provider。
+- [ ] auth-providers-sms-live-20260704T-current.json 已证明真实短信实发。
 - [ ] 07-sms-provider.png 已归档。
 - [ ] verify_auth_providers.py --send-test-sms --require-sms-live-send 已完成真实实发验证。
 - [ ] 09-obs-policy.png 已归档。
-- [ ] storage-backend-20260630T-current.json 已通过。
+- [ ] storage-backend-20260704T-current.json 已通过。
 - [ ] 01-company-account.png、02-mainland-availability.png、03-app-filing、04-privacy-label 已归档。
-- [ ] production-readiness-20260630T-current.json 已变绿。
-- [ ] 已同步稳定 alias，且 auth-providers.json 来自 auth-providers-sms-live-20260630T-current.json。
+- [ ] production-readiness-20260704T-current.json 已变绿。
+- [ ] 已同步稳定 alias，且 auth-providers.json 来自 auth-providers-sms-live-20260704T-current.json。
 - [ ] 未记录 root 密码、SSH key、AK/SK、AppSecret、完整手机号、验证码、恢复密钥或 token。
 - [ ] 如果任一项未通过，不提交 App Store Connect 审核。
 
@@ -307,7 +307,7 @@ def valid_external_capture_workbench() -> str:
     return """
 # 小奶瓶外部平台现场采集工作台
 
-日期：2026-06-30
+日期：2026-07-04
 
 结论：这份工作台用于现场采集微信开放平台、短信服务商、OBS、备案、隐私标签和生产 proof。它不是提交许可，也不代表这些外部平台已经配置完成；只有小奶瓶自己的 `provider-evidence-materials.json`、`mainland-filing-materials.json`、`signed-archive-testflight-materials.json`、`app-store-evidence.json`、`production-readiness.json`、`launch-objective-audit.json` 和 iOS 26.5 真机回归均通过后，才允许进入 App Store Connect 提交审核。
 
@@ -315,13 +315,13 @@ def valid_external_capture_workbench() -> str:
 
 来源文件：
 
-- `Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json`
-- `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md`
-- `Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260630.md`
+- `Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json`
+- `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md`
+- `Docs/08_Release/APP_STORE_CONNECT_COPY_PASTE_20260704.md`
 - `Docs/08_Release/APP_STORE_PRIVACY_LABEL.json`
 - `Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md`
-- `Docs/08_Release/AppStoreEvidence/RealDevice/EXECUTION_SHEET_20260630.md`
-- `Backend/proof/production-readiness-20260630T-current.json`
+- `Docs/08_Release/AppStoreEvidence/RealDevice/EXECUTION_SHEET_20260704.md`
+- `Backend/proof/production-readiness-20260704T-current.json`
 - `Backend/proof/provider-evidence-materials.json`
 - `Backend/proof/mainland-filing-materials.json`
 - `Backend/proof/signed-archive-testflight-materials.json`
@@ -333,31 +333,31 @@ def valid_external_capture_workbench() -> str:
 采集后立刻复跑：
 
 ```bash
-python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260630T-current.json
-python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete
+python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-current.json
+python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete
 ```
 
 ## 3. Universal Link / AASA 现场采集
 
 ```bash
-python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links-20260630T-current.json
-python3 Backend/scripts/check_ios_app_bundle.py --output Backend/proof/ios-app-bundle-20260630T-current-ios265.json
+python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links-20260704T-current.json
+python3 Backend/scripts/check_ios_app_bundle.py --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json
 ```
 
 ## 4. 短信服务商现场采集
 
 短信 provider 服务器 proof 只能证明后端配置存在，不能替代服务商截图和真实短信实发。
 验证码模板，必须能证明只用于账号登录/验证。模板审核状态和发送区域必须可见。模板内容不含营销、不含医疗、不含育儿建议。
-真实实发 proof 必须单独保存为 `Backend/proof/auth-providers-sms-live-20260630T-current.json`，并且只有它和 `Backend/proof/auth-providers-20260630T-current.json` 都通过后，才能把 sms-live proof 同步到稳定 alias `Backend/proof/auth-providers.json`。
+真实实发 proof 必须单独保存为 `Backend/proof/auth-providers-sms-live-20260704T-current.json`，并且只有它和 `Backend/proof/auth-providers-20260704T-current.json` 都通过后，才能把 sms-live proof 同步到稳定 alias `Backend/proof/auth-providers.json`。
 
 ```bash
-python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-sms-live-20260630T-current.json --allow-incomplete
+python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-sms-live-20260704T-current.json --allow-incomplete
 ```
 
 ## 5. OBS / 对象存储现场采集
 
 ```bash
-python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json
+python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json
 ```
 
 ## 6. 备案、隐私标签和 URL 现场采集
@@ -371,9 +371,9 @@ iOS 26.5 TestFlight 和 12-real-device-regression.md 必须补齐。
 ## 8. 最终复跑顺序
 
 ```bash
-python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json
-python3 Backend/scripts/check_production_readiness.py --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --remote-proof Backend/proof/remote-api-20260630T-current.json --storage-proof Backend/proof/storage-backend-20260630T-current.json --auth-providers-proof Backend/proof/auth-providers-sms-live-20260630T-current.json --ios-app-bundle-proof Backend/proof/ios-app-bundle-20260630T-current-ios265.json --app-store-evidence Backend/proof/app-store-evidence-20260630T-current.json --output Backend/proof/production-readiness-20260630T-current.json --allow-incomplete
-python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit-20260630T-current.json
+python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json
+python3 Backend/scripts/check_production_readiness.py --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --remote-proof Backend/proof/remote-api-20260704T-current.json --storage-proof Backend/proof/storage-backend-20260704T-current.json --auth-providers-proof Backend/proof/auth-providers-sms-live-20260704T-current.json --ios-app-bundle-proof Backend/proof/ios-app-bundle-20260704T-current-ios265.json --app-store-evidence Backend/proof/app-store-evidence-20260704T-current.json --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete
+python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit-20260704T-current.json
 python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json
 python3 Backend/scripts/check_mainland_filing_materials.py --output Backend/proof/mainland-filing-materials.json
 python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json
@@ -397,10 +397,10 @@ App Store 证据归档到 `09-obs-policy.png`，必须能看到 bucket、prefix�
 
 ## OBS 私有访问与删除验证执行包
 
-结构化执行包见 `Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json`。该 JSON 只用于上线当天按顺序核对 OBS 后台截图、storage proof、production readiness 和稳定 alias 同步；它不是证据、不是 OBS 密钥容器，也不能作为提交许可。
+结构化执行包见 `Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json`。该 JSON 只用于上线当天按顺序核对 OBS 后台截图、storage proof、production readiness 和稳定 alias 同步；它不是证据、不是 OBS 密钥容器，也不能作为提交许可。
 
-1. `09-obs-policy.png` 只证明后台截图，不等于 `Backend/proof/storage-backend-20260630T-current.json`。
-2. `production-readiness-20260630T-current.json` 必须同轮读取 storage proof。
+1. `09-obs-policy.png` 只证明后台截图，不等于 `Backend/proof/storage-backend-20260704T-current.json`。
+2. `production-readiness-20260704T-current.json` 必须同轮读取 storage proof。
 3. 变绿后同步 `Backend/proof/storage-backend.json` 和 `Backend/proof/production-readiness.json` 稳定 alias。
 4. 不保存 public bucket、signed URL、完整对象 key、真实宝宝照片、AK/SK 或 SecretKey。
 """.lstrip()
@@ -443,7 +443,7 @@ def external_capture_evidence_file_checks(target_files: dict[str, str]) -> list[
 def valid_sms_provider_template() -> str:
     target_files = {
         "smsProvider": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
-        "smsLiveProof": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+        "smsLiveProof": "Backend/proof/auth-providers-sms-live-20260704T-current.json",
     }
     return json.dumps(
         {
@@ -470,8 +470,8 @@ def valid_sms_provider_template() -> str:
                 "templateBoundary": "no marketing, no medical wording, no feeding advice, no vaccine advice",
             },
             "serverProofToRefresh": [
-                "Backend/proof/auth-providers-20260630T-current.json",
-                "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                "Backend/proof/auth-providers-20260704T-current.json",
+                "Backend/proof/auth-providers-sms-live-20260704T-current.json",
             ],
             "redactionChecklist": [
                 "Hide XNP_SMS_SECRET",
@@ -483,9 +483,9 @@ def valid_sms_provider_template() -> str:
                 "Keep provider name, signature, template ID/name, audit status, send region, and successful send state visible",
             ],
             "postCaptureChecks": [
-                "python3 Backend/scripts/verify_auth_providers.py --live-check --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete",
-                "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-sms-live-20260630T-current.json --allow-incomplete",
-                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+                "python3 Backend/scripts/verify_auth_providers.py --live-check --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete",
+                "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-sms-live-20260704T-current.json --allow-incomplete",
+                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
             ],
             "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until real 07-sms-provider.png/PDF/JSON evidence exists, the real SMS live-send proof passes, and the production auth provider proof is refreshed in the same evidence round.",
         },
@@ -499,14 +499,14 @@ def valid_sms_live_send_packet() -> str:
         {
             "artifactType": "sms-provider-live-send-packet",
             "status": "live-send-packet-not-evidence",
-            "date": "2026-06-30",
+            "date": "2026-07-04",
             "project": "XiaoNaiPing",
             "appName": "小奶瓶",
             "sourceFiles": {
                 "smsAdapterHandoff": "Backend/deploy/aliyun-sms-webhook-adapter.md",
                 "smsProviderEvidenceTemplate": "Docs/08_Release/AppStoreEvidence/_templates/sms-provider-evidence.template.json",
-                "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
-                "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+                "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
+                "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json",
                 "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
                 "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md",
             },
@@ -522,8 +522,8 @@ def valid_sms_live_send_packet() -> str:
             "targetEvidenceFiles": {
                 "smsProviderConsole": "Docs/08_Release/AppStoreEvidence/07-sms-provider.png",
                 "smsProviderConsolePdf": "Docs/08_Release/AppStoreEvidence/07-sms-provider.pdf",
-                "providerConfigProof": "Backend/proof/auth-providers-20260630T-current.json",
-                "smsLiveSendProof": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                "providerConfigProof": "Backend/proof/auth-providers-20260704T-current.json",
+                "smsLiveSendProof": "Backend/proof/auth-providers-sms-live-20260704T-current.json",
                 "stableAuthAlias": "Backend/proof/auth-providers.json",
             },
             "evidenceFileChecks": [
@@ -540,7 +540,7 @@ def valid_sms_live_send_packet() -> str:
                 },
                 {
                     "artifactId": "providerConfigProof",
-                    "target": "Backend/proof/auth-providers-20260630T-current.json",
+                    "target": "Backend/proof/auth-providers-20260704T-current.json",
                     "fileSizeBytes": "FILL_AFTER_CAPTURE",
                     "sha256": "FILL_AFTER_CAPTURE",
                     "redactionChecked": False,
@@ -551,7 +551,7 @@ def valid_sms_live_send_packet() -> str:
                 },
                 {
                     "artifactId": "smsLiveSendProof",
-                    "target": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                    "target": "Backend/proof/auth-providers-sms-live-20260704T-current.json",
                     "fileSizeBytes": "FILL_AFTER_CAPTURE",
                     "sha256": "FILL_AFTER_CAPTURE",
                     "redactionChecked": False,
@@ -596,7 +596,7 @@ def valid_sms_live_send_packet() -> str:
                 },
                 {
                     "artifactId": "providerConfigProof",
-                    "target": "Backend/proof/auth-providers-20260630T-current.json",
+                    "target": "Backend/proof/auth-providers-20260704T-current.json",
                     "proves": [
                         "production SMS provider configuration",
                         "live-check reached provider configuration",
@@ -612,7 +612,7 @@ def valid_sms_live_send_packet() -> str:
                 },
                 {
                     "artifactId": "smsLiveSendProof",
-                    "target": "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                    "target": "Backend/proof/auth-providers-sms-live-20260704T-current.json",
                     "proves": [
                         "real SMS sent to redacted test phone",
                         "--send-test-sms",
@@ -647,7 +647,7 @@ def valid_sms_live_send_packet() -> str:
                 "providerConfigProof is not smsLiveSendProof",
                 "verify_auth_providers.py --live-check only proves provider configuration",
                 "verify_auth_providers.py --send-test-sms --require-sms-live-send is required for real live send proof",
-                "stableAuthAlias must be copied from auth-providers-sms-live-20260630T-current.json",
+                "stableAuthAlias must be copied from auth-providers-sms-live-20260704T-current.json",
             ],
             "consoleEvidenceMustKeep": [
                 "provider name",
@@ -680,15 +680,15 @@ def valid_sms_live_send_packet() -> str:
                 {"step": "refreshProviderConfigProof"},
                 {
                     "step": "runRealSmsLiveSend",
-                    "command": "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --output Backend/proof/auth-providers-sms-live-20260630T-current.json --allow-incomplete",
+                    "command": "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-sms-live-20260704T-current.json --allow-incomplete",
                 },
                 {
                     "step": "refreshAppStoreEvidence",
-                    "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30",
+                    "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04",
                 },
                 {
                     "step": "syncStableAuthAlias",
-                    "command": "cp Backend/proof/auth-providers-sms-live-20260630T-current.json Backend/proof/auth-providers.json",
+                    "command": "cp Backend/proof/auth-providers-sms-live-20260704T-current.json Backend/proof/auth-providers.json",
                 },
             ],
             "postExecutionGates": [
@@ -742,16 +742,16 @@ def valid_wechat_open_platform_template() -> str:
                 "Keep AppID, Bundle ID, URL Scheme, Universal Link, and configuration status visible",
             ],
             "postCaptureChecks": [
-                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
-                "python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260630T-current.json",
-                ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260630T-current-ios265.json",
-                "python3 Backend/scripts/check_ios_app_bundle.py --app <Release XiaoNaiPing.app from iOS 26.5 build> --output Backend/proof/ios-app-bundle-20260630T-current-ios265.json",
-                "python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --base-url https://api.mewpow.com/xiaonaiping --live-check --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete",
-                "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan-20260630T-current.json",
-                "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+                "python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260704T-current.json",
+                ". /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json",
+                "python3 Backend/scripts/check_ios_app_bundle.py --app <Release XiaoNaiPing.app from iOS 26.5 build> --output Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
+                "python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --base-url https://api.mewpow.com/xiaonaiping --live-check --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete",
+                "python3 Backend/scripts/check_testflight_regression_plan.py --allow-incomplete --output Backend/proof/testflight-regression-plan-20260704T-current.json",
+                "python3 Backend/scripts/check_production_readiness.py --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
                 "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
             ],
-            "completionRule": "This template is only a capture worksheet. The App Store evidence gate is still incomplete until real 08-wechat-open-platform.png or PDF evidence exists; real 08b-wechat-universal-link-aasa.png or PDF evidence proves same-round AASA alignment; real wx AppID and URL Scheme are injected into the Release build; server-side XNP_WECHAT_APP_SECRET is configured; auth-providers-20260630T-current.json is refreshed; RD-14 iOS 26.5 WeChat login evidence passes on TestFlight or a signed real device build; production-readiness.json is ready=true; and launch-objective-audit.json is ready=true.",
+            "completionRule": "This template is only a capture worksheet. The App Store evidence gate is still incomplete until real 08-wechat-open-platform.png or PDF evidence exists; real 08b-wechat-universal-link-aasa.png or PDF evidence proves same-round AASA alignment; real wx AppID and URL Scheme are injected into the Release build; server-side XNP_WECHAT_APP_SECRET is configured; auth-providers-20260704T-current.json is refreshed; RD-14 iOS 26.5 WeChat login evidence passes on TestFlight or a signed real device build; production-readiness.json is ready=true; and launch-objective-audit.json is ready=true.",
         },
         ensure_ascii=False,
         indent=2,
@@ -761,7 +761,7 @@ def valid_wechat_open_platform_template() -> str:
 def valid_obs_policy_template() -> str:
     target_files = {
         "obsPolicy": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
-        "storageProof": "Backend/proof/storage-backend-20260630T-current.json",
+        "storageProof": "Backend/proof/storage-backend-20260704T-current.json",
     }
     return json.dumps(
         {
@@ -787,8 +787,8 @@ def valid_obs_policy_template() -> str:
                 "accountDeletionResult": "account deletion clears corresponding baby photos and object data",
             },
             "serverProofToRefresh": [
-                "Backend/proof/storage-backend-20260630T-current.json",
-                "Backend/proof/production-readiness-20260630T-current.json",
+                "Backend/proof/storage-backend-20260704T-current.json",
+                "Backend/proof/production-readiness-20260704T-current.json",
             ],
             "redactionChecklist": [
                 "Hide HUAWEI_OBS_ACCESS_KEY_ID and HUAWEI_OBS_SECRET_ACCESS_KEY",
@@ -799,9 +799,9 @@ def valid_obs_policy_template() -> str:
                 "Keep provider, bucket or prefix, region, private policy, encryption/lifecycle/deletion state, and storage proof summary visible",
             ],
             "postCaptureChecks": [
-                "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json",
-                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
-                "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --storage-proof Backend/proof/storage-backend-20260630T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260630T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260630T-current.json --allow-incomplete",
+                "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json",
+                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+                "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --storage-proof Backend/proof/storage-backend-20260704T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260704T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete",
             ],
             "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until real 09-obs-policy.png/PDF/JSON evidence exists and same-round storage/production proof proves private OBS access plus account deletion cleanup.",
         },
@@ -815,22 +815,22 @@ def valid_obs_storage_packet() -> str:
         {
             "artifactType": "obs-storage-proof-packet",
             "status": "storage-proof-packet-not-evidence",
-            "date": "2026-06-30",
+            "date": "2026-07-04",
             "project": "XiaoNaiPing",
             "appName": "小奶瓶",
             "sourceFiles": {
                 "obsHandoff": "Backend/deploy/huawei-obs.md",
                 "obsPolicyEvidenceTemplate": "Docs/08_Release/AppStoreEvidence/_templates/obs-policy-evidence.template.json",
-                "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
-                "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+                "externalPlatformHandoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
+                "externalPlatformCapturePacket": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json",
                 "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
                 "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md",
             },
             "targetEvidenceFiles": {
                 "obsPolicyConsole": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
                 "obsPolicyConsolePdf": "Docs/08_Release/AppStoreEvidence/09-obs-policy.pdf",
-                "storageProof": "Backend/proof/storage-backend-20260630T-current.json",
-                "productionReadinessCurrent": "Backend/proof/production-readiness-20260630T-current.json",
+                "storageProof": "Backend/proof/storage-backend-20260704T-current.json",
+                "productionReadinessCurrent": "Backend/proof/production-readiness-20260704T-current.json",
                 "stableStorageAlias": "Backend/proof/storage-backend.json",
                 "stableProductionReadinessAlias": "Backend/proof/production-readiness.json",
             },
@@ -848,7 +848,7 @@ def valid_obs_storage_packet() -> str:
                 },
                 {
                     "artifactId": "storageProof",
-                    "target": "Backend/proof/storage-backend-20260630T-current.json",
+                    "target": "Backend/proof/storage-backend-20260704T-current.json",
                     "fileSizeBytes": "FILL_AFTER_CAPTURE",
                     "sha256": "FILL_AFTER_CAPTURE",
                     "redactionChecked": False,
@@ -859,7 +859,7 @@ def valid_obs_storage_packet() -> str:
                 },
                 {
                     "artifactId": "productionReadinessCurrent",
-                    "target": "Backend/proof/production-readiness-20260630T-current.json",
+                    "target": "Backend/proof/production-readiness-20260704T-current.json",
                     "fileSizeBytes": "FILL_AFTER_CAPTURE",
                     "sha256": "FILL_AFTER_CAPTURE",
                     "redactionChecked": False,
@@ -910,7 +910,7 @@ def valid_obs_storage_packet() -> str:
                 },
                 {
                     "artifactId": "storageProof",
-                    "target": "Backend/proof/storage-backend-20260630T-current.json",
+                    "target": "Backend/proof/storage-backend-20260704T-current.json",
                     "proves": [
                         "same-round storage backend proof passed or records the current storage failure",
                         "server-side upload, download, delete, and account deletion cleanup checks were rerun",
@@ -926,7 +926,7 @@ def valid_obs_storage_packet() -> str:
                 },
                 {
                     "artifactId": "productionReadinessCurrent",
-                    "target": "Backend/proof/production-readiness-20260630T-current.json",
+                    "target": "Backend/proof/production-readiness-20260704T-current.json",
                     "proves": [
                         "same-round production readiness result after storage, App Store evidence, auth, and deployment gates",
                     ],
@@ -1009,28 +1009,28 @@ def valid_obs_storage_packet() -> str:
                 {"step": "captureObsConsole"},
                 {
                     "step": "refreshStorageProof",
-                    "command": "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json",
+                    "command": "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json",
                 },
                 {
                     "step": "refreshAppStoreEvidence",
-                    "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
+                    "command": "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
                 },
                 {
                     "step": "refreshProductionReadiness",
-                    "command": "python3 Backend/scripts/check_production_readiness.py --storage-proof Backend/proof/storage-backend-20260630T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260630T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260630T-current.json --allow-incomplete",
+                    "command": "python3 Backend/scripts/check_production_readiness.py --storage-proof Backend/proof/storage-backend-20260704T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260704T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete",
                 },
                 {
                     "step": "syncStableStorageAliases",
                     "commands": [
-                        "cp Backend/proof/storage-backend-20260630T-current.json Backend/proof/storage-backend.json",
-                        "cp Backend/proof/production-readiness-20260630T-current.json Backend/proof/production-readiness.json",
+                        "cp Backend/proof/storage-backend-20260704T-current.json Backend/proof/storage-backend.json",
+                        "cp Backend/proof/production-readiness-20260704T-current.json Backend/proof/production-readiness.json",
                     ],
                 },
             ],
             "postExecutionGates": [
                 "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
-                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
-                "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+                "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
                 "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
             ],
             "completionRule": "This packet is not evidence and not submission permission. OBS storage proof is complete only after real 09-obs-policy.png or PDF exists, current storage proof passes, account deletion cleanup is proven, production-readiness.json ready=true, and launch-objective-audit.json ready=true.",
@@ -1048,18 +1048,18 @@ def valid_external_capture_packet() -> str:
         "huaweiObsPolicy": "Docs/08_Release/AppStoreEvidence/09-obs-policy.png",
         "mainlandFiling": "Docs/08_Release/AppStoreEvidence/03-app-filing.png",
         "privacyLabel": "Docs/08_Release/AppStoreEvidence/04-privacy-label.png",
-        "productionReadinessCurrent": "Backend/proof/production-readiness-20260630T-current.json",
+        "productionReadinessCurrent": "Backend/proof/production-readiness-20260704T-current.json",
     }
     return json.dumps(
         {
             "artifactType": "external-platform-capture-packet",
             "status": "template-only-not-evidence",
-            "date": "2026-06-30",
+            "date": "2026-07-04",
             "project": "XiaoNaiPing",
             "appName": "小奶瓶",
             "sourceFiles": {
-                "handoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
-                "workbench": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260630.md",
+                "handoff": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
+                "workbench": "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260704.md",
                 "captureGuide": "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md",
                 "appStoreEvidenceReadme": "Docs/08_Release/AppStoreEvidence/README.md",
                 "wechatConfiguration": "Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md",
@@ -1163,7 +1163,7 @@ def valid_external_capture_packet() -> str:
                 },
                 {
                     "artifactId": "productionReadinessCurrent",
-                    "target": "Backend/proof/production-readiness-20260630T-current.json",
+                    "target": "Backend/proof/production-readiness-20260704T-current.json",
                     "proves": [
                         "same-round production readiness proof result after deployment, storage, auth providers, App Store evidence, and stable alias checks",
                     ],
@@ -1195,8 +1195,8 @@ def valid_external_capture_packet() -> str:
                         "URL Scheme equal to AppID",
                         "Universal Link",
                         "AppSecret",
-                        "Backend/proof/wechat-client-configuration-20260630T-current.json",
-                        "Backend/proof/auth-providers-20260630T-current.json",
+                        "Backend/proof/wechat-client-configuration-20260704T-current.json",
+                        "Backend/proof/auth-providers-20260704T-current.json",
                     ],
                 },
                 {
@@ -1209,8 +1209,8 @@ def valid_external_capture_packet() -> str:
                         "/xiaonaiping/wechat/",
                         "XNPWeChatUniversalLink",
                         "Apple 新组织 Team ID + com.mewpow.xiaonaiping",
-                        "Backend/proof/universal-links-20260630T-current.json",
-                        "Backend/proof/ios-app-bundle-20260630T-current-ios265.json",
+                        "Backend/proof/universal-links-20260704T-current.json",
+                        "Backend/proof/ios-app-bundle-20260704T-current-ios265.json",
                     ],
                 },
                 {
@@ -1225,7 +1225,7 @@ def valid_external_capture_packet() -> str:
                         "不含营销",
                         "不含医疗",
                         "不含育儿建议",
-                        "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                        "Backend/proof/auth-providers-sms-live-20260704T-current.json",
                     ],
                 },
                 {
@@ -1239,7 +1239,7 @@ def valid_external_capture_packet() -> str:
                         "加密",
                         "生命周期",
                         "删除验证",
-                        "Backend/proof/storage-backend-20260630T-current.json",
+                        "Backend/proof/storage-backend-20260704T-current.json",
                     ],
                 },
                 {
@@ -1266,21 +1266,21 @@ def valid_external_capture_packet() -> str:
                 },
                 {
                     "id": "productionProof",
-                    "target": "Backend/proof/production-readiness-20260630T-current.json",
+                    "target": "Backend/proof/production-readiness-20260704T-current.json",
                     "markers": [
                         "production readiness",
-                        "huawei-baota-deploy-20260630T-current.json",
-                        "remote-api-20260630T-current.json",
-                        "storage-backend-20260630T-current.json",
-                        "auth-providers-sms-live-20260630T-current.json",
-                        "app-store-evidence-20260630T-current.json",
+                        "huawei-baota-deploy-20260704T-current.json",
+                        "remote-api-20260704T-current.json",
+                        "storage-backend-20260704T-current.json",
+                        "auth-providers-sms-live-20260704T-current.json",
+                        "app-store-evidence-20260704T-current.json",
                     ],
                 },
             ],
             "postCaptureCommands": [
                 "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json",
-                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-06-30 --output Backend/proof/app-store-evidence-20260630T-current.json",
-                "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260630T-current.json",
+                "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
+                "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness-20260704T-current.json",
                 "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
             ],
             "completionRule": "template-only-not-evidence; not submission permission; only after real external platform evidence files, app-store-evidence.json ready=true, production-readiness.json ready=true, launch-objective-audit.json ready=true.",
@@ -1301,7 +1301,7 @@ def valid_external_capture_result_template() -> str:
 def valid_production_proof_refresh_packet() -> str:
     packet_path = (
         Path(__file__).resolve().parents[2]
-        / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json"
+        / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json"
     )
     return packet_path.read_text(encoding="utf-8")
 
@@ -1360,13 +1360,13 @@ def valid_production_proof_refresh_status() -> str:
         {
             "artifactType": "production-proof-refresh-status",
             "status": "current-proof-status-not-submit-permission",
-            "date": "2026-06-30",
-            "checkedAt": "2026-06-30T00:00:00.000Z",
+            "date": "2026-07-04",
+            "checkedAt": "2026-07-04T00:00:00.000Z",
             "project": "XiaoNaiPing",
             "appName": "小奶瓶",
             "xnpRoot": "/tmp/xiaonaiping",
             "baseUrl": "https://api.mewpow.com/xiaonaiping",
-            "sourcePlan": "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json",
+            "sourcePlan": "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json",
             "canSubmitFromThisStatus": False,
             "stableAliasSyncAllowed": False,
             "stableAliasSyncReason": "current proof files are incomplete or failed; do not sync stable aliases",
@@ -1412,17 +1412,17 @@ def write_valid_docs(root: Path) -> None:
     write(root / "Docs/08_Release/AppStoreEvidence/README.md", valid_evidence_readme())
     write(root / "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md", valid_capture_guide())
     write(root / "Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md", valid_wechat_doc())
-    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md", valid_external_handoff())
-    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260630.md", valid_external_capture_workbench())
-    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json", valid_external_capture_packet())
+    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md", valid_external_handoff())
+    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260704.md", valid_external_capture_workbench())
+    write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json", valid_external_capture_packet())
     write(
         root / "Docs/08_Release/AppStoreEvidence/ExternalPlatform/EXTERNAL-PLATFORM-CAPTURE-RESULT.template.json",
         valid_external_capture_result_template(),
     )
-    write(root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json", valid_sms_live_send_packet())
-    write(root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json", valid_obs_storage_packet())
-    write(root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json", valid_production_proof_refresh_packet())
-    write(root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260630.json", valid_production_proof_refresh_status())
+    write(root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json", valid_sms_live_send_packet())
+    write(root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json", valid_obs_storage_packet())
+    write(root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json", valid_production_proof_refresh_packet())
+    write(root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260704.json", valid_production_proof_refresh_status())
     write(root / "Backend/scripts/check_production_proof_refresh_status.py", valid_production_proof_refresh_status_script())
     write(root / "Backend/deploy/aliyun-sms-webhook-adapter.md", valid_sms_doc())
     write(root / "Backend/sms/aliyun-webhook-adapter/server.js", valid_sms_adapter_server())
@@ -1475,7 +1475,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             status = json.loads(valid_production_proof_refresh_status())
             status["proofFileStatuses"][0]["sha256"] = "a19279187045" + ("b" * 52)
             write(
-                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260630.json",
+                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260704.json",
                 json.dumps(status, ensure_ascii=False),
             )
 
@@ -1532,7 +1532,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("sms.targetEvidenceFiles.smsLiveProof", evidence)
             self.assertIn("sms.evidenceFileChecks order must match targetEvidenceFiles", evidence)
             self.assertIn("sms.evidenceFileChecks.smsProvider missing object", evidence)
-            self.assertIn("sms.evidenceFileChecks.smsLiveProof.target must be Backend/proof/auth-providers-sms-live-20260630T-current.json", evidence)
+            self.assertIn("sms.evidenceFileChecks.smsLiveProof.target must be Backend/proof/auth-providers-sms-live-20260704T-current.json", evidence)
             self.assertIn("sms.evidenceFileChecks.smsLiveProof.sha256 must be 'FILL_AFTER_CAPTURE'", evidence)
             self.assertIn("sms.evidenceFileChecks.smsLiveProof.sameRoundAsTemplateCapture must be False", evidence)
             self.assertIn("sms.evidenceFileChecks.smsLiveProof.secretValuesNotRecorded must be False", evidence)
@@ -1566,7 +1566,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             ]
             packet["completionRule"] = "SMS is done."
             write(
-                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json",
+                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1585,7 +1585,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             )
             self.assertIn(
                 "smsLiveSendPacket.evidenceDependencyMatrix.providerConfigProof.target must be "
-                "Backend/proof/auth-providers-20260630T-current.json",
+                "Backend/proof/auth-providers-20260704T-current.json",
                 evidence,
             )
             self.assertIn(
@@ -1615,10 +1615,10 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                     step["command"] = (
                         "python3 Backend/scripts/verify_auth_providers.py --live-check "
                         "--send-test-sms --require-sms-live-send --phone +8613800138000 "
-                        "--output Backend/proof/auth-providers-sms-live-20260630T-current.json"
+                        "--output Backend/proof/auth-providers-sms-live-20260704T-current.json"
                     )
             write(
-                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json",
+                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1665,7 +1665,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             packet["evidenceFileChecks"][0]["sameRoundAsSmsLiveSend"] = True
             packet["evidenceFileChecks"][0]["secretValuesNotRecorded"] = True
             write(
-                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json",
+                root / "Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1677,7 +1677,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("smsLiveSendPacket.evidenceFileChecks.smsProviderConsole missing object", evidence)
             self.assertIn(
                 "smsLiveSendPacket.evidenceFileChecks.providerConfigProof.target must be "
-                "Backend/proof/auth-providers-20260630T-current.json",
+                "Backend/proof/auth-providers-20260704T-current.json",
                 evidence,
             )
             self.assertIn(
@@ -1705,7 +1705,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             ]
             packet["completionRule"] = "OBS storage is done."
             write(
-                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json",
+                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1732,7 +1732,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             packet["evidenceFileChecks"][0]["sameRoundAsObsStorageProof"] = True
             packet["evidenceFileChecks"][0]["secretValuesNotRecorded"] = True
             write(
-                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json",
+                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1744,7 +1744,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("obsStorageProofPacket.evidenceFileChecks.obsPolicyConsole missing object", evidence)
             self.assertIn(
                 "obsStorageProofPacket.evidenceFileChecks.storageProof.target must be "
-                "Backend/proof/storage-backend-20260630T-current.json",
+                "Backend/proof/storage-backend-20260704T-current.json",
                 evidence,
             )
             self.assertIn(
@@ -1776,7 +1776,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             packet["evidenceDependencyMatrix"][0]["initialStatus"] = "captured"
             packet["evidenceDependencyMatrix"][0]["extra"] = "unexpected"
             write(
-                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json",
+                root / "Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1852,14 +1852,14 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             for case in packet["cases"]:
                 if case["target"] == "Docs/08_Release/AppStoreEvidence/07-sms-provider.png":
                     case["markers"] = ["短信服务商", "账号登录/验证验证码模板"]
-                if case["target"] == "Backend/proof/production-readiness-20260630T-current.json":
+                if case["target"] == "Backend/proof/production-readiness-20260704T-current.json":
                     case["markers"] = ["production readiness"]
             packet["postCaptureCommands"] = [
                 "python3 Backend/scripts/check_provider_evidence_materials.py --output Backend/proof/provider-evidence-materials.json"
             ]
             packet["completionRule"] = "template-only-not-evidence"
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1893,7 +1893,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("evidenceDependencyMatrix.productionReadinessCurrent.initialStatus must be pending", evidence)
             self.assertIn("cases missing Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png", evidence)
             self.assertIn("Docs/08_Release/AppStoreEvidence/07-sms-provider.png missing 真实实发验证", evidence)
-            self.assertIn("Backend/proof/production-readiness-20260630T-current.json missing huawei-baota-deploy-20260630T-current.json", evidence)
+            self.assertIn("Backend/proof/production-readiness-20260704T-current.json missing huawei-baota-deploy-20260704T-current.json", evidence)
             self.assertIn("postCaptureCommands missing python3 Backend/scripts/check_app_store_evidence.py", evidence)
             self.assertIn("completionRule missing real external platform evidence files", evidence)
 
@@ -1906,7 +1906,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 if case["target"] == "Docs/08_Release/AppStoreEvidence/09-obs-policy.png":
                     case["id"] = "smsProvider"
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1935,7 +1935,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 },
             ]
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -1954,9 +1954,9 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             template["status"] = "captured-live-external-platforms"
             template["canSubmitAtCapture"] = True
             template["capturedBy"] = "Penghui She"
-            template["currentProofs"]["xnpIosBundle"] = "Backend/proof/ios-app-bundle-20260630T-current.json"
+            template["currentProofs"]["xnpIosBundle"] = "Backend/proof/ios-app-bundle-20260704T-current.json"
             template["currentProofs"]["cross-app-submission-readiness"] = (
-                "/Users/smianmian/Emotion Isle/output/cross-app-submission-readiness-20260630-current.json"
+                "/Users/smianmian/Emotion Isle/output/cross-app-submission-readiness-20260704-current.json"
             )
             template["xiaonaipingRequiredProofs"].pop("productionReadiness")
             template["crossAppDoesNotReplaceXiaoNaiPingProof"] = False
@@ -1968,7 +1968,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 command
                 for command in template["postCaptureRerunCommands"]
                 if "check_provider_evidence_materials.py" not in command
-                and "auth-providers-sms-live-20260630T-current.json" not in command
+                and "auth-providers-sms-live-20260704T-current.json" not in command
             ]
             template["sameRoundEvidenceManifest"]["allDependenciesCurrentAndPassed"] = True
             template["sameRoundEvidenceManifest"]["sameRoundProofLinks"] = [
@@ -2030,7 +2030,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             )
             self.assertIn(
                 "externalPlatformCaptureResultTemplate.postCaptureRerunCommands missing "
-                "Backend/proof/auth-providers-sms-live-20260630T-current.json",
+                "Backend/proof/auth-providers-sms-live-20260704T-current.json",
                 evidence,
             )
             self.assertIn(
@@ -2142,8 +2142,8 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             write(root / "Backend/deploy/aliyun-sms-webhook-adapter.md", loosen(valid_sms_doc()))
             write(root / "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md", loosen(valid_capture_guide()))
             write(root / "Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md", loosen(valid_runbook()))
-            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md", loosen(valid_external_handoff()))
-            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260630.md", loosen(valid_external_capture_workbench()))
+            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md", loosen(valid_external_handoff()))
+            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260704.md", loosen(valid_external_capture_workbench()))
 
             report = self.run_checker(root)
 
@@ -2210,7 +2210,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff().replace("真实实发验证", ""),
             )
 
@@ -2235,11 +2235,11 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 .replace("`applinks:api.mewpow.com`", ""),
             )
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
                 .replace("08b-wechat-universal-link-aasa.png", "08b-aasa.png")
-                .replace("Backend/proof/universal-links-20260630T-current.json", "")
-                .replace("Backend/proof/wechat-client-configuration-20260630T-current.json", "")
+                .replace("Backend/proof/universal-links-20260704T-current.json", "")
+                .replace("Backend/proof/wechat-client-configuration-20260704T-current.json", "")
                 .replace("Associated Domains 包含 `applinks:api.mewpow.com`。", "")
                 .replace("微信开放平台后台 Universal Link 与 iOS Release 包中的 `XNPWeChatUniversalLink` 完全一致。", "")
                 .replace("AASA、Associated Domains、Release 包和微信开放平台 Universal Link 已同轮核对。", ""),
@@ -2251,20 +2251,20 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("wechatUniversalLinkAasaEvidenceBoundaryPresent", report["failedRequiredChecks"])
             evidence = report["checks"]["wechatUniversalLinkAasaEvidenceBoundaryPresent"]["evidence"]
             self.assertIn("08b-wechat-universal-link-aasa.png", evidence)
-            self.assertIn("Backend/proof/universal-links-20260630T-current.json", evidence)
+            self.assertIn("Backend/proof/universal-links-20260704T-current.json", evidence)
 
     def test_production_proof_refresh_plan_must_pin_current_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
-                .replace("python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260630T-current.json\n", "")
-                .replace("Backend/proof/production-readiness-20260630T-current.json", "Backend/proof/production-readiness.json")
-                .replace("cp Backend/proof/huawei-baota-deploy-20260630T-current.json Backend/proof/huawei-baota-deploy.json\n", "")
-                .replace("cp Backend/proof/storage-backend-20260630T-current.json Backend/proof/storage-backend.json\n", "")
-                .replace("cp Backend/proof/auth-providers-sms-live-20260630T-current.json Backend/proof/auth-providers.json\n", "")
+                .replace("python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json\n", "")
+                .replace("Backend/proof/production-readiness-20260704T-current.json", "Backend/proof/production-readiness.json")
+                .replace("cp Backend/proof/huawei-baota-deploy-20260704T-current.json Backend/proof/huawei-baota-deploy.json\n", "")
+                .replace("cp Backend/proof/storage-backend-20260704T-current.json Backend/proof/storage-backend.json\n", "")
+                .replace("cp Backend/proof/auth-providers-sms-live-20260704T-current.json Backend/proof/auth-providers.json\n", "")
                 .replace("不得写入 root 密码、SSH key、AK/SK、AppSecret、完整手机号或验证码。", ""),
             )
 
@@ -2273,10 +2273,10 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertFalse(report["passed"])
             self.assertIn("productionProofRefreshPlanCoversCurrentProofs", report["failedRequiredChecks"])
             evidence = report["checks"]["productionProofRefreshPlanCoversCurrentProofs"]["evidence"]
-            self.assertIn("Backend/proof/production-readiness-20260630T-current.json", evidence)
-            self.assertIn("cp Backend/proof/huawei-baota-deploy-20260630T-current.json Backend/proof/huawei-baota-deploy.json", evidence)
-            self.assertIn("cp Backend/proof/storage-backend-20260630T-current.json Backend/proof/storage-backend.json", evidence)
-            self.assertIn("cp Backend/proof/auth-providers-sms-live-20260630T-current.json Backend/proof/auth-providers.json", evidence)
+            self.assertIn("Backend/proof/production-readiness-20260704T-current.json", evidence)
+            self.assertIn("cp Backend/proof/huawei-baota-deploy-20260704T-current.json Backend/proof/huawei-baota-deploy.json", evidence)
+            self.assertIn("cp Backend/proof/storage-backend-20260704T-current.json Backend/proof/storage-backend.json", evidence)
+            self.assertIn("cp Backend/proof/auth-providers-sms-live-20260704T-current.json Backend/proof/auth-providers.json", evidence)
             self.assertIn("不得写入 root 密码", evidence)
 
     def test_production_proof_refresh_packet_is_directly_validated(self) -> None:
@@ -2314,7 +2314,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             ]
             packet["completionRule"] = "done"
             write(
-                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json",
+                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -2323,11 +2323,11 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertFalse(report["passed"])
             self.assertIn("productionProofRefreshPacketValid", report["failedRequiredChecks"])
             evidence = report["checks"]["productionProofRefreshPacketValid"]["evidence"]
-            self.assertIn("productionProofRefreshPacket.targetProofFiles.productionReadinessCurrent must be Backend/proof/production-readiness-20260630T-current.json", evidence)
+            self.assertIn("productionProofRefreshPacket.targetProofFiles.productionReadinessCurrent must be Backend/proof/production-readiness-20260704T-current.json", evidence)
             self.assertIn("productionProofRefreshPacket.proofFileChecks order must match targetProofFiles", evidence)
             self.assertIn("productionProofRefreshPacket.proofFileChecks.stableRemoteApiAlias missing object", evidence)
             self.assertIn(
-                "productionProofRefreshPacket.proofFileChecks.deploymentProofCurrent.target must be Backend/proof/huawei-baota-deploy-20260630T-current.json",
+                "productionProofRefreshPacket.proofFileChecks.deploymentProofCurrent.target must be Backend/proof/huawei-baota-deploy-20260704T-current.json",
                 evidence,
             )
             self.assertIn("productionProofRefreshPacket.proofFileChecks.deploymentProofCurrent.sha256 must be 'FILL_AFTER_REFRESH'", evidence)
@@ -2336,7 +2336,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("productionProofRefreshPacket.proofFileChecks.deploymentProofCurrent.stableAliasSyncedOnlyAfterGreen must be False", evidence)
             self.assertIn("productionProofRefreshPacket.proofFileChecks.deploymentProofCurrent.realProofNotTemplate must be False", evidence)
             self.assertIn("productionProofRefreshPacket.separationRules missing stable aliases sync only after same-round current proofs pass", evidence)
-            self.assertIn("productionProofRefreshPacket.refreshSequence.refreshProductionReadinessCurrent missing --auth-providers-proof Backend/proof/auth-providers-sms-live-20260630T-current.json", evidence)
+            self.assertIn("productionProofRefreshPacket.refreshSequence.refreshProductionReadinessCurrent missing --auth-providers-proof Backend/proof/auth-providers-sms-live-20260704T-current.json", evidence)
             self.assertIn("productionProofRefreshPacket.stopConditions missing smsLiveSendProofMissing", evidence)
             self.assertIn("productionProofRefreshPacket.postRefreshGates missing check_launch_blocker_action_packet.py", evidence)
             self.assertIn("productionProofRefreshPacket.completionRule missing refresh-plan-not-evidence", evidence)
@@ -2355,7 +2355,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             ]
             packet["stopConditions"].append(dict(packet["stopConditions"][0]))
             write(
-                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json",
+                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json",
                 json.dumps(packet, ensure_ascii=False),
             )
 
@@ -2382,7 +2382,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 {"artifactId": "deploymentProofCurrent", "secretScanHits": ["smsSecretAssignment"]}
             ]
             write(
-                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260630.json",
+                root / "Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260704.json",
                 json.dumps(status, ensure_ascii=False),
             )
 
@@ -2392,7 +2392,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("productionProofRefreshStatusValid", report["failedRequiredChecks"])
             evidence = report["checks"]["productionProofRefreshStatusValid"]["evidence"]
             self.assertIn(
-                "productionProofRefreshStatus.proofFileStatuses.deploymentProofCurrent.target must be Backend/proof/huawei-baota-deploy-20260630T-current.json",
+                "productionProofRefreshStatus.proofFileStatuses.deploymentProofCurrent.target must be Backend/proof/huawei-baota-deploy-20260704T-current.json",
                 evidence,
             )
             self.assertIn("productionProofRefreshStatus.proofFileStatuses.deploymentProofCurrent.secretScanHits must be empty", evidence)
@@ -2412,17 +2412,17 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
                 .replace("只有两份 auth provider proof 都通过", "auth provider proof 通过"),
             )
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
-                .replace("Backend/proof/auth-providers-sms-live-20260630T-current.json", "Backend/proof/auth-providers-20260630T-current.json")
+                .replace("Backend/proof/auth-providers-sms-live-20260704T-current.json", "Backend/proof/auth-providers-20260704T-current.json")
                 .replace("只有两份 auth provider proof 都通过", "auth provider proof 通过")
                 .replace("不能来自未实发短信的配置 proof", ""),
             )
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260704.md",
                 valid_external_capture_workbench().replace(
-                    "Backend/proof/auth-providers-sms-live-20260630T-current.json",
-                    "Backend/proof/auth-providers-20260630T-current.json",
+                    "Backend/proof/auth-providers-sms-live-20260704T-current.json",
+                    "Backend/proof/auth-providers-20260704T-current.json",
                 ),
             )
 
@@ -2431,7 +2431,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertFalse(report["passed"])
             self.assertIn("smsLiveSendProofKeptSeparateFromProviderConfigProof", report["failedRequiredChecks"])
             evidence = report["checks"]["smsLiveSendProofKeptSeparateFromProviderConfigProof"]["evidence"]
-            self.assertIn("Backend/proof/auth-providers-sms-live-20260630T-current.json", evidence)
+            self.assertIn("Backend/proof/auth-providers-sms-live-20260704T-current.json", evidence)
             self.assertIn("不能来自未实发短信的配置 proof", evidence)
 
     def test_production_proof_date_rollover_rule_is_required(self) -> None:
@@ -2439,10 +2439,10 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
                 .replace("## Current proof 日期滚动规则", "## Proof 日期")
-                .replace("20260630T-current", "")
+                .replace("20260704T-current", "")
                 .replace("不得继续把 `20260627T-current` 当成 fresh proof", "")
                 .replace("proof 内时间戳", ""),
             )
@@ -2453,7 +2453,7 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("productionProofDateRolloverRulePresent", report["failedRequiredChecks"])
             evidence = report["checks"]["productionProofDateRolloverRulePresent"]["evidence"]
             self.assertIn("## Current proof 日期滚动规则", evidence)
-            self.assertIn("20260630T-current", evidence)
+            self.assertIn("20260704T-current", evidence)
             self.assertIn("不得继续把 `20260627T-current` 当成 fresh proof", evidence)
             self.assertIn("proof 内时间戳", evidence)
 
@@ -2462,12 +2462,12 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
                 .replace("## 外部平台上线当天执行记录模板", "## 上线当天记录")
-                .replace("auth-providers-20260630T-current.json 已证明微信 provider。", "")
-                .replace("auth-providers-sms-live-20260630T-current.json 已证明真实短信实发。", "")
-                .replace("production-readiness-20260630T-current.json 已变绿。", "")
+                .replace("auth-providers-20260704T-current.json 已证明微信 provider。", "")
+                .replace("auth-providers-sms-live-20260704T-current.json 已证明真实短信实发。", "")
+                .replace("production-readiness-20260704T-current.json 已变绿。", "")
                 .replace("如果任一项未通过，不提交 App Store Connect 审核。", ""),
             )
 
@@ -2477,9 +2477,9 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             self.assertIn("externalPlatformSameDayExecutionTemplatePresent", report["failedRequiredChecks"])
             evidence = report["checks"]["externalPlatformSameDayExecutionTemplatePresent"]["evidence"]
             self.assertIn("## 外部平台上线当天执行记录模板", evidence)
-            self.assertIn("auth-providers-20260630T-current.json 已证明微信 provider", evidence)
-            self.assertIn("auth-providers-sms-live-20260630T-current.json 已证明真实短信实发", evidence)
-            self.assertIn("production-readiness-20260630T-current.json 已变绿", evidence)
+            self.assertIn("auth-providers-20260704T-current.json 已证明微信 provider", evidence)
+            self.assertIn("auth-providers-sms-live-20260704T-current.json 已证明真实短信实发", evidence)
+            self.assertIn("production-readiness-20260704T-current.json 已变绿", evidence)
             self.assertIn("如果任一项未通过，不提交 App Store Connect 审核", evidence)
 
     def test_external_platform_evidence_index_and_redaction_review_is_required(self) -> None:
@@ -2487,12 +2487,12 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md",
+                root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md",
                 valid_external_handoff()
                 .replace("## 外部平台证据索引与脱敏复核", "## 证据索引")
                 .replace("verify_auth_providers.py --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE", "")
-                .replace("Backend/proof/auth-providers-sms-live-20260630T-current.json", "")
-                .replace("Backend/proof/huawei-baota-deploy-20260630T-current.json", "Backend/proof/huawei-baota-deploy.json")
+                .replace("Backend/proof/auth-providers-sms-live-20260704T-current.json", "")
+                .replace("Backend/proof/huawei-baota-deploy-20260704T-current.json", "Backend/proof/huawei-baota-deploy.json")
                 .replace("HUAWEI_OBS_SECRET_ACCESS_KEY", "")
                 .replace("check_app_store_evidence.py --allow-incomplete", "check_app_store_evidence.py")
                 .replace("稳定 alias", "alias"),
@@ -2505,8 +2505,8 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             evidence = report["checks"]["externalPlatformEvidenceIndexAndRedactionReviewPresent"]["evidence"]
             self.assertIn("## 外部平台证据索引与脱敏复核", evidence)
             self.assertIn("verify_auth_providers.py --send-test-sms --require-sms-live-send", evidence)
-            self.assertIn("Backend/proof/auth-providers-sms-live-20260630T-current.json", evidence)
-            self.assertIn("Backend/proof/huawei-baota-deploy-20260630T-current.json", evidence)
+            self.assertIn("Backend/proof/auth-providers-sms-live-20260704T-current.json", evidence)
+            self.assertIn("Backend/proof/huawei-baota-deploy-20260704T-current.json", evidence)
             self.assertIn("HUAWEI_OBS_SECRET_ACCESS_KEY", evidence)
             self.assertIn("check_app_store_evidence.py --allow-incomplete", evidence)
             self.assertIn("稳定 alias", evidence)
@@ -2517,18 +2517,18 @@ class ProviderEvidenceMaterialsTest(unittest.TestCase):
             write_valid_docs(root)
             stale_workbench = (
                 valid_external_capture_workbench()
-                .replace("20260630T-current", "20260627T-current")
-                .replace("XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260630.md", "XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260627.md")
-                .replace("APP_STORE_CONNECT_COPY_PASTE_20260630.md", "APP_STORE_CONNECT_COPY_PASTE_20260627.md")
-                .replace("EXECUTION_SHEET_20260630.md", "EXECUTION_SHEET_20260627.md")
-                .replace("--date 2026-06-30", "--date 2026-06-27")
+                .replace("20260704T-current", "20260627T-current")
+                .replace("XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md", "XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260627.md")
+                .replace("APP_STORE_CONNECT_COPY_PASTE_20260704.md", "APP_STORE_CONNECT_COPY_PASTE_20260627.md")
+                .replace("EXECUTION_SHEET_20260704.md", "EXECUTION_SHEET_20260627.md")
+                .replace("--date 2026-07-04", "--date 2026-06-27")
             )
             stale_workbench += (
                 "\n旧提交守卫：`canSubmit=true`。\n"
                 "npm --prefix \"/Users/smianmian/Emotion Isle\" run check-cross-app-submit-ready "
-                "-- --date 2026-06-30 --output output/cross-app-submission-readiness-20260630-current.json\n"
+                "-- --date 2026-07-04 --output output/cross-app-submission-readiness-20260704-current.json\n"
             )
-            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260630.md", stale_workbench)
+            write(root / "Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_WORKBENCH_20260704.md", stale_workbench)
 
             report = self.run_checker(root)
 

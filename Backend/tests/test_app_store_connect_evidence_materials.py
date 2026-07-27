@@ -73,7 +73,7 @@ def valid_readme() -> str:
 """.lstrip()
 
 
-def valid_capture_guide(date: str = "20260630") -> str:
+def valid_capture_guide(date: str = "20260704") -> str:
     return """
 # CAPTURE_GUIDE.md
 
@@ -123,13 +123,13 @@ def valid_privacy_label() -> dict:
 
 
 def write_valid_docs(root: Path) -> None:
-    write(root / "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260630.md", valid_fill_sheet())
+    write(root / "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md", valid_fill_sheet())
     write(root / "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md", valid_packet())
     write(root / "Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md", valid_runbook())
     write(root / "Docs/08_Release/AppStoreEvidence/README.md", valid_readme())
     write(root / "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md", valid_capture_guide())
     write(
-        root / "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260630.md",
+        root / "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260704.md",
         valid_asc_execution_sheet(),
     )
     write(root / "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json", json.dumps(valid_privacy_label(), ensure_ascii=False))
@@ -176,7 +176,7 @@ class AppStoreConnectEvidenceMaterialsTest(unittest.TestCase):
             self.assertTrue(report["passed"])
             self.assertEqual(
                 report["checks"]["fillSheetPresent"]["evidence"],
-                "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260630.md",
+                "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md",
             )
             self.assertTrue(report["checks"]["fillSheetUsesExpectedMaterialDate"]["passed"])
 
@@ -184,7 +184,7 @@ class AppStoreConnectEvidenceMaterialsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_valid_docs(root)
-            (root / "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260630.md").unlink()
+            (root / "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260704.md").unlink()
             write(root / "Docs/08_Release/APP_STORE_CONNECT_FILL_SHEET_20260628.md", valid_fill_sheet())
             write(root / "Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md", valid_capture_guide("20260628"))
 
@@ -192,7 +192,7 @@ class AppStoreConnectEvidenceMaterialsTest(unittest.TestCase):
 
             self.assertFalse(report["passed"])
             self.assertIn("fillSheetUsesExpectedMaterialDate", report["failedRequiredChecks"])
-            self.assertIn("expected=20260630", report["checks"]["fillSheetUsesExpectedMaterialDate"]["evidence"])
+            self.assertIn("expected=20260704", report["checks"]["fillSheetUsesExpectedMaterialDate"]["evidence"])
 
     def test_missing_capture_and_privacy_label_fail(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -237,7 +237,7 @@ class AppStoreConnectEvidenceMaterialsTest(unittest.TestCase):
             root = Path(tempdir)
             write_valid_docs(root)
             write(
-                root / "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260630.md",
+                root / "Docs/08_Release/AppStoreEvidence/AppStoreConnect/EXECUTION_SHEET_20260704.md",
                 valid_asc_execution_sheet()
                 .replace("ASC-PRIVACY-AGE-REVIEW-RESULT.template.json", "")
                 .replace("17-age-rating-result", "")
@@ -269,7 +269,7 @@ class AppStoreConnectEvidenceMaterialsTest(unittest.TestCase):
             self.assertFalse(report["passed"])
             self.assertIn("captureGuideUsesCurrentAgeRatingAnswerSheet", report["failedRequiredChecks"])
             evidence = report["checks"]["captureGuideUsesCurrentAgeRatingAnswerSheet"]["evidence"]
-            self.assertIn("APP_STORE_AGE_RATING_ANSWERS_20260630.md", evidence)
+            self.assertIn("APP_STORE_AGE_RATING_ANSWERS_20260704.md", evidence)
             self.assertIn("APP_STORE_AGE_RATING_ANSWERS_20260629.md", evidence)
 
     def test_completion_claim_without_archived_evidence_fails(self) -> None:

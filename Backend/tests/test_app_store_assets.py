@@ -32,17 +32,17 @@ def png_chunk(kind: bytes, data: bytes) -> bytes:
 def write_png(path: Path, width: int, height: int, color_type: int = 2, blank: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     channels = {2: 3, 6: 4}[color_type]
-    rows = bytearray()
-    for y in range(height):
-        rows.append(0)
+    if blank:
+        pixel = bytes((245, 245, 245, 255)) if channels == 4 else bytes((245, 245, 245))
+        scanline = b"\x00" + pixel * width
+    else:
+        pixels = bytearray()
         for x in range(width):
-            if blank:
-                rgb = (245, 245, 245)
-            else:
-                rgb = ((x * 3) % 256, (y * 5) % 256, ((x + y) * 7) % 256)
-            rows.extend(rgb)
+            pixels.extend(((x * 3) % 256, (x * 5) % 256, (x * 7) % 256))
             if channels == 4:
-                rows.append(255)
+                pixels.append(255)
+        scanline = b"\x00" + bytes(pixels)
+    rows = scanline * height
     ihdr = (
         width.to_bytes(4, "big")
         + height.to_bytes(4, "big")
@@ -51,7 +51,7 @@ def write_png(path: Path, width: int, height: int, color_type: int = 2, blank: b
     path.write_bytes(
         b"\x89PNG\r\n\x1a\n"
         + png_chunk(b"IHDR", ihdr)
-        + png_chunk(b"IDAT", zlib.compress(bytes(rows)))
+        + png_chunk(b"IDAT", zlib.compress(rows))
         + png_chunk(b"IEND", b"")
     )
 

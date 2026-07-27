@@ -10,42 +10,42 @@ from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_launch_operator_workbench.py"
 REPO_ROOT = Path(__file__).resolve().parents[2]
-REAL_WORKBENCH = REPO_ROOT / "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260630.md"
+REAL_WORKBENCH = REPO_ROOT / "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260704.md"
 SUPPORTING_FILES = (
     Path("Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json"),
     Path("Docs/08_Release/AppStoreEvidence/AppleDeveloper/EXTERNAL-STATUS-POLL-RESULT.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/AppleDeveloper/DUNS-POST-DELIVERY-EXECUTION-RESULT.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/AppleDeveloper/APPLE-DEVELOPER-ORG-SIGNING-RESULT.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-BACKFILL-RESULT.template.json"),
-    Path("Docs/08_Release/APP_REVIEW_TEST_ACCOUNT_PACKET_20260630.json"),
-    Path("Docs/08_Release/AppStoreEvidence/RealDevice/FOCUSED_CAPTURE_PACKET_20260630.json"),
+    Path("Docs/08_Release/APP_REVIEW_TEST_ACCOUNT_PACKET_20260704.json"),
+    Path("Docs/08_Release/AppStoreEvidence/RealDevice/FOCUSED_CAPTURE_PACKET_20260704.json"),
     Path("Docs/08_Release/AppStoreEvidence/12-real-device-regression.template.md"),
     Path("Docs/08_Release/AppStoreEvidence/RealDevice/REAL-DEVICE-CAPTURE-RESULT.template.json"),
-    Path("Docs/08_Release/CROSS_APP_REUSABLE_EVIDENCE_PACKET_20260630.json"),
-    Path("Docs/08_Release/APP_STORE_CONNECT_SUBMIT_REVIEW_PREFLIGHT_20260630.json"),
-    Path("Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260630.json"),
-    Path("Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260630.json"),
+    Path("Docs/08_Release/CROSS_APP_REUSABLE_EVIDENCE_PACKET_20260704.json"),
+    Path("Docs/08_Release/APP_STORE_CONNECT_SUBMIT_REVIEW_PREFLIGHT_20260704.json"),
+    Path("Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json"),
+    Path("Docs/08_Release/XNP_EXTERNAL_PLATFORM_CAPTURE_PACKET_20260704.json"),
     Path("Docs/08_Release/AppStoreEvidence/ExternalPlatform/EXTERNAL-PLATFORM-CAPTURE-RESULT.template.json"),
-    Path("Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260630.md"),
-    Path("Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260630.json"),
-    Path("Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260630.json"),
-    Path("Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260630.json"),
-    Path("Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260630.json"),
-    Path("Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260630.json"),
-    Path("Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260630.json"),
-    Path("Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260630.json"),
-    Path("Docs/08_Release/AppStoreEvidence/RealDevice/REAL_DEVICE_CAPTURE_PREFLIGHT_20260630.json"),
-    Path("Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260630.json"),
-    Path("Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260630.json"),
-    Path("Docs/08_Release/APP_STORE_MANUAL_EVIDENCE_PACKET_20260630.json"),
+    Path("Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260704.md"),
+    Path("Docs/08_Release/APP_STORE_CONNECT_DRAFT_20260704.json"),
+    Path("Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260704.json"),
+    Path("Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json"),
+    Path("Docs/08_Release/OBS_STORAGE_PROOF_PACKET_20260704.json"),
+    Path("Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260704.json"),
+    Path("Docs/08_Release/PRODUCTION_PROOF_REFRESH_PACKET_20260704.json"),
+    Path("Docs/08_Release/PRODUCTION_PROOF_REFRESH_STATUS_20260704.json"),
+    Path("Docs/08_Release/AppStoreEvidence/RealDevice/REAL_DEVICE_CAPTURE_PREFLIGHT_20260704.json"),
+    Path("Docs/08_Release/APP_STORE_CONNECT_FIELD_FREEZE_PACKET_20260704.json"),
+    Path("Docs/08_Release/APP_STORE_CONNECT_ENTRY_SESSION_PACKET_20260704.json"),
+    Path("Docs/08_Release/APP_STORE_MANUAL_EVIDENCE_PACKET_20260704.json"),
     Path("Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-PRIVACY-AGE-REVIEW-RESULT.template.json"),
-    Path("Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260630.md"),
-    Path("Docs/08_Release/AppStoreEvidence/RealDevice/EXECUTION_SHEET_20260630.md"),
+    Path("Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md"),
+    Path("Docs/08_Release/AppStoreEvidence/RealDevice/EXECUTION_SHEET_20260704.md"),
     Path("Docs/08_Release/AppStoreEvidence/_templates/wechat-open-platform-evidence.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/_templates/apple-developer-team-signing-evidence.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/_templates/mainland-filing-privacy-evidence.template.json"),
     Path("Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.template.json"),
-    Path("Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260630.md"),
+    Path("Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md"),
 )
 
 
@@ -56,7 +56,7 @@ def write(path: Path, value: str) -> None:
 
 def write_valid_context(root: Path, workbench_text: str | None = None) -> None:
     write(
-        root / "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260630.md",
+        root / "Docs/08_Release/APP_STORE_CONNECT_OPERATOR_WORKBENCH_20260704.md",
         workbench_text if workbench_text is not None else REAL_WORKBENCH.read_text(encoding="utf-8"),
     )
     for relative_path in SUPPORTING_FILES:
@@ -97,14 +97,14 @@ class LaunchOperatorWorkbenchTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             text = REAL_WORKBENCH.read_text(encoding="utf-8")
-            text = text.replace("日期：2026-06-30", "日期：2026-06-28")
+            text = text.replace("日期：2026-07-04", "日期：2026-06-28")
             text = text.replace("App 名称 | 小奶瓶", "App 名称 | 待填")
             text = text.replace("确认组织 Team ID", "确认组织")
             text = text.replace("所有本机证据只认 iOS 26.5", "所有本机证据待定")
             text = text.replace("08-wechat-open-platform.png", "08-wechat.png")
             text = text.replace("跨项目可复用材料边界", "跨项目材料")
             text = text.replace("不得点击 Submit for Review", "可以提交")
-            text = text.replace("check_app_store_evidence.py --allow-incomplete --date 2026-06-30", "check_app_store_evidence.py")
+            text = text.replace("check_app_store_evidence.py --allow-incomplete --date 2026-07-04", "check_app_store_evidence.py")
             write_valid_context(root, text)
 
             report = self.run_checker(root)
@@ -123,7 +123,7 @@ class LaunchOperatorWorkbenchTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_valid_context(root)
-            review_information = root / "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260630.md"
+            review_information = root / "Docs/08_Release/APP_STORE_REVIEW_INFORMATION_20260704.md"
             write(
                 review_information,
                 review_information.read_text(encoding="utf-8").replace(
@@ -189,7 +189,7 @@ class LaunchOperatorWorkbenchTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_valid_context(root)
-            path = root / "Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260630.json"
+            path = root / "Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260704.json"
             packet = json.loads(path.read_text(encoding="utf-8"))
             for step in packet["executionOrder"]:
                 if step["step"] in {"buildReleaseSimIos265", "buildReleaseDeviceIos265"}:
@@ -210,7 +210,7 @@ class LaunchOperatorWorkbenchTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_valid_context(root)
-            path = root / "Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260630.md"
+            path = root / "Docs/08_Release/XNP_PRODUCTION_PRIVACY_EVIDENCE_WORKBENCH_20260704.md"
             path.write_text(
                 path.read_text(encoding="utf-8").replace("HUAWEI_OBS_BUCKET", "XNP_HUAWEI_OBS_BUCKET", 1),
                 encoding="utf-8",
