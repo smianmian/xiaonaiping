@@ -83,7 +83,7 @@ struct VaccineView: View {
                 }
 
                 // 集盾牌打卡册：每一针一枚小盾牌，点亮 = 已接种。
-                if !store.vaccineRecords.isEmpty {
+                if !store.activeVaccineRecords.isEmpty {
                     shieldCollectionGrid
                 }
 
@@ -111,7 +111,7 @@ struct VaccineView: View {
                         dueBadge(for: next)
                     }
                 } else {
-                    Text(store.vaccineRecords.isEmpty ? "生成模板或新增记录，开始建立宝宝疫苗本。" : "当前没有待接种记录。")
+                    Text(store.activeVaccineRecords.isEmpty ? "生成模板或新增记录，开始建立宝宝疫苗本。" : "当前没有待接种记录。")
                         .font(AppTypography.body)
                         .foregroundStyle(AppColors.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)
@@ -191,7 +191,7 @@ struct VaccineView: View {
 
     /// 已生成模板的地区（大陆优先）；没生成过则为 nil。
     private var generatedTemplateRegion: String? {
-        let regions = Set(store.vaccineRecords.map { BabyRecordStore.normalizedVaccineRegion($0.region) })
+        let regions = Set(store.activeVaccineRecords.map { BabyRecordStore.normalizedVaccineRegion($0.region) })
         if regions.contains(BabyRecordStore.mainlandVaccineRegion) {
             return BabyRecordStore.mainlandVaccineRegion
         }
@@ -202,13 +202,13 @@ struct VaccineView: View {
     }
 
     private var shieldSubtitle: String {
-        store.vaccineRecords.isEmpty
+        store.activeVaccineRecords.isEmpty
             ? "生成模板或新增记录，开始集小盾牌"
-            : AppLocalization.format("已集 %d / %d 枚小盾牌", administeredCount, store.vaccineRecords.count)
+            : AppLocalization.format("已集 %d / %d 枚小盾牌", administeredCount, store.activeVaccineRecords.count)
     }
 
     private var sortedShieldRecords: [VaccineRecord] {
-        store.vaccineRecords.sorted { ($0.dueDays ?? Int.max) < ($1.dueDays ?? Int.max) }
+        store.activeVaccineRecords.sorted { ($0.dueDays ?? Int.max) < ($1.dueDays ?? Int.max) }
     }
 
     private var shieldCollectionGrid: some View {
@@ -266,7 +266,7 @@ struct VaccineView: View {
                             .foregroundStyle(AppColors.inkSoft)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
-                        if store.vaccineRecords.isEmpty {
+                        if store.activeVaccineRecords.isEmpty {
                             PrimaryWatercolorButton(title: "新增接种记录") {
                                 openEditor()
                             }
@@ -332,16 +332,16 @@ struct VaccineView: View {
     }
 
     private var administeredCount: Int {
-        store.vaccineRecords.filter(\.isAdministered).count
+        store.activeVaccineRecords.filter(\.isAdministered).count
     }
 
     private var vaccinationProgress: Double {
-        guard !store.vaccineRecords.isEmpty else { return 0 }
-        return Double(administeredCount) / Double(store.vaccineRecords.count)
+        guard !store.activeVaccineRecords.isEmpty else { return 0 }
+        return Double(administeredCount) / Double(store.activeVaccineRecords.count)
     }
 
     private var timelineRecords: [VaccineRecord] {
-        store.vaccineRecords
+        store.activeVaccineRecords
             .filter { record in
                 switch selectedFilter {
                 case .all:
@@ -374,7 +374,7 @@ struct VaccineView: View {
     }
 
     private var emptyStateDetail: String {
-        if store.vaccineRecords.isEmpty {
+        if store.activeVaccineRecords.isEmpty {
             return "可选择中国大陆或香港模板，也可以手动新增。".localizedText
         }
         return "可切换上方筛选查看其他记录。".localizedText
@@ -407,7 +407,7 @@ struct VaccineView: View {
 
     private func toggleAdministered(_ vaccine: VaccineRecord) {
         store.toggleVaccineCompleted(vaccine)
-        guard let updated = store.vaccineRecords.first(where: { $0.id == vaccine.id }) else { return }
+        guard let updated = store.activeVaccineRecords.first(where: { $0.id == vaccine.id }) else { return }
         if updated.isAdministered {
             AppNotificationScheduler.removeVaccineReminder(updated)
         } else {

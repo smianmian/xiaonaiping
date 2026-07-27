@@ -12,7 +12,7 @@ struct HealthObservationView: View {
     private let kinds = [HealthObservation.jaundiceKind, HealthObservation.temperatureKind, HealthObservation.medicationKind]
 
     private var filteredRecords: [HealthObservation] {
-        store.healthObservations.filter { $0.kind == selectedKind }
+        store.activeHealthObservations.filter { $0.kind == selectedKind }
     }
 
     var body: some View {
@@ -79,7 +79,7 @@ struct HealthObservationView: View {
     }
 
     private var lastMedicationText: String? {
-        guard let last = store.healthObservations.first(where: { $0.kind == HealthObservation.medicationKind }) else {
+        guard let last = store.activeHealthObservations.first(where: { $0.kind == HealthObservation.medicationKind }) else {
             return nil
         }
         let elapsed = BabyRecordStore.displayDateString(from: last.occurredAt)

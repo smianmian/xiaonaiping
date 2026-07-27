@@ -22,6 +22,7 @@
 		2789B2894670943DB6B8637F /* DiaperRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9288BA6A519F0205772786E1 /* DiaperRecordView.swift */; };
 		2A6E1C1969123A9592A91486 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE03F876BF374BCE60D48DB /* AppColors.swift */; };
 		2F27250455AB5B806BB154EC /* CloudSyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838A938A99E6E6295D2DEE1D /* CloudSyncController.swift */; };
+		337875CFE2DCEC1DD2B6E93C /* MultiBabyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D848151BD79312072575A90 /* MultiBabyTests.swift */; };
 		33C9B005D4CF64885D08F7AF /* RecordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF167A08D1CF3FC993C518E /* RecordRowView.swift */; };
 		3BE4D88A676901B994F9D7D3 /* LiquidGlassTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB79549ACD4AC58F317755DD /* LiquidGlassTabBar.swift */; };
 		3E9A6134A2589A043FE207BB /* RecordExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11309ACBEDD768C59F5433D6 /* RecordExportService.swift */; };
@@ -113,6 +114,7 @@
 		058526A113C98D420C2FAA02 /* CloudSyncModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncModels.swift; sourceTree = "<group>"; };
 		085C85CB56FF2803580F5CAF /* DaySwitcherBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaySwitcherBar.swift; sourceTree = "<group>"; };
 		0C7ADB4B5DAF8E38969C2E42 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		0D848151BD79312072575A90 /* MultiBabyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiBabyTests.swift; sourceTree = "<group>"; };
 		11309ACBEDD768C59F5433D6 /* RecordExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordExportService.swift; sourceTree = "<group>"; };
 		11D3DCA5372CA40FD59F8FDD /* PrimaryWatercolorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryWatercolorButton.swift; sourceTree = "<group>"; };
 		13A47A30EE6DAF366897F584 /* FeedingReminderLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingReminderLiveActivityController.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 			isa = PBXGroup;
 			children = (
 				2B245E6A8AB01E97E89F7D55 /* BabyRecordStorePersistenceTests.swift */,
+				0D848151BD79312072575A90 /* MultiBabyTests.swift */,
 			);
 			path = XiaoNaiPingTests;
 			sourceTree = "<group>";
@@ -538,6 +541,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5CA0A32C7D4B8DA410558854 /* BabyRecordStorePersistenceTests.swift in Sources */,
+				337875CFE2DCEC1DD2B6E93C /* MultiBabyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

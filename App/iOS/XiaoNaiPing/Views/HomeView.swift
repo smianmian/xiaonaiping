@@ -31,31 +31,68 @@ struct HomeView: View {
         .sensoryFeedback(.success, trigger: quickFeedbackTrigger)
     }
 
+    /// 单宝宝：点头部进相册；多宝宝：点头部弹切换菜单（双胞胎场景）。
+    @ViewBuilder
     private var header: some View {
-        Button(action: onOpenAlbum) {
-            HStack(spacing: AppSpacing.medium) {
-                BabyAvatarView(
-                    imageData: store.baby.avatarImageData,
-                    fallbackAssetName: "approvedBabyAvatar",
-                    size: AppLayout.headerAvatar
-                )
-                VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+        if store.babies.count > 1 {
+            Menu {
+                ForEach(store.babies) { candidate in
+                    Button {
+                        store.switchActiveBaby(candidate.id)
+                    } label: {
+                        if candidate.id == store.baby.id {
+                            Label(candidate.name, systemImage: "checkmark")
+                        } else {
+                            Text(candidate.name)
+                        }
+                    }
+                }
+                Divider()
+                Button("打开相册", action: onOpenAlbum)
+            } label: {
+                headerContent(showsSwitcher: true)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(store.baby.name)，第\(store.currentBabyDaysSinceBirth)天，切换宝宝")
+        } else {
+            Button(action: onOpenAlbum) {
+                headerContent(showsSwitcher: false)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(store.baby.name)，第\(store.currentBabyDaysSinceBirth)天，打开相册")
+        }
+    }
+
+    private func headerContent(showsSwitcher: Bool) -> some View {
+        HStack(spacing: AppSpacing.medium) {
+            BabyAvatarView(
+                imageData: store.baby.avatarImageData,
+                fallbackAssetName: "approvedBabyAvatar",
+                size: AppLayout.headerAvatar
+            )
+            VStack(alignment: .leading, spacing: AppSpacing.tiny) {
+                HStack(spacing: AppSpacing.tiny) {
                     Text(store.baby.name)
                         .font(AppTypography.homeBabyName)
                         .foregroundStyle(AppColors.inkGreen)
-                    Text("第\(store.currentBabyDaysSinceBirth)天")
-                        .font(AppTypography.homeDay)
-                        .foregroundStyle(AppColors.coral)
+                    if showsSwitcher {
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
                 }
-                Spacer(minLength: 0)
+                Text("第\(store.currentBabyDaysSinceBirth)天")
+                    .font(AppTypography.homeDay)
+                    .foregroundStyle(AppColors.coral)
+            }
+            Spacer(minLength: 0)
+            if !showsSwitcher {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(AppColors.inkSoft)
             }
-            .frame(height: 90)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(store.baby.name)，第\(store.currentBabyDaysSinceBirth)天，打开相册")
+        .frame(height: 90)
     }
 
     private var currentState: some View {

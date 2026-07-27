@@ -26,7 +26,30 @@ final class BabyRecordStore: ObservableObject {
     static let manualVaccineRegion = "手动"
 
     @Published var hasCompletedOnboarding = false
-    @Published var baby = BabyRecordStore.emptyBaby
+    /// 多宝宝：档案数组 + 当前活跃宝宝。全部统计/列表只看活跃宝宝。
+    @Published var babies: [Baby] = [BabyRecordStore.emptyBaby]
+    @Published var activeBabyID: UUID? {
+        didSet { invalidateTodaySlices() }
+    }
+
+    /// 兼容桥：既有的几十处 `store.baby` 读写全部落到 babies 数组上。
+    var baby: Baby {
+        get {
+            babies.first(where: { $0.id == activeBabyID }) ?? babies.first ?? Self.emptyBaby
+        }
+        set {
+            if let index = babies.firstIndex(where: { $0.id == newValue.id }) {
+                babies[index] = newValue
+            } else if let activeBabyID, let index = babies.firstIndex(where: { $0.id == activeBabyID }) {
+                babies[index] = newValue
+            } else {
+                babies = [newValue]
+            }
+            if activeBabyID == nil || !babies.contains(where: { $0.id == activeBabyID }) {
+                activeBabyID = newValue.id
+            }
+        }
+    }
     @Published var feedingRecords: [FeedingRecord] = [] {
         didSet { invalidateTodaySlices() }
     }
@@ -65,8 +88,8 @@ final class BabyRecordStore: ObservableObject {
 
     /// 写盘专用串行队列：保证写入顺序与保存顺序一致，主线程零磁盘 IO。
     private let persistenceQueue = DispatchQueue(label: "com.mewpow.xiaonaiping.persistence", qos: .utility)
-    /// 上一次落盘的头像数据，用于跳过未变化的头像写入。
-    private var lastPersistedAvatarData: Data?
+    /// 上一次落盘的头像数据（按宝宝），用于跳过未变化的头像写入。
+    private var lastPersistedAvatarByBaby: [UUID: Data] = [:]
 
     /// 今日切片缓存：todayXxx 在 SwiftUI body 里被高频读取，
     /// 无缓存时每次求值都是全表 filter + sort，一年数据量后必然掉帧。
@@ -94,7 +117,9 @@ final class BabyRecordStore: ObservableObject {
         let slices = TodaySlices(
             dayKey: key,
             feeding: feedingRecords(on: now),
-            sortedFeedingAscending: feedingRecords.sorted { $0.occurredAt < $1.occurredAt },
+            sortedFeedingAscending: feedingRecords
+                .filter { $0.babyId == baby.id }
+                .sorted { $0.occurredAt < $1.occurredAt },
             water: waterRecords(on: now),
             sleep: sleepRecords(on: now),
             diaper: diaperRecords(on: now)
@@ -215,7 +240,7 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var ongoingSleep: SleepRecord? {
-        sleepRecords.first { $0.isOngoing }
+        sleepRecords.first { $0.isOngoing && $0.babyId == baby.id }
     }
 
     /// 进行中睡眠超过该时长即视为“忘了结束”，统计口径也按此封顶，
@@ -280,25 +305,25 @@ final class BabyRecordStore: ObservableObject {
 
     func feedingRecords(on day: Date) -> [FeedingRecord] {
         feedingRecords
-            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
+            .filter { $0.babyId == baby.id && Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
             .sorted { $0.occurredAt > $1.occurredAt }
     }
 
     func waterRecords(on day: Date) -> [WaterRecord] {
         waterRecords
-            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
+            .filter { $0.babyId == baby.id && Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
             .sorted { $0.occurredAt > $1.occurredAt }
     }
 
     func sleepRecords(on day: Date) -> [SleepRecord] {
         sleepRecords
-            .filter { Self.isSleepRecord($0, on: day) }
+            .filter { $0.babyId == baby.id && Self.isSleepRecord($0, on: day) }
             .sorted { Self.sleepSortDate($0) > Self.sleepSortDate($1) }
     }
 
     func diaperRecords(on day: Date) -> [DiaperRecord] {
         diaperRecords
-            .filter { Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
+            .filter { $0.babyId == baby.id && Calendar.current.isDate($0.occurredAt, inSameDayAs: day) }
             .sorted { $0.occurredAt > $1.occurredAt }
     }
 
@@ -326,7 +351,9 @@ final class BabyRecordStore: ObservableObject {
 
     /// 最近一次喂养（不限日期），供“同上次”一键记录取默认值。
     var latestFeedingRecordEver: FeedingRecord? {
-        feedingRecords.max { $0.occurredAt < $1.occurredAt }
+        feedingRecords
+            .filter { $0.babyId == baby.id }
+            .max { $0.occurredAt < $1.occurredAt }
     }
 
     var recentHomeRecords: [HomeRecentRecord] {
@@ -387,10 +414,23 @@ final class BabyRecordStore: ObservableObject {
     }
 
     var nextVaccine: VaccineRecord? {
-        vaccineRecords
+        activeVaccineRecords
             .filter { !$0.isAdministered }
             .sorted(by: isVaccineEarlier)
             .first
+    }
+
+    /// 活跃宝宝的疫苗/纪念日/健康观察切片（多宝宝过滤）。
+    var activeVaccineRecords: [VaccineRecord] {
+        vaccineRecords.filter { $0.babyId == baby.id }
+    }
+
+    var activeMilestones: [Milestone] {
+        milestones.filter { $0.babyId == baby.id }
+    }
+
+    var activeHealthObservations: [HealthObservation] {
+        healthObservations.filter { $0.babyId == baby.id }
     }
 
     private func feedingResultText(for record: FeedingRecord) -> String {
@@ -410,6 +450,7 @@ final class BabyRecordStore: ObservableObject {
         let birthDate = Calendar.current.startOfDay(for: baby.birthDate)
         let today = Calendar.current.startOfDay(for: Date())
         return growthRecords
+            .filter { $0.babyId == baby.id }
             .filter { record in
                 guard let measuredAt = Self.date(fromDateString: record.measuredAt) else {
                     return false
@@ -479,9 +520,9 @@ final class BabyRecordStore: ObservableObject {
     }
 
     func monthlyReport(for monthDate: Date) -> MonthlyReportSnapshot {
-        let monthlyFeedings = feedingRecords.filter { Self.isSameMonth($0.occurredAt, monthDate: monthDate) }
-        let monthlySleep = sleepRecords.filter { Self.isSameMonthSleepRecord($0, monthDate: monthDate) }
-        let monthlyDiapers = diaperRecords.filter { Self.isSameMonth($0.occurredAt, monthDate: monthDate) }
+        let monthlyFeedings = feedingRecords.filter { $0.babyId == baby.id && Self.isSameMonth($0.occurredAt, monthDate: monthDate) }
+        let monthlySleep = sleepRecords.filter { $0.babyId == baby.id && Self.isSameMonthSleepRecord($0, monthDate: monthDate) }
+        let monthlyDiapers = diaperRecords.filter { $0.babyId == baby.id && Self.isSameMonth($0.occurredAt, monthDate: monthDate) }
         let monthlyPhotos = babyPhotos.filter { Calendar.current.isDate($0.capturedAt, equalTo: monthDate, toGranularity: .month) }
         let monthlyGrowth = currentBabyGrowthRecords.filter { record in
             guard let measuredAt = Self.date(fromDateString: record.measuredAt) else {
@@ -489,11 +530,11 @@ final class BabyRecordStore: ObservableObject {
             }
             return Calendar.current.isDate(measuredAt, equalTo: monthDate, toGranularity: .month)
         }
-        let monthlyMilestones = milestones.filter { milestone in
+        let monthlyMilestones = activeMilestones.filter { milestone in
             guard let date = Self.milestoneDate(milestone) else { return false }
             return Calendar.current.isDate(date, equalTo: monthDate, toGranularity: .month)
         }
-        let monthlyVaccines = vaccineRecords.filter { record in
+        let monthlyVaccines = activeVaccineRecords.filter { record in
             guard let dueDate = Self.date(fromDateString: record.dueText) else { return false }
             return Calendar.current.isDate(dueDate, equalTo: monthDate, toGranularity: .month)
         }
@@ -518,12 +559,12 @@ final class BabyRecordStore: ObservableObject {
             heightDelta: Self.delta(latest?.height == 0 ? nil : latest?.height, previous?.height == 0 ? nil : previous?.height),
             milestoneCount: monthlyMilestones.count,
             vaccineOpenCount: monthlyVaccines.filter { !$0.isAdministered }.count,
-            recordCount: monthlyFeedings.count + waterRecords.filter { Self.isSameMonth($0.occurredAt, monthDate: monthDate) }.count + monthlySleep.count + monthlyDiapers.count + monthlyPhotos.count + monthlyGrowth.count + monthlyMilestones.count + monthlyVaccines.count
+            recordCount: monthlyFeedings.count + waterRecords.filter { $0.babyId == baby.id && Self.isSameMonth($0.occurredAt, monthDate: monthDate) }.count + monthlySleep.count + monthlyDiapers.count + monthlyPhotos.count + monthlyGrowth.count + monthlyMilestones.count + monthlyVaccines.count
         )
     }
 
     func createBabyProfile(name: String, birthDate: Date, sex: String) {
-        baby = Baby(
+        let newBaby = Baby(
             id: UUID(),
             name: name,
             daysSinceBirth: Self.daysSinceBirth(from: birthDate),
@@ -531,10 +572,91 @@ final class BabyRecordStore: ObservableObject {
             birthDate: birthDate,
             sex: sex
         )
+        babies = [newBaby]
+        activeBabyID = newBaby.id
         removeAllLocalRecords()
         loadFeedingReminderPreference()
         hasCompletedOnboarding = true
         saveState()
+    }
+
+    /// 添加第二个及以后的宝宝（双胞胎/三胞胎/二胎），不清空任何已有记录。
+    @discardableResult
+    func addBaby(name: String, birthDate: Date, sex: String) -> Bool {
+        let newBaby = Baby(
+            id: UUID(),
+            name: name,
+            daysSinceBirth: Self.daysSinceBirth(from: birthDate),
+            ageText: Self.ageText(from: birthDate),
+            birthDate: birthDate,
+            sex: sex
+        )
+        let previousBabies = babies
+        let previousActive = activeBabyID
+        babies.append(newBaby)
+        activeBabyID = newBaby.id
+        guard saveState() else {
+            babies = previousBabies
+            activeBabyID = previousActive
+            return false
+        }
+        loadFeedingReminderPreference()
+        return true
+    }
+
+    /// 切换活跃宝宝：全部页面统计随之切换。
+    func switchActiveBaby(_ id: UUID) {
+        guard babies.contains(where: { $0.id == id }), id != activeBabyID else { return }
+        activeBabyID = id
+        loadFeedingReminderPreference()
+        saveState()
+    }
+
+    /// 删除一个宝宝及其全部记录（照片是家庭相册，保留）。至少保留一个宝宝。
+    @discardableResult
+    func deleteBaby(_ id: UUID) -> Bool {
+        guard babies.count > 1, let index = babies.firstIndex(where: { $0.id == id }) else { return false }
+        let previousBabies = babies
+        let previousActive = activeBabyID
+        let previousFeeding = feedingRecords
+        let previousWater = waterRecords
+        let previousSleep = sleepRecords
+        let previousDiaper = diaperRecords
+        let previousGrowth = growthRecords
+        let previousVaccine = vaccineRecords
+        let previousMilestones = milestones
+        let previousHealth = healthObservations
+
+        AppNotificationScheduler.removeVaccineReminders(vaccineRecords.filter { $0.babyId == id })
+        babies.remove(at: index)
+        feedingRecords.removeAll { $0.babyId == id }
+        waterRecords.removeAll { $0.babyId == id }
+        sleepRecords.removeAll { $0.babyId == id }
+        diaperRecords.removeAll { $0.babyId == id }
+        growthRecords.removeAll { $0.babyId == id }
+        vaccineRecords.removeAll { $0.babyId == id }
+        milestones.removeAll { $0.babyId == id }
+        healthObservations.removeAll { $0.babyId == id }
+        if activeBabyID == id {
+            activeBabyID = babies.first?.id
+        }
+        removeFeedingReminderPreference(for: id)
+
+        guard saveState() else {
+            babies = previousBabies
+            activeBabyID = previousActive
+            feedingRecords = previousFeeding
+            waterRecords = previousWater
+            sleepRecords = previousSleep
+            diaperRecords = previousDiaper
+            growthRecords = previousGrowth
+            vaccineRecords = previousVaccine
+            milestones = previousMilestones
+            healthObservations = previousHealth
+            return false
+        }
+        loadFeedingReminderPreference()
+        return true
     }
 
     func clearSaveError() {
@@ -822,6 +944,9 @@ final class BabyRecordStore: ObservableObject {
         let previous = growthRecords
         var saved = record
         saved.updatedAt = Date()
+        if !babies.contains(where: { $0.id == saved.babyId }) {
+            saved.babyId = baby.id
+        }
         if let index = growthRecords.firstIndex(where: { $0.id == saved.id }) {
             growthRecords[index] = saved
         } else {
@@ -851,6 +976,9 @@ final class BabyRecordStore: ObservableObject {
         let previous = vaccineRecords
         var saved = record
         saved.updatedAt = Date()
+        if !babies.contains(where: { $0.id == saved.babyId }) {
+            saved.babyId = baby.id
+        }
         saved.region = Self.normalizedVaccineRegion(record.region)
         if saved.status == VaccineRecord.legacyCompletedStatus {
             saved.status = VaccineRecord.administeredStatus
@@ -906,6 +1034,9 @@ final class BabyRecordStore: ObservableObject {
         let previous = milestones
         var saved = milestone
         saved.updatedAt = Date()
+        if !babies.contains(where: { $0.id == saved.babyId }) {
+            saved.babyId = baby.id
+        }
         if let index = milestones.firstIndex(where: { $0.id == saved.id }) {
             milestones[index] = saved
         } else {
@@ -922,8 +1053,10 @@ final class BabyRecordStore: ObservableObject {
     func upsert(_ record: HealthObservation) -> Bool {
         let previous = healthObservations
         var saved = record
-        saved.babyId = baby.id
         saved.updatedAt = Date()
+        if !babies.contains(where: { $0.id == saved.babyId }) {
+            saved.babyId = baby.id
+        }
         if let index = healthObservations.firstIndex(where: { $0.id == saved.id }) {
             healthObservations[index] = saved
         } else {
@@ -1041,7 +1174,7 @@ final class BabyRecordStore: ObservableObject {
     func generateVaccineTemplate(region: String) -> [VaccineRecord] {
         let normalizedRegion = Self.normalizedVaccineRegion(region)
         let templates = VaccineTemplate.templates(for: normalizedRegion)
-        let existingKeys = Set(vaccineRecords.map { "\(Self.normalizedVaccineRegion($0.region))-\($0.title)" })
+        let existingKeys = Set(activeVaccineRecords.map { "\(Self.normalizedVaccineRegion($0.region))-\($0.title)" })
         let today = Calendar.current.startOfDay(for: Date())
         let newRecords = templates.compactMap { template -> VaccineRecord? in
             let key = "\(normalizedRegion)-\(template.title)"
@@ -1052,6 +1185,7 @@ final class BabyRecordStore: ObservableObject {
 
             let dueDays = Calendar.current.dateComponents([.day], from: today, to: Calendar.current.startOfDay(for: dueDate)).day
             return VaccineRecord(
+                babyId: baby.id,
                 title: template.title,
                 status: VaccineRecord.pendingStatus,
                 tintName: "orange",
@@ -1135,10 +1269,12 @@ final class BabyRecordStore: ObservableObject {
 
     func encodedCloudSyncData() throws -> Data {
         let payload = CloudSyncPayload(
-            schemaVersion: 1,
+            schemaVersion: 2,
             generatedAt: Date(),
             hasCompletedOnboarding: hasCompletedOnboarding,
             baby: baby,
+            babies: babies,
+            activeBabyID: activeBabyID,
             feedingRecords: feedingRecords,
             waterRecords: waterRecords,
             sleepRecords: sleepRecords,
@@ -1158,7 +1294,16 @@ final class BabyRecordStore: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let payload = try decoder.decode(CloudSyncPayload.self, from: data)
-        baby = payload.baby
+        if let storedBabies = payload.babies, !storedBabies.isEmpty {
+            babies = storedBabies
+            let storedActive = payload.activeBabyID
+            activeBabyID = storedBabies.contains(where: { $0.id == storedActive })
+                ? storedActive
+                : storedBabies.first?.id
+        } else {
+            babies = [payload.baby]
+            activeBabyID = payload.baby.id
+        }
         hasCompletedOnboarding = payload.hasCompletedOnboarding
         feedingRecords = payload.feedingRecords
         waterRecords = payload.waterRecords
@@ -1350,23 +1495,52 @@ final class BabyRecordStore: ObservableObject {
             return updated
         }
 
+        // 多宝宝：不再把所有记录改写成当前宝宝，只“认领”孤儿记录——
+        // babyId 不属于任何已知宝宝（旧数据的 legacy 默认值）时归到首个宝宝。
+        let knownIDs = Set(babies.map(\.id))
+        let fallbackID = babies.first?.id ?? baby.id
+        func claimed(_ id: UUID) -> UUID {
+            knownIDs.contains(id) ? id : fallbackID
+        }
+
         feedingRecords = feedingRecords.map { record in
             var normalized = record
-            normalized.babyId = baby.id
+            normalized.babyId = claimed(record.babyId)
+            return normalized
+        }
+        waterRecords = waterRecords.map { record in
+            var normalized = record
+            normalized.babyId = claimed(record.babyId)
             return normalized
         }
         sleepRecords = sleepRecords.map { record in
             var normalized = record
-            normalized.babyId = baby.id
+            normalized.babyId = claimed(record.babyId)
             return normalized
         }
         diaperRecords = diaperRecords.map { record in
             var normalized = record
-            normalized.babyId = baby.id
+            normalized.babyId = claimed(record.babyId)
+            return normalized
+        }
+        growthRecords = growthRecords.map { record in
+            var normalized = record
+            normalized.babyId = claimed(record.babyId)
+            return normalized
+        }
+        milestones = milestones.map { milestone in
+            var normalized = milestone
+            normalized.babyId = claimed(milestone.babyId)
+            return normalized
+        }
+        healthObservations = healthObservations.map { record in
+            var normalized = record
+            normalized.babyId = claimed(record.babyId)
             return normalized
         }
         vaccineRecords = vaccineRecords.map { record in
             var normalized = record
+            normalized.babyId = claimed(record.babyId)
             if normalized.status == VaccineRecord.legacyCompletedStatus {
                 normalized.status = VaccineRecord.administeredStatus
             }
@@ -1379,7 +1553,7 @@ final class BabyRecordStore: ObservableObject {
             }
 
             var normalized = reminder
-            normalized.babyId = baby.id
+            normalized.babyId = claimed(reminder.babyId)
             feedingReminder = normalized
         }
     }
@@ -1417,7 +1591,18 @@ final class BabyRecordStore: ObservableObject {
     }
 
     private func apply(_ state: LocalAppState) {
-        baby = state.baby ?? Self.emptyBaby
+        // 多宝宝迁移：新格式读 babies 数组，老文件只有单个 baby。
+        if let storedBabies = state.babies, !storedBabies.isEmpty {
+            babies = storedBabies
+            let storedActive = state.activeBabyID
+            activeBabyID = storedBabies.contains(where: { $0.id == storedActive })
+                ? storedActive
+                : storedBabies.first?.id
+        } else {
+            let single = state.baby ?? Self.emptyBaby
+            babies = [single]
+            activeBabyID = single.id
+        }
         hasCompletedOnboarding = state.hasCompletedOnboarding
         feedingRecords = state.feedingRecords
         waterRecords = state.waterRecords
@@ -1436,20 +1621,25 @@ final class BabyRecordStore: ObservableObject {
         loadAvatarFromDisk()
     }
 
-    /// 头像已从状态 JSON 拆到独立文件。
-    /// 旧版状态文件里内联的头像（legacy）保持不动，下次保存时会自动迁出。
+    /// 头像已从状态 JSON 拆到独立文件；多宝宝时每个宝宝各一个文件，
+    /// legacy 单文件（baby-avatar.jpg）归首个宝宝。
     private func loadAvatarFromDisk() {
-        if let inlineAvatar = baby.avatarImageData {
-            // 旧格式：头像还在 JSON 里。置空 lastPersisted 让首次保存写出文件。
-            lastPersistedAvatarData = nil
-            _ = inlineAvatar
-            return
-        }
-        if let fileData = try? Data(contentsOf: avatarFileURL) {
-            baby.avatarImageData = fileData
-            lastPersistedAvatarData = fileData
-        } else {
-            lastPersistedAvatarData = nil
+        for index in babies.indices {
+            let babyID = babies[index].id
+            if babies[index].avatarImageData != nil {
+                // 旧格式：头像还在 JSON 里。置空 lastPersisted 让首次保存写出文件。
+                lastPersistedAvatarByBaby[babyID] = nil
+                continue
+            }
+            if let fileData = try? Data(contentsOf: avatarFileURL(for: babyID)) {
+                babies[index].avatarImageData = fileData
+                lastPersistedAvatarByBaby[babyID] = fileData
+            } else if index == 0, let legacyData = try? Data(contentsOf: legacyAvatarFileURL) {
+                babies[index].avatarImageData = legacyData
+                lastPersistedAvatarByBaby[babyID] = nil
+            } else {
+                lastPersistedAvatarByBaby[babyID] = nil
+            }
         }
     }
 
@@ -1497,13 +1687,18 @@ final class BabyRecordStore: ObservableObject {
         }
 
         // 头像不再内联进状态 JSON（每次保存都 base64 重编码 50-80KB），
-        // 改为独立文件，仅在变化时写。
+        // 改为独立文件，仅在变化时写；多宝宝各自一个文件。
         var babyForDisk = baby
         babyForDisk.avatarImageData = nil
+        let babiesForDisk = babies.map { stored -> Baby in
+            var copy = stored
+            copy.avatarImageData = nil
+            return copy
+        }
         let avatarToPersist: Data??
-        if lastPersistedAvatarData != baby.avatarImageData {
+        if lastPersistedAvatarByBaby[baby.id] != baby.avatarImageData {
             avatarToPersist = .some(baby.avatarImageData)
-            lastPersistedAvatarData = baby.avatarImageData
+            lastPersistedAvatarByBaby[baby.id] = baby.avatarImageData
         } else {
             avatarToPersist = nil
         }
@@ -1511,6 +1706,8 @@ final class BabyRecordStore: ObservableObject {
         let state = LocalAppState(
             hasCompletedOnboarding: hasCompletedOnboarding,
             baby: babyForDisk,
+            babies: babiesForDisk,
+            activeBabyID: activeBabyID,
             feedingRecords: feedingRecords,
             waterRecords: waterRecords,
             feedingReminder: feedingReminder,
@@ -1533,7 +1730,7 @@ final class BabyRecordStore: ObservableObject {
             stateURL: stateURL,
             backupStateURL: backupStateURL,
             stagingURL: applicationSupportDirectory.appendingPathComponent("\(stateFileName).new"),
-            avatarURL: avatarFileURL,
+            avatarURL: avatarFileURL(for: baby.id),
             directoryURL: applicationSupportDirectory
         )
         persistenceQueue.async { [weak self] in
@@ -1613,7 +1810,12 @@ final class BabyRecordStore: ObservableObject {
         applicationSupportDirectory.appendingPathComponent(backupStateFileName)
     }
 
-    private var avatarFileURL: URL {
+    /// 每个宝宝各自的头像文件；legacy 单文件是多宝宝之前的旧路径。
+    private func avatarFileURL(for babyID: UUID) -> URL {
+        applicationSupportDirectory.appendingPathComponent("baby-avatar-\(babyID.uuidString).jpg")
+    }
+
+    private var legacyAvatarFileURL: URL {
         applicationSupportDirectory.appendingPathComponent(avatarFileName)
     }
 
@@ -1996,7 +2198,8 @@ final class BabyRecordStore: ObservableObject {
     private static let legacyMockBabyID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
 
     private func resetToEmptyProfile() {
-        baby = Self.emptyBaby
+        babies = [Self.emptyBaby]
+        activeBabyID = Self.emptyBaby.id
         hasCompletedOnboarding = false
         removeAllLocalRecords()
     }
@@ -2015,6 +2218,8 @@ struct FailableDecodable<T: Decodable>: Decodable {
 private struct LocalAppState: Codable {
     var hasCompletedOnboarding: Bool
     var baby: Baby?
+    var babies: [Baby]?
+    var activeBabyID: UUID?
     var feedingRecords: [FeedingRecord]
     var waterRecords: [WaterRecord]
     var feedingReminder: FeedingReminder?
@@ -2032,6 +2237,8 @@ private struct LocalAppState: Codable {
     private enum CodingKeys: String, CodingKey {
         case hasCompletedOnboarding
         case baby
+        case babies
+        case activeBabyID
         case feedingRecords
         case waterRecords
         case feedingReminder
@@ -2050,6 +2257,8 @@ private struct LocalAppState: Codable {
     init(
         hasCompletedOnboarding: Bool,
         baby: Baby,
+        babies: [Baby]? = nil,
+        activeBabyID: UUID? = nil,
         feedingRecords: [FeedingRecord],
         waterRecords: [WaterRecord] = [],
         feedingReminder: FeedingReminder? = nil,
@@ -2066,6 +2275,8 @@ private struct LocalAppState: Codable {
     ) {
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
+        self.babies = babies
+        self.activeBabyID = activeBabyID
         self.feedingRecords = feedingRecords
         self.waterRecords = waterRecords
         self.feedingReminder = feedingReminder
@@ -2085,6 +2296,8 @@ private struct LocalAppState: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         hasCompletedOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? false
         baby = Self.tolerantValue(Baby.self, in: container, forKey: .baby)
+        babies = Self.tolerantValue([Baby].self, in: container, forKey: .babies)
+        activeBabyID = try? container.decodeIfPresent(UUID.self, forKey: .activeBabyID)
         feedingRecords = Self.tolerantArray(FeedingRecord.self, in: container, forKey: .feedingRecords)
         waterRecords = Self.tolerantArray(WaterRecord.self, in: container, forKey: .waterRecords)
         feedingReminder = Self.tolerantValue(FeedingReminder.self, in: container, forKey: .feedingReminder)

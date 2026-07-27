@@ -18,6 +18,9 @@ struct CloudSyncPayload: Codable {
     var generatedAt: Date
     var hasCompletedOnboarding: Bool
     var baby: Baby
+    /// 多宝宝：schemaVersion 2 起携带；老包只有单个 baby。
+    var babies: [Baby]?
+    var activeBabyID: UUID?
     var feedingRecords: [FeedingRecord]
     var waterRecords: [WaterRecord]
     var sleepRecords: [SleepRecord]
@@ -28,7 +31,7 @@ struct CloudSyncPayload: Codable {
     var babyPhotos: [BabyPhoto]
 
     private enum CodingKeys: String, CodingKey {
-        case schemaVersion, generatedAt, hasCompletedOnboarding, baby, feedingRecords, waterRecords, sleepRecords, diaperRecords, growthRecords, vaccineRecords, milestones, babyPhotos
+        case schemaVersion, generatedAt, hasCompletedOnboarding, baby, babies, activeBabyID, feedingRecords, waterRecords, sleepRecords, diaperRecords, growthRecords, vaccineRecords, milestones, babyPhotos
     }
 
     init(
@@ -36,6 +39,8 @@ struct CloudSyncPayload: Codable {
         generatedAt: Date,
         hasCompletedOnboarding: Bool,
         baby: Baby,
+        babies: [Baby]? = nil,
+        activeBabyID: UUID? = nil,
         feedingRecords: [FeedingRecord],
         waterRecords: [WaterRecord] = [],
         sleepRecords: [SleepRecord],
@@ -49,6 +54,8 @@ struct CloudSyncPayload: Codable {
         self.generatedAt = generatedAt
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.baby = baby
+        self.babies = babies
+        self.activeBabyID = activeBabyID
         self.feedingRecords = feedingRecords
         self.waterRecords = waterRecords
         self.sleepRecords = sleepRecords
@@ -65,6 +72,8 @@ struct CloudSyncPayload: Codable {
         generatedAt = try container.decode(Date.self, forKey: .generatedAt)
         hasCompletedOnboarding = try container.decode(Bool.self, forKey: .hasCompletedOnboarding)
         baby = try container.decode(Baby.self, forKey: .baby)
+        babies = try container.decodeIfPresent([Baby].self, forKey: .babies)
+        activeBabyID = try container.decodeIfPresent(UUID.self, forKey: .activeBabyID)
         feedingRecords = try container.decode([FeedingRecord].self, forKey: .feedingRecords)
         waterRecords = try container.decodeIfPresent([WaterRecord].self, forKey: .waterRecords) ?? []
         sleepRecords = try container.decode([SleepRecord].self, forKey: .sleepRecords)

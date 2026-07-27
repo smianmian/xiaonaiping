@@ -252,7 +252,7 @@ struct GrowthView: View {
                     Spacer(minLength: 0)
                 }
 
-                if !store.vaccineRecords.isEmpty {
+                if !store.activeVaccineRecords.isEmpty {
                     HStack(spacing: AppSpacing.regular) {
                         vaccineBookStat(
                             title: "已接种",
@@ -274,7 +274,7 @@ struct GrowthView: View {
                 Divider().opacity(0.35)
 
                 HStack(spacing: AppSpacing.tiny) {
-                    Text(store.vaccineRecords.isEmpty ? "创建疫苗本".localizedText : "打开疫苗本".localizedText)
+                    Text(store.activeVaccineRecords.isEmpty ? "创建疫苗本".localizedText : "打开疫苗本".localizedText)
                         .font(AppTypography.body.weight(.semibold))
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .semibold))
@@ -285,12 +285,12 @@ struct GrowthView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(store.vaccineRecords.isEmpty ? "还没有建立宝宝疫苗本" : AppLocalization.format("宝宝疫苗本，已接种 %d 针，待接种 %d 针", administeredVaccineCount, pendingVaccineCount))
+        .accessibilityLabel(store.activeVaccineRecords.isEmpty ? "还没有建立宝宝疫苗本" : AppLocalization.format("宝宝疫苗本，已接种 %d 针，待接种 %d 针", administeredVaccineCount, pendingVaccineCount))
     }
 
     /// “下一针：脊灰疫苗 · 2026.08.30”——疫苗名用主题绿，其余淡墨。
     private var vaccineSubtitleText: Text {
-        guard !store.vaccineRecords.isEmpty else {
+        guard !store.activeVaccineRecords.isEmpty else {
             return Text("还没有建立宝宝疫苗本".localizedText)
                 .foregroundColor(AppColors.inkSoft)
         }
@@ -326,15 +326,15 @@ struct GrowthView: View {
     }
 
     private var administeredVaccineCount: Int {
-        store.vaccineRecords.filter(\.isAdministered).count
+        store.activeVaccineRecords.filter(\.isAdministered).count
     }
 
     private var pendingVaccineCount: Int {
-        store.vaccineRecords.filter { !$0.isAdministered }.count
+        store.activeVaccineRecords.filter { !$0.isAdministered }.count
     }
 
     private var vaccineBookSubtitle: String {
-        guard !store.vaccineRecords.isEmpty else {
+        guard !store.activeVaccineRecords.isEmpty else {
             return "还没有建立宝宝疫苗本".localizedText
         }
 

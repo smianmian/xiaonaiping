@@ -10,6 +10,8 @@ struct ProfileView: View {
     @State private var isPrivacyStatusPresented = false
     @State private var isBabyEditorPresented = false
     @State private var isProfileDeletePresented = false
+    @State private var isAddBabyPresented = false
+    @State private var babyDeleteCandidate: Baby?
     @State private var selectedAvatarItem: PhotosPickerItem?
     @State private var pendingAvatarImage: UIImage?
     @State private var avatarErrorMessage: String?
@@ -32,6 +34,7 @@ struct ProfileView: View {
                         .foregroundStyle(AppColors.inkGreen)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     profileHeader
+                    babiesCard
                     primarySettingsCard
                     globalSettingsCard
                     dangerSettingsCard
@@ -62,6 +65,29 @@ struct ProfileView: View {
                 store.updateBaby(name: name, birthDate: birthDate, sex: sex)
             }
             .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $isAddBabyPresented) {
+            AddBabySheet { name, birthDate, sex in
+                store.addBaby(name: name, birthDate: birthDate, sex: sex)
+            }
+            .presentationDetents([.medium, .large])
+        }
+        .alert("删除\(babyDeleteCandidate?.name ?? "宝宝")？", isPresented: Binding {
+            babyDeleteCandidate != nil
+        } set: { isPresented in
+            if !isPresented { babyDeleteCandidate = nil }
+        }) {
+            Button("删除", role: .destructive) {
+                if let babyDeleteCandidate {
+                    store.deleteBaby(babyDeleteCandidate.id)
+                }
+                babyDeleteCandidate = nil
+            }
+            Button("取消", role: .cancel) {
+                babyDeleteCandidate = nil
+            }
+        } message: {
+            Text("会删除这个宝宝的档案和全部记录（喂养、睡眠、疫苗等），家庭相册照片保留。")
         }
         .sheet(isPresented: avatarEditorBinding) {
             if let pendingAvatarImage {
@@ -138,6 +164,76 @@ struct ProfileView: View {
         .background { CardBackground(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius) }
         }
         .buttonStyle(.plain)
+    }
+
+    /// 多宝宝管理：列出全部宝宝、一键切换、添加新宝宝（双胞胎/二胎）。
+    private var babiesCard: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.largeCardRadius, padding: 0) {
+            VStack(spacing: 0) {
+                ForEach(store.babies) { candidate in
+                    Button {
+                        store.switchActiveBaby(candidate.id)
+                    } label: {
+                        HStack(spacing: AppSpacing.medium) {
+                            BabyAvatarView(
+                                imageData: candidate.avatarImageData,
+                                fallbackAssetName: "approvedBabyAvatar",
+                                size: 44
+                            )
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(candidate.name)
+                                    .font(AppTypography.bodyLarge)
+                                    .foregroundStyle(AppColors.inkGreen)
+                                Text(BabyRecordStore.ageText(from: candidate.birthDate))
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.inkSoft)
+                            }
+                            Spacer()
+                            if candidate.id == store.baby.id {
+                                Text("当前")
+                                    .font(AppTypography.caption)
+                                    .foregroundStyle(AppColors.milk)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(AppColors.coral, in: Capsule())
+                            }
+                        }
+                        .padding(.horizontal, AppSpacing.roomy)
+                        .padding(.vertical, AppSpacing.regular)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        if store.babies.count > 1 {
+                            Button("删除宝宝及其记录", role: .destructive) {
+                                babyDeleteCandidate = candidate
+                            }
+                        }
+                    }
+
+                    Divider().padding(.leading, 72).padding(.trailing, AppSpacing.roomy)
+                }
+
+                Button {
+                    isAddBabyPresented = true
+                } label: {
+                    HStack(spacing: AppSpacing.medium) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 22, weight: .regular))
+                            .foregroundStyle(AppColors.coral)
+                            .frame(width: 44)
+                        Text("添加宝宝")
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.inkGreen)
+                        Spacer()
+                    }
+                    .padding(.horizontal, AppSpacing.roomy)
+                    .padding(.vertical, AppSpacing.regular)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     private var primarySettingsCard: some View {
@@ -1268,6 +1364,117 @@ private struct ProfileMenuRow: View {
                 .frame(height: 1)
                 .padding(.leading, 72)
                 .padding(.trailing, AppSpacing.roomy)
+        }
+    }
+}
+
+/// 添加第二个及以后的宝宝（双胞胎/三胞胎/二胎）。
+/// 与建档不同：不清空任何已有记录，添加后自动切换为活跃宝宝。
+private struct AddBabySheet: View {
+    let onSave: (String, Date, String) -> Bool
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var name = ""
+    @State private var birthDate = Date()
+    @State private var sex = "未设置"
+    @State private var errorMessage: String?
+
+    private let sexOptions = ["未设置", "女宝", "男宝"]
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppSpacing.large) {
+                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                        Text("昵称")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                        TextField("宝宝昵称", text: $name)
+                            .font(AppTypography.bodyLarge)
+                            .foregroundStyle(AppColors.ink)
+                            .textInputAutocapitalization(.never)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .frame(height: 48)
+                            .background {
+                                RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
+                                    .fill(AppColors.milk)
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: AppShapes.smallRadius, style: .continuous)
+                                            .stroke(AppColors.softStroke.opacity(0.28), lineWidth: 1)
+                                    }
+                            }
+
+                        DatePicker("出生日期", selection: $birthDate, in: ...Date(), displayedComponents: [.date])
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.ink)
+                            .tint(AppColors.coral)
+
+                        Picker("性别", selection: $sex) {
+                            ForEach(sexOptions, id: \.self) { option in
+                                Text(option.localizedText).tag(option)
+                            }
+                        }
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.ink)
+                        .tint(AppColors.coral)
+                    }
+                    .padding(AppSpacing.roomy)
+                    .background {
+                        RoundedRectangle(cornerRadius: AppShapes.largeCardRadius, style: .continuous)
+                            .fill(AppColors.cream.opacity(0.86))
+                    }
+
+                    Text("添加后会自动切换到新宝宝；点首页顶部的宝宝名可以随时切换。")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.inkSoft)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.coral)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(AppSpacing.large)
+            }
+            .background(PaperBackgroundView())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Button {
+                    save()
+                } label: {
+                    Text("添加宝宝")
+                        .font(AppTypography.bodyLarge.weight(.semibold))
+                        .foregroundStyle(AppColors.milk)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(AppColors.coral, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.vertical, AppSpacing.small)
+                .background(.ultraThinMaterial)
+            }
+            .navigationTitle("添加宝宝")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("取消") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func save() {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            errorMessage = "请先给宝宝起个昵称。"
+            return
+        }
+        if onSave(trimmed, birthDate, sex) {
+            dismiss()
+        } else {
+            errorMessage = "保存失败，请稍后再试。"
         }
     }
 }

@@ -7,6 +7,8 @@ struct VaccineRecord: Identifiable, Equatable, Codable {
     static let legacyCompletedStatus = "已完成"
 
     var id = UUID()
+    /// 多宝宝：记录归属；旧数据缺省用 legacy 默认值，迁移时归到首个宝宝。
+    var babyId: UUID = RecordCodingDefaults.babyId
     var title: String
     var status: String
     var tintName: String
@@ -29,6 +31,7 @@ struct VaccineRecord: Identifiable, Equatable, Codable {
 
     private enum CodingKeys: String, CodingKey {
         case id
+        case babyId
         case title
         case status
         case tintName
@@ -46,6 +49,7 @@ extension VaccineRecord {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        babyId = try container.decodeIfPresent(UUID.self, forKey: .babyId) ?? RecordCodingDefaults.babyId
         title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
         status = try container.decodeIfPresent(String.self, forKey: .status) ?? Self.pendingStatus
         tintName = try container.decodeIfPresent(String.self, forKey: .tintName) ?? "orange"

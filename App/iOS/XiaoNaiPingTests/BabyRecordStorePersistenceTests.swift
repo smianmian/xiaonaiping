@@ -124,6 +124,9 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
         baby.removeValue(forKey: "birthDate")
         baby.removeValue(forKey: "sex")
         json["baby"] = baby
+        // 模拟多宝宝之前的旧格式文件：只有单个 baby 字段。
+        json.removeValue(forKey: "babies")
+        json.removeValue(forKey: "activeBabyID")
         json.removeValue(forKey: "milestones")
         try writeStateJSON(json)
 
@@ -143,6 +146,9 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
         var baby = try XCTUnwrap(json["baby"] as? [String: Any])
         baby["id"] = legacyMockBabyID
         json["baby"] = baby
+        // 模拟多宝宝之前的旧格式文件：只有单个 baby 字段。
+        json.removeValue(forKey: "babies")
+        json.removeValue(forKey: "activeBabyID")
         try writeStateJSON(json)
 
         let store = makeStore()
@@ -157,6 +163,9 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
         var baby = try XCTUnwrap(json["baby"] as? [String: Any])
         baby["id"] = legacyMockBabyID
         json["baby"] = baby
+        // 模拟多宝宝之前的旧格式文件：只有单个 baby 字段。
+        json.removeValue(forKey: "babies")
+        json.removeValue(forKey: "activeBabyID")
         try writeStateJSON(json)
         UserDefaults.standard.set(true, forKey: mockSeededKey)
 

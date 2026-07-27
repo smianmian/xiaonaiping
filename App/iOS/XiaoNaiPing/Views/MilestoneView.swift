@@ -119,7 +119,7 @@ struct MilestoneView: View {
     private var manualMilestoneSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.regular) {
             SectionTitleView(title: "我的纪念日")
-            if store.milestones.isEmpty {
+            if store.activeMilestones.isEmpty {
                 WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius) {
                     VStack(spacing: AppSpacing.small) {
                         Text("还没有手动添加的纪念日")
@@ -133,7 +133,7 @@ struct MilestoneView: View {
                     .frame(maxWidth: .infinity)
                 }
             } else {
-                ForEach(store.milestones) { item in
+                ForEach(store.activeMilestones) { item in
                     Button {
                         openEditor(item)
                     } label: {

@@ -2,6 +2,8 @@ import Foundation
 
 struct GrowthRecord: Identifiable, Equatable, Codable {
     var id = UUID()
+    /// 多宝宝：记录归属；旧数据缺省用 legacy 默认值，迁移时归到首个宝宝。
+    var babyId: UUID = RecordCodingDefaults.babyId
     var month: String
     var weight: Double
     var height: Double
@@ -13,6 +15,7 @@ struct GrowthRecord: Identifiable, Equatable, Codable {
 
     private enum CodingKeys: String, CodingKey {
         case id
+        case babyId
         case month
         case weight
         case height
@@ -27,6 +30,7 @@ extension GrowthRecord {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        babyId = try container.decodeIfPresent(UUID.self, forKey: .babyId) ?? RecordCodingDefaults.babyId
         month = try container.decodeIfPresent(String.self, forKey: .month) ?? ""
         weight = try container.decodeIfPresent(Double.self, forKey: .weight) ?? 0
         height = try container.decodeIfPresent(Double.self, forKey: .height) ?? 0
