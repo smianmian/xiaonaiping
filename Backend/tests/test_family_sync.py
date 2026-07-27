@@ -113,6 +113,71 @@ class FamilySyncTestCase(unittest.TestCase):
         self.assertEqual(status, 404)
         self.assertEqual(body["error"]["code"], "invite_code_not_found")
 
+    def test_owner_can_rotate_invite_and_old_code_is_rejected(self) -> None:
+        owner = self.make_account()
+        _, created = self.request("POST", "/v1/family", body={}, token=owner)
+        old_invite = created["family"]["inviteCode"]
+
+        status, rotated = self.request("POST", "/v1/family/invite/rotate", body={}, token=owner)
+        self.assertEqual(status, 200)
+        new_invite = rotated["family"]["inviteCode"]
+        self.assertNotEqual(new_invite, old_invite)
+
+        old_invitee = self.make_account()
+        status, body = self.request("POST", "/v1/family/join", body={"inviteCode": old_invite}, token=old_invitee)
+        self.assertEqual(status, 404)
+        self.assertEqual(body["error"]["code"], "invite_code_not_found")
+
+        new_invitee = self.make_account()
+        status, _ = self.request("POST", "/v1/family/join", body={"inviteCode": new_invite}, token=new_invitee)
+        self.assertEqual(status, 201)
+
+    def test_member_can_leave_and_owner_can_remove_access(self) -> None:
+        owner = self.make_account()
+        member = self.make_account()
+        _, created = self.request("POST", "/v1/family", body={}, token=owner)
+        self.request("POST", "/v1/family/join", body={"inviteCode": created["family"]["inviteCode"]}, token=member)
+
+        status, left = self.request("DELETE", "/v1/family", token=member)
+        self.assertEqual(status, 200)
+        self.assertTrue(left["left"])
+        status, info = self.request("GET", "/v1/family", token=member)
+        self.assertEqual(status, 200)
+        self.assertIsNone(info["family"])
+        status, body = self.request("GET", "/v1/family/records?since=0", token=member)
+        self.assertEqual(status, 403)
+        self.assertEqual(body["error"]["code"], "not_in_family")
+
+        self.request("POST", "/v1/family/join", body={"inviteCode": created["family"]["inviteCode"]}, token=member)
+        status, owner_info = self.request("GET", "/v1/family", token=owner)
+        target = next(item for item in owner_info["family"]["members"] if item["role"] == "member")
+        status, removed = self.request("DELETE", f"/v1/family/members/{target['accountId']}", token=owner)
+        self.assertEqual(status, 200)
+        self.assertTrue(removed["removed"])
+        status, body = self.request("PUT", "/v1/family/records", body={"records": []}, token=member)
+        self.assertEqual(status, 403)
+        self.assertEqual(body["error"]["code"], "not_in_family")
+
+    def test_owner_leave_or_account_deletion_transfers_family(self) -> None:
+        owner = self.make_account()
+        member = self.make_account()
+        _, created = self.request("POST", "/v1/family", body={}, token=owner)
+        self.request("POST", "/v1/family/join", body={"inviteCode": created["family"]["inviteCode"]}, token=member)
+
+        status, _ = self.request("DELETE", "/v1/family", token=owner)
+        self.assertEqual(status, 200)
+        status, member_info = self.request("GET", "/v1/family", token=member)
+        self.assertEqual(status, 200)
+        self.assertEqual(member_info["family"]["role"], "owner")
+
+        second_member = self.make_account()
+        self.request("POST", "/v1/family/join", body={"inviteCode": member_info["family"]["inviteCode"]}, token=second_member)
+        status, _ = self.request("DELETE", "/v1/account", token=member)
+        self.assertEqual(status, 200)
+        status, successor_info = self.request("GET", "/v1/family", token=second_member)
+        self.assertEqual(status, 200)
+        self.assertEqual(successor_info["family"]["role"], "owner")
+
     def test_non_member_cannot_touch_records(self) -> None:
         outsider = self.make_account()
         status, body = self.request(

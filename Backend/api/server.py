@@ -427,6 +427,14 @@ def generate_family_invite_code() -> str:
     return "".join(secrets.choice(FAMILY_INVITE_CODE_ALPHABET) for _ in range(FAMILY_INVITE_CODE_LENGTH))
 
 
+def new_family_invite_code(db: DatabaseConnection) -> str:
+    for _ in range(8):
+        invite_code = generate_family_invite_code()
+        if db.execute("SELECT 1 FROM families WHERE invite_code = ?", (invite_code,)).fetchone() is None:
+            return invite_code
+    raise RuntimeError("unable to generate unique family invite code")
+
+
 def family_membership(db: DatabaseConnection, account_id: str):
     return db.execute(
         """
@@ -449,14 +457,49 @@ def family_member_count(db: DatabaseConnection, family_id: str) -> int:
 
 
 def family_membership_response(db: DatabaseConnection, membership) -> dict:
-    return {
-        "family": {
-            "familyId": membership["family_id"],
-            "role": membership["role"],
-            "inviteCode": membership["invite_code"],
-            "memberCount": family_member_count(db, membership["family_id"]),
-        }
+    family = {
+        "familyId": membership["family_id"],
+        "role": membership["role"],
+        "inviteCode": membership["invite_code"],
+        "memberCount": family_member_count(db, membership["family_id"]),
     }
+    if membership["role"] == "owner":
+        rows = db.execute(
+            """
+            SELECT account_id, role, created_at FROM family_members
+            WHERE family_id = ?
+            ORDER BY CASE WHEN role = 'owner' THEN 0 ELSE 1 END, created_at ASC
+            """,
+            (membership["family_id"],),
+        ).fetchall()
+        family["members"] = [
+            {"accountId": row["account_id"], "role": row["role"], "joinedAt": row["created_at"]}
+            for row in rows
+        ]
+    return {"family": family}
+
+
+def remove_family_membership(db: DatabaseConnection, membership, account_id: str) -> None:
+    """删除成员资格；创建者离开时转移给最早加入的剩余成员。"""
+    family_id = membership["family_id"]
+    remaining = db.execute(
+        """
+        SELECT account_id FROM family_members
+        WHERE family_id = ? AND account_id != ?
+        ORDER BY created_at ASC, account_id ASC
+        """,
+        (family_id, account_id),
+    ).fetchall()
+    if not remaining:
+        db.execute("DELETE FROM family_records WHERE family_id = ?", (family_id,))
+        db.execute("DELETE FROM family_members WHERE family_id = ?", (family_id,))
+        db.execute("DELETE FROM families WHERE family_id = ?", (family_id,))
+        return
+    if membership["role"] == "owner":
+        successor_id = remaining[0]["account_id"]
+        db.execute("UPDATE families SET owner_account_id = ? WHERE family_id = ?", (successor_id, family_id))
+        db.execute("UPDATE family_members SET role = 'owner' WHERE family_id = ? AND account_id = ?", (family_id, successor_id))
+    db.execute("DELETE FROM family_members WHERE family_id = ? AND account_id = ?", (family_id, account_id))
 
 
 def upsert_family_record(
@@ -688,6 +731,10 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             account_id = self.require_account()
             if account_id is not None:
                 self.handle_join_family(account_id)
+        elif path == "/v1/family/invite/rotate":
+            account_id = self.require_account()
+            if account_id is not None:
+                self.handle_rotate_family_invite(account_id)
         else:
             self.write_error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在。")
 
@@ -714,6 +761,10 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/v1/account":
             self.handle_delete_account(account_id)
+        elif path == "/v1/family":
+            self.handle_leave_family(account_id)
+        elif path.startswith("/v1/family/members/"):
+            self.handle_remove_family_member(account_id, path.removeprefix("/v1/family/members/"))
         elif path.startswith("/v1/photos/"):
             self.handle_delete_photo(account_id, path.removeprefix("/v1/photos/"))
         else:
@@ -885,15 +936,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                 return
 
             family_id = str(uuid.uuid4())
-            invite_code = generate_family_invite_code()
-            for _ in range(8):
-                collision = db.execute(
-                    "SELECT family_id FROM families WHERE invite_code = ?",
-                    (invite_code,),
-                ).fetchone()
-                if collision is None:
-                    break
-                invite_code = generate_family_invite_code()
+            invite_code = new_family_invite_code(db)
 
             now = utc_now()
             db.execute(
@@ -956,6 +999,61 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             response = family_membership_response(db, membership)
             db.commit()
         self.write_json(response, status=HTTPStatus.CREATED)
+
+    def handle_rotate_family_invite(self, account_id: str) -> None:
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_error(HTTPStatus.FORBIDDEN, "not_in_family", "还没有加入家庭。")
+                return
+            if membership["role"] != "owner":
+                self.write_error(HTTPStatus.FORBIDDEN, "not_family_owner", "只有创建者可以更换邀请码。")
+                return
+            invite_code = new_family_invite_code(db)
+            db.execute("UPDATE families SET invite_code = ? WHERE family_id = ?", (invite_code, membership["family_id"]))
+            membership = family_membership(db, account_id)
+            response = family_membership_response(db, membership)
+            db.commit()
+        self.write_json(response)
+
+    def handle_leave_family(self, account_id: str) -> None:
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_error(HTTPStatus.NOT_FOUND, "family_not_found", "当前账号没有加入家庭。")
+                return
+            remove_family_membership(db, membership, account_id)
+            db.commit()
+        self.write_json({"left": True})
+
+    def handle_remove_family_member(self, account_id: str, member_account_id: str) -> None:
+        if not self.is_safe_id(member_account_id):
+            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_member_id", "成员 ID 不合法。")
+            return
+        with connect(self.config) as db:
+            membership = family_membership(db, account_id)
+            if membership is None:
+                self.write_error(HTTPStatus.FORBIDDEN, "not_in_family", "还没有加入家庭。")
+                return
+            if membership["role"] != "owner":
+                self.write_error(HTTPStatus.FORBIDDEN, "not_family_owner", "只有创建者可以移除成员。")
+                return
+            if member_account_id == account_id:
+                self.write_error(HTTPStatus.BAD_REQUEST, "cannot_remove_owner", "创建者请使用退出家庭。")
+                return
+            target = db.execute(
+                "SELECT 1 FROM family_members WHERE family_id = ? AND account_id = ?",
+                (membership["family_id"], member_account_id),
+            ).fetchone()
+            if target is None:
+                self.write_error(HTTPStatus.NOT_FOUND, "family_member_not_found", "成员不存在或已离开。")
+                return
+            db.execute(
+                "DELETE FROM family_members WHERE family_id = ? AND account_id = ?",
+                (membership["family_id"], member_account_id),
+            )
+            db.commit()
+        self.write_json({"removedAccountId": member_account_id, "removed": True})
 
     def handle_put_family_records(self, account_id: str) -> None:
         body = self.read_json(MAX_SYNC_BYTES)
@@ -1332,6 +1430,63 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                 (utc_days_ago(7),),
             ).fetchall()
 
+            # 30 天日粒度序列：仪表盘趋势图的数据源。
+            # 时间戳是 ISO 字符串，SUBSTR(…,1,10) 即 UTC 日期，SQLite/MySQL 通用。
+            series_window_start = utc_days_ago(29)
+            new_accounts_daily = db.execute(
+                """
+                SELECT SUBSTR(created_at, 1, 10) AS day, COUNT(*) AS count
+                FROM accounts
+                WHERE created_at >= ?
+                GROUP BY SUBSTR(created_at, 1, 10)
+                ORDER BY day
+                """,
+                (series_window_start,),
+            ).fetchall()
+            analytics_daily = db.execute(
+                """
+                SELECT SUBSTR(received_at, 1, 10) AS day,
+                       COUNT(*) AS events,
+                       COUNT(DISTINCT account_hash) AS actors
+                FROM analytics_events
+                WHERE received_at >= ?
+                GROUP BY SUBSTR(received_at, 1, 10)
+                ORDER BY day
+                """,
+                (series_window_start,),
+            ).fetchall()
+            sync_activity_daily = db.execute(
+                """
+                SELECT SUBSTR(archived_at, 1, 10) AS day,
+                       COUNT(*) AS count,
+                       COUNT(DISTINCT account_id) AS accounts
+                FROM sync_versions
+                WHERE archived_at >= ?
+                GROUP BY SUBSTR(archived_at, 1, 10)
+                ORDER BY day
+                """,
+                (series_window_start,),
+            ).fetchall()
+            photo_uploads_daily = db.execute(
+                """
+                SELECT SUBSTR(updated_at, 1, 10) AS day, COUNT(*) AS count
+                FROM photos
+                WHERE updated_at >= ?
+                GROUP BY SUBSTR(updated_at, 1, 10)
+                ORDER BY day
+                """,
+                (series_window_start,),
+            ).fetchall()
+            family_totals = db.execute("SELECT COUNT(*) AS count FROM families").fetchone()["count"]
+            family_member_totals = db.execute("SELECT COUNT(*) AS count FROM family_members").fetchone()["count"]
+            multi_member_families = db.execute(
+                """
+                SELECT COUNT(*) AS count FROM (
+                    SELECT family_id FROM family_members GROUP BY family_id HAVING COUNT(*) >= 2
+                ) AS multi
+                """
+            ).fetchone()["count"]
+
         self.write_json(
             {
                 "generatedAt": utc_now(),
@@ -1366,6 +1521,28 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                         for row in top_analytics_events
                     ],
                 },
+                "family": {
+                    "families": int(family_totals),
+                    "members": int(family_member_totals),
+                    "familiesWithPartner": int(multi_member_families),
+                },
+                "series": {
+                    "windowDays": 30,
+                    "newAccountsDaily": [
+                        {"day": row["day"], "count": int(row["count"])} for row in new_accounts_daily
+                    ],
+                    "analyticsDaily": [
+                        {"day": row["day"], "events": int(row["events"]), "actors": int(row["actors"])}
+                        for row in analytics_daily
+                    ],
+                    "syncActivityDaily": [
+                        {"day": row["day"], "count": int(row["count"]), "accounts": int(row["accounts"])}
+                        for row in sync_activity_daily
+                    ],
+                    "photoUploadsDaily": [
+                        {"day": row["day"], "count": int(row["count"])} for row in photo_uploads_daily
+                    ],
+                },
             }
         )
 
@@ -1380,7 +1557,10 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
                 "SELECT COUNT(*) AS count FROM analytics_events WHERE account_hash = ?",
                 (analytics_digest,),
             ).fetchone()["count"]
+            membership = family_membership(db, account_id)
             now = utc_now()
+            if membership is not None:
+                remove_family_membership(db, membership, account_id)
             db.execute("DELETE FROM syncs WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM photos WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM account_identities WHERE account_id = ?", (account_id,))

@@ -60,6 +60,43 @@ final class FamilySyncEngine: ObservableObject {
         }
     }
 
+    func rotateInvite() async {
+        guard let token = sessionStore.session?.sessionToken,
+              let client = makeClient() else { return }
+        errorMessage = nil
+        do {
+            familyInfo = try await client.rotateFamilyInvite(token: token)
+            statusText = "已生成新邀请码，旧邀请码已失效。"
+        } catch {
+            errorMessage = "更换邀请码失败，请稍后再试。"
+        }
+    }
+
+    func leaveFamily() async {
+        guard let token = sessionStore.session?.sessionToken,
+              let client = makeClient() else { return }
+        errorMessage = nil
+        do {
+            try await resetMembership(using: client, token: token)
+            statusText = "已退出家庭，后续不会再访问共享记录。"
+        } catch {
+            errorMessage = "退出家庭失败，请稍后再试。"
+        }
+    }
+
+    func removeMember(accountId: String) async {
+        guard let token = sessionStore.session?.sessionToken,
+              let client = makeClient() else { return }
+        errorMessage = nil
+        do {
+            try await client.removeFamilyMember(accountId: accountId, token: token)
+            familyInfo = try await client.fetchFamily(token: token)
+            statusText = "已移除该成员；对方无法再访问共享记录。"
+        } catch {
+            errorMessage = "移除成员失败，请稍后再试。"
+        }
+    }
+
     // MARK: 同步
 
     /// 保存后 2 秒合并触发一次；不在家庭里则完全静默。
@@ -139,6 +176,13 @@ final class FamilySyncEngine: ObservableObject {
     private func resetCursor() {
         UserDefaults.standard.removeObject(forKey: cursorKey)
         UserDefaults.standard.removeObject(forKey: watermarkKey)
+    }
+
+    private func resetMembership(using client: CloudSyncAPIClient, token: String) async throws {
+        try await client.leaveFamily(token: token)
+        resetCursor()
+        familyInfo = nil
+        scheduledSyncTask?.cancel()
     }
 
     private func makeClient() -> CloudSyncAPIClient? {

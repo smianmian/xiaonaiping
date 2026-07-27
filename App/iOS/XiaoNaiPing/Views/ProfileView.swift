@@ -794,6 +794,8 @@ private struct DataStatusSheet: View {
     @State private var exportErrorMessage: String?
     @State private var familyInviteCodeInput = ""
     @State private var familySyncMessage: String?
+    @State private var isLeaveFamilyPresented = false
+    @State private var familyMemberPendingRemoval: FamilyMember?
     @FocusState private var focusedPhoneLoginField: PhoneLoginField?
 
     var body: some View {
@@ -929,6 +931,27 @@ private struct DataStatusSheet: View {
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)
+                    if family.isOwner {
+                        Button("换一个邀请码") {
+                            Task { await familySync.rotateInvite() }
+                        }
+                        .font(AppTypography.body.weight(.semibold))
+                        .foregroundStyle(AppColors.blueInk)
+                        if let members = family.members {
+                            ForEach(members.filter { !$0.isOwner }) { member in
+                                HStack {
+                                    Text("家庭成员 · (member.accountId.suffix(4))")
+                                        .font(AppTypography.caption)
+                                        .foregroundStyle(AppColors.inkSoft)
+                                    Spacer()
+                                    Button("移除", role: .destructive) {
+                                        familyMemberPendingRemoval = member
+                                    }
+                                    .font(AppTypography.caption.weight(.semibold))
+                                }
+                            }
+                        }
+                    }
                     if familySync.isSyncing {
                         Text("正在同步…")
                             .font(AppTypography.caption)
@@ -942,6 +965,10 @@ private struct DataStatusSheet: View {
                         Task { await familySync.syncNow(store: store) }
                     }
                     .disabled(familySync.isSyncing)
+                    Button(family.isOwner ? "退出并转交家庭" : "退出家庭", role: .destructive) {
+                        isLeaveFamilyPresented = true
+                    }
+                    .font(AppTypography.body.weight(.semibold))
                 } else {
                     Text("和爸爸/家人共同记录：一人创建家庭拿到邀请码，其他人输入邀请码加入。")
                         .font(AppTypography.caption)
@@ -979,6 +1006,29 @@ private struct DataStatusSheet: View {
         }
         .task {
             await familySync.refreshMembership()
+        }
+        .alert("确认退出家庭？", isPresented: $isLeaveFamilyPresented) {
+            Button("退出", role: .destructive) {
+                Task { await familySync.leaveFamily() }
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("退出后将无法继续访问或同步这组家庭记录。创建者退出时，家庭会转交给最早加入的其他成员；若没有其他成员，家庭组会被删除。")
+        }
+        .alert("确认移除成员？", isPresented: Binding(
+            get: { familyMemberPendingRemoval != nil },
+            set: { if !$0 { familyMemberPendingRemoval = nil } }
+        )) {
+            Button("移除", role: .destructive) {
+                guard let member = familyMemberPendingRemoval else { return }
+                familyMemberPendingRemoval = nil
+                Task { await familySync.removeMember(accountId: member.accountId) }
+            }
+            Button("取消", role: .cancel) {
+                familyMemberPendingRemoval = nil
+            }
+        } message: {
+            Text("被移除的成员将无法继续读取或写入共享记录。")
         }
     }
 

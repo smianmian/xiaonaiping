@@ -6,6 +6,18 @@ struct FamilyInfo: Codable, Equatable {
     var role: String
     var inviteCode: String
     var memberCount: Int
+    var members: [FamilyMember]?
+
+    var isOwner: Bool { role == "owner" }
+}
+
+struct FamilyMember: Codable, Equatable, Identifiable {
+    var accountId: String
+    var role: String
+    var joinedAt: String
+
+    var id: String { accountId }
+    var isOwner: Bool { role == "owner" }
 }
 
 struct FamilyInfoResponse: Codable {

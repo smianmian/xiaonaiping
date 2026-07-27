@@ -16,7 +16,8 @@
     "Photos may be copied into the app private container",
     "V1 needs account-based sync and restore",
     "V1 uploads original baby photos selected by the user",
-    "First submission targets Hong Kong; installed app features are not location-gated",
+    "V1 supports multiple baby profiles and private family collaboration for up to six members; original photos are not shared between members",
+    "First submission targets Mainland China; installed app features are not location-gated",
     "Vaccine templates cover Mainland China and Hong Kong",
     "Crash reporting is required in V1"
   ],
@@ -28,14 +29,12 @@
   "pending_confirmation": [
     "Exact brand color direction",
     "Whether dark mode is a v1 acceptance requirement",
-    "Whether multiple baby profiles are required",
     "Whether account sign-in appears during onboarding or sync setup",
     "Which crash reporting channel is used"
   ],
   "excluded_from_v1": [
     "macOS UI",
-    "family collaboration UI",
-    "community or sharing UI",
+    "community or public sharing UI",
     "subscription or commerce UI",
     "China Mainland App Store launch UI"
   ],
@@ -214,6 +213,22 @@
       "primary_action": "手机号/微信/恢复密钥登录并开启同步",
       "empty_state": "Not signed in or cloud service not configured",
       "error_state": "Sync or restore failed"
+    },
+    {
+      "id": "baby_management",
+      "label": "宝宝管理",
+      "goal": "Add, switch, or delete multiple baby profiles without mixing their records",
+      "primary_action": "添加宝宝 / 切换宝宝",
+      "empty_state": "One baby profile",
+      "error_state": "Delete failed"
+    },
+    {
+      "id": "family_collaboration",
+      "label": "家庭协作",
+      "goal": "Create or join a private family group and synchronize shared records; original photos remain private to each account",
+      "primary_action": "创建家庭 / 加入家庭",
+      "empty_state": "Not in a family group",
+      "error_state": "Invalid invite, family full, sync failed, or access revoked"
     }
   ],
   "empty_states": [

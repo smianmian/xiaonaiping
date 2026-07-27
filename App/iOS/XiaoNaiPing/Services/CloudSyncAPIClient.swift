@@ -155,6 +155,20 @@ final class CloudSyncAPIClient {
         return try decode(FamilyInfoResponse.self, from: data).family
     }
 
+    func rotateFamilyInvite(token: String) async throws -> FamilyInfo? {
+        let body = try JSONEncoder().encode([String: String]())
+        let data = try await request(path: "/v1/family/invite/rotate", method: "POST", body: body, token: token)
+        return try decode(FamilyInfoResponse.self, from: data).family
+    }
+
+    func leaveFamily(token: String) async throws {
+        _ = try await request(path: "/v1/family", method: "DELETE", token: token)
+    }
+
+    func removeFamilyMember(accountId: String, token: String) async throws {
+        _ = try await request(path: "/v1/family/members/\(accountId)", method: "DELETE", token: token)
+    }
+
     func pushFamilyRecords(_ envelopes: [FamilyRecordEnvelope], token: String) async throws -> FamilyPushResponse {
         let body = try JSONEncoder().encode(FamilyPushRequest(records: envelopes))
         let data = try await request(path: "/v1/family/records", method: "PUT", body: body, token: token)

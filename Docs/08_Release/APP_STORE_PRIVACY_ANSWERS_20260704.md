@@ -26,8 +26,8 @@
 |---|---|---|---|---|---|
 | Identifiers | Yes | Yes | No | App Functionality | 账号 ID、session token、微信 openid/unionid hash |
 | Contact Info | Yes | Yes | No | App Functionality | 手机号验证码登录；真实短信服务商和区域提交前复核 |
-| User Content | Yes | Yes | No | App Functionality | 宝宝档案、备注、喂养、睡眠、排便、成长、疫苗提醒、照片元数据 |
-| Photos or Videos | Yes | Yes | No | App Functionality | 用户主动加入 App 的照片原图，仅用于私有账号同步 |
+| User Content | Yes | Yes | No | App Functionality | 宝宝档案、备注、喂养、睡眠、排便、成长、疫苗提醒、照片元数据；用户主动加入私密家庭组后，档案和非照片记录仅向受邀请成员同步 |
+| Photos or Videos | Yes | Yes | No | App Functionality | 用户主动加入 App 的照片原图，仅用于私有账号同步，不向家庭成员共享 |
 | Health and Fitness | Yes | Yes | No | App Functionality | 用户主动输入的喂养、睡眠、成长、疫苗提醒记录 |
 | Usage Data | Yes | Yes | No | Analytics | 第一方产品交互事件，例如账号创建、登录、同步、恢复、记录类型和提醒类型 |
 

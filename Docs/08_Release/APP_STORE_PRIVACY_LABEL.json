@@ -36,8 +36,8 @@
       "linkedToUser": true,
       "usedForTracking": false,
       "purposes": ["App Functionality"],
-      "projectData": ["baby profile", "notes", "feeding records", "sleep records", "diaper records", "growth records", "vaccine reminders", "photo metadata"],
-      "notes": "Uploaded only for account sync and restore."
+      "projectData": ["baby profile", "notes", "feeding records", "sleep records", "diaper records", "growth records", "vaccine reminders", "photo metadata", "private family membership and invitation code"],
+      "notes": "Uploaded for account sync and restore. When a user actively joins a private family group, baby profiles and non-photo records are shared only with invited group members; photo metadata remains account-private."
     },
     {
       "category": "Photos or Videos",
@@ -46,7 +46,7 @@
       "usedForTracking": false,
       "purposes": ["App Functionality"],
       "projectData": ["original photos added by the user to the app"],
-      "notes": "Private account sync only; no public sharing in V1."
+      "notes": "Private account sync only; no public sharing and no family-member photo sharing in V1."
     },
     {
       "category": "Health and Fitness",

@@ -182,6 +182,19 @@
             <tbody></tbody>
           </table>
         </section>
+        <section class="panel">
+          <h2>家庭协作</h2>
+          <table id="family">
+            <tbody></tbody>
+          </table>
+        </section>
+        <section class="panel">
+          <h2>近 30 天趋势</h2>
+          <table id="series">
+            <thead><tr><th>日期</th><th>新增账号</th><th>埋点</th><th>同步版本</th><th>照片上传</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
       </div>
     </section>
   </main>
@@ -208,6 +221,7 @@
     const value = (data, key) => data[key] ?? 0;
     const formatNumber = (input) => Number(input || 0).toLocaleString("zh-CN");
     const formatTime = (input) => input || "暂无";
+    const seriesByDay = (items, value) => new Map((items || []).map((item) => [item.day, value(item)]));
 
     document.querySelector("#login").addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -258,6 +272,28 @@
         document.querySelector("#analytics tbody").innerHTML = topEvents.length
           ? topEvents.map((event) => `<tr><td>${event.eventName}</td><td>${formatNumber(event.count)}</td></tr>`).join("")
           : `<tr><td class="empty" colspan="2">暂无事件</td></tr>`;
+
+        const family = data.family || {};
+        document.querySelector("#family tbody").innerHTML = [
+          ["家庭组", formatNumber(family.families)],
+          ["成员", formatNumber(family.members)],
+          ["至少两名成员的家庭", formatNumber(family.familiesWithPartner)]
+        ].map(([label, text]) => `<tr><th>${label}</th><td>${text}</td></tr>`).join("");
+
+        const series = data.series || {};
+        const accountsByDay = seriesByDay(series.newAccountsDaily, (item) => item.count);
+        const eventsByDay = seriesByDay(series.analyticsDaily, (item) => item.events);
+        const syncByDay = seriesByDay(series.syncActivityDaily, (item) => item.count);
+        const photosByDay = seriesByDay(series.photoUploadsDaily, (item) => item.count);
+        const days = [...new Set([
+          ...accountsByDay.keys(),
+          ...eventsByDay.keys(),
+          ...syncByDay.keys(),
+          ...photosByDay.keys()
+        ])].sort().reverse();
+        document.querySelector("#series tbody").innerHTML = days.length
+          ? days.map((day) => `<tr><td>${day}</td><td>${formatNumber(accountsByDay.get(day))}</td><td>${formatNumber(eventsByDay.get(day))}</td><td>${formatNumber(syncByDay.get(day))}</td><td>${formatNumber(photosByDay.get(day))}</td></tr>`).join("")
+          : `<tr><td class="empty" colspan="5">近 30 天暂无活动</td></tr>`;
 
         status.textContent = "读取成功";
       } catch (error) {

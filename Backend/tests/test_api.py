@@ -175,6 +175,8 @@ class APITestCase(unittest.TestCase):
             token=token,
             content_type="image/jpeg",
         )
+        self.request("PUT", "/v1/sync", {"baby": {"name": "不应出现在指标里", "revision": 2}}, token=token)
+        self.request("POST", "/v1/family", {}, token=token)
 
         with self.assertRaises(urllib.error.HTTPError) as context:
             self.request("GET", "/internal/metrics")
@@ -190,6 +192,11 @@ class APITestCase(unittest.TestCase):
         self.assertGreater(metrics["syncBytes"], 0)
         self.assertEqual(metrics["photoObjects"], 1)
         self.assertEqual(metrics["deletionAudit"]["deletedAccounts"], 0)
+        self.assertEqual(metrics["family"], {"families": 1, "members": 1, "familiesWithPartner": 0})
+        self.assertEqual(metrics["series"]["windowDays"], 30)
+        self.assertEqual(metrics["series"]["newAccountsDaily"][0]["count"], 1)
+        self.assertEqual(metrics["series"]["syncActivityDaily"][0]["count"], 1)
+        self.assertEqual(metrics["series"]["photoUploadsDaily"][0]["count"], 1)
         self.assertNotIn("不应出现在指标里", json.dumps(metrics, ensure_ascii=False))
 
     def test_analytics_events_are_whitelisted_aggregated_and_deleted(self) -> None:

@@ -25,22 +25,19 @@
 
 1. 本地存储优先使用 SwiftData 或 Core Data，最终选择需在实现计划中确认。
 2. 所有业务对象都应带本地 UUID、创建时间、更新时间、删除状态和同步状态。
-3. 第一版单人记录，冲突处理可以保持简单。
+3. 第一版支持多个宝宝档案；私密家庭组内的共享记录按单条更新时间处理冲突。
 4. 月度成长报告优先作为聚合视图生成，不必先保存成独立重数据。
 
 ## 待我确认的问题
 
-1. 是否支持多个宝宝档案。
-2. 删除是立即硬删除，还是服务器保留短期可恢复窗口。
-3. 是否上传照片缩略图。
-4. Apple 原生崩溃上报脱敏验证方式。
+1. 删除是立即硬删除，还是服务器保留短期可恢复窗口。
+2. 是否上传照片缩略图。
+3. Apple 原生崩溃上报脱敏验证方式。
 
 ## 不进入第一版的功能
 
-1. 家庭成员权限模型。
-2. 多人协作冲突模型。
-3. 社交分享数据模型。
-4. 电商、广告、订阅数据模型。
+1. 社交分享数据模型。
+2. 电商、广告、订阅数据模型。
 
 ## 通用字段
 
@@ -78,6 +75,9 @@
 | Milestone | 纪念日 | 是 | 不需要同步；可由生日计算 | 随档案删除 |
 | MonthlyReport | 月度报告聚合结果 | 是 | 默认不同步；由本地数据生成 | 可重新生成 |
 | AppPrivacySetting | 隐私和同步偏好 | 是 | 默认本地；必要时同步最小状态 | 是 |
+| FamilyGroup | 私密家庭组与邀请码 | 是 | 是 | 是 |
+| FamilyMembership | 账号与家庭组的成员关系 | 是 | 是 | 是 |
+| FamilyRecordEnvelope | 家庭组内的单条记录同步信封 | 是 | 是，不含照片原图 | 是 |
 
 ### Account
 
@@ -88,6 +88,12 @@
 | providerUserId | String | 是 | 第三方或自有账号用户 ID |
 | createdAt | Date | 是 | 创建时间 |
 | deletedAt | Date? | 否 | 删除时间 |
+
+### FamilyGroup 与 FamilyMembership
+
+`FamilyGroup` 只表示私密共同记录边界，不是公开社交关系。一个账号最多属于一个家庭组；每组最多 6 名成员。服务端保存随机 `familyId`、邀请码、创建时间和成员角色（创建者/成员），不保存成员昵称、通讯录或关系标签。
+
+`FamilyRecordEnvelope` 按 `familyId + recordType + recordId` 标识，携带最小 JSON payload、`updatedAtMs` 和可选 `deletedAtMs`。允许的类型为宝宝档案、喂养、喝水、睡眠、排便、成长、疫苗、纪念日和健康观察；照片二进制、照片元数据与提醒偏好不进入家庭共享通道。新更新时间覆盖旧更新时间；删除墓碑优先于旧更新。
 
 ## 字段定义
 
@@ -246,6 +252,7 @@
 6. BabyProfile 1 - N BabyPhoto。
 7. BabyProfile 1 - N VaccineReminder。
 8. MonthlyReport 由 BabyProfile 及当月记录聚合生成。
+9. FamilyGroup 1 - N FamilyMembership；FamilyGroup 1 - N FamilyRecordEnvelope；共享记录仍以 `babyId` 归属具体宝宝。
 
 ## 删除策略
 
