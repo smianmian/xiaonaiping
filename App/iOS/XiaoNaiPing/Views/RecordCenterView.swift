@@ -22,8 +22,8 @@ struct RecordCenterView: View {
         Entry(title: "喝水", asset: "waterDrop", systemIcon: nil, artHeight: 58, route: .water),
         Entry(title: "照片", asset: "cameraPink", systemIcon: nil, artHeight: 52, route: .album),
         Entry(title: "身高体重", asset: "rulerScale", systemIcon: nil, artHeight: 54, route: .growth),
-        Entry(title: "健康观察", asset: nil, systemIcon: "stethoscope", artHeight: 0, route: .health),
-        Entry(title: "纪念日", asset: nil, systemIcon: "rosette", artHeight: 0, route: .milestone)
+        Entry(title: "健康观察", asset: "recordHealthStethoscope", systemIcon: nil, artHeight: 58, route: .health),
+        Entry(title: "纪念日", asset: "recordMilestoneMedal", systemIcon: nil, artHeight: 58, route: .milestone)
     ]
 
     var body: some View {

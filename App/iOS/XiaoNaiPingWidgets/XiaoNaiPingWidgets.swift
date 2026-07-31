@@ -270,7 +270,14 @@ struct FeedingReminderLiveActivityWidget: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    avatarOrMark(context.state, size: 26)
+                    HStack(spacing: 7) {
+                        avatarOrMark(size: 26)
+                        Text(context.state.babyName)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.86))
+                            .lineLimit(1)
+                            .frame(maxWidth: 90, alignment: .leading)
+                    }
                         .padding(.leading, 8)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -278,34 +285,51 @@ struct FeedingReminderLiveActivityWidget: Widget {
                         .padding(.trailing, 8)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    HStack(spacing: 10) {
-                        avatarOrMark(context.state, size: 34)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(reminderHeadline(context.state))
-                                .font(.headline.weight(.semibold))
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.82)
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .center, spacing: 14) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(reminderHeadline(context.state))
+                                    .font(.headline.weight(.semibold))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.82)
 
-                            Text(reminderSubheadline(context.state))
-                                .font(.caption2.weight(.medium))
-                                .foregroundStyle(.white.opacity(0.68))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.82)
-
-                            progressBar(context.state)
+                                Text(context.state.nextReminderAt, style: .time)
+                                    .font(.caption2.weight(.medium))
+                                    .foregroundStyle(.white.opacity(0.68))
+                                    .lineLimit(1)
+                            }
+                            Spacer(minLength: 12)
+                            VStack(alignment: .trailing, spacing: 2) {
+                                if context.state.nextReminderAt > Date() {
+                                    Text(String(localized: "还有"))
+                                        .font(.caption2.weight(.medium))
+                                        .foregroundStyle(.white.opacity(0.62))
+                                    Text(context.state.nextReminderAt, style: .timer)
+                                        .font(.title3.weight(.semibold))
+                                        .monospacedDigit()
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text(String(localized: "现在"))
+                                        .font(.title3.weight(.semibold))
+                                        .foregroundStyle(Self.milk)
+                                }
+                            }
+                            .frame(minWidth: 74, alignment: .trailing)
                         }
+
+                        progressBar(context.state)
                     }
-                    .frame(maxWidth: 226, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 6)
                 }
             } compactLeading: {
-                avatarOrMark(context.state, size: 20)
+                avatarOrMark(size: 20)
             } compactTrailing: {
                 compactCountdown(context.state, foreground: .white.opacity(0.94))
             } minimal: {
-                avatarOrMark(context.state, size: 16)
+                avatarOrMark(size: 16)
             }
             .keylineTint(Self.coral)
         }
@@ -313,21 +337,12 @@ struct FeedingReminderLiveActivityWidget: Widget {
 
     private func liveActivityBody(_ context: ActivityViewContext<FeedingReminderActivityAttributes>) -> some View {
         HStack(spacing: 12) {
-            avatarOrMark(context.state, size: 38)
+            avatarOrMark(size: 38)
             VStack(alignment: .leading, spacing: 5) {
                 Text(reminderHeadline(context.state))
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                HStack(spacing: 6) {
-                    Text(context.state.babyName)
-                        .lineLimit(1)
-                    Text("·")
-                    Text(liveActivityDetail(context.state))
-                        .lineLimit(1)
-                }
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.70))
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: 3) {
@@ -362,8 +377,8 @@ struct FeedingReminderLiveActivityWidget: Widget {
     }
 
     @ViewBuilder
-    private func avatarOrMark(_ state: FeedingReminderActivityAttributes.ContentState, size: CGFloat) -> some View {
-        if let avatarData = state.babyAvatarData,
+    private func avatarOrMark(size: CGFloat) -> some View {
+        if let avatarData = XiaoNaiPingSharedStore.readLiveActivityAvatarData(),
            let image = UIImage(data: avatarData) {
             Image(uiImage: image)
                 .resizable()
@@ -419,26 +434,8 @@ struct FeedingReminderLiveActivityWidget: Widget {
         case .preparing:
             return String(localized: "准备泡奶啦")
         case .waiting:
-            return String(localized: "下一顿奶")
+            return String(localized: "下次喝奶")
         }
-    }
-
-    private func reminderSubheadline(_ state: FeedingReminderActivityAttributes.ContentState) -> String {
-        switch reminderPhase(state) {
-        case .due:
-            return String(localized: "现在可以喂奶了")
-        case .preparing:
-            return String(localized: "5分钟后喝奶")
-        case .waiting:
-            return String(format: String(localized: "%@ 后喝奶"), compactStatusText(state))
-        }
-    }
-
-    private func liveActivityDetail(_ state: FeedingReminderActivityAttributes.ContentState) -> String {
-        if let repeatText = repeatIntervalText(state.repeatIntervalMinutes) {
-            return String(format: String(localized: "每 %@ 轻轻提醒"), repeatText)
-        }
-        return String(localized: "只提醒这一次")
     }
 
     private func repeatPillText(_ minutes: Int?) -> String {
@@ -483,14 +480,17 @@ struct FeedingReminderLiveActivityWidget: Widget {
     }
 
     private func progressBar(_ state: FeedingReminderActivityAttributes.ContentState) -> some View {
-        ZStack(alignment: .leading) {
-            Capsule()
-                .fill(.white.opacity(0.14))
-            Capsule()
-                .fill(Self.milk.opacity(0.86))
-                .frame(width: 76 * reminderProgress(state))
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(.white.opacity(0.14))
+                Capsule()
+                    .fill(Self.milk.opacity(0.86))
+                    .frame(width: geometry.size.width * reminderProgress(state))
+            }
         }
-        .frame(width: 76, height: 4)
+        .frame(maxWidth: .infinity)
+        .frame(height: 4)
     }
 
     private func reminderProgress(_ state: FeedingReminderActivityAttributes.ContentState) -> CGFloat {

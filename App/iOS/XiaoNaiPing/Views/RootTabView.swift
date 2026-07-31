@@ -73,7 +73,7 @@ struct RootTabView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
-        .preferredColorScheme(nightModeEnabled ? .dark : nil)
+        .preferredColorScheme(nightModeEnabled ? .dark : .light)
         .environmentObject(store)
         .environmentObject(cloudSync)
         .environmentObject(familySync)

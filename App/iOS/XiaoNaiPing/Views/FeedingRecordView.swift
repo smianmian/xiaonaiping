@@ -664,7 +664,7 @@ private struct FeedingEditorSheet: View {
             ?? defaultOccurredAt
             ?? BabyRecordStore.date(fromTimeString: record?.time ?? BabyRecordStore.timeString(from: Date())))
         _type = State(initialValue: record?.type ?? "奶粉")
-        _amountText = State(initialValue: record?.amountML.map(String.init) ?? "")
+        _amountText = State(initialValue: record?.amountML.map(String.init) ?? (record == nil ? "120" : ""))
         _durationText = State(initialValue: record?.durationMinutes.map(String.init) ?? "")
         _breastSide = State(initialValue: record?.breastSide)
         _note = State(initialValue: record?.note ?? "")
@@ -677,22 +677,16 @@ private struct FeedingEditorSheet: View {
                     WatercolorCard(tint: AppColors.cream, cornerRadius: AppShapes.largeCardRadius) {
                         VStack(alignment: .leading, spacing: AppSpacing.medium) {
                             Text("这一次")
-                                .font(AppTypography.caption)
+                                .font(AppTypography.readableBodyMedium)
                                 .foregroundStyle(AppColors.inkSoft)
 
-                            Picker("类型", selection: $type) {
-                                ForEach(types, id: \.self) { type in
-                                    Text(type).tag(type)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            .tint(AppColors.peach)
+                            SegmentedPill(items: types, selected: $type)
 
                             HStack(spacing: AppSpacing.small) {
                                 AssetWatercolorImage(name: "approvedFeedingBottle")
                                     .frame(width: 34, height: 40)
                                 Text("记录时间")
-                                    .font(AppTypography.caption)
+                                    .font(AppTypography.readableBodyMedium)
                                     .foregroundStyle(AppColors.inkSoft)
                                 Spacer(minLength: 0)
                             }
@@ -706,16 +700,27 @@ private struct FeedingEditorSheet: View {
                             VStack(alignment: .leading, spacing: AppSpacing.small) {
                                 TextField("奶量 ml（必填）", text: $amountText)
                                     .keyboardType(.numberPad)
-                                    .textFieldStyle(.roundedBorder)
+                                    .font(AppTypography.bodyLarge)
+                                    .foregroundStyle(AppColors.ink)
+                                    .padding(.horizontal, AppSpacing.medium)
+                                    .frame(minHeight: 56)
+                                    .background {
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .fill(AppColors.porcelain)
+                                            .overlay {
+                                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                                    .stroke(AppColors.hairline, lineWidth: 1)
+                                            }
+                                    }
                                 HStack(spacing: AppSpacing.small) {
                                     ForEach([60, 90, 120, 150, 180], id: \.self) { preset in
                                         Button("\(preset)") {
                                             amountText = "\(preset)"
                                         }
-                                        .font(AppTypography.caption)
+                                        .font(AppTypography.readableBodyMedium)
                                         .foregroundStyle(amountText == "\(preset)" ? AppColors.milk : AppColors.blueInk)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 7)
+                                        .frame(maxWidth: .infinity, minHeight: 44)
+                                        .padding(.horizontal, 4)
                                         .background(
                                             amountText == "\(preset)" ? AppColors.blueInk : AppColors.cream,
                                             in: Capsule()
@@ -741,7 +746,7 @@ private struct FeedingEditorSheet: View {
                                 Text("更多详情（可不填）")
                                 Spacer(minLength: 0)
                                 Text(showsMoreDetails ? "收起" : "按需填写")
-                                    .font(AppTypography.caption)
+                                    .font(AppTypography.readableBody)
                                     .foregroundStyle(AppColors.inkSoft)
                             }
                             .font(AppTypography.body)
@@ -769,7 +774,7 @@ private struct FeedingEditorSheet: View {
 
                     if !canSave && (type == "奶粉" || type == "瓶喂") {
                         Text("奶量必须填写大于 0 的数字")
-                            .font(AppTypography.caption)
+                            .font(AppTypography.readableBody)
                             .foregroundStyle(AppColors.coral)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -813,7 +818,7 @@ private struct FeedingEditorSheet: View {
         WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
                 Text("哺乳侧")
-                    .font(AppTypography.caption)
+                    .font(AppTypography.readableBodyMedium)
                     .foregroundStyle(AppColors.inkSoft)
                 HStack(spacing: AppSpacing.small) {
                     ForEach(["左侧", "右侧", "不记录"], id: \.self) { option in
@@ -821,10 +826,10 @@ private struct FeedingEditorSheet: View {
                         Button(option) {
                             breastSide = option == "不记录" ? nil : option
                         }
-                        .font(AppTypography.caption)
+                        .font(AppTypography.readableBodyMedium)
                         .foregroundStyle(isSelected ? AppColors.milk : AppColors.blueInk)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .padding(.horizontal, 4)
                         .background(
                             isSelected ? AppColors.blueInk : AppColors.cream,
                             in: Capsule()
@@ -858,7 +863,7 @@ private struct FeedingEditorSheet: View {
                     .font(AppTypography.cardTitle)
                     .foregroundStyle(AppColors.inkGreen)
                 Text("默认会在结束时间后 \(feedingReminderIntervalText(intervalMinutes)) 安排下一次提醒。")
-                    .font(AppTypography.caption)
+                    .font(AppTypography.readableBody)
                     .foregroundStyle(AppColors.inkSoft)
                 Toggle("本次不提醒", isOn: $skipsAutomaticReminder)
                     .font(AppTypography.body)

@@ -3,10 +3,10 @@
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录
-- 阶段：中国大陆首发策略更新
+- 阶段：全球发布策略更新
 - 日期：2026-07-04
 - 公司主体：深圳市闪现生活科技有限公司
-- 当前结论：中国大陆 App Store 为第一批，香港 App Store 为第二批；完成当天生产 proof、备案、App Store 人工证据、微信/短信/OBS 和 iOS 26.5 真机/TestFlight 证据前不得提交
+- 当前结论：全球 App Store 同批发布；完成当天生产 proof、各地区适用合规、App Store 人工证据、微信/短信/OBS 和 iOS 26.5 真机/TestFlight 证据前不得提交
 
 ## 已确认事实
 
@@ -14,8 +14,8 @@
 2. 第一版免费验证。
 3. 第一版不做社区、AI、订阅、电商。
 4. 第一版需要账号、同步恢复和服务器存储照片原图。
-5. 当前提交目标调整为中国大陆 App Store。
-6. 香港进入第二批，美国暂不进入第一批。
+5. 本次提交目标调整为全球 App Store 同批发布。
+6. 中国大陆、香港和其他可售地区同批开放；App Store Connect 中以全球可售地区设置为准。
 7. 疫苗模板覆盖中国大陆 + 香港，崩溃上报进入第一版并使用 Apple 原生渠道。
 8. API 服务与对象存储区域需在发布前按合规策略确认。
 9. App 内语言跟随系统，简体中文用于中国大陆，已加入繁体中文香港 `zh-Hant-HK` 资源。
@@ -23,10 +23,10 @@
 
 ## 合理推断
 
-1. 中国大陆首发需要先完成公司主体、APP 备案、域名/接入服务、儿童个人信息和生产基础设施闭环。
-2. 后端、数据库和对象存储应优先部署在华为云中国大陆区域，并在隐私政策中清楚说明。
-3. 中国大陆上线需要儿童/未成年人、个人信息保护、APP 备案、ICP 判断和 SDK 清单。
-4. “国内用户安装后可用”可以由 App 功能保证；“中国大陆 Apple ID 直接下载”由 App Store Connect 上架地区决定，不能只靠代码保证。
+1. 全球发布需要先完成公司主体、APP 备案、域名/接入服务、儿童个人信息和生产基础设施闭环。
+2. 后端、数据库和对象存储的区域及跨境传输安排必须在隐私政策中清楚说明，并满足每个可售地区的适用要求。
+3. 中国大陆上线仍需儿童/未成年人、个人信息保护、APP 备案、ICP 判断和 SDK 清单。
+4. “全球用户可下载”由 App Store Connect 上架地区决定，不能只靠代码保证。
 
 ## 待我确认的问题
 
@@ -38,33 +38,32 @@
 
 ## 当前证据口径
 
-1. 中国大陆首发判断以 `Backend/proof/production-readiness.json` 和 `Backend/proof/launch-objective-audit.json` 为准；任一不是 ready 都不得提交。
+1. 全球提交判断以 `Backend/proof/production-readiness.json` 和 `Backend/proof/launch-objective-audit.json` 为准；任一不是 ready 都不得提交。
 2. 2026-07-04 当天生产 proof、外部平台证据和稳定 alias 同步按 `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 执行。
-3. 当前仍缺 APP 备案、App Store 人工证据、微信/短信/OBS 真实证据、签名归档 / TestFlight、iOS 26.5 真机/TestFlight 回归和 production readiness。
+3. 中国大陆 APP 备案已完成（用户于 2026-07-28 确认约已一个月）；当前仍缺 App Store 人工证据、微信/短信/OBS 真实证据、签名归档 / TestFlight、iOS 26.5 真机/TestFlight 回归和 production readiness。
 
 ## 不进入第一版的功能
 
-1. 美国 App Store 首发提交。
-2. 分地区复杂商业化。
-3. 地区差异化商业或服务功能包。
+1. 分地区复杂商业化。
+2. 地区差异化商业或服务功能包。
 
 ## 策略选择
 
 | 策略 | 当前结论 | 说明 |
 |---|---|---|
-| China Mainland First | 已确认 | 完成生产与合规门禁后第一批提交 |
-| Hong Kong Second | 已确认 | 第二批复用 `zh-Hant-HK` 资源 |
-| US/HK First | 已取消 | 不再作为当前首发策略 |
-| Global Except China | 已取消 | 与当前大陆优先决策冲突 |
+| Global First | 已确认 | App Store Connect 选择全球可售地区后同批提交 |
+| China Mainland First | 已取消 | 不再作为单独的首发策略 |
+| Hong Kong Second | 已取消 | 不再作为第二批策略 |
+| Global Except China | 已取消 | 与本次全球可售地区策略冲突 |
 | Split / Feature Flag | 暂不需要 | 第一版不做复杂地区功能差异 |
 
 ## 发布要求
 
-1. App Store Connect 第一批选择中国大陆，并补齐中国大陆适用的合规信息；香港在第二批开放。
+1. App Store Connect 选择全球可售地区，并补齐中国大陆及其他可售地区适用的合规信息。
 2. Review Notes 写清楚：免费、无医疗诊断、账号同步恢复、照片原图云同步、删除账号路径。
 3. 隐私政策必须覆盖跨境传输、账号、照片原图存储、删除机制。
 4. 按 `CHINA_MAINLAND_LAUNCH_GAP_ASSESSMENT.md` 和 `XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 完成 APP 备案、正式域名、当天生产 proof、微信/短信/OBS、App Store 人工证据和 iOS 26.5 真机/TestFlight 验证。
 5. 疫苗模板文案必须写成提醒工具，不写成医疗建议。
 6. 崩溃上报必须在隐私政策和 App Privacy Label 中按实际方案披露。
-7. 中国大陆使用简体中文主元数据；香港第二批使用繁中，截图不得使用真实宝宝照片。
+7. 中国大陆使用简体中文主元数据；香港及其他繁中用户使用繁中资源，截图不得使用真实宝宝照片。
 8. 疫苗提醒入口必须保留中国大陆 / 香港模板切换，不按用户所在地隐藏模板。

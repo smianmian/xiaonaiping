@@ -404,7 +404,7 @@ struct ProfileView: View {
             store.setFeedingLiveActivityEnabled(false)
             liveActivityMessage = "系统没有允许实时活动。请到 iPhone 设置里允许小奶瓶实时活动。"
         case .failed(let message):
-            liveActivityMessage = "灵动岛开关已打开。".localizedText + message.localizedText
+            liveActivityMessage = message.localizedText
         }
     }
 
@@ -590,7 +590,6 @@ private struct AvatarEditorSheet: View {
                 }
             }
         }
-        .preferredColorScheme(.light)
     }
 
     private var avatarPreview: some View {
@@ -1367,7 +1366,6 @@ private struct BabyProfileEditorSheet: View {
                 }
             }
         }
-        .preferredColorScheme(.light)
     }
 
     private func save() {

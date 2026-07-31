@@ -11,10 +11,10 @@ struct SegmentedPill: View {
                     selected = item
                 } label: {
                     Text(item.localizedText)
-                        .font(AppTypography.body)
+                        .font(AppTypography.readableBodyMedium)
                         .foregroundStyle(selected == item ? AppColors.coral : AppColors.inkGreen)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .frame(minHeight: 48)
                         .background {
                             if selected == item {
                                 Capsule()

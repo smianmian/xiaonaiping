@@ -5,7 +5,6 @@ struct XiaoNaiPingApp: App {
     var body: some Scene {
         WindowGroup {
             RootTabView()
-                .preferredColorScheme(.light)
                 .onOpenURL { url in
                     _ = WeChatLoginService.shared.handleOpenURL(url)
                 }

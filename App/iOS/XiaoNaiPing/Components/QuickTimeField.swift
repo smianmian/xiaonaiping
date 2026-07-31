@@ -10,6 +10,8 @@ struct QuickTimeField: View {
     @State private var isExpanded = false
     /// 只有用户主动点过 chip 才高亮；编辑旧记录时不能一进来就亮着“刚刚”。
     @State private var selectedOffset: Int?
+    @State private var manualTimeText = ""
+    @State private var manualTimeError: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {
@@ -26,7 +28,7 @@ struct QuickTimeField: View {
                         isExpanded.toggle()
                     }
                 }
-                .font(AppTypography.caption)
+                .font(AppTypography.readableBodyMedium)
                 .foregroundStyle(AppColors.blueInk)
             }
 
@@ -44,23 +46,72 @@ struct QuickTimeField: View {
             }
 
             if isExpanded {
-                DatePicker(
-                    "时间",
-                    selection: Binding(
-                        get: { date },
-                        set: { newValue in
-                            date = newValue
-                            selectedOffset = nil
+                VStack(alignment: .leading, spacing: AppSpacing.small) {
+                    Text("横向滑动选择，手输可精确到分钟")
+                        .font(AppTypography.readableBody)
+                        .foregroundStyle(AppColors.inkSoft)
+
+                    HStack(spacing: AppSpacing.small) {
+                        Text("24小时前")
+                            .font(AppTypography.stateLabel)
+                            .foregroundStyle(AppColors.inkSoft)
+                        Slider(
+                            value: Binding(
+                                get: { max(-1_440, min(0, date.timeIntervalSinceNow / 60)) },
+                                set: { minutesFromNow in
+                                    selectedOffset = nil
+                                    date = Date().addingTimeInterval(minutesFromNow * 60)
+                                    manualTimeText = manualTimeDisplayText
+                                    manualTimeError = nil
+                                }
+                            ),
+                            in: -1_440...0,
+                            step: 5
+                        )
+                        .tint(AppColors.blueInk)
+                        Text("刚刚")
+                            .font(AppTypography.stateLabel)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+
+                    HStack(spacing: AppSpacing.small) {
+                        TextField("11:20", text: $manualTimeText)
+                            .keyboardType(.numbersAndPunctuation)
+                            .font(AppTypography.readableBodyMedium)
+                            .foregroundStyle(AppColors.ink)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, AppSpacing.medium)
+                            .frame(height: 44)
+                            .background(AppColors.porcelain, in: Capsule())
+                            .overlay {
+                                Capsule()
+                                    .stroke(AppColors.hairline, lineWidth: 1)
+                            }
+
+                        Button("确定") {
+                            applyManualTime()
                         }
-                    ),
-                    in: ...Date(),
-                    displayedComponents: [.date, .hourAndMinute]
-                )
-                .datePickerStyle(.wheel)
-                .labelsHidden()
-                .frame(maxHeight: 170)
-                .frame(maxWidth: .infinity)
+                        .font(AppTypography.readableBodyMedium)
+                        .foregroundStyle(AppColors.milk)
+                        .frame(width: 64, height: 44)
+                        .background(AppColors.blueInk, in: Capsule())
+                        .buttonStyle(.plain)
+                    }
+
+                    Text("输入 11:20；补记可输入 07-31 11:20")
+                        .font(AppTypography.stateLabel)
+                        .foregroundStyle(AppColors.inkSoft)
+
+                    if let manualTimeError {
+                        Text(manualTimeError)
+                            .font(AppTypography.stateLabel)
+                            .foregroundStyle(AppColors.coral)
+                    }
+                }
             }
+        }
+        .onAppear {
+            manualTimeText = manualTimeDisplayText
         }
     }
 
@@ -81,12 +132,64 @@ struct QuickTimeField: View {
 
     private func chip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(title, action: action)
-            .font(AppTypography.caption)
+            .font(AppTypography.readableBodyMedium)
             .foregroundStyle(isSelected ? AppColors.milk : AppColors.blueInk)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .padding(.horizontal, 4)
             .background(isSelected ? AppColors.blueInk : AppColors.cream, in: Capsule())
             .buttonStyle(.plain)
+    }
+
+    private var manualTimeDisplayText: String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return BabyRecordStore.timeString(from: date)
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "MM-dd HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func applyManualTime() {
+        let values = manualTimeText.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+        let calendar = Calendar.current
+        let now = Date()
+        var components = calendar.dateComponents([.year, .month, .day], from: now)
+        let hour: Int
+        let minute: Int
+
+        switch values.count {
+        case 2:
+            hour = values[0]
+            minute = values[1]
+        case 4:
+            components.month = values[0]
+            components.day = values[1]
+            hour = values[2]
+            minute = values[3]
+        default:
+            manualTimeError = "请输入 11:20 或 07-31 11:20"
+            return
+        }
+
+        guard (0...23).contains(hour), (0...59).contains(minute) else {
+            manualTimeError = "时间请按 24 小时制输入"
+            return
+        }
+
+        components.hour = hour
+        components.minute = minute
+        components.second = 0
+        guard let selectedDate = calendar.date(from: components), selectedDate <= now else {
+            manualTimeError = "不能填写未来时间"
+            return
+        }
+
+        selectedOffset = nil
+        date = selectedDate
+        manualTimeText = manualTimeDisplayText
+        manualTimeError = nil
     }
 }
 

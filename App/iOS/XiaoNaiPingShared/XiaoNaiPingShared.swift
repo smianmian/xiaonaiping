@@ -41,7 +41,6 @@ struct FeedingReminderActivityAttributes: ActivityAttributes {
         var babyName: String
         var nextReminderAt: Date
         var repeatIntervalMinutes: Int?
-        var babyAvatarData: Data?
     }
 
     var reminderID: String
@@ -74,9 +73,37 @@ enum XiaoNaiPingSharedStore {
         try data.write(to: url, options: [.atomic])
     }
 
+    static func writeLiveActivityAvatar(_ data: Data?) {
+        let url = liveActivityAvatarURL()
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+
+        guard let data else {
+            try? FileManager.default.removeItem(at: url)
+            return
+        }
+        try? data.write(to: url, options: [.atomic])
+    }
+
+    static func readLiveActivityAvatarData() -> Data? {
+        try? Data(contentsOf: liveActivityAvatarURL())
+    }
+
+    static func clearLiveActivityAvatar() {
+        try? FileManager.default.removeItem(at: liveActivityAvatarURL())
+    }
+
     private static func snapshotURL() -> URL {
         let baseURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
             ?? FileManager.default.temporaryDirectory
         return baseURL.appendingPathComponent("xiaonaiping-today-snapshot.json")
+    }
+
+    private static func liveActivityAvatarURL() -> URL {
+        let baseURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
+            ?? FileManager.default.temporaryDirectory
+        return baseURL.appendingPathComponent("xiaonaiping-live-activity-avatar.jpg")
     }
 }

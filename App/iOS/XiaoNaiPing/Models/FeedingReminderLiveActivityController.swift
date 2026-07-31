@@ -34,11 +34,14 @@ enum FeedingReminderLiveActivityController {
                 return
             }
 
+            XiaoNaiPingSharedStore.writeLiveActivityAvatar(
+                liveActivityAvatarData(from: babyAvatarData)
+            )
+
             let state = FeedingReminderActivityAttributes.ContentState(
                 babyName: babyName,
                 nextReminderAt: reminder.remindAt,
-                repeatIntervalMinutes: repeatIntervalMinutes,
-                babyAvatarData: liveActivityAvatarData(from: babyAvatarData)
+                repeatIntervalMinutes: repeatIntervalMinutes
             )
             let content = ActivityContent(
                 state: state,
@@ -52,12 +55,12 @@ enum FeedingReminderLiveActivityController {
                 await activity.update(content)
                 complete(.startedOrUpdated, completion: completion)
             } else {
-                await endAllActivities()
+                await endAllActivities(clearAvatar: false)
                 let attributes = FeedingReminderActivityAttributes(reminderID: reminder.id.uuidString)
-                if await requestActivity(attributes: attributes, content: content) {
-                    complete(.startedOrUpdated, completion: completion)
+                if let failureMessage = await requestActivity(attributes: attributes, content: content) {
+                    complete(.failed(message: failureMessage), completion: completion)
                 } else {
-                    complete(.failed(message: "系统刚刚还在处理上一条灵动岛提醒，请稍等几秒再试。"), completion: completion)
+                    complete(.startedOrUpdated, completion: completion)
                 }
             }
         }
@@ -70,32 +73,50 @@ enum FeedingReminderLiveActivityController {
         }
     }
 
-    private static func endAllActivities() async {
+    private static func endAllActivities(clearAvatar: Bool = true) async {
         for activity in Activity<FeedingReminderActivityAttributes>.activities {
             await activity.end(nil, dismissalPolicy: .immediate)
+        }
+        if clearAvatar {
+            XiaoNaiPingSharedStore.clearLiveActivityAvatar()
         }
     }
 
     private static func requestActivity(
         attributes: FeedingReminderActivityAttributes,
         content: ActivityContent<FeedingReminderActivityAttributes.ContentState>
-    ) async -> Bool {
+    ) async -> String? {
         do {
             _ = try Activity.request(attributes: attributes, content: content, pushType: nil)
-            return true
+            return nil
         } catch {
-            try? await Task.sleep(nanoseconds: 700_000_000)
-            if let activity = Activity<FeedingReminderActivityAttributes>.activities.first {
-                await activity.update(content)
-                return true
-            }
+            print("Live Activity request failed: \(error)")
+            return activityRequestFailureMessage(for: error)
+        }
+    }
 
-            do {
-                _ = try Activity.request(attributes: attributes, content: content, pushType: nil)
-                return true
-            } catch {
-                return false
-            }
+    private static func activityRequestFailureMessage(for error: Error) -> String {
+        guard let authorizationError = error as? ActivityAuthorizationError else {
+            return "系统未能启动实时活动，请检查 iPhone 的实时活动设置后再试。"
+        }
+
+        switch authorizationError {
+        case .attributesTooLarge:
+            return "灵动岛内容超过系统限制，请重新打开后再试。"
+        case .globalMaximumExceeded, .targetMaximumExceeded:
+            return "系统当前的实时活动数量已达上限，请先结束其他实时活动。"
+        case .denied:
+            return "系统没有允许小奶瓶显示实时活动。"
+        case .unsupported, .unsupportedTarget:
+            return "当前设备暂不支持小奶瓶的实时活动。"
+        case .unentitled:
+            return "当前安装包缺少实时活动授权。"
+        case .visibility:
+            return "系统当前不允许显示实时活动。"
+        case .persistenceFailure, .missingProcessIdentifier, .malformedActivityIdentifier, .reconnectNotPermitted:
+            return "系统未能启动实时活动，请关闭后重新打开再试。"
+        @unknown default:
+            return "系统未能启动实时活动，请检查 iPhone 的实时活动设置后再试。"
         }
     }
 
