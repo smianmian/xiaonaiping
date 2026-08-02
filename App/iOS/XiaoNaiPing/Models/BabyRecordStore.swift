@@ -554,6 +554,7 @@ final class BabyRecordStore: ObservableObject {
             diaperCount: monthlyDiapers.count,
             photoCount: monthlyPhotos.count,
             latestWeight: latest?.weight == 0 ? nil : latest?.weight,
+            latestWeightUnit: latest?.weightUnit ?? .kilograms,
             latestHeight: latest?.height == 0 ? nil : latest?.height,
             weightDelta: Self.delta(latest?.weight == 0 ? nil : latest?.weight, previous?.weight == 0 ? nil : previous?.weight),
             heightDelta: Self.delta(latest?.height == 0 ? nil : latest?.height, previous?.height == 0 ? nil : previous?.height),
@@ -2339,6 +2340,7 @@ struct MonthlyReportSnapshot: Equatable {
     var diaperCount: Int
     var photoCount: Int
     var latestWeight: Double?
+    var latestWeightUnit: GrowthWeightUnit = .kilograms
     var latestHeight: Double?
     var weightDelta: Double?
     var heightDelta: Double?

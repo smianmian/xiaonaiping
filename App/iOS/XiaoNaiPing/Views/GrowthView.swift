@@ -108,7 +108,7 @@ struct GrowthView: View {
                     }
                     .frame(maxWidth: .infinity)
                 } else {
-                    SegmentedPill(items: ["体重", "身高", "头围"], selected: $selectedMetric)
+                    SegmentedPill(items: ["体重", "身高"], selected: $selectedMetric)
                         .padding(.horizontal, AppSpacing.small)
 
                     GrowthChartView(
@@ -125,9 +125,15 @@ struct GrowthView: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     HStack(spacing: AppSpacing.regular) {
-                        metricCard(title: "体重", value: formatted(store.latestGrowthRecord?.weight), unit: "kg", icon: "heart.fill", tint: AppColors.blush, color: AppColors.coral)
+                        metricCard(
+                            title: "体重",
+                            value: formattedWeight(store.latestGrowthRecord),
+                            unit: store.latestGrowthRecord?.weightUnit.label ?? "kg",
+                            icon: "heart.fill",
+                            tint: AppColors.blush,
+                            color: AppColors.coral
+                        )
                         metricCard(title: "身高", value: formatted(store.latestGrowthRecord?.height), unit: "cm", icon: "shield.fill", tint: AppColors.mistBlue, color: AppColors.blueInk)
-                        metricCard(title: "头围", value: formatted(store.latestGrowthRecord?.head), unit: "cm", icon: "leaf.fill", tint: AppColors.grass, color: AppColors.inkGreen)
                     }
 
                     HStack {
@@ -367,6 +373,11 @@ struct GrowthView: View {
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(value)) : String(format: "%.1f", value)
     }
 
+    private func formattedWeight(_ record: GrowthRecord?) -> String {
+        guard let record else { return "--" }
+        return formatted(record.weightUnit.value(fromKilograms: record.weight))
+    }
+
     private func metricCard(title: String, value: String, unit: String, icon: String, tint: Color, color: Color) -> some View {
         WatercolorCard(tint: tint, cornerRadius: AppShapes.largeCardRadius, padding: AppSpacing.medium) {
             VStack(spacing: AppSpacing.small) {
@@ -604,7 +615,6 @@ private struct GrowthChartView: View {
     private var whoMetric: WHOGrowthReference.Metric {
         switch metric {
         case "身高": .height
-        case "头围": .head
         default: .weight
         }
     }
@@ -653,8 +663,6 @@ private struct GrowthChartView: View {
         switch metric {
         case "身高":
             record.height
-        case "头围":
-            record.head
         default:
             record.weight
         }
@@ -664,8 +672,6 @@ private struct GrowthChartView: View {
         switch metric {
         case "身高":
             AppColors.blueInk
-        case "头围":
-            AppColors.sage
         default:
             AppColors.coral
         }
@@ -725,9 +731,13 @@ private struct MonthlyReportCard: View {
             return "添加身高或体重后，这里会自动生成成长变化摘要。"
         }
 
-        let weightDelta = report.weightDelta.map { "，较上次\(deltaText($0, unit: "kg"))" } ?? ""
+        let displayWeight = report.latestWeightUnit.value(fromKilograms: weight)
+        let weightUnit = report.latestWeightUnit.label
+        let weightDelta = report.weightDelta.map {
+            "，较上次\(deltaText(report.latestWeightUnit.value(fromKilograms: $0), unit: weightUnit))"
+        } ?? ""
         let heightDelta = report.heightDelta.map { "，较上次\(deltaText($0, unit: "cm"))" } ?? ""
-        return "最近记录：体重 \(display(weight))kg\(weightDelta)，身高 \(display(height))cm\(heightDelta)。"
+        return "最近记录：体重 \(display(displayWeight))\(weightUnit)\(weightDelta)，身高 \(display(height))cm\(heightDelta)。"
     }
 
     /// 指标小瓦片：与 growthCard 的 metricCard / vaccineBookStat 同一族（低饱和 tint 底 + 主题色数值）。
@@ -781,11 +791,6 @@ private struct GrowthHistoryRow: View {
                     .foregroundStyle(AppColors.ink)
             }
             Spacer()
-            if let headSummary {
-                Text(headSummary)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.ink)
-            }
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.vertical, 11)
@@ -796,15 +801,11 @@ private struct GrowthHistoryRow: View {
 
     private var measurementSummary: String {
         let parts = [
-            record.weight > 0 ? "体重 \(display(record.weight))kg" : nil,
+            record.weight > 0 ? "体重 \(display(record.weightUnit.value(fromKilograms: record.weight)))\(record.weightUnit.label)" : nil,
             record.height > 0 ? "身高 \(display(record.height))cm" : nil
         ].compactMap { $0 }
 
         return parts.isEmpty ? "这次只记录了日期" : parts.joined(separator: "  ")
-    }
-
-    private var headSummary: String? {
-        record.head > 0 ? "头围 \(display(record.head))cm" : nil
     }
 
     private func display(_ value: Double) -> String {
@@ -813,8 +814,8 @@ private struct GrowthHistoryRow: View {
 }
 
 /// 「记录身高体重」编辑表单：分行卡片式布局。
-/// 时间行（内联日期选择）＋ 体重/身高/头围三个 stepper 行 ＋ 备注卡 ＋ 底部珊瑚色保存胶囊。
-/// 三项数值都随 stepper 保存（有默认值即有效值），不再有“至少填一项”的报错分支。
+/// 时间行（内联日期选择）＋ 体重/身高两个 stepper 行 ＋ 备注卡 ＋ 底部珊瑚色保存胶囊。
+/// 体重以 kg 保存，录入时可切换 kg / 斤；两项数值都随 stepper 保存。
 private struct GrowthEditorSheet: View {
     let record: GrowthRecord?
     let onSave: (GrowthRecord) -> Bool
@@ -822,15 +823,15 @@ private struct GrowthEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var measuredAt: Date
     @State private var weight: Double
+    @State private var weightUnit: GrowthWeightUnit
     @State private var height: Double
-    @State private var head: Double
     @State private var note: String
     @State private var errorMessage: String?
     @State private var showsDatePicker = false
 
     private static let weightRange: ClosedRange<Double> = 1.0...30.0
+    private static let jinWeightRange: ClosedRange<Double> = 2.0...60.0
     private static let heightRange: ClosedRange<Double> = 30.0...130.0
-    private static let headRange: ClosedRange<Double> = 25.0...60.0
     private static let noteLimit = 100
 
     private static let displayDateFormatter: DateFormatter = {
@@ -846,8 +847,8 @@ private struct GrowthEditorSheet: View {
         self.onSave = onSave
         _measuredAt = State(initialValue: record.flatMap { BabyRecordStore.date(fromDateString: $0.measuredAt) } ?? Date())
         _weight = State(initialValue: Self.initialValue(record?.weight, latest: latest?.weight, fallback: 4.0, in: Self.weightRange))
+        _weightUnit = State(initialValue: record?.weightUnit ?? .kilograms)
         _height = State(initialValue: Self.initialValue(record?.height, latest: latest?.height, fallback: 55.0, in: Self.heightRange))
-        _head = State(initialValue: Self.initialValue(record?.head, latest: latest?.head, fallback: 37.0, in: Self.headRange))
         _note = State(initialValue: record?.note ?? "")
     }
 
@@ -856,9 +857,8 @@ private struct GrowthEditorSheet: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpacing.medium) {
                     dateCard
-                    stepperRow(icon: "scalemass", iconColor: AppColors.inkGreen, title: "体重", value: $weight, step: 0.1, range: Self.weightRange, unit: "kg")
+                    weightRow
                     stepperRow(icon: "ruler", iconColor: AppColors.inkGreen, title: "身高", value: $height, step: 0.5, range: Self.heightRange, unit: "cm")
-                    stepperRow(icon: "face.smiling", iconColor: AppColors.peach, title: "头围", value: $head, step: 0.5, range: Self.headRange, unit: "cm")
                     noteCard
 
                     if let errorMessage {
@@ -903,6 +903,75 @@ private struct GrowthEditorSheet: View {
                 }
             }
         }
+    }
+
+    private var weightRow: some View {
+        WatercolorCard(tint: AppColors.milk, cornerRadius: AppShapes.cardRadius, padding: AppSpacing.medium) {
+            VStack(spacing: AppSpacing.medium) {
+                HStack(spacing: AppSpacing.small) {
+                    Image(systemName: "scalemass")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(AppColors.inkGreen)
+                        .frame(width: 26)
+                    Text("体重")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.inkGreen)
+                    Spacer(minLength: AppSpacing.small)
+                    SegmentedPill(items: GrowthWeightUnit.allCases.map(\.label), selected: weightUnitLabel)
+                        .frame(width: 128)
+                }
+
+                HStack(spacing: AppSpacing.small) {
+                    Spacer()
+                    stepButton(symbol: "minus", enabled: displayedWeight > weightRange.lowerBound + 0.001) {
+                        adjust(displayedWeightBinding, by: 0.1, in: weightRange)
+                    }
+                    .accessibilityLabel("减少体重")
+
+                    HStack(alignment: .firstTextBaseline, spacing: 3) {
+                        Text(String(format: "%.1f", displayedWeight))
+                            .font(AppTypography.largeNumber)
+                            .foregroundStyle(AppColors.ink)
+                        Text(weightUnit.label)
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.inkSoft)
+                    }
+                    .frame(minWidth: 88)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("体重")
+                    .accessibilityValue("\(String(format: "%.1f", displayedWeight)) \(weightUnit.label)")
+
+                    stepButton(symbol: "plus", enabled: displayedWeight < weightRange.upperBound - 0.001) {
+                        adjust(displayedWeightBinding, by: 0.1, in: weightRange)
+                    }
+                    .accessibilityLabel("增加体重")
+                }
+            }
+        }
+    }
+
+    private var weightUnitLabel: Binding<String> {
+        Binding(
+            get: { weightUnit.label },
+            set: { label in
+                weightUnit = GrowthWeightUnit.allCases.first(where: { $0.label == label }) ?? .kilograms
+            }
+        )
+    }
+
+    private var displayedWeight: Double {
+        weightUnit.value(fromKilograms: weight)
+    }
+
+    private var displayedWeightBinding: Binding<Double> {
+        Binding(
+            get: { displayedWeight },
+            set: { weight = weightUnit.kilograms(from: $0) }
+        )
+    }
+
+    private var weightRange: ClosedRange<Double> {
+        weightUnit == .kilograms ? Self.weightRange : Self.jinWeightRange
     }
 
     // MARK: - 行卡
@@ -1063,13 +1132,13 @@ private struct GrowthEditorSheet: View {
             month: BabyRecordStore.monthString(from: measuredAt),
             weight: weight,
             height: height,
-            head: head,
+            head: 0,
             measuredAt: BabyRecordStore.dateString(from: measuredAt)
         )
         saved.month = BabyRecordStore.monthString(from: measuredAt)
         saved.weight = weight
+        saved.weightUnit = weightUnit
         saved.height = height
-        saved.head = head
         saved.measuredAt = BabyRecordStore.dateString(from: measuredAt)
         let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
         saved.note = trimmedNote.isEmpty ? nil : trimmedNote

@@ -174,7 +174,8 @@
 | id | UUID/String | 是 | 记录 ID |
 | babyId | UUID/String | 是 | 所属宝宝 |
 | measuredAt | Date | 是 | 测量日期 |
-| weightKg | Decimal? | 否 | 体重 |
+| weightKg | Decimal? | 否 | 体重，统一以 kg 保存 |
+| weightUnit | Enum | 是 | 用户录入与回看的单位：kg / 斤；旧记录缺省为 kg |
 | heightCm | Decimal? | 否 | 身高 |
 | note | String? | 否 | 备注 |
 

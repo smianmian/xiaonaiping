@@ -95,15 +95,15 @@ enum RecordExportService {
 
         sections.append(csvSection(
             title: "成长记录",
-            header: ["测量日期", "体重kg", "身高cm", "头围cm", "备注"],
+            header: ["测量日期", "体重", "体重单位", "身高cm", "备注"],
             rows: store.growthRecords
                 .sorted { $0.measuredAt < $1.measuredAt }
                 .map { record in
                     [
                         record.measuredAt,
-                        record.weight > 0 ? String(format: "%.1f", record.weight) : "",
+                        record.weight > 0 ? String(format: "%.1f", record.weightUnit.value(fromKilograms: record.weight)) : "",
+                        record.weight > 0 ? record.weightUnit.label : "",
                         record.height > 0 ? String(format: "%.1f", record.height) : "",
-                        record.head > 0 ? String(format: "%.1f", record.head) : "",
                         record.note ?? ""
                     ]
                 }

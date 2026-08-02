@@ -137,6 +137,18 @@ final class BabyRecordStorePersistenceTests: XCTestCase {
         XCTAssertEqual(store.feedingRecords.count, 1)
     }
 
+    func testLegacyGrowthRecordDefaultsToKilograms() throws {
+        let data = Data("""
+        {"month":"满月","weight":4.2,"height":54,"head":37,"measuredAt":"2026.07.01"}
+        """.utf8)
+
+        let record = try JSONDecoder().decode(GrowthRecord.self, from: data)
+
+        XCTAssertEqual(record.weightUnit, .kilograms)
+        XCTAssertEqual(record.weightUnit.value(fromKilograms: record.weight), 4.2)
+        XCTAssertEqual(GrowthWeightUnit.jin.value(fromKilograms: record.weight), 8.4)
+    }
+
     // MARK: - legacyMockBabyID 不再是删库开关
 
     func testLegacyMockBabyIdDoesNotWipeWithoutDebugMarker() throws {
