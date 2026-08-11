@@ -1,24 +1,26 @@
 {
-  "capturedAt": "2026-06-28T10:47:00+08:00",
+  "capturedAt": "2026-08-11T23:33:00+08:00",
   "status": "iOS 26.5 Debug simulator 6.9-inch App Store screenshot candidates with screenshot seed data; not a TestFlight, signed-device, or Release build final evidence substitute",
   "device": {
     "name": "iPhone 17 Pro Max",
-    "udid": "0E6B0651-5F8A-4D5F-BBF6-CEB1001BF3B8",
+    "udid": "1D2C7ABF-5397-463D-BD15-01A4B80A4976",
     "runtime": "iOS 26.5"
   },
   "app": {
-    "path": "/tmp/XiaoNaiPing-DebugScreenshots-26_5/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app",
+    "path": "/tmp/XiaoNaiPing-DebugScreenshots-1.3.4-15/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app",
     "bundleId": "com.mewpow.xiaonaiping",
-    "sdkName": "iphonesimulator26.5"
+    "sdkName": "iphonesimulator26.5",
+    "marketingVersion": "1.3.4",
+    "buildNumber": "15"
   },
-  "buildLog": "Backend/proof/xcodebuild-debug-screenshots-ios265-20260627.log",
-  "command": "SIMCTL_CHILD_XNP_API_BASE_URL=https://api.mewpow.com/xiaonaiping python3 Backend/scripts/capture_ios_screenshots.py --device 0E6B0651-5F8A-4D5F-BBF6-CEB1001BF3B8 --app /tmp/XiaoNaiPing-DebugScreenshots-26_5/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app --output-dir Docs/08_Release/Screenshots-69 --tabs home record growth profile profile-sync --settle-seconds 2.5 --shutdown",
+  "buildLog": null,
+  "command": "SIMCTL_CHILD_XNP_API_BASE_URL=https://api.mewpow.com/xiaonaiping python3 Backend/scripts/capture_ios_screenshots.py --device 1D2C7ABF-5397-463D-BD15-01A4B80A4976 --app /tmp/XiaoNaiPing-DebugScreenshots-1.3.4-15/Build/Products/Debug-iphonesimulator/XiaoNaiPing.app --output-dir /tmp/xnp-app-store-screenshots-current --tabs home record growth profile profile-sync --settle-seconds 2.5 --shutdown",
   "stagingFiles": [
-    "Docs/08_Release/Screenshots-69/home-iphone16pro.png",
-    "Docs/08_Release/Screenshots-69/record-iphone16pro.png",
-    "Docs/08_Release/Screenshots-69/growth-iphone16pro.png",
-    "Docs/08_Release/Screenshots-69/profile-iphone16pro.png",
-    "Docs/08_Release/Screenshots-69/profile-sync-iphone16pro.png"
+    "/tmp/xnp-app-store-screenshots-current/home-iphone16pro.png",
+    "/tmp/xnp-app-store-screenshots-current/record-iphone16pro.png",
+    "/tmp/xnp-app-store-screenshots-current/growth-iphone16pro.png",
+    "/tmp/xnp-app-store-screenshots-current/profile-iphone16pro.png",
+    "/tmp/xnp-app-store-screenshots-current/profile-sync-iphone16pro.png"
   ],
   "finalFiles": [
     "01-home-iphone16pro.png",
