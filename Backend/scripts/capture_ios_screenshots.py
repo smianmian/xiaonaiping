@@ -39,7 +39,7 @@ def capture_tab(device: str, bundle_id: str, tab: str, output_path: Path, settle
         selected_tab,
     ]
     if tab == "profile-sync":
-        launch_args.append("-XNPScreenshotSyncSheet")
+        launch_args.append("-XNPScreenshotAccountSheet")
     run(["xcrun", "simctl", "terminate", device, bundle_id], check=False)
     run(launch_args)
     time.sleep(settle_seconds)
