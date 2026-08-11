@@ -51,6 +51,15 @@ struct FamilyPullResponse: Codable {
     var hasMore: Bool
 }
 
+/// 家庭共享只同步宝宝档案字段，不把账号私有头像塞进逐条记录通道。
+struct FamilyBabyProfile: Codable {
+    var id: UUID
+    var name: String
+    var birthDate: Date
+    var sex: String
+    var updatedAt: Date
+}
+
 /// 本地删除的墓碑：随状态一起持久化，推送给家庭成员后仍保留一段时间，
 /// 保证晚上线的设备也能收到删除。
 struct FamilyTombstone: Codable, Equatable, Identifiable {
@@ -62,6 +71,7 @@ struct FamilyTombstone: Codable, Equatable, Identifiable {
 }
 
 enum FamilyRecordType: String, CaseIterable {
+    case baby
     case feeding
     case water
     case sleep

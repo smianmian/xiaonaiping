@@ -8,6 +8,7 @@ struct Baby: Identifiable, Equatable, Codable {
     var birthDate: Date = Date()
     var sex: String = "未设置"
     var avatarImageData: Data? = nil
+    var updatedAt: Date = Date()
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -17,6 +18,7 @@ struct Baby: Identifiable, Equatable, Codable {
         case birthDate
         case sex
         case avatarImageData
+        case updatedAt
     }
 }
 
@@ -32,5 +34,6 @@ extension Baby {
         birthDate = try container.decodeIfPresent(Date.self, forKey: .birthDate) ?? Date()
         sex = try container.decodeIfPresent(String.self, forKey: .sex) ?? "未设置"
         avatarImageData = try container.decodeIfPresent(Data.self, forKey: .avatarImageData)
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
     }
 }

@@ -25,14 +25,14 @@
 | 3 | 照片时间线 | 私密照片整理，不用真实宝宝照片 | 把珍贵瞬间放进私密时间线 |
 | 4 | 成长/月报 | 月度回看、成长趋势 | 一个月的成长，轻轻回看 |
 | 5 | 疫苗提醒 | 中国大陆 + 香港模板，非医疗建议 | 提醒和记录，不替代医生建议 |
-| 6 | 账号与同步 | 恢复密钥账号、同步、删除云端数据 | 主动同步，也能主动删除 |
+| 6 | 账号与同步 | 手机号/微信账号、自动同步、删除云端数据 | 自动同步，也能主动删除 |
 
 ## 截图前检查
 
 1. 使用最终 App 名称和图标。
 2. 使用非真实宝宝照片或授权素材。
-3. 不出现真实 token、恢复密钥、服务器域名或账号 ID。
-4. 账号与同步截图必须使用测试账号，并在截图后删除云端账号。
+3. 不出现真实 token、完整手机号、验证码、微信凭证、服务器域名或账号 ID。
+4. 账号与同步截图必须使用无真实宝宝数据的生产认证测试会话，并在截图后删除云端账号；仓库不保存手机号、验证码、微信凭据或 token。
 5. 所有截图文字与 App Store 隐私标签、Review Notes 一致。
 6. 设备或 App 语言设置为繁体中文香港，确认截图里不混入未预期简体文案。
 7. 不出现 debug 文案、本地地址、internal 路径、工程说明或不可审核复现的功能状态。
@@ -54,7 +54,7 @@
 
 这些文件是当前 App Store 截图候选；不是 TestFlight、签名真机或 Release build 最终证据。正式提交前仍需用 iOS 26.5 TestFlight 或签名真机包归档最终截图，并在 `10-final-screenshots/UPLOAD_PROVENANCE.json` 记录 `final-app-store-upload`、`iPhone 6.9" display`、安装来源和五张 finalFiles。
 
-最终截图上传执行包：`Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260629.json`。该包状态为 `upload-plan-not-evidence`，只锁定当前 6.9 英寸候选图、最终 `UPLOAD_PROVENANCE.json` 的填写要求、同一 TestFlight / 签名真机 build 证据、停止条件、脱敏清单和复跑 gate；它不是最终上传证据，不能替代 iOS 26.5 TestFlight / 签名真机截图，也不能作为提交许可。
+旧日期截图上传执行包已移除。最终 `UPLOAD_PROVENANCE.json`、五张上传图和同一 TestFlight / 签名真机 build 证据必须重新采集；候选图、模板或口头结论不能作为提交许可。
 
 ## App Store Connect 截图上传矩阵
 

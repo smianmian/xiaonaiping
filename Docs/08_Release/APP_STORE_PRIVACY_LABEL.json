@@ -88,13 +88,13 @@
   ],
   "blockingEvidenceBeforeSubmit": [
     "Current public URLs use the /xiaonaiping path on api.mewpow.com until a dedicated XiaoNaiPing API subdomain is configured.",
-    "Set App Store Connect availability to China mainland only for the first batch after filing and compliance evidence are complete.",
-    "Keep Hong Kong as the second launch batch with zh-Hant-HK resources.",
+    "Set App Store Connect availability for the same global launch round only after every target region's mandatory compliance evidence is complete.",
+    "Keep zh-Hant-HK and other required localizations in the same global launch build.",
     "Run Backend/scripts/verify_auth_providers.py and keep Backend/proof/auth-providers.json passed before submission.",
     "Run Backend/scripts/check_diagnostics_redaction.py and keep Backend/proof/diagnostics-redaction.json passed before submission.",
-    "Run Backend/scripts/check_public_pages.py and keep Backend/proof/public-pages.json passed before submission.",
-    "Run Backend/scripts/check_review_notes.py and keep Backend/proof/review-notes.json passed before submission.",
-    "Run Backend/scripts/check_legal_drafts.py and keep Backend/proof/legal-drafts.json passed before submission.",
+    "Run Backend/scripts/check_public_pages.py after the current SMS/WeChat authentication cleanup and archive newly generated evidence before submission.",
+    "Run Backend/scripts/check_review_notes.py after the current SMS/WeChat authentication cleanup and archive newly generated evidence before submission.",
+    "Run Backend/scripts/check_app_store_assets.py and archive the current privacy-label screenshot before submission.",
     "Run Backend/scripts/check_universal_links.py and keep Backend/proof/universal-links.json passed before submission.",
     "Run Backend/scripts/check_production_readiness.py without --allow-incomplete.",
     "Attach App Store Connect privacy label screenshot or export to the release proof pack."

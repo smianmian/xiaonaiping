@@ -629,6 +629,7 @@ final class BabyRecordStore: ObservableObject {
         let previousHealth = healthObservations
 
         AppNotificationScheduler.removeVaccineReminders(vaccineRecords.filter { $0.babyId == id })
+        recordFamilyTombstone(type: FamilyRecordType.baby.rawValue, id: id)
         babies.remove(at: index)
         feedingRecords.removeAll { $0.babyId == id }
         waterRecords.removeAll { $0.babyId == id }
@@ -1101,6 +1102,7 @@ final class BabyRecordStore: ObservableObject {
         baby.sex = sex
         baby.daysSinceBirth = Self.daysSinceBirth(from: birthDate)
         baby.ageText = Self.ageText(from: birthDate)
+        baby.updatedAt = Date()
         saveState()
     }
 
@@ -1283,6 +1285,7 @@ final class BabyRecordStore: ObservableObject {
             growthRecords: growthRecords,
             vaccineRecords: vaccineRecords,
             milestones: milestones,
+            healthObservations: healthObservations,
             babyPhotos: babyPhotos
         )
         let encoder = JSONEncoder()
@@ -1313,6 +1316,7 @@ final class BabyRecordStore: ObservableObject {
         growthRecords = payload.growthRecords
         vaccineRecords = payload.vaccineRecords
         milestones = payload.milestones
+        healthObservations = payload.healthObservations
         babyPhotos = payload.babyPhotos
         photoCount = babyPhotos.count
         AppNotificationScheduler.removeFeedingReminder()
@@ -1350,6 +1354,7 @@ final class BabyRecordStore: ObservableObject {
             + growthRecords.count
             + vaccineRecords.count
             + milestones.count
+            + healthObservations.count
             + babyPhotos.count
     }
 
@@ -1391,11 +1396,6 @@ final class BabyRecordStore: ObservableObject {
             updated.syncStatus = .synced
             return updated
         }
-        let updatedWater = waterRecords.map { record in
-            var normalized = record
-            normalized.babyId = baby.id
-            return normalized
-        }
         let updatedSleep = sleepRecords.map { record in
             var updated = record
             updated.syncStatus = .synced
@@ -1413,14 +1413,12 @@ final class BabyRecordStore: ObservableObject {
         }
 
         let changed = updatedFeeding != feedingRecords
-            || updatedWater != waterRecords
             || updatedSleep != sleepRecords
             || updatedDiaper != diaperRecords
             || updatedPhotos != babyPhotos
         guard changed else { return false }
 
         feedingRecords = updatedFeeding
-        waterRecords = updatedWater
         sleepRecords = updatedSleep
         diaperRecords = updatedDiaper
         babyPhotos = updatedPhotos
@@ -2436,6 +2434,28 @@ extension BabyRecordStore {
     func familyDirtyEnvelopes(since watermark: Date) -> [FamilyRecordEnvelope] {
         var envelopes: [FamilyRecordEnvelope] = []
 
+        for baby in babies where baby.updatedAt > watermark {
+            let profile = FamilyBabyProfile(
+                id: baby.id,
+                name: baby.name,
+                birthDate: baby.birthDate,
+                sex: baby.sex,
+                updatedAt: baby.updatedAt
+            )
+            guard let data = try? Self.familyPayloadEncoder.encode(profile),
+                  let payload = String(data: data, encoding: .utf8) else { continue }
+            envelopes.append(
+                FamilyRecordEnvelope(
+                    recordType: FamilyRecordType.baby.rawValue,
+                    recordId: baby.id.uuidString,
+                    payload: payload,
+                    updatedAtMs: Self.millis(baby.updatedAt),
+                    deletedAtMs: nil,
+                    mine: nil
+                )
+            )
+        }
+
         func append<T: Codable & Identifiable>(_ records: [T], type: FamilyRecordType, updatedAt: (T) -> Date) where T.ID == UUID {
             for record in records where updatedAt(record) > watermark {
                 guard let data = try? Self.familyPayloadEncoder.encode(record),
@@ -2483,6 +2503,83 @@ extension BabyRecordStore {
     func applyFamilyChanges(_ envelopes: [FamilyRecordEnvelope]) -> Int {
         var changed = 0
 
+        func removeRecords(for babyID: UUID) {
+            feedingRecords.removeAll { $0.babyId == babyID }
+            waterRecords.removeAll { $0.babyId == babyID }
+            sleepRecords.removeAll { $0.babyId == babyID }
+            diaperRecords.removeAll { $0.babyId == babyID }
+            growthRecords.removeAll { $0.babyId == babyID }
+            vaccineRecords.removeAll { $0.babyId == babyID }
+            milestones.removeAll { $0.babyId == babyID }
+            healthObservations.removeAll { $0.babyId == babyID }
+        }
+
+        func mergeBaby(_ envelope: FamilyRecordEnvelope) {
+            guard let babyID = UUID(uuidString: envelope.recordId) else { return }
+            if let deletedAtMs = envelope.deletedAtMs {
+                guard let index = babies.firstIndex(where: { $0.id == babyID }),
+                      Self.millis(babies[index].updatedAt) <= deletedAtMs else { return }
+                babies.remove(at: index)
+                removeRecords(for: babyID)
+                if activeBabyID == babyID {
+                    activeBabyID = babies.first?.id
+                }
+                if babies.isEmpty {
+                    let replacement = Self.emptyBaby
+                    babies = [replacement]
+                    activeBabyID = replacement.id
+                    hasCompletedOnboarding = false
+                }
+                changed += 1
+                return
+            }
+
+            guard let data = envelope.payload.data(using: .utf8),
+                  let profile = try? Self.familyPayloadDecoder.decode(FamilyBabyProfile.self, from: data),
+                  profile.id == babyID else { return }
+            if let index = babies.firstIndex(where: { $0.id == babyID }) {
+                guard Self.millis(babies[index].updatedAt) < envelope.updatedAtMs else { return }
+                babies[index].name = profile.name
+                babies[index].birthDate = profile.birthDate
+                babies[index].sex = profile.sex
+                babies[index].daysSinceBirth = Self.daysSinceBirth(from: profile.birthDate)
+                babies[index].ageText = Self.ageText(from: profile.birthDate)
+                babies[index].updatedAt = profile.updatedAt
+            } else {
+                babies.append(
+                    Baby(
+                        id: babyID,
+                        name: profile.name,
+                        daysSinceBirth: Self.daysSinceBirth(from: profile.birthDate),
+                        ageText: Self.ageText(from: profile.birthDate),
+                        birthDate: profile.birthDate,
+                        sex: profile.sex,
+                        updatedAt: profile.updatedAt
+                    )
+                )
+                if activeBabyID == nil {
+                    activeBabyID = babyID
+                }
+            }
+            changed += 1
+        }
+
+        func ensureFamilyBabyExists(_ babyID: UUID) {
+            guard !babies.contains(where: { $0.id == babyID }) else { return }
+            babies.append(
+                Baby(
+                    id: babyID,
+                    name: "家庭宝宝",
+                    daysSinceBirth: 0,
+                    ageText: "",
+                    birthDate: Date(),
+                    sex: "未设置",
+                    updatedAt: .distantPast
+                )
+            )
+            changed += 1
+        }
+
         func merge<T: Codable & Identifiable>(
             _ array: inout [T],
             envelope: FamilyRecordEnvelope,
@@ -2502,9 +2599,9 @@ extension BabyRecordStore {
 
             guard let data = envelope.payload.data(using: .utf8),
                   var incoming = try? Self.familyPayloadDecoder.decode(T.self, from: data) else { return }
-            normalize(&incoming)
             if let index {
                 if Self.millis(updatedAt(array[index])) < envelope.updatedAtMs {
+                    normalize(&incoming)
                     array[index] = incoming
                     changed += 1
                 }
@@ -2516,30 +2613,37 @@ extension BabyRecordStore {
                 if let tombstone, Self.millis(tombstone.deletedAt) >= envelope.updatedAtMs {
                     return
                 }
+                normalize(&incoming)
                 array.append(incoming)
                 changed += 1
             }
         }
 
-        for envelope in envelopes {
+        for envelope in envelopes where envelope.recordType == FamilyRecordType.baby.rawValue {
+            mergeBaby(envelope)
+        }
+
+        for envelope in envelopes where envelope.recordType != FamilyRecordType.baby.rawValue {
             guard let type = FamilyRecordType(rawValue: envelope.recordType) else { continue }
             switch type {
+            case .baby:
+                break
             case .feeding:
-                merge(&feedingRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+                merge(&feedingRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .water:
-                merge(&waterRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+                merge(&waterRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .sleep:
-                merge(&sleepRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+                merge(&sleepRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .diaper:
-                merge(&diaperRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+                merge(&diaperRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .growth:
-                merge(&growthRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+                merge(&growthRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .vaccine:
-                merge(&vaccineRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+                merge(&vaccineRecords, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .milestone:
-                merge(&milestones, envelope: envelope, updatedAt: { $0.updatedAt }) { _ in }
+                merge(&milestones, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             case .health:
-                merge(&healthObservations, envelope: envelope, updatedAt: { $0.updatedAt }) { $0.babyId = self.baby.id }
+                merge(&healthObservations, envelope: envelope, updatedAt: { $0.updatedAt }) { ensureFamilyBabyExists($0.babyId) }
             }
         }
 

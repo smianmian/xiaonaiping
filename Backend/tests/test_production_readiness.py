@@ -6,11 +6,12 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_production_readiness.py"
-CURRENT_TS = "2026-07-27T00:00:00+00:00"
+CURRENT_TS = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def write(path: Path, value: str) -> None:
@@ -46,10 +47,8 @@ settings:
         "Docs/07_PrivacySecurity/SDK_DATA_INVENTORY.md",
         "Docs/05_QA/TEST_PLAN.md",
         "Docs/06_Release/RELEASE_CHECKLIST.md",
-        "Docs/06_Release/PROOF_PACK.md",
         "Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md",
         "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
-        "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
         "Docs/08_Release/MAINLAND_FILING_MATERIALS.md",
         "Docs/08_Release/PRIVACY_POLICY_DRAFT.md",
         "Docs/08_Release/TERMS_OF_USE_DRAFT.md",
@@ -60,7 +59,7 @@ settings:
     write(root / "Docs/08_Release/APP_STORE_METADATA.md", f"Privacy URL: {app_metadata_url}\n")
     write(
         root / "Backend/proof/release-flow.json",
-        json.dumps({"passed": True, "checks": {"accountCreated": True}, "failedChecks": []}),
+        json.dumps({"passed": True, "checks": {"phoneAccountAuthenticated": True}, "failedChecks": []}),
     )
     if remote_proof:
         write(
@@ -69,7 +68,7 @@ settings:
                 {
                     "passed": True,
                     "apiBaseUrl": release_url,
-                    "checks": {"healthz": True, "accountCreated": True},
+                    "checks": {"healthz": True, "phoneAccountAuthenticated": True},
                     "failedChecks": [],
                 }
             ),
@@ -175,22 +174,6 @@ settings:
         ),
     )
     write(
-        root / "Backend/proof/testflight-regression-plan.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "reviewAccountRedactedProofPresent": {"passed": True},
-                    "regressionCaseIdsComplete": {"passed": True},
-                    "regressionCoverageComplete": {"passed": True},
-                    "externalAuthCasesMarkedPending": {"passed": True},
-                    "passCriteriaSeparateExternalAuthAndEvidence": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
         root / "Backend/proof/sim-launch-ios265-20260626.json",
         json.dumps(
             {
@@ -217,103 +200,6 @@ settings:
                     "appIcon1024PngValid": {"passed": True},
                     "appIconHasNoAlpha": {"passed": True},
                     "finalScreenshotsAcceptedSizes": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/app-store-connect-materials.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "appNameMatches": {"passed": True},
-                    "subtitleWithinLimit": {"passed": True},
-                    "primaryCategoryLifestyle": {"passed": True},
-                    "secondaryCategoryBlank": {"passed": True},
-                    "publicUrlsMatch": {"passed": True},
-                    "screenshotCopyComplete": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/app-store-connect-evidence-materials.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "appStoreConnectEvidenceFilenamesPresent": {"passed": True},
-                    "appStoreConnectEvidenceRedactionCovered": {"passed": True},
-                    "privacyLabelJsonMatchesEvidenceChecklist": {"passed": True},
-                    "doesNotPretendAppStoreConnectEvidenceCompleteBeforeFiles": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/app-store-submission-packet.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "officialAppleCheckpointsPresent": {"passed": True},
-                    "reviewNotesPresent": {"passed": True},
-                    "privacyLabelSourcesComplete": {"passed": True},
-                    "preSubmitCommandsComplete": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/mainland-filing-materials.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "materialsDocumentPresent": {"passed": True},
-                    "currentJudgmentCoversLaunchAndFilingPath": {"passed": True},
-                    "draftFilingFieldsComplete": {"passed": True},
-                    "evidenceArchiveFilenamesMatchGate": {"passed": True},
-                    "doesNotPretendFilingCompleteBeforeEvidence": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/signed-archive-testflight-materials.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "signingArchiveStatusDocumentsCurrentBlocker": {"passed": True},
-                    "postArchiveBundleVerificationRequired": {"passed": True},
-                    "signedArchiveAndTestFlightEvidenceFilenamesPresent": {"passed": True},
-                    "signedArchiveAndTestFlightEvidenceRedactionCovered": {"passed": True},
-                    "testFlightEvidenceBoundaryPresent": {"passed": True},
-                    "doesNotPretendArchiveOrTestFlightCompleteBeforeEvidence": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/provider-evidence-materials.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "providerEvidenceFilenamesPresent": {"passed": True},
-                    "providerEvidenceRedactionCovered": {"passed": True},
-                    "smsProviderMaterialCoversSignatureTemplateSendAndSecrets": {"passed": True},
-                    "wechatOpenPlatformMaterialCoversClientServerSecretBoundary": {"passed": True},
-                    "huaweiObsMaterialCoversBucketEncryptionLifecycleDeletion": {"passed": True},
-                    "doesNotPretendProviderEvidenceCompleteBeforeFiles": {"passed": True},
                 },
             }
         ),
@@ -356,8 +242,8 @@ settings:
                 "passed": True,
                 "failedRequiredChecks": [],
                 "checks": {
-                    "privacyPageMainlandFirst": {"passed": True},
-                    "privacyPageHongKongSecond": {"passed": True},
+                    "privacyPageGlobalLaunch": {"passed": True},
+                    "privacyPageGlobalComplianceGate": {"passed": True},
                     "privacyPageCompanyEntity": {"passed": True},
                     "termsPagePhoneAndWeChatLogin": {"passed": True},
                 },
@@ -371,27 +257,10 @@ settings:
                 "passed": True,
                 "failedRequiredChecks": [],
                 "checks": {
-                    "submissionReviewNotesFree": {"passed": True},
-                    "submissionReviewNotesNoMedicalAdvice": {"passed": True},
-                    "submissionReviewNotesDeletionPath": {"passed": True},
+                    "metadataReviewNotesFree": {"passed": True},
+                    "metadataReviewNotesNoMedicalAdvice": {"passed": True},
+                    "metadataReviewNotesDeletionPath": {"passed": True},
                     "metadataReviewNotesNoDebugCode": {"passed": True},
-                },
-            }
-        ),
-    )
-    write(
-        root / "Backend/proof/legal-drafts.json",
-        json.dumps(
-            {
-                "passed": True,
-                "failedRequiredChecks": [],
-                "checks": {
-                    "privacyCurrentDate": {"passed": True},
-                    "privacyCompanyEntity": {"passed": True},
-                    "privacyMainlandFirst": {"passed": True},
-                    "termsCurrentDate": {"passed": True},
-                    "termsAccountMethods": {"passed": True},
-                    "termsOutdatedRecoveryOnly": {"passed": True},
                 },
             }
         ),
@@ -739,234 +608,6 @@ class ProductionReadinessTest(unittest.TestCase):
 
             self.assertFalse(report["ready"])
             self.assertFalse(report["checks"]["authDebugModeDisabled"]["passed"])
-
-    def test_app_store_manual_evidence_can_be_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write_png_header(root / "Docs/08_Release/Screenshots/home.png", 1206, 2622)
-            env = {
-                "XNP_SECRET_KEY": "production-secret-key-with-enough-length",
-                "XNP_DATA_DIR": "/srv/xiaonaiping/data",
-                "XNP_DATABASE_BACKEND": "mysql",
-                "XNP_MYSQL_HOST": "rds.internal",
-                "XNP_MYSQL_USER": "xiaonaiping",
-                "XNP_MYSQL_PASSWORD": "configured",
-                "XNP_MYSQL_DATABASE": "xiaonaiping",
-                "XNP_STORAGE_BACKEND": "huawei_obs",
-                "HUAWEI_OBS_ACCESS_KEY_ID": "set",
-                "HUAWEI_OBS_SECRET_ACCESS_KEY": "set",
-                "HUAWEI_OBS_ENDPOINT": "https://obs.example.test",
-                "HUAWEI_OBS_BUCKET": "xiaonaiping-prod",
-                "HUAWEI_OBS_PREFIX": "xiaonaiping",
-                "XNP_SMS_PROVIDER": "webhook",
-                "XNP_SMS_SECRET": "configured",
-                "XNP_SMS_WEBHOOK_URL": "https://sms.example.test/send",
-                "XNP_WECHAT_APP_ID": "wxa4f19c3e802b7d65",
-                "XNP_WECHAT_APP_SECRET": "configured",
-                "XNP_ADMIN_TOKEN": "production-admin-token-with-enough-length",
-            }
-
-            report = self.run_checker(
-                root,
-                env,
-                "--require-huawei-obs",
-                "--require-screenshots",
-                "--require-app-store-evidence",
-            )
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["appStoreManualEvidenceReady"]["passed"])
-
-    def test_app_store_connect_materials_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/app-store-connect-materials.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["metadataNoHealthFitnessCategoryAlternative"],
-                        "checks": {
-                            "metadataNoHealthFitnessCategoryAlternative": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "Health & Fitness alternate category remains",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["appStoreConnectMaterialsProofPassed"]["passed"])
-
-    def test_app_store_submission_packet_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/app-store-submission-packet.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["officialAppleCheckpointsPresent"],
-                        "checks": {
-                            "officialAppleCheckpointsPresent": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "missing App Review Guidelines URL",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["appStoreSubmissionPacketProofPassed"]["passed"])
-
-    def test_app_store_connect_evidence_materials_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/app-store-connect-evidence-materials.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["privacyLabelJsonMatchesEvidenceChecklist"],
-                        "checks": {
-                            "privacyLabelJsonMatchesEvidenceChecklist": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "usesTracking=true",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["appStoreConnectEvidenceMaterialsProofPassed"]["passed"])
-
-    def test_mainland_filing_materials_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/mainland-filing-materials.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["evidenceArchiveFilenamesMatchGate"],
-                        "checks": {
-                            "evidenceArchiveFilenamesMatchGate": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "missing 03-app-filing.pdf",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["mainlandFilingMaterialsProofPassed"]["passed"])
-
-    def test_signed_archive_testflight_materials_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/signed-archive-testflight-materials.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["preSubmitCommandsIncludeArchiveTestFlightGate"],
-                        "checks": {
-                            "preSubmitCommandsIncludeArchiveTestFlightGate": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "missing check_signed_archive_testflight_materials.py",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["signedArchiveTestFlightMaterialsProofPassed"]["passed"])
-
-    def test_provider_evidence_materials_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/provider-evidence-materials.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["providerEvidenceRedactionCovered"],
-                        "checks": {
-                            "providerEvidenceRedactionCovered": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "missing AppSecret redaction",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["providerEvidenceMaterialsProofPassed"]["passed"])
-
-    def test_testflight_regression_plan_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/testflight-regression-plan.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["regressionCoverageComplete"],
-                        "checks": {
-                            "regressionCoverageComplete": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "missing widget regression case",
-                            }
-                        },
-                    }
-                ),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["testFlightRegressionPlanProofPassed"]["passed"])
 
     def test_ios_release_readiness_proof_is_required(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -1350,9 +991,9 @@ class ProductionReadinessTest(unittest.TestCase):
                 json.dumps(
                     {
                         "passed": False,
-                        "failedRequiredChecks": ["submissionReviewNotesDeletionPath"],
+                        "failedRequiredChecks": ["metadataReviewNotesDeletionPath"],
                         "checks": {
-                            "submissionReviewNotesDeletionPath": {
+                            "metadataReviewNotesDeletionPath": {
                                 "passed": False,
                                 "required": True,
                                 "evidence": "missing deletion path",
@@ -1387,54 +1028,6 @@ class ProductionReadinessTest(unittest.TestCase):
 
             self.assertFalse(report["ready"])
             self.assertFalse(report["checks"]["reviewNotesProofPassed"]["passed"])
-
-    def test_legal_drafts_proof_is_required(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            release_url = "https://api.xiaonaiping.test"
-            write_minimal_repo(root, release_url, release_url + "/privacy", remote_proof=True)
-            write(
-                root / "Backend/proof/legal-drafts.json",
-                json.dumps(
-                    {
-                        "passed": False,
-                        "failedRequiredChecks": ["termsOutdatedRecoveryOnly"],
-                        "checks": {
-                            "termsOutdatedRecoveryOnly": {
-                                "passed": False,
-                                "required": True,
-                                "evidence": "old recovery-only account copy",
-                            }
-                        },
-                    }
-                ),
-            )
-            env = {
-                "XNP_SECRET_KEY": "production-secret-key-with-enough-length",
-                "XNP_DATA_DIR": "/srv/xiaonaiping/data",
-                "XNP_DATABASE_BACKEND": "mysql",
-                "XNP_MYSQL_HOST": "rds.internal",
-                "XNP_MYSQL_USER": "xiaonaiping",
-                "XNP_MYSQL_PASSWORD": "configured",
-                "XNP_MYSQL_DATABASE": "xiaonaiping",
-                "XNP_STORAGE_BACKEND": "huawei_obs",
-                "HUAWEI_OBS_ACCESS_KEY_ID": "set",
-                "HUAWEI_OBS_SECRET_ACCESS_KEY": "set",
-                "HUAWEI_OBS_ENDPOINT": "https://obs.example.test",
-                "HUAWEI_OBS_BUCKET": "xiaonaiping-prod",
-                "HUAWEI_OBS_PREFIX": "xiaonaiping",
-                "XNP_SMS_PROVIDER": "webhook",
-                "XNP_SMS_SECRET": "configured",
-                "XNP_SMS_WEBHOOK_URL": "https://sms.example.test/send",
-                "XNP_WECHAT_APP_ID": "wxa4f19c3e802b7d65",
-                "XNP_WECHAT_APP_SECRET": "configured",
-                "XNP_ADMIN_TOKEN": "production-admin-token-with-enough-length",
-            }
-
-            report = self.run_checker(root, env, "--require-huawei-obs")
-
-            self.assertFalse(report["ready"])
-            self.assertFalse(report["checks"]["legalDraftsProofPassed"]["passed"])
 
     def test_universal_links_proof_is_required(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

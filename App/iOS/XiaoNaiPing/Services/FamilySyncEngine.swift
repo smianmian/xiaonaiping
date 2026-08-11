@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /// 家人共享同步引擎：与整包 blob 备份并存的第二条通道。
@@ -12,9 +13,21 @@ final class FamilySyncEngine: ObservableObject {
 
     private let sessionStore: CloudAccountSessionStore
     private var scheduledSyncTask: Task<Void, Never>?
+    private var sessionCancellable: AnyCancellable?
+    private var sessionGeneration = 0
+    private var lastSessionAccountID: String?
 
     init(sessionStore: CloudAccountSessionStore = CloudAccountSessionStore()) {
         self.sessionStore = sessionStore
+        lastSessionAccountID = sessionStore.session?.accountId
+        sessionCancellable = sessionStore.$session
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleSessionChange()
+                }
+            }
     }
 
     var isAvailable: Bool {
@@ -30,7 +43,9 @@ final class FamilySyncEngine: ObservableObject {
     func refreshMembership() async {
         guard let token = sessionStore.session?.sessionToken,
               let client = makeClient() else { return }
-        familyInfo = (try? await client.fetchFamily(token: token)) ?? familyInfo
+        let refreshed = try? await client.fetchFamily(token: token)
+        guard token == sessionStore.session?.sessionToken else { return }
+        familyInfo = refreshed ?? familyInfo
     }
 
     func createFamily() async {
@@ -117,6 +132,7 @@ final class FamilySyncEngine: ObservableObject {
         isSyncing = true
         defer { isSyncing = false }
 
+        let generation = sessionGeneration
         let syncStart = Date()
         do {
             // 1) 推送本地水位线之后的变更（含墓碑）。
@@ -125,6 +141,8 @@ final class FamilySyncEngine: ObservableObject {
             if !dirty.isEmpty {
                 for batch in stride(from: 0, to: dirty.count, by: 200).map({ Array(dirty[$0..<min($0 + 200, dirty.count)]) }) {
                     _ = try await client.pushFamilyRecords(batch, token: token)
+                    guard generation == sessionGeneration,
+                          token == sessionStore.session?.sessionToken else { return }
                 }
             }
 
@@ -133,6 +151,8 @@ final class FamilySyncEngine: ObservableObject {
             var applied = 0
             while true {
                 let page = try await client.pullFamilyRecords(since: cursor, token: token)
+                guard generation == sessionGeneration,
+                      token == sessionStore.session?.sessionToken else { return }
                 applied += store.applyFamilyChanges(page.records.filter { $0.mine != true })
                 cursor = page.cursor
                 if !page.hasMore { break }
@@ -151,12 +171,16 @@ final class FamilySyncEngine: ObservableObject {
 
     // MARK: 游标与水位线
 
+    private var syncScopeKey: String {
+        "\(sessionStore.session?.accountId ?? "none").\(familyInfo?.familyId ?? "none")"
+    }
+
     private var cursorKey: String {
-        "xnp.family.pull-cursor.\(familyInfo?.familyId ?? "none")"
+        "xnp.family.pull-cursor.\(syncScopeKey)"
     }
 
     private var watermarkKey: String {
-        "xnp.family.push-watermark.\(familyInfo?.familyId ?? "none")"
+        "xnp.family.push-watermark.\(syncScopeKey)"
     }
 
     private var pullCursor: Int {
@@ -176,6 +200,20 @@ final class FamilySyncEngine: ObservableObject {
     private func resetCursor() {
         UserDefaults.standard.removeObject(forKey: cursorKey)
         UserDefaults.standard.removeObject(forKey: watermarkKey)
+    }
+
+    private func handleSessionChange() {
+        if let accountID = lastSessionAccountID, let familyID = familyInfo?.familyId {
+            UserDefaults.standard.removeObject(forKey: "xnp.family.pull-cursor.\(accountID).\(familyID)")
+            UserDefaults.standard.removeObject(forKey: "xnp.family.push-watermark.\(accountID).\(familyID)")
+        }
+        lastSessionAccountID = sessionStore.session?.accountId
+        sessionGeneration += 1
+        scheduledSyncTask?.cancel()
+        scheduledSyncTask = nil
+        familyInfo = nil
+        statusText = nil
+        errorMessage = nil
     }
 
     private func resetMembership(using client: CloudSyncAPIClient, token: String) async throws {

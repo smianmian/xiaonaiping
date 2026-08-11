@@ -11,8 +11,8 @@ from typing import Any
 
 
 REQUIRED_MARKERS = {
-    "privacyPageMainlandFirst": ("privacy.html", "第一版计划先在中国大陆 App Store 提交"),
-    "privacyPageHongKongSecond": ("privacy.html", "香港为第二批"),
+    "privacyPageGlobalLaunch": ("privacy.html", "App Store Connect 全部计划上架地区同轮开放"),
+    "privacyPageGlobalComplianceGate": ("privacy.html", "各地区法律、备案和商店要求未满足则整体不可发布"),
     "privacyPageCompanyEntity": ("privacy.html", "深圳市闪现生活科技有限公司"),
     "privacyPagePhoneAndWeChatLogin": ("privacy.html", "手机号验证码或微信授权"),
     "privacyPageStatusDisplayBoundary": ("privacy.html", "灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示"),
@@ -26,7 +26,7 @@ REQUIRED_MARKERS = {
     "privacyPageNoHealthPressureFeedingAdvice": ("privacy.html", "不生成健康建议、压力提醒、喂养建议或医疗判断"),
     "privacyPageNoHealthKitOrSensors": ("privacy.html", "不接入 HealthKit、传感器、医院系统或第三方健康数据源"),
     "privacyPageAccountDeletionPath": ("privacy.html", "资料 -> 账号与同步 -> 删除云端账号与同步"),
-    "termsPagePhoneAndWeChatLogin": ("terms.html", "恢复密钥、手机号验证码和微信授权登录"),
+    "termsPagePhoneAndWeChatLogin": ("terms.html", "手机号验证码和微信授权登录"),
     "termsPageCompanyEntity": ("terms.html", "深圳市闪现生活科技有限公司"),
     "termsPageStatusDisplayBoundary": ("terms.html", "灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示"),
     "termsPageManualReminderDeferral": ("terms.html", "你可以手动顺延下一次喝奶提醒"),
@@ -39,7 +39,7 @@ REQUIRED_MARKERS = {
     "termsPageNoHealthPressureFeedingAdvice": ("terms.html", "不生成健康建议、压力提醒、喂养建议或医疗判断"),
     "termsPageNoHealthKitOrSensors": ("terms.html", "不接入 HealthKit、传感器、医院系统或第三方健康数据源"),
     "termsPageAccountDeletionPath": ("terms.html", "资料 -> 账号与同步 -> 删除云端账号与同步"),
-    "supportPagePhoneAndWeChatSync": ("support.html", "恢复密钥、手机号或微信登录"),
+    "supportPagePhoneAndWeChatSync": ("support.html", "手机号验证码或微信授权登录"),
     "supportPageCompanyEntity": ("support.html", "深圳市闪现生活科技有限公司"),
     "supportPageOfficialWebsiteTitle": ("support.html", "小奶瓶 - 宝宝成长记录 App 官方网站"),
     "supportPageHomepage": ("support.html", "首页"),
@@ -53,7 +53,6 @@ REQUIRED_MARKERS = {
     "supportPageFavicon": ("support.html", 'rel="icon"'),
     "supportPageHomeScreenshotAsset": ("support.html", "support-assets/screenshot-home.jpg"),
     "supportPageRecordScreenshotAsset": ("support.html", "support-assets/screenshot-record.jpg"),
-    "supportPageSyncScreenshotAsset": ("support.html", "support-assets/screenshot-sync.jpg"),
     "supportPageOperationFlowAsset": ("support.html", "support-assets/operation-flow.jpg"),
     "supportPageCopyrightOwner": ("support.html", "版权所有者：深圳市闪现生活科技有限公司"),
     "supportPageContactEmail": ("support.html", "support@mewpow.com"),
@@ -86,8 +85,8 @@ PUBLIC_URL_MARKERS = {
 FORBIDDEN_PATTERNS = {
     "privacyOutdatedHongKongUsFirst": ("privacy.html", r"首发香港和美国|首發香港和美國"),
     "privacyOutdatedMainlandExcluded": ("privacy.html", r"不选择中国大陆|不選擇中國大陸|不含中国大陆|不含中國大陸"),
+    "privacyOutdatedPhasedLaunch": ("privacy.html", r"先在中国大陆.*香港为第二批|香港为第二批|分批上线|分阶段上线"),
     "privacyNoPlaceholderFilingNumber": ("privacy.html", r"ICP备0{4,}号?|ICP备待|待备案号|占位备案号|示例备案号|placeholder filing"),
-    "termsOutdatedRecoveryOnly": ("terms.html", r"账号采用恢复密钥方式|帳號採用恢復密鑰方式"),
     "termsNoPlaceholderFilingNumber": ("terms.html", r"ICP备0{4,}号?|ICP备待|待备案号|占位备案号|示例备案号|placeholder filing"),
     "supportOutdatedRecoveryOnly": ("support.html", r"中创建账号并同步|中創建帳號並同步"),
     "supportNoPlaceholderFilingNumber": ("support.html", r"ICP备0{4,}号?|ICP备待|待备案号|占位备案号|示例备案号|placeholder filing"),

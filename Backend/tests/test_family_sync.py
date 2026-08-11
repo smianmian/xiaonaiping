@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import sys
 import tempfile
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
@@ -39,6 +41,7 @@ class FamilySyncTestCase(unittest.TestCase):
         self.thread.start()
         host, port = self.server.server_address
         self.base_url = f"http://{host}:{port}"
+        self.test_phone_counter = 0
 
     def tearDown(self) -> None:
         self.server.shutdown()
@@ -62,9 +65,17 @@ class FamilySyncTestCase(unittest.TestCase):
             return error.code, json.loads(error.read().decode("utf-8"))
 
     def make_account(self) -> str:
-        status, created = self.request("POST", "/v1/accounts")
-        self.assertEqual(status, 201)
-        return created["sessionToken"]
+        self.test_phone_counter += 1
+        phone_number = f"+8526{self.test_phone_counter:07d}"
+        status, sent = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
+        self.assertEqual(status, 200)
+        status, session = self.request(
+            "POST",
+            "/v1/auth/phone/verify",
+            {"phoneNumber": phone_number, "code": sent["debugCode"]},
+        )
+        self.assertEqual(status, 200)
+        return session["sessionToken"]
 
     def envelope(self, record_type: str, record_id: str, payload: dict, updated_at_ms: int, deleted_at_ms=None):
         item = {
@@ -172,11 +183,27 @@ class FamilySyncTestCase(unittest.TestCase):
 
         second_member = self.make_account()
         self.request("POST", "/v1/family/join", body={"inviteCode": member_info["family"]["inviteCode"]}, token=second_member)
+        _, deleting_account = self.request("GET", "/v1/account", token=member)
+        self.request(
+            "PUT",
+            "/v1/family/records",
+            body={"records": [self.envelope("feeding", "owned-record", {"amountML": 120}, int(time.time() * 1000))]},
+            token=member,
+        )
         status, _ = self.request("DELETE", "/v1/account", token=member)
         self.assertEqual(status, 200)
         status, successor_info = self.request("GET", "/v1/family", token=second_member)
         self.assertEqual(status, 200)
         self.assertEqual(successor_info["family"]["role"], "owner")
+        with sqlite3.connect(Path(self.tempdir.name) / "xiaonaiping.sqlite3") as db:
+            author_id = db.execute(
+                "SELECT author_account_id FROM family_records WHERE record_id = 'owned-record'"
+            ).fetchone()[0]
+            self.assertNotEqual(author_id, deleting_account["accountId"])
+            self.assertEqual(
+                db.execute("SELECT COUNT(*) FROM accounts WHERE account_id = ?", (deleting_account["accountId"],)).fetchone()[0],
+                0,
+            )
 
     def test_non_member_cannot_touch_records(self) -> None:
         outsider = self.make_account()
@@ -314,6 +341,29 @@ class FamilySyncTestCase(unittest.TestCase):
         )
         self.assertEqual(status, 400)
         self.assertEqual(body["error"]["code"], "invalid_record_type")
+
+    def test_future_record_timestamp_is_rejected_without_freezing_lww(self) -> None:
+        owner = self.make_account()
+        self.request("POST", "/v1/family", body={}, token=owner)
+        far_future = int(time.time() * 1000) + 24 * 60 * 60 * 1000
+        status, body = self.request(
+            "PUT",
+            "/v1/family/records",
+            body={"records": [self.envelope("feeding", "f1", {"amountML": 120}, far_future)]},
+            token=owner,
+        )
+        self.assertEqual(status, 400)
+        self.assertEqual(body["error"]["code"], "record_timestamp_in_future")
+
+        current = int(time.time() * 1000)
+        status, body = self.request(
+            "PUT",
+            "/v1/family/records",
+            body={"records": [self.envelope("feeding", "f1", {"amountML": 150}, current)]},
+            token=owner,
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(body["accepted"], 1)
 
 
 if __name__ == "__main__":

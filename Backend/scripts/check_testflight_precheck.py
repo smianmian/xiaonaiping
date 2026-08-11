@@ -447,18 +447,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "await cloudSync.requestPhoneCode",
         "await cloudSync.verifyPhoneCode",
         "微信登录",
-        "await cloudSync.loginWithWeChat",
-        "!cloudSync.isWeChatLoginConfigured",
-        "恢复密钥登录",
-        "await cloudSync.recoverSession",
-        "CloudSyncController.validateE164PhoneNumber",
-        "CloudSyncController.validateSmsCode",
-    }
-    current_account_login_surface_markers = {
-        "手机号登录",
-        "await cloudSync.requestPhoneCode",
-        "await cloudSync.verifyPhoneCode",
-        "微信登录",
         "await cloudSync.loginWithWeChat(store: store)",
         "!cloudSync.isWeChatLoginConfigured",
         "CloudSyncController.validateE164PhoneNumber",
@@ -466,26 +454,17 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
     account_login_surface_present = has_marker_variant(
         profile_source,
-        (account_login_surface_markers, current_account_login_surface_markers),
+        (account_login_surface_markers,),
     )
     report.add(
         "accountLoginClientSurfacesPresent",
         account_login_surface_present,
         "missing a supported phone and WeChat login implementation"
         if not account_login_surface_present
-        else "Profile exposes recovery-key, phone, and gated WeChat login paths",
+        else "Profile exposes phone and gated WeChat login paths",
     )
 
     sync_restore_delete_surface_markers = {
-        "await cloudSync.createAccountAndSync",
-        "await cloudSync.restoreLatestSync",
-        "await cloudSync.deleteCloudAccount",
-        "立即同步",
-        "从云端恢复",
-        "删除云端账号与同步",
-        "本机资料保留",
-    }
-    current_sync_restore_delete_surface_markers = {
         "await cloudSync.restoreFromCloud",
         "await cloudSync.deleteCloudAccount",
         "从云端恢复",
@@ -494,7 +473,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
     sync_restore_delete_surface_present = has_marker_variant(
         profile_source,
-        (sync_restore_delete_surface_markers, current_sync_restore_delete_surface_markers),
+        (sync_restore_delete_surface_markers,),
     )
     report.add(
         "cloudSyncRestoreDeleteClientSurfacesPresent",
@@ -521,20 +500,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     )
 
     cloud_controller_markers = {
-        "func createAccountAndSync",
-        "func requestPhoneCode",
-        "func verifyPhoneCode",
-        "func recoverSession",
-        "func loginWithWeChat",
-        "func restoreLatestSync",
-        "func deleteCloudAccount",
-        "sessionStore.clear()",
-        "store.markCloudAccountDeletedLocally()",
-        "private func uploadEverything",
-        "client.uploadPhoto",
-        "client.downloadPhoto",
-    }
-    current_cloud_controller_markers = {
         "func requestPhoneCode",
         "func verifyPhoneCode",
         "func loginWithWeChat",
@@ -547,7 +512,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
     cloud_controller_present = has_marker_variant(
         cloud_controller_source,
-        (cloud_controller_markers, current_cloud_controller_markers),
+        (cloud_controller_markers,),
     )
     report.add(
         "cloudSyncControllerCoreFlowsPresent",
@@ -558,8 +523,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     )
 
     cloud_api_endpoint_markers = {
-        'request(path: "/v1/accounts", method: "POST"',
-        'request(path: "/v1/sessions/recover", method: "POST"',
         'request(path: "/v1/auth/phone/request-code", method: "POST"',
         'request(path: "/v1/auth/phone/verify", method: "POST"',
         'request(path: "/v1/auth/wechat/login", method: "POST"',
@@ -569,13 +532,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         'request(path: "/v1/photos", method: "GET"',
         'request(path: "/v1/account", method: "DELETE"',
     }
-    current_cloud_api_endpoint_markers = cloud_api_endpoint_markers - {
-        'request(path: "/v1/accounts", method: "POST"',
-        'request(path: "/v1/sessions/recover", method: "POST"',
-    }
     cloud_api_endpoints_present = has_marker_variant(
         cloud_api_source,
-        (cloud_api_endpoint_markers, current_cloud_api_endpoint_markers),
+        (cloud_api_endpoint_markers,),
     )
     report.add(
         "cloudSyncServiceEndpointsPresent",

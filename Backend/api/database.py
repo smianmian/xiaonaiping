@@ -129,7 +129,6 @@ def ensure_schema(db: DatabaseConnection) -> None:
             """
             CREATE TABLE IF NOT EXISTS accounts (
                 account_id TEXT PRIMARY KEY,
-                recovery_hash TEXT NOT NULL UNIQUE,
                 created_at TEXT NOT NULL,
                 deleted_at TEXT
             );
@@ -161,7 +160,12 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 phone_hash TEXT PRIMARY KEY,
                 code_hash TEXT NOT NULL,
                 created_at TEXT NOT NULL,
-                expires_at INTEGER NOT NULL
+                expires_at INTEGER NOT NULL,
+                request_window_started_at INTEGER NOT NULL,
+                last_requested_at INTEGER NOT NULL,
+                request_count INTEGER NOT NULL DEFAULT 1,
+                failed_attempts INTEGER NOT NULL DEFAULT 0,
+                locked_until INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE TABLE IF NOT EXISTS photos (
@@ -229,6 +233,7 @@ def ensure_schema(db: DatabaseConnection) -> None:
                 ON family_records(family_id, seq);
             """
         )
+        ensure_phone_login_code_security_columns(db)
         ensure_deletion_audit_sync_deleted_column(db)
         db.commit()
         return
@@ -237,7 +242,6 @@ def ensure_schema(db: DatabaseConnection) -> None:
         """
         CREATE TABLE IF NOT EXISTS accounts (
             account_id CHAR(36) PRIMARY KEY,
-            recovery_hash CHAR(64) NOT NULL UNIQUE,
             created_at VARCHAR(40) NOT NULL,
             deleted_at VARCHAR(40) NULL,
             INDEX idx_accounts_deleted_at (deleted_at)
@@ -281,7 +285,12 @@ def ensure_schema(db: DatabaseConnection) -> None:
             phone_hash CHAR(64) PRIMARY KEY,
             code_hash CHAR(64) NOT NULL,
             created_at VARCHAR(40) NOT NULL,
-            expires_at BIGINT NOT NULL
+            expires_at BIGINT NOT NULL,
+            request_window_started_at BIGINT NOT NULL,
+            last_requested_at BIGINT NOT NULL,
+            request_count INT NOT NULL DEFAULT 1,
+            failed_attempts INT NOT NULL DEFAULT 0,
+            locked_until BIGINT NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,
         """
@@ -362,8 +371,46 @@ def ensure_schema(db: DatabaseConnection) -> None:
     ]
     for statement in statements:
         db.execute(statement)
+    ensure_phone_login_code_security_columns(db)
     ensure_deletion_audit_sync_deleted_column(db)
     db.commit()
+
+
+def insert_account(db: DatabaseConnection, account_id: str, created_at: str) -> None:
+    db.execute(
+        "INSERT INTO accounts(account_id, created_at) VALUES (?, ?)",
+        (account_id, created_at),
+    )
+
+
+def ensure_phone_login_code_security_columns(db: DatabaseConnection) -> None:
+    columns = {
+        "request_window_started_at": ("INTEGER NOT NULL DEFAULT 0", "BIGINT NOT NULL DEFAULT 0"),
+        "last_requested_at": ("INTEGER NOT NULL DEFAULT 0", "BIGINT NOT NULL DEFAULT 0"),
+        "request_count": ("INTEGER NOT NULL DEFAULT 1", "INT NOT NULL DEFAULT 1"),
+        "failed_attempts": ("INTEGER NOT NULL DEFAULT 0", "INT NOT NULL DEFAULT 0"),
+        "locked_until": ("INTEGER NOT NULL DEFAULT 0", "BIGINT NOT NULL DEFAULT 0"),
+    }
+    if db.dialect == "sqlite":
+        existing = {row["name"] for row in db.execute("PRAGMA table_info(phone_login_codes)").fetchall()}
+        for name, (sqlite_type, _) in columns.items():
+            if name not in existing:
+                db.execute(f"ALTER TABLE phone_login_codes ADD COLUMN {name} {sqlite_type}")
+        return
+
+    for name, (_, mysql_type) in columns.items():
+        row = db.execute(
+            """
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = 'phone_login_codes'
+              AND column_name = ?
+            """,
+            (name,),
+        ).fetchone()
+        if row is None:
+            db.execute(f"ALTER TABLE phone_login_codes ADD COLUMN {name} {mysql_type}")
 
 
 def ensure_deletion_audit_sync_deleted_column(db: DatabaseConnection) -> None:

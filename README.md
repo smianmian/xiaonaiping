@@ -34,7 +34,7 @@ xcodebuild -project XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Deb
 当前更新为 **Level 2.5：本地优先 + 账号 + 自动云端同步 + 原图文件存储**。
 
 - 已确认：本地优先、单人记录、照片可复制进 App 私有空间、需要账号、需要自动云端同步、服务器需要存照片原图。
-- 已确认首发地区：香港和美国。
+- 已确认第一版全球同步首发，不采用地区分批上线。
 - 已确认：疫苗提醒模板覆盖国内 + 香港，崩溃上报进入第一版。
 - 已确认：API 服务和对象存储区域必须在发布前按合规策略确认。
 - 已确认：崩溃上报使用 Apple 原生渠道。
@@ -83,7 +83,6 @@ xcodebuild -project XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Deb
 - `Docs/07_PrivacySecurity/CHINA_MAINLAND_COMPLIANCE.md`
 - `Docs/07_PrivacySecurity/US_HK_COMPLIANCE.md`
 - `Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md`
-- `Docs/08_Release/APP_STORE_COMPLIANCE_TIMELINE.md`
 
 ## 明确不在当前阶段做
 

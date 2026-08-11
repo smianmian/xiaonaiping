@@ -8,7 +8,7 @@
 
 D-U-N-S 交付后，立刻回到 Apple Developer 继续深圳市闪现生活科技有限公司的组织注册。注册完成后，确认 Apple Developer 组织 Team ID、证书、Identifiers、Profiles、Archive 和 TestFlight 证据链路。
 
-当前工程已把 Development Team 写为 `L2TYJNDTJK`，但这只证明本机 Xcode 工程有签名 Team 槽位；企业注册完成后必须在 Apple Developer 后台重新确认组织 Team ID。如果 Apple Developer 显示的组织 Team ID 不是 `L2TYJNDTJK`，必须同步更新 `App/iOS/project.yml`、`App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj`、`Backend/static/apple-app-site-association`、AASA 中的 `appID` / `appIDs`，并重新归档 `08b-wechat-universal-link-aasa.png`，然后重跑 `Backend/scripts/check_universal_links.py`、`Backend/scripts/check_wechat_client_configuration.py`、`Backend/scripts/check_ios_release_readiness.py`、`Backend/scripts/check_provider_evidence_materials.py` 和 `Backend/scripts/check_signed_archive_testflight_materials.py`。
+当前工程已把 Development Team 写为 `L2TYJNDTJK`，但这只证明本机 Xcode 工程有签名 Team 槽位；企业注册完成后必须在 Apple Developer 后台重新确认组织 Team ID。如果 Apple Developer 显示的组织 Team ID 不是 `L2TYJNDTJK`，必须同步更新 `App/iOS/project.yml`、`App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj`、`Backend/static/apple-app-site-association`、AASA 中的 `appID` / `appIDs`，并重新归档 `08b-wechat-universal-link-aasa.png`，然后重跑 `Backend/scripts/check_universal_links.py`、`Backend/scripts/check_wechat_client_configuration.py` 和 `Backend/scripts/check_ios_release_readiness.py`。
 
 ## 企业主体一致性锁
 
@@ -16,14 +16,13 @@ D-U-N-S 交付后，Apple Developer Organization enrollment、App Store Connect 
 
 | 核对位置 | 必须一致的主体字段 | 证据或复跑 |
 | --- | --- | --- |
-| Apple Developer 组织页 | 深圳市闪现生活科技有限公司、Organization / Membership 状态、Team ID | `AppleDeveloper/13-organization-team-id.png`、`check_signed_archive_testflight_materials.py` |
-| App Store Connect 公司主体 | 深圳市闪现生活科技有限公司 | `Docs/08_Release/AppStoreEvidence/01-company-account.png`、`check_app_store_connect_materials.py` |
-| App Store metadata | `Docs/08_Release/APP_STORE_METADATA.md` 的公司主体、Copyright 和提交阻断说明 | `check_app_store_connect_materials.py` |
-| 中国大陆备案材料 | `Docs/08_Release/MAINLAND_FILING_MATERIALS.md` 的公司主体 / 主办单位 | `check_mainland_filing_materials.py` |
-| App Store 提交包 | `Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md` 的 Company / Copyright | `check_app_store_submission_packet.py` |
-| 公开法律页 | `Backend/static/privacy.html`、`Backend/static/terms.html`、`Backend/static/support.html` 的开发者主体 | `check_legal_drafts.py`、`check_public_pages.py` |
+| Apple Developer 组织页 | 深圳市闪现生活科技有限公司、Organization / Membership 状态、Team ID | `AppleDeveloper/13-organization-team-id.png`、人工核对当前 Organization / Team ID |
+| App Store Connect 公司主体 | 深圳市闪现生活科技有限公司 | `Docs/08_Release/AppStoreEvidence/01-company-account.png`、人工核对当前 App Store Connect 主体 |
+| App Store metadata | `Docs/08_Release/APP_STORE_METADATA.md` 的公司主体、Copyright 和提交阻断说明 | `check_review_notes.py` |
+| 中国大陆备案材料 | `Docs/08_Release/MAINLAND_FILING_MATERIALS.md` 的公司主体 / 主办单位 | 人工核对当前备案材料与 `03-app-filing.*` |
+| 公开法律页 | `Backend/static/privacy.html`、`Backend/static/terms.html`、`Backend/static/support.html` 的开发者主体 | `check_public_pages.py` |
 
-主体不一致时不得继续 Archive / TestFlight / Submit for Review；先修正主体材料、重新归档 `01-company-account.png` 和 `AppleDeveloper/13-organization-team-id.png`，再重跑 `check_signed_archive_testflight_materials.py`、`check_mainland_filing_materials.py`、`check_app_store_connect_materials.py` 和 `check_production_readiness.py`。
+主体不一致时不得继续 Archive / TestFlight / Submit for Review；先修正主体材料、重新归档 `01-company-account.png` 和 `AppleDeveloper/13-organization-team-id.png`，人工复核备案与 App Store Connect 主体，再重跑 `check_public_pages.py`、`check_review_notes.py` 和 `check_production_readiness.py`。
 
 ## Apple Developer 联系人姓名锁
 
@@ -31,11 +30,7 @@ Apple Developer Organization enrollment、D&B 补充信息和后续 Apple 联系
 
 ## D-U-N-S 到手后的动作
 
-现场执行前先打开 `Docs/08_Release/AppStoreEvidence/_templates/apple-developer-team-signing-evidence.template.json`。它只用于核对 Apple Developer Team ID、Bundle ID、App Groups、Associated Domains、ExportOptions、证书/Profile、Archive、TestFlight 和脱敏边界，不是证据，不能改名成 `AppleDeveloper/13-...`、`05-signed-archive.*` 或 `06-testflight.*`。
-
-结构化执行包见 `Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json`。该 JSON 只用于按顺序核对 D-U-N-S 后 Organization enrollment、Team ID、账号权限、证书/Profile、Archive、TestFlight、post-archive gate 和 iOS 26.5 真机回归，不证明 D-U-N-S、Archive 或 TestFlight 已完成。
-
-执行包里的 `postDeliveryMilestoneGateMatrix` 是每一步进入下一步的出口闸门：D-U-N-S 到手、组织注册继续、Team ID 确认、权限确认、Bundle/capability、Team ID / 微信同步、证书/Profile、Archive、TestFlight、iOS 26.5 真机回归和最终提交 gate 都必须按矩阵逐项留下证据、复跑 gate，并保持 `canSubmitFromMilestone=false`，直到 `app-store-evidence.json`、`production-readiness.json` 和 `launch-objective-audit.json` 同轮全绿。
+旧结构化执行包与旧 proof 索引已移除。现场必须直接按本节顺序核对 Organization enrollment、Team ID、账号权限、证书/Profile、Archive、TestFlight 和 iOS 26.5 真机回归；每一步只记录真实证据，直到按现行认证方案重新生成的 App Store、生产就绪和上线总审计证据同轮全绿。
 
 1. 打开 Apple Developer，继续 Organization enrollment。
 2. 主体选择深圳市闪现生活科技有限公司。
@@ -53,7 +48,7 @@ Apple Developer Organization enrollment、D&B 补充信息和后续 Apple 联系
 14. 如果 Team ID 漂移，确认 AASA 中 App ID 已使用 `新 Team ID.com.mewpow.xiaonaiping`，Associated Domains 仍包含 `applinks:api.mewpow.com`，微信开放平台 Universal Link 与 Release 包 `XNPWeChatUniversalLink` 一致，并重新归档 `Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png`。
 15. 执行 App Store Distribution Archive。
 16. 使用 `Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist` 执行 `xcodebuild -exportArchive`，ExportOptions 必须是 `method=app-store-connect`、`destination=upload`、`teamID=<confirmed Apple Developer Team ID>`、`distributionBundleIdentifier=com.mewpow.xiaonaiping`、`manageAppVersionAndBuildNumber=false`、`testFlightInternalTestingOnly=false`、`uploadSymbols=true`。当前工程/模板值仍为 `L2TYJNDTJK`；只有 Apple Developer 后台确认同一 Team ID 后才可直接沿用。
-17. Archive / export / upload 成功后，用同一导出 `.app` 或 `.ipa` 重新跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_testflight_regression_plan.py` 和 `check_provider_evidence_materials.py`。
+17. Archive / export / upload 成功后，用同一导出 `.app` 重新跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_wechat_client_configuration.py` 和 `check_production_readiness.py`。
 18. 等待 App Store Connect / TestFlight 构建处理完成。
 19. 归档 `Docs/08_Release/AppStoreEvidence/05-signed-archive.png` 和 `Docs/08_Release/AppStoreEvidence/06-testflight.png`。
 
@@ -61,9 +56,9 @@ Apple Developer Organization enrollment、D&B 补充信息和后续 Apple 联系
 
 拿到 Team ID 后，先确认当前 Apple ID 的权限，再配证书、Archive、上传 TestFlight 或点 Submit for Review。必须归档 `AppleDeveloper/16-account-roles-access.png`：保留当前 Apple ID 所属团队、角色列表、Certificates, Identifiers & Profiles 访问状态、App 管理权限、构建上传权限、TestFlight 管理权限和提交审核权限；遮挡 Apple ID 邮箱、联系人完整电话、付款信息和无关成员。不能只用 Team ID 截图替代权限截图。
 
-结构化权限矩阵见 `Docs/08_Release/APPLE_DEVELOPER_DUNS_POST_DELIVERY_ACTIONS.json` 的 `accountPermissionMatrix`。现场必须逐项确认证书/Profile、App 管理、构建上传、TestFlight 管理、提交审核和 Account Holder / Admin 补权限路径；任一项未确认时，不得继续证书、Archive、TestFlight 或 Submit for Review。
+现场必须逐项确认证书/Profile、App 管理、构建上传、TestFlight 管理、提交审核和 Account Holder / Admin 补权限路径；任一项未确认时，不得继续证书、Archive、TestFlight 或 Submit for Review。
 
-如果当前账号缺少 App Store Distribution certificate / provisioning profile 创建权限、App 管理权限、构建上传权限、TestFlight 管理权限或提交审核权限，不得继续 Archive / TestFlight / Submit for Review；先让 Account Holder 或管理员补权限，再重跑 `check_signed_archive_testflight_materials.py`、`check_app_store_connect_materials.py` 和 `check_app_store_evidence.py --allow-incomplete`。
+如果当前账号缺少 App Store Distribution certificate / provisioning profile 创建权限、App 管理权限、构建上传权限、TestFlight 管理权限或提交审核权限，不得继续 Archive / TestFlight / Submit for Review；先让 Account Holder 或管理员补权限、重新归档账号权限截图，再用同一导出 `.app` 重跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py` 和 `check_production_readiness.py --allow-incomplete`。
 
 ## Team ID 漂移同步矩阵
 
@@ -74,10 +69,10 @@ Apple Developer 显示的组织 Team ID 是最终口径。若新 Team ID 不是 
 | `App/iOS/project.yml` | `DEVELOPMENT_TEAM`；Release 仍使用真实 `XNP_WECHAT_APP_ID` / `XNP_WECHAT_URL_SCHEME` / `XNP_WECHAT_UNIVERSAL_LINK` | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png` | `check_ios_release_readiness.py`、`check_ios_app_bundle.py` |
 | `App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj` | `DEVELOPMENT_TEAM` | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/13-organization-team-id.png` | `check_ios_release_readiness.py`、`check_ios_app_bundle.py` |
 | `Backend/static/apple-app-site-association` | `appID` / `appIDs` 使用新 Team ID，例如 `新 Team ID.com.mewpow.xiaonaiping` | `Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png` | `check_universal_links.py`、`check_wechat_client_configuration.py` |
-| `Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist` | `teamID` | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png` | `check_signed_archive_testflight_materials.py` |
-| `Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md` | `XNPWeChatUniversalLink`、Associated Domains 和微信开放平台 Universal Link 同轮一致 | `Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png` | `check_wechat_client_configuration.py`、`check_provider_evidence_materials.py` |
-| `Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md` | 当前 Team ID、签名状态和 ExportOptions 口径 | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png` | `check_app_store_submission_packet.py`、`check_signed_archive_testflight_materials.py` |
-| `Docs/08_Release/CHINA_MAINLAND_APP_STORE_RUNBOOK.md` | 中国大陆提交 runbook 中的 Team ID、Archive / TestFlight 前置项 | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png` | `check_app_store_submission_packet.py`、`check_production_readiness.py` |
+| `Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist` | `teamID` | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/15-distribution-certificate-profile.png` | `check_ios_release_readiness.py`、导出后运行 `check_ios_app_bundle.py` |
+| `Docs/08_Release/WECHAT_CLIENT_CONFIGURATION.md` | `XNPWeChatUniversalLink`、Associated Domains 和微信开放平台 Universal Link 同轮一致 | `Docs/08_Release/AppStoreEvidence/08b-wechat-universal-link-aasa.png` | `check_wechat_client_configuration.py` |
+| `Docs/08_Release/APP_STORE_METADATA.md` | 当前公司主体、账号认证、同步和提交阻断口径 | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png` | `check_review_notes.py`、`check_ios_release_readiness.py` |
+| `Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md` | 全球首发策略中的 Team ID、Archive / TestFlight 与地区合规前置项 | `Docs/08_Release/AppStoreEvidence/AppleDeveloper/14-bundle-id-capabilities.png` | `check_review_notes.py`、`check_production_readiness.py` |
 
 ## Team ID 预导出一致性锁
 
@@ -90,7 +85,7 @@ Apple Developer 后台 Team ID 是最终值。执行 `xcodebuild -exportArchive`
 | Xcode 工程文件 | `App/iOS/XiaoNaiPing.xcodeproj/project.pbxproj` 的 `DEVELOPMENT_TEAM` | `Backend/proof/ios-release-readiness.json` |
 | ExportOptions | `Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist` 的 `teamID` | `AppleDeveloper/15-distribution-certificate-profile.png` |
 | AASA | `Backend/static/apple-app-site-association` 的 `appID` / `appIDs` Team 前缀 | `08b-wechat-universal-link-aasa.png`、`Backend/proof/universal-links.json` |
-| 微信客户端配置 | Associated Domains、`XNPWeChatUniversalLink` 和 AASA Team ID | `Backend/proof/wechat-client-configuration.json` |
+| 微信客户端配置 | Associated Domains、`XNPWeChatUniversalLink` 和 AASA Team ID | 按现行配置重新生成的微信客户端证据 |
 | 导出前包体检查 | Release app bundle 中的 Team / Associated Domains / 微信值 | `Backend/proof/ios-app-bundle.json` |
 
 如果 ExportOptions 仍是 `L2TYJNDTJK` 但 Apple 页面显示新 Team ID，先更新 ExportOptions `teamID`、工程签名、AASA 和微信 Universal Link 证据，再重新生成 Archive / TestFlight。不要用旧 Team ID 的 Archive 或 TestFlight 证据补交。
@@ -115,12 +110,12 @@ D-U-N-S 交付后，按下面顺序把 Apple Developer / Xcode / App Store Conne
 |---|---|---|---|
 | `AppleDeveloper/13-organization-team-id.png` | 深圳市闪现生活科技有限公司、Organization / Membership 状态、Team ID | Apple ID 邮箱、联系人完整电话、付款信息、D-U-N-S 编码完整值 | 若 Team ID 不同于 `L2TYJNDTJK`，先同步工程、AASA 和 ExportOptions |
 | `AppleDeveloper/14-bundle-id-capabilities.png` | Bundle ID `com.mewpow.xiaonaiping`、当前 Team、App Groups `group.com.mewpow.xiaonaiping.shared`、Associated Domains `applinks:api.mewpow.com` | 无关 App、人员信息、Apple ID 邮箱 | `check_universal_links.py`、`check_wechat_client_configuration.py`、`check_ios_release_readiness.py` |
-| `AppleDeveloper/15-distribution-certificate-profile.png` | App Store Distribution certificate / provisioning profile 类型、Bundle ID、Team ID、有效状态 | 证书私钥、provisioning profile 原文件、下载链接、个人邮箱 | `check_signed_archive_testflight_materials.py` |
-| `AppleDeveloper/16-account-roles-access.png` | 当前 Apple ID、角色列表、Certificates, Identifiers & Profiles、App 管理权限、构建上传权限、TestFlight 管理权限、提交审核权限 | Apple ID 邮箱、联系人完整电话、付款信息、无关成员 | `check_signed_archive_testflight_materials.py`、`check_app_store_connect_materials.py`、`check_app_store_evidence.py --allow-incomplete` |
-| `08b-wechat-universal-link-aasa.png` | AASA endpoint、`新 Team ID.com.mewpow.xiaonaiping`、Associated Domains、`XNPWeChatUniversalLink`、微信开放平台 Universal Link | Apple ID 邮箱、完整手机号、AppSecret、验证码、token | `check_provider_evidence_materials.py`、`check_wechat_client_configuration.py` |
+| `AppleDeveloper/15-distribution-certificate-profile.png` | App Store Distribution certificate / provisioning profile 类型、Bundle ID、Team ID、有效状态 | 证书私钥、provisioning profile 原文件、下载链接、个人邮箱 | 人工复核证书/Profile；导出后运行 `check_ios_app_bundle.py` |
+| `AppleDeveloper/16-account-roles-access.png` | 当前 Apple ID、角色列表、Certificates, Identifiers & Profiles、App 管理权限、构建上传权限、TestFlight 管理权限、提交审核权限 | Apple ID 邮箱、联系人完整电话、付款信息、无关成员 | 人工复核当前权限；导出后运行 `check_testflight_precheck.py` |
+| `08b-wechat-universal-link-aasa.png` | AASA endpoint、`新 Team ID.com.mewpow.xiaonaiping`、Associated Domains、`XNPWeChatUniversalLink`、微信开放平台 Universal Link | Apple ID 邮箱、完整手机号、AppSecret、验证码、token | `check_wechat_client_configuration.py` |
 | `05-signed-archive.png` | Xcode Organizer / Archive 成功状态、`com.mewpow.xiaonaiping`、version、build、App Store Distribution | Apple ID 邮箱、证书私钥、provisioning profile、导出的 `.ipa` 路径 | `check_ios_app_bundle.py --app /path/to/XiaoNaiPing.app --output Backend/proof/ios-app-bundle.json` |
-| `06-testflight.png` | App Store Connect / TestFlight build 版本、build、处理完成或可测试状态、选中 build 与 App Store Connect 一致 | 测试员邮箱、Apple ID 邮箱、内部备注 | `check_testflight_precheck.py`、`check_testflight_regression_plan.py` |
-| `12-real-device-regression.md` | iOS 26.5、TestFlight 或 Xcode 签名真机包、RD-01 到 RD-24 全部通过、证据文件路径 | 恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 | `check_testflight_regression_plan.py`、`check_app_store_evidence.py --allow-incomplete` |
+| `06-testflight.png` | App Store Connect / TestFlight build 版本、build、处理完成或可测试状态、选中 build 与 App Store Connect 一致 | 测试员邮箱、Apple ID 邮箱、内部备注 | `check_testflight_precheck.py`；人工核对截图中的版本/build |
+| `12-real-device-regression.md` | iOS 26.5、TestFlight 或 Xcode 签名真机包、RD-01 到 RD-24 全部通过、证据文件路径 | 验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 | 人工核对 RD-01 到 RD-24；运行 `check_testflight_precheck.py` 和 `check_production_readiness.py` |
 
 ## D-U-N-S 交付当天执行记录模板
 
@@ -143,7 +138,7 @@ D-U-N-S 交付后，按下面顺序把 Apple Developer / Xcode / App Store Conne
 - [ ] Archive 成功截图已按 `05-signed-archive.png` 归档。
 - [ ] TestFlight 构建处理完成截图已按 `06-testflight.png` 归档。
 - [ ] `AppleDeveloper/13-organization-team-id.png`、`AppleDeveloper/14-bundle-id-capabilities.png`、`AppleDeveloper/15-distribution-certificate-profile.png`、`AppleDeveloper/16-account-roles-access.png`、`05-signed-archive.png`、`06-testflight.png` 和 `12-real-device-regression.md` 已按页面证据索引归档并脱敏。
-- [ ] Archive / TestFlight 后已重跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_testflight_regression_plan.py`、`check_app_store_evidence.py` 和 `check_production_readiness.py`。
+- [ ] Archive / TestFlight 后已重跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_app_store_assets.py` 和 `check_production_readiness.py`，并人工核对 `12-real-device-regression.md`。
 
 证据文件名：
 
@@ -160,7 +155,7 @@ D-U-N-S 交付后，按下面顺序把 Apple Developer / Xcode / App Store Conne
 
 ## Archive / TestFlight 当天执行记录模板
 
-复制下面清单到当天的私有执行记录或工单中填写；这里只记录执行结论和证据路径，不记录 Apple ID 邮箱、测试员邮箱、D-U-N-S 编码完整值、证书私钥、provisioning profile、AppSecret、恢复密钥或验证码。
+复制下面清单到当天的私有执行记录或工单中填写；这里只记录执行结论和证据路径，不记录 Apple ID 邮箱、测试员邮箱、D-U-N-S 编码完整值、证书私钥、provisioning profile、AppSecret 或验证码。
 
 - [ ] Xcode 已登录 Apple Developer 账号并选择组织 Team。
 - [ ] 当前 Apple ID 已确认具备证书/Profile、App 管理、构建上传、TestFlight 管理和提交审核权限。
@@ -174,7 +169,7 @@ D-U-N-S 交付后，按下面顺序把 Apple Developer / Xcode / App Store Conne
 - [ ] ExportOptions 使用 `method=app-store-connect`、`destination=upload`、`teamID=<confirmed Apple Developer Team ID>`、`distributionBundleIdentifier=com.mewpow.xiaonaiping`；当前工程/模板值仍为 `L2TYJNDTJK`，只有 Apple Developer 后台确认同一 Team ID 后才可直接沿用。
 - [ ] `testFlightInternalTestingOnly=false`，本轮构建不限制为仅内部 TestFlight。
 - [ ] 导出的 `.app` 或 `.ipa` 仅保存在本机私有路径或临时路径，不提交到仓库。
-- [ ] 导出后已重跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_testflight_regression_plan.py`、`check_app_store_evidence.py` 和 `check_production_readiness.py`。
+- [ ] 导出后已重跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_app_store_assets.py` 和 `check_production_readiness.py`，并人工核对 `12-real-device-regression.md`。
 - [ ] TestFlight build 号和版本号已和 App Store Connect 选中的构建、`12-real-device-regression.md` 环境信息一致。
 - [ ] `05-signed-archive.png` 能证明 App Store Distribution Archive 成功。
 - [ ] `06-testflight.png` 能证明 TestFlight 构建已处理完成并可测试。
@@ -187,14 +182,13 @@ python3 Backend/scripts/prepare_wechat_release_env.py --app-id "$REAL_WECHAT_APP
 . /tmp/xnp-wechat-release.env && xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Release -destination 'generic/platform=iOS' -archivePath /tmp/XiaoNaiPing-CN.xcarchive XNP_WECHAT_APP_ID="$XNP_WECHAT_APP_ID" XNP_WECHAT_URL_SCHEME="$XNP_WECHAT_URL_SCHEME" XNP_WECHAT_UNIVERSAL_LINK="$XNP_WECHAT_UNIVERSAL_LINK" archive
 xcodebuild -exportArchive -archivePath /tmp/XiaoNaiPing-CN.xcarchive -exportPath /tmp/XiaoNaiPing-CN-AppStoreConnect -exportOptionsPlist Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist -allowProvisioningUpdates
 python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links.json
-python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration.json
+python3 Backend/scripts/check_wechat_client_configuration.py
 . /tmp/xnp-wechat-release.env && python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260704T-current-ios265.json
 python3 Backend/scripts/check_ios_app_bundle.py --app /path/to/XiaoNaiPing.app --output Backend/proof/ios-app-bundle.json
-python3 Backend/scripts/check_testflight_precheck.py --app /path/to/XiaoNaiPing.app --output Backend/proof/testflight-precheck.json
-python3 Backend/scripts/check_testflight_regression_plan.py --output Backend/proof/testflight-regression-plan.json
-python3 Backend/scripts/check_signed_archive_testflight_materials.py --output Backend/proof/signed-archive-testflight-materials.json
-python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json
-python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --require-huawei-obs --require-screenshots --require-app-store-evidence --output Backend/proof/production-readiness.json --allow-incomplete
+python3 Backend/scripts/check_testflight_precheck.py --app /path/to/XiaoNaiPing.app
+python3 Backend/scripts/check_app_store_assets.py --allow-incomplete
+python3 Backend/scripts/check_review_notes.py --allow-incomplete
+python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --require-huawei-obs --require-screenshots --allow-incomplete
 ```
 
 不要把 App Store Connect API key、Apple ID 邮箱、验证码、provisioning profile、证书私钥或导出的 `.ipa` 提交到仓库。`Docs/08_Release/XCODE_EXPORT_OPTIONS_APP_STORE_CONNECT.plist` 只保存无密钥的导出参数；真实账号凭证只存在 Xcode Accounts、Keychain 或私有 CI secret。

@@ -22,7 +22,6 @@
 | App 打开趋势 | 是 | `app_opened`，不带设备指纹 |
 | 引导完成率 | 是 | `onboarding_completed`，不带宝宝档案 |
 | 登录方式完成率 | 是 | `login_completed`，只带 `authProvider` 枚举 |
-| 账号创建率 | 是 | `account_created`，只带登录方式枚举 |
 | 云同步成功率 | 是 | `cloud_sync_completed`，不带同步内容 |
 | 云恢复成功率 | 是 | `cloud_restore_completed`，不带恢复内容 |
 | 记录功能采用率 | 是 | `record_created`，只带 `recordType` 枚举 |
@@ -36,7 +35,7 @@
 2. 照片、照片文件名、照片 EXIF、对象 key。
 3. 喂养量、睡眠时长、排便内容、身高体重数值。
 4. 疫苗名称、接种日期、备注内容。
-5. 手机号、微信 openid/unionid、恢复密钥、session token。
+5. 手机号、微信 openid/unionid、登录凭证、session token。
 6. 联系人、定位、剪贴板、广告标识、设备指纹。
 7. IP、User-Agent 或可用于跨站追踪的客户端标识。
 

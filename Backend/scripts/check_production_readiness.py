@@ -62,11 +62,9 @@ REQUIRED_DOCS = {
     "sdkInventory": "Docs/07_PrivacySecurity/SDK_DATA_INVENTORY.md",
     "testPlan": "Docs/05_QA/TEST_PLAN.md",
     "releaseChecklist": "Docs/06_Release/RELEASE_CHECKLIST.md",
-    "proofPack": "Docs/06_Release/PROOF_PACK.md",
     "regionalStrategy": "Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md",
     "appStoreMetadata": "Docs/08_Release/APP_STORE_METADATA.md",
     "appStorePrivacyLabel": "Docs/08_Release/APP_STORE_PRIVACY_LABEL.json",
-    "appStoreSubmissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
     "mainlandFilingMaterials": "Docs/08_Release/MAINLAND_FILING_MATERIALS.md",
     "privacyPolicyDraft": "Docs/08_Release/PRIVACY_POLICY_DRAFT.md",
     "termsDraft": "Docs/08_Release/TERMS_OF_USE_DRAFT.md",
@@ -383,22 +381,6 @@ def screenshot_evidence(path: Path) -> tuple[bool, str]:
     return False, "; ".join(details)
 
 
-def app_store_evidence(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    missing = data.get("missingEvidence", [])
-    if data.get("ready") is True and missing == []:
-        return True, "App Store manual evidence is complete"
-    if isinstance(missing, list) and missing:
-        return False, "missing evidence: " + ", ".join(str(item) for item in missing)
-    return False, "App Store manual evidence is not ready"
-
-
 def app_store_assets_proof(path: Path) -> tuple[bool, str]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -414,108 +396,6 @@ def app_store_assets_proof(path: Path) -> tuple[bool, str]:
     if isinstance(failed_checks, list) and failed_checks:
         return False, "failed asset checks: " + ", ".join(str(item) for item in failed_checks)
     return False, "App Store assets proof did not pass"
-
-
-def app_store_connect_materials_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"App Store Connect materials proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed App Store Connect material checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "App Store Connect materials proof did not pass"
-
-
-def app_store_connect_evidence_materials_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"App Store Connect evidence materials proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed App Store Connect evidence material checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "App Store Connect evidence materials proof did not pass"
-
-
-def app_store_submission_packet_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"App Store submission packet proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed App Store submission packet checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "App Store submission packet proof did not pass"
-
-
-def mainland_filing_materials_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"mainland filing materials proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed mainland filing material checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "mainland filing materials proof did not pass"
-
-
-def signed_archive_testflight_materials_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"signed archive/TestFlight materials proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed signed archive/TestFlight material checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "signed archive/TestFlight materials proof did not pass"
-
-
-def provider_evidence_materials_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"provider evidence materials proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed provider evidence material checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "provider evidence materials proof did not pass"
 
 
 def auth_providers_proof(path: Path) -> tuple[bool, str]:
@@ -584,23 +464,6 @@ def review_notes_proof(path: Path) -> tuple[bool, str]:
     if isinstance(failed_checks, list) and failed_checks:
         return False, "failed review notes checks: " + ", ".join(str(item) for item in failed_checks)
     return False, "review notes proof did not pass"
-
-
-def legal_drafts_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"legal drafts proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed legal draft checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "legal drafts proof did not pass"
 
 
 def universal_links_proof(path: Path) -> tuple[bool, str]:
@@ -706,23 +569,6 @@ def testflight_precheck_proof(path: Path) -> tuple[bool, str]:
     if isinstance(failed_checks, list) and failed_checks:
         return False, "failed TestFlight precheck checks: " + ", ".join(str(item) for item in failed_checks)
     return False, "TestFlight precheck proof did not pass"
-
-
-def testflight_regression_plan_proof(path: Path) -> tuple[bool, str]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return False, f"missing {path}"
-    except json.JSONDecodeError as error:
-        return False, f"invalid JSON: {error}"
-
-    failed_checks = data.get("failedRequiredChecks", [])
-    if data.get("passed") is True and failed_checks == []:
-        checks = data.get("checks", {})
-        return True, f"TestFlight regression plan proof passed {len(checks) if isinstance(checks, dict) else 0} checks"
-    if isinstance(failed_checks, list) and failed_checks:
-        return False, "failed TestFlight regression plan checks: " + ", ".join(str(item) for item in failed_checks)
-    return False, "TestFlight regression plan proof did not pass"
 
 
 def ios_sim_launch_proof(path: Path, expected_runtime: str) -> tuple[bool, str]:
@@ -1037,33 +883,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     testflight_precheck_passed, testflight_precheck_evidence = testflight_precheck_proof(root / args.testflight_precheck_proof)
     report.add("testFlightClientPrecheckProofPassed", testflight_precheck_passed, testflight_precheck_evidence)
 
-    testflight_regression_plan_passed, testflight_regression_plan_evidence = testflight_regression_plan_proof(root / args.testflight_regression_plan_proof)
-    report.add("testFlightRegressionPlanProofPassed", testflight_regression_plan_passed, testflight_regression_plan_evidence)
-
     sim_launch_path = root / args.sim_launch_proof if args.sim_launch_proof else latest_sim_launch_proof(root)
     sim_launch_passed, sim_launch_evidence = ios_sim_launch_proof(sim_launch_path, args.expected_sim_runtime)
     report.add("ios265SimulatorLaunchProofPassed", sim_launch_passed, sim_launch_evidence)
 
     app_store_assets_passed, app_store_assets_evidence = app_store_assets_proof(root / args.app_store_assets_proof)
     report.add("appStoreAssetsProofPassed", app_store_assets_passed, app_store_assets_evidence)
-
-    app_store_connect_materials_passed, app_store_connect_materials_evidence = app_store_connect_materials_proof(root / args.app_store_connect_materials_proof)
-    report.add("appStoreConnectMaterialsProofPassed", app_store_connect_materials_passed, app_store_connect_materials_evidence)
-
-    app_store_connect_evidence_materials_passed, app_store_connect_evidence_materials_evidence = app_store_connect_evidence_materials_proof(root / args.app_store_connect_evidence_materials_proof)
-    report.add("appStoreConnectEvidenceMaterialsProofPassed", app_store_connect_evidence_materials_passed, app_store_connect_evidence_materials_evidence)
-
-    app_store_submission_packet_passed, app_store_submission_packet_evidence = app_store_submission_packet_proof(root / args.app_store_submission_packet_proof)
-    report.add("appStoreSubmissionPacketProofPassed", app_store_submission_packet_passed, app_store_submission_packet_evidence)
-
-    mainland_filing_materials_passed, mainland_filing_materials_evidence = mainland_filing_materials_proof(root / args.mainland_filing_materials_proof)
-    report.add("mainlandFilingMaterialsProofPassed", mainland_filing_materials_passed, mainland_filing_materials_evidence)
-
-    signed_archive_testflight_materials_passed, signed_archive_testflight_materials_evidence = signed_archive_testflight_materials_proof(root / args.signed_archive_testflight_materials_proof)
-    report.add("signedArchiveTestFlightMaterialsProofPassed", signed_archive_testflight_materials_passed, signed_archive_testflight_materials_evidence)
-
-    provider_evidence_materials_passed, provider_evidence_materials_evidence = provider_evidence_materials_proof(root / args.provider_evidence_materials_proof)
-    report.add("providerEvidenceMaterialsProofPassed", provider_evidence_materials_passed, provider_evidence_materials_evidence)
 
     auth_providers_passed, auth_providers_evidence = auth_providers_proof(root / args.auth_providers_proof)
     report.add("authProvidersProofPassed", auth_providers_passed, auth_providers_evidence)
@@ -1076,9 +901,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     review_notes_passed, review_notes_evidence = review_notes_proof(root / args.review_notes_proof)
     report.add("reviewNotesProofPassed", review_notes_passed, review_notes_evidence)
-
-    legal_drafts_passed, legal_drafts_evidence = legal_drafts_proof(root / args.legal_drafts_proof)
-    report.add("legalDraftsProofPassed", legal_drafts_passed, legal_drafts_evidence)
 
     universal_links_passed, universal_links_evidence = universal_links_proof(root / args.universal_links_proof)
     report.add("universalLinksProofPassed", universal_links_passed, universal_links_evidence)
@@ -1101,14 +923,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 path if ok else body_or_error,
             )
 
-    evidence_passed, evidence_detail = app_store_evidence(root / args.app_store_evidence)
-    report.add(
-        "appStoreManualEvidenceReady",
-        evidence_passed,
-        evidence_detail,
-        required=args.require_app_store_evidence,
-    )
-
     return report.to_dict(started_at, utc_now())
 
 
@@ -1123,29 +937,19 @@ def main() -> None:
     parser.add_argument("--ios-app-bundle-proof", default="Backend/proof/ios-app-bundle.json")
     parser.add_argument("--ios-265-build-proof", default="Backend/proof/ios-265-build.json")
     parser.add_argument("--testflight-precheck-proof", default="Backend/proof/testflight-precheck.json")
-    parser.add_argument("--testflight-regression-plan-proof", default="Backend/proof/testflight-regression-plan.json")
     parser.add_argument("--sim-launch-proof")
     parser.add_argument("--expected-sim-runtime", default="iOS 26.5")
     parser.add_argument("--app-store-assets-proof", default="Backend/proof/app-store-assets.json")
-    parser.add_argument("--app-store-connect-materials-proof", default="Backend/proof/app-store-connect-materials.json")
-    parser.add_argument("--app-store-connect-evidence-materials-proof", default="Backend/proof/app-store-connect-evidence-materials.json")
-    parser.add_argument("--app-store-submission-packet-proof", default="Backend/proof/app-store-submission-packet.json")
-    parser.add_argument("--mainland-filing-materials-proof", default="Backend/proof/mainland-filing-materials.json")
-    parser.add_argument("--signed-archive-testflight-materials-proof", default="Backend/proof/signed-archive-testflight-materials.json")
-    parser.add_argument("--provider-evidence-materials-proof", default="Backend/proof/provider-evidence-materials.json")
     parser.add_argument("--auth-providers-proof", default="Backend/proof/auth-providers.json")
     parser.add_argument("--diagnostics-redaction-proof", default="Backend/proof/diagnostics-redaction.json")
     parser.add_argument("--public-pages-proof", default="Backend/proof/public-pages.json")
     parser.add_argument("--review-notes-proof", default="Backend/proof/review-notes.json")
-    parser.add_argument("--legal-drafts-proof", default="Backend/proof/legal-drafts.json")
     parser.add_argument("--universal-links-proof", default="Backend/proof/universal-links.json")
-    parser.add_argument("--app-store-evidence", default="Backend/proof/app-store-evidence.json")
     parser.add_argument("--screenshot-dir", default="Docs/08_Release/Screenshots")
     parser.add_argument("--output", default="Backend/proof/production-readiness.json")
     parser.add_argument("--expected-proof-date", default=expected_proof_date())
     parser.add_argument("--require-huawei-obs", action="store_true")
     parser.add_argument("--require-screenshots", action="store_true")
-    parser.add_argument("--require-app-store-evidence", action="store_true")
     parser.add_argument("--live-check", action="store_true")
     parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()

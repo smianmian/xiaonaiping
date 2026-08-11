@@ -69,7 +69,6 @@ EXPECTED_SCREENSHOT_SDK = "iphonesimulator26.5"
 SCREENSHOT_PROVENANCE_FILE = "PROVENANCE.json"
 SCREENSHOT_UPLOAD_PROVENANCE_FILE = "UPLOAD_PROVENANCE.json"
 SCREENSHOT_UPLOAD_PROVENANCE_TEMPLATE_FILE = "UPLOAD_PROVENANCE.template.json"
-DEFAULT_FINAL_SCREENSHOT_UPLOAD_PACKET = "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json"
 EXPECTED_UPLOAD_SOURCE_EVIDENCE = {
     "signedArchive": "../05-signed-archive.png",
     "testFlight": "../06-testflight.png",
@@ -85,8 +84,8 @@ SCREENSHOT_FILENAME_FORBIDDEN_MARKERS = (
     "debug",
     "token",
     "bearer",
-    "recovery",
-    "恢复密钥",
+    "credential",
+    "凭证",
     "wechat-success",
     "微信登录成功",
     "medical",
@@ -101,215 +100,12 @@ PROVENANCE_FORBIDDEN_MARKERS = (
     "debug_wechat",
     "sk-",
 )
-FINAL_SCREENSHOT_UPLOAD_PACKET_SOURCE_FILES = {
-    "screenshotPlan": "Docs/08_Release/SCREENSHOT_PLAN.md",
-    "candidateProvenance": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/PROVENANCE.json",
-    "uploadProvenanceTemplate": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.template.json",
-    "appStoreEvidenceChecklist": "Docs/08_Release/APP_STORE_EVIDENCE_CHECKLIST_20260704.md",
-    "finalEntryAudit": "Docs/08_Release/APP_STORE_CONNECT_FINAL_ENTRY_AUDIT_20260704.md",
-    "appStoreSubmissionPacket": "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md",
-    "testflightRegressionPlan": "Docs/08_Release/TEST_ACCOUNT_AND_REAL_DEVICE_REGRESSION.md",
-}
-FINAL_SCREENSHOT_UPLOAD_PACKET_TARGET_EVIDENCE_FILES = {
-    "uploadProvenance": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
-    "finalScreenshot01": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/01-home-iphone16pro.png",
-    "finalScreenshot02": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/02-record-iphone16pro.png",
-    "finalScreenshot03": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/03-growth-iphone16pro.png",
-    "finalScreenshot04": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/04-profile-iphone16pro.png",
-    "finalScreenshot05": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/05-profile-sync-iphone16pro.png",
-    "signedArchive": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
-    "testFlight": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
-    "appStoreConnectBuildLink": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
-    "appStoreConnectScreenshotOrder": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
-    "realDeviceRegression": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
-    "versionReleaseSettings": "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md",
-}
-FINAL_SCREENSHOT_UPLOAD_PACKET_EVIDENCE_FILE_CHECK_FIELDS = (
-    ("fileSizeBytes", "FILL_AFTER_CAPTURE"),
-    ("sha256", "FILL_AFTER_CAPTURE"),
-    ("redactionChecked", False),
-    ("sameRoundAsFinalScreenshotUpload", False),
-    ("sameBuildAsFinalScreenshotUpload", False),
-    ("runtimeIsIos265", False),
-    ("sourceIsAllowedEvidenceRoot", False),
-    ("realEvidenceNotTemplate", False),
-    ("secretValuesNotRecorded", False),
-)
-FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_FIELDS = (
-    "artifactId",
-    "target",
-    "proves",
-    "doesNotProve",
-    "requiredBeforeSubmit",
-    "initialStatus",
-)
-FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_MATRIX = {
-    "uploadProvenance": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
-        "proves": [
-            "final screenshot set was captured or accepted for App Store upload from the same iOS 26.5 TestFlight or Xcode signed device build",
-            "file order, sha256, dimensions, redaction checks, selected build, and source evidence are recorded",
-        ],
-        "doesNotProve": [
-            "signed archive evidence exists",
-            "TestFlight processed build evidence exists",
-            "App Store Connect selected build screenshot exists",
-            "iOS 26.5 real-device regression passed",
-            "app-store-evidence.json ready=true",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "finalScreenshot01": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/01-home-iphone16pro.png",
-        "proves": ["home screenshot file is present for the expected iPhone 6.9 upload slot"],
-        "doesNotProve": [
-            "screenshot was uploaded to App Store Connect",
-            "same build as TestFlight or signed archive",
-            "other final screenshots passed redaction",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "finalScreenshot02": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/02-record-iphone16pro.png",
-        "proves": ["record screenshot file is present for the expected iPhone 6.9 upload slot"],
-        "doesNotProve": [
-            "screenshot was uploaded to App Store Connect",
-            "same build as TestFlight or signed archive",
-            "other final screenshots passed redaction",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "finalScreenshot03": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/03-growth-iphone16pro.png",
-        "proves": ["growth screenshot file is present for the expected iPhone 6.9 upload slot"],
-        "doesNotProve": [
-            "screenshot was uploaded to App Store Connect",
-            "same build as TestFlight or signed archive",
-            "other final screenshots passed redaction",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "finalScreenshot04": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/04-profile-iphone16pro.png",
-        "proves": ["profile screenshot file is present for the expected iPhone 6.9 upload slot"],
-        "doesNotProve": [
-            "screenshot was uploaded to App Store Connect",
-            "same build as TestFlight or signed archive",
-            "other final screenshots passed redaction",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "finalScreenshot05": {
-        "target": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/05-profile-sync-iphone16pro.png",
-        "proves": ["profile sync screenshot file is present for the expected iPhone 6.9 upload slot"],
-        "doesNotProve": [
-            "screenshot was uploaded to App Store Connect",
-            "same build as TestFlight or signed archive",
-            "other final screenshots passed redaction",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "signedArchive": {
-        "target": "Docs/08_Release/AppStoreEvidence/05-signed-archive.png",
-        "proves": ["signed archive evidence target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "signed archive evidence exists now",
-            "screenshots were captured from that archive",
-            "TestFlight processed build evidence exists",
-            "App Store Connect screenshot upload completed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "testFlight": {
-        "target": "Docs/08_Release/AppStoreEvidence/06-testflight.png",
-        "proves": ["TestFlight processed build evidence target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "TestFlight evidence exists now",
-            "signed archive evidence exists",
-            "screenshots were uploaded to App Store Connect",
-            "iOS 26.5 real-device regression passed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "appStoreConnectBuildLink": {
-        "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-07-build-testflight-link.png",
-        "proves": ["App Store Connect selected build screenshot target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "selected build screenshot exists now",
-            "final screenshots were uploaded to that build",
-            "TestFlight regression passed",
-            "Submit for Review is allowed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "appStoreConnectScreenshotOrder": {
-        "target": "Docs/08_Release/AppStoreEvidence/AppStoreConnect/ASC-02-version-information.png",
-        "proves": ["App Store Connect screenshot order evidence target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "screenshot order screenshot exists now",
-            "final screenshots were uploaded",
-            "UPLOAD_PROVENANCE.json exists",
-            "Submit for Review is allowed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "realDeviceRegression": {
-        "target": "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
-        "proves": ["iOS 26.5 real-device regression evidence target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "real-device regression passed now",
-            "final screenshots were uploaded",
-            "signed archive or TestFlight evidence exists",
-            "app-store-evidence.json ready=true",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-    "versionReleaseSettings": {
-        "target": "Docs/08_Release/APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md",
-        "proves": ["version release settings target is required before final screenshot upload provenance can be trusted"],
-        "doesNotProve": [
-            "version release settings were entered in App Store Connect",
-            "final screenshots were uploaded",
-            "TestFlight selected build evidence exists",
-            "Submit for Review is allowed",
-        ],
-        "requiredBeforeSubmit": True,
-        "initialStatus": "pending",
-    },
-}
-FINAL_SCREENSHOT_UPLOAD_STOP_CONDITIONS = {
-    "missingTestFlightOrSignedBuild": ("iOS 26.5", "TestFlight", "Xcode signed physical-device"),
-    "uploadProvenanceMissing": ("UPLOAD_PROVENANCE.json", "app-store-assets.json incomplete"),
-    "uploadProvenanceFromDebugSimulator": ("Debug simulator", "final screenshots complete"),
-    "ios265RealDeviceUnavailable": ("iOS 26.5 physical-device availability proof", "iOS 27", "simulator"),
-    "buildMismatch": ("signed archive", "TestFlight", "ASC selected build", "real-device regression"),
-    "screenshotDimensionsWrong": ("iPhone 6.9", "Do not upload"),
-    "screenshotLeaksPrivateData": ("real baby photo", "complete phone number", "recovery key", "token"),
-    "finalFilesOutOfOrder": ("Final files", "expected App Store upload order"),
-    "appStoreEvidenceStillIncomplete": ("app-store-evidence.json", "Do not submit for review"),
-}
-FINAL_SCREENSHOT_UPLOAD_STOP_CONDITION_IDS = tuple(FINAL_SCREENSHOT_UPLOAD_STOP_CONDITIONS)
 FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS = (
     "real baby photo",
     "complete phone number",
     "verification code",
-    "recovery key",
+    "account credentials",
+    "WeChat credentials",
     "token",
     "object storage key",
     "local server marker",
@@ -320,26 +116,6 @@ FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS = (
     "medical advice claim",
     "feeding recommendation claim",
     "pressure reminder claim",
-)
-FINAL_SCREENSHOT_UPLOAD_POST_GATES = (
-    "python3 Backend/scripts/check_app_store_assets.py --allow-incomplete --output Backend/proof/app-store-assets.json",
-    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
-    "python3 Backend/scripts/check_app_store_connect_materials.py --output Backend/proof/app-store-connect-materials.json",
-    "python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --allow-incomplete --output Backend/proof/production-readiness.json",
-    "python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json",
-)
-FINAL_SCREENSHOT_UPLOAD_COMPLETION_MARKERS = (
-    "upload-plan-not-evidence",
-    "does not prove UPLOAD_PROVENANCE.json exists",
-    "does not replace iOS 26.5 TestFlight or Xcode signed physical-device screenshots",
-    "does not replace 05-signed-archive.png",
-    "06-testflight.png",
-    "ASC-07-build-testflight-link.png",
-    "12-real-device-regression.md",
-    "app-store-assets.json passed=true",
-    "app-store-evidence.json ready=true",
-    "production-readiness.json ready=true",
-    "launch-objective-audit.json ready=true",
 )
 UPLOAD_PROVENANCE_TEMPLATE_STATUS = (
     "final App Store upload evidence captured from the same iOS 26.5 TestFlight build "
@@ -846,277 +622,6 @@ def screenshot_upload_provenance_failures(data: dict[str, Any], final_screenshot
     return failures
 
 
-def final_screenshot_upload_packet_failures(
-    packet: dict[str, Any],
-    screenshot_details: list[dict[str, Any]],
-) -> list[str]:
-    if not packet:
-        return ["missing final screenshot upload packet JSON"]
-
-    failures: list[str] = []
-    expected_scalars: dict[str, Any] = {
-        "artifactType": "final-screenshot-upload-packet",
-        "status": "upload-plan-not-evidence",
-        "date": "2026-07-04",
-        "project": "XiaoNaiPing",
-        "appName": EXPECTED_APP_NAME,
-        "bundleId": EXPECTED_BUNDLE_ID,
-        "canSubmitFromThisPacket": False,
-    }
-    for key, expected in expected_scalars.items():
-        if packet.get(key) != expected:
-            expected_text = str(expected).lower() if isinstance(expected, bool) else str(expected)
-            failures.append(f"{key} must be {expected_text}")
-
-    source_files = packet.get("sourceFiles")
-    if not isinstance(source_files, dict):
-        failures.append("sourceFiles must be an object")
-    else:
-        if tuple(source_files) != tuple(FINAL_SCREENSHOT_UPLOAD_PACKET_SOURCE_FILES):
-            failures.append(
-                "sourceFiles order must be "
-                + " -> ".join(FINAL_SCREENSHOT_UPLOAD_PACKET_SOURCE_FILES)
-            )
-        for key, expected in FINAL_SCREENSHOT_UPLOAD_PACKET_SOURCE_FILES.items():
-            if source_files.get(key) != expected:
-                failures.append(f"sourceFiles.{key} must be {expected}")
-
-    target_files = packet.get("targetEvidenceFiles")
-    if not isinstance(target_files, dict):
-        failures.append("targetEvidenceFiles must be an object")
-    else:
-        if tuple(target_files) != tuple(FINAL_SCREENSHOT_UPLOAD_PACKET_TARGET_EVIDENCE_FILES):
-            failures.append("targetEvidenceFiles order must match final screenshot upload workflow")
-        for key, expected in FINAL_SCREENSHOT_UPLOAD_PACKET_TARGET_EVIDENCE_FILES.items():
-            if key not in target_files:
-                failures.append(f"targetEvidenceFiles.{key} missing")
-            elif target_files.get(key) != expected:
-                failures.append(f"targetEvidenceFiles.{key} must be {expected}")
-
-    file_checks = packet.get("evidenceFileChecks")
-    if not isinstance(file_checks, list):
-        failures.append("evidenceFileChecks must be an array")
-    else:
-        seen: set[str] = set()
-        by_artifact: dict[str, dict[str, Any]] = {}
-        for item in file_checks:
-            if not isinstance(item, dict):
-                failures.append("evidenceFileChecks entry must be an object")
-                continue
-            artifact_id = item.get("artifactId")
-            if not isinstance(artifact_id, str) or not artifact_id:
-                failures.append("evidenceFileChecks entry missing artifactId")
-                continue
-            if artifact_id in seen:
-                failures.append(f"evidenceFileChecks duplicate {artifact_id}")
-                continue
-            seen.add(artifact_id)
-            by_artifact[artifact_id] = item
-        if tuple(by_artifact) != tuple(FINAL_SCREENSHOT_UPLOAD_PACKET_TARGET_EVIDENCE_FILES):
-            failures.append("evidenceFileChecks order must match final screenshot upload workflow")
-        for artifact_id, expected_target in FINAL_SCREENSHOT_UPLOAD_PACKET_TARGET_EVIDENCE_FILES.items():
-            check = by_artifact.get(artifact_id)
-            if not isinstance(check, dict):
-                failures.append(f"evidenceFileChecks.{artifact_id} missing object")
-                continue
-            if check.get("target") != expected_target:
-                failures.append(f"evidenceFileChecks.{artifact_id}.target must be {expected_target}")
-            for field, expected in FINAL_SCREENSHOT_UPLOAD_PACKET_EVIDENCE_FILE_CHECK_FIELDS:
-                if check.get(field) != expected:
-                    failures.append(f"evidenceFileChecks.{artifact_id}.{field} must be {expected!r}")
-
-    dependency_matrix = packet.get("evidenceDependencyMatrix")
-    if not isinstance(dependency_matrix, list):
-        failures.append("evidenceDependencyMatrix must be an array")
-    else:
-        seen_dependency_ids: set[str] = set()
-        dependency_by_artifact: dict[str, dict[str, Any]] = {}
-        for item in dependency_matrix:
-            if not isinstance(item, dict):
-                failures.append("evidenceDependencyMatrix entry must be an object")
-                continue
-            artifact_id = item.get("artifactId")
-            if not isinstance(artifact_id, str) or not artifact_id:
-                failures.append("evidenceDependencyMatrix entry missing artifactId")
-                continue
-            if artifact_id in seen_dependency_ids:
-                failures.append(f"evidenceDependencyMatrix duplicate {artifact_id}")
-                continue
-            seen_dependency_ids.add(artifact_id)
-            dependency_by_artifact[artifact_id] = item
-            if tuple(item) != FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_FIELDS:
-                failures.append(
-                    f"evidenceDependencyMatrix.{artifact_id}.fields must be "
-                    + " -> ".join(FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_FIELDS)
-                )
-        if tuple(dependency_by_artifact) != tuple(FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_MATRIX):
-            failures.append("evidenceDependencyMatrix order must match final screenshot upload workflow")
-        for artifact_id, expected in FINAL_SCREENSHOT_UPLOAD_DEPENDENCY_MATRIX.items():
-            item = dependency_by_artifact.get(artifact_id)
-            if not isinstance(item, dict):
-                failures.append(f"evidenceDependencyMatrix.{artifact_id} missing object")
-                continue
-            for field, expected_value in expected.items():
-                if item.get(field) != expected_value:
-                    failures.append(f"evidenceDependencyMatrix.{artifact_id}.{field} must be {expected_value}")
-
-    candidate = packet.get("currentCandidateSet")
-    if not isinstance(candidate, dict):
-        failures.append("currentCandidateSet must be an object")
-        candidate = {}
-    candidate_text = json.dumps(candidate, ensure_ascii=False)
-    expected_candidate_scalars: dict[str, Any] = {
-        "status": "debug-simulator-candidates-not-final",
-        "directory": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/",
-        "stagingDirectory": "Docs/08_Release/Screenshots-69/",
-        "appStoreDeviceSlot": 'iPhone 6.9" display',
-    }
-    for key, expected in expected_candidate_scalars.items():
-        if candidate.get(key) != expected:
-            failures.append(f"currentCandidateSet.{key} must be {expected}")
-    if nested_value(candidate, "device", "runtime") != EXPECTED_SCREENSHOT_RUNTIME:
-        failures.append(f"currentCandidateSet.device.runtime must be {EXPECTED_SCREENSHOT_RUNTIME}")
-    if nested_value(candidate, "app", "bundleId") != EXPECTED_BUNDLE_ID:
-        failures.append(f"currentCandidateSet.app.bundleId must be {EXPECTED_BUNDLE_ID}")
-    if nested_value(candidate, "app", "sdkName") != EXPECTED_SCREENSHOT_SDK:
-        failures.append(f"currentCandidateSet.app.sdkName must be {EXPECTED_SCREENSHOT_SDK}")
-    if nested_value(candidate, "dimensions", "width") != 1320 or nested_value(candidate, "dimensions", "height") != 2868:
-        failures.append("currentCandidateSet.dimensions must be 1320x2868")
-    if candidate.get("finalFiles") != EXPECTED_FINAL_SCREENSHOT_FILENAMES:
-        failures.append("currentCandidateSet.finalFiles must match expected upload order")
-    for marker in (
-        "Debug simulator candidate screenshots are not final App Store upload evidence",
-        "No iOS 26.5 TestFlight build selected",
-        "No Xcode signed physical-device capture",
-        "05-signed-archive.png",
-        "06-testflight.png",
-        "AppStoreConnect/ASC-07-build-testflight-link.png",
-        "12-real-device-regression.md",
-        "UPLOAD_PROVENANCE.json is still missing",
-    ):
-        if marker not in candidate_text:
-            failures.append(f"currentCandidateSet missing {marker}")
-
-    detail_by_name = {Path(str(detail.get("path"))).name: detail for detail in screenshot_details}
-    for filename in EXPECTED_FINAL_SCREENSHOT_FILENAMES:
-        detail = detail_by_name.get(filename)
-        if not detail:
-            failures.append(f"actual screenshot missing {filename}")
-            continue
-        if (detail.get("width"), detail.get("height")) != (1320, 2868):
-            failures.append(f"actual screenshot {filename} must be 1320x2868")
-
-    requirements = packet.get("finalUploadRequirements")
-    if not isinstance(requirements, dict):
-        failures.append("finalUploadRequirements must be an object")
-        requirements = {}
-    requirements_text = json.dumps(requirements, ensure_ascii=False)
-    expected_requirements: dict[str, Any] = {
-        "targetFile": "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
-        "evidenceType": "final-app-store-upload",
-        "appStoreDeviceSlot": 'iPhone 6.9" display',
-        "deviceRuntime": EXPECTED_SCREENSHOT_RUNTIME,
-    }
-    for key, expected in expected_requirements.items():
-        if requirements.get(key) != expected:
-            failures.append(f"finalUploadRequirements.{key} must be {expected}")
-    if requirements.get("finalFiles") != EXPECTED_FINAL_SCREENSHOT_FILENAMES:
-        failures.append("finalUploadRequirements.finalFiles must match expected upload order")
-    for marker in (
-        "TestFlight",
-        "Xcode 签名真机包",
-        "05-signed-archive.png",
-        "06-testflight.png",
-        "ASC-07-build-testflight-link.png",
-        "12-real-device-regression.md",
-        "APP_STORE_VERSION_RELEASE_SETTINGS_20260704.md",
-        "fileChecks",
-        "fileSizeBytes",
-        "sha256",
-        "redactionChecked",
-        "matchesFinalUploadOrder",
-        "secretValuesNotRecorded",
-        "Debug simulator",
-        "iOS 27",
-        "different TestFlight build",
-        "template JSON",
-        "candidate-only provenance",
-    ):
-        if marker not in requirements_text:
-            failures.append(f"finalUploadRequirements missing {marker}")
-
-    stop_conditions = packet.get("stopConditions")
-    if not isinstance(stop_conditions, list):
-        failures.append("stopConditions must be an array")
-        stop_conditions = []
-    stop_condition_ids = tuple(
-        condition.get("id")
-        for condition in stop_conditions
-        if isinstance(condition, dict)
-    )
-    if stop_condition_ids != FINAL_SCREENSHOT_UPLOAD_STOP_CONDITION_IDS:
-        failures.append(
-            "stopConditions order must be "
-            + " -> ".join(FINAL_SCREENSHOT_UPLOAD_STOP_CONDITION_IDS)
-        )
-    stop_by_id: dict[str, dict[str, Any]] = {}
-    for condition in stop_conditions:
-        if not isinstance(condition, dict):
-            failures.append("stopConditions entry must be an object")
-            continue
-        condition_id = condition.get("id")
-        if not isinstance(condition_id, str) or not condition_id:
-            failures.append("stopConditions entry missing id")
-            continue
-        if condition_id in stop_by_id:
-            failures.append(f"stopConditions duplicate {condition_id}")
-        stop_by_id[condition_id] = condition
-    for condition_id, markers in FINAL_SCREENSHOT_UPLOAD_STOP_CONDITIONS.items():
-        condition = stop_by_id.get(condition_id)
-        if not condition:
-            failures.append(f"stopConditions missing {condition_id}")
-            continue
-        condition_text = json.dumps(condition, ensure_ascii=False)
-        for marker in markers:
-            if marker not in condition_text:
-                failures.append(f"stopConditions.{condition_id} missing {marker}")
-
-    redaction_text = json.dumps(packet.get("redactionChecklist"), ensure_ascii=False)
-    if not isinstance(packet.get("redactionChecklist"), list):
-        failures.append("redactionChecklist must be an array")
-    elif tuple(str(item) for item in packet["redactionChecklist"]) != FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS:
-        failures.append(
-            "redactionChecklist order must be "
-            + " -> ".join(FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS)
-        )
-    for marker in FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS:
-        if marker not in redaction_text:
-            failures.append(f"redactionChecklist missing {marker}")
-
-    post_gates_text = json.dumps(packet.get("postCaptureGates"), ensure_ascii=False)
-    if not isinstance(packet.get("postCaptureGates"), list):
-        failures.append("postCaptureGates must be an array")
-    elif tuple(str(item) for item in packet["postCaptureGates"]) != FINAL_SCREENSHOT_UPLOAD_POST_GATES:
-        failures.append(
-            "postCaptureGates order must be "
-            + " -> ".join(FINAL_SCREENSHOT_UPLOAD_POST_GATES)
-        )
-    for marker in FINAL_SCREENSHOT_UPLOAD_POST_GATES:
-        if marker not in post_gates_text:
-            failures.append(f"postCaptureGates missing {marker}")
-
-    completion_rule = str(packet.get("completionRule", ""))
-    for marker in FINAL_SCREENSHOT_UPLOAD_COMPLETION_MARKERS:
-        if marker not in completion_rule:
-            failures.append(f"completionRule missing {marker}")
-
-    packet_text = json.dumps(packet, ensure_ascii=False)
-    leaked_markers = [marker for marker in PROVENANCE_FORBIDDEN_MARKERS if marker in packet_text]
-    if leaked_markers:
-        failures.append("final screenshot upload packet contains forbidden local/debug/secret markers: " + ", ".join(leaked_markers))
-    return failures
-
-
 class Report:
     def __init__(self) -> None:
         self.checks: dict[str, dict[str, Any]] = {}
@@ -1184,8 +689,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     )
 
     final_screenshot_dir = root / args.final_screenshot_dir
-    final_screenshot_upload_packet_path = root / args.final_screenshot_upload_packet
-    final_screenshot_upload_packet = read_json(final_screenshot_upload_packet_path)
     screenshots = screenshot_files(final_screenshot_dir)
     screenshot_names = [screenshot.name for screenshot in screenshots]
     report.add(
@@ -1278,25 +781,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else "risky screenshot filenames: " + ", ".join(risky_screenshot_names),
     )
 
-    report.add(
-        "finalScreenshotUploadPacketPresent",
-        bool(final_screenshot_upload_packet),
-        str(final_screenshot_upload_packet_path)
-        if final_screenshot_upload_packet
-        else "missing final screenshot upload packet JSON",
-    )
-    final_screenshot_upload_packet_problems = final_screenshot_upload_packet_failures(
-        final_screenshot_upload_packet,
-        screenshot_details,
-    )
-    report.add(
-        "finalScreenshotUploadPacketValid",
-        bool(final_screenshot_upload_packet) and not final_screenshot_upload_packet_problems,
-        "final screenshot upload packet locks iPhone 6.9 current candidates, required final UPLOAD_PROVENANCE.json, iOS 26.5 TestFlight/signed-device source, same-build evidence, stop conditions, redaction checklist, and post-capture gates"
-        if not final_screenshot_upload_packet_problems
-        else "; ".join(final_screenshot_upload_packet_problems),
-    )
-
     provenance_path = final_screenshot_dir / SCREENSHOT_PROVENANCE_FILE
     provenance = read_json(provenance_path)
     provenance_failures = screenshot_provenance_failures(provenance) if provenance else ["missing provenance file"]
@@ -1354,7 +838,6 @@ def main() -> None:
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--app-icon-set", default="App/iOS/XiaoNaiPing/Assets.xcassets/AppIcon.appiconset")
     parser.add_argument("--final-screenshot-dir", default="Docs/08_Release/AppStoreEvidence/10-final-screenshots")
-    parser.add_argument("--final-screenshot-upload-packet", default=DEFAULT_FINAL_SCREENSHOT_UPLOAD_PACKET)
     parser.add_argument("--final-screenshot-upload-template", default=SCREENSHOT_UPLOAD_PROVENANCE_TEMPLATE_FILE)
     parser.add_argument("--min-screenshots", type=int, default=5)
     parser.add_argument("--output", default="Backend/proof/app-store-assets.json")

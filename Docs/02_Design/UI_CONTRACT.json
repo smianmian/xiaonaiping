@@ -209,10 +209,10 @@
     {
       "id": "account_sync",
       "label": "账号与同步",
-      "goal": "Sign in with phone, WeChat, or recovery key; show sync status, restore data, delete account",
-      "primary_action": "手机号/微信/恢复密钥登录并开启同步",
+      "goal": "Sign in with phone verification or WeChat; automatically sync cloud data; show sync status and delete account",
+      "primary_action": "手机号验证码/微信登录并自动开启云同步",
       "empty_state": "Not signed in or cloud service not configured",
-      "error_state": "Sync or restore failed"
+      "error_state": "Login or automatic sync failed"
     },
     {
       "id": "baby_management",

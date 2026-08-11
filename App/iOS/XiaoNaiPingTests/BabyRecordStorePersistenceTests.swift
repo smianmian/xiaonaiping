@@ -315,6 +315,7 @@ final class FamilySyncMergeTests: XCTestCase {
 
     func testEnvelopesRoundTripToSecondStore() {
         let (storeA, storeB) = makePair()
+        let sharedBabyID = storeA.baby.id
         _ = storeA.upsert(FeedingRecord(time: "08:00", type: "奶粉", detail: "120ml", icon: "", amountML: 120))
         _ = storeA.upsert(GrowthRecord(month: "满月", weight: 4.2, height: 54, head: 37, measuredAt: "2026.07.01"))
 
@@ -326,8 +327,10 @@ final class FamilySyncMergeTests: XCTestCase {
         XCTAssertEqual(storeB.feedingRecords.count, 1)
         XCTAssertEqual(storeB.feedingRecords.first?.amountML, 120)
         XCTAssertEqual(storeB.growthRecords.count, 1)
-        // 合并进来的记录归属到本机宝宝档案。
-        XCTAssertEqual(storeB.feedingRecords.first?.babyId, storeB.baby.id)
+        // 家庭同步必须保留发送端宝宝身份，并先同步对应档案，不能串到接收端当前宝宝。
+        XCTAssertEqual(storeB.feedingRecords.first?.babyId, sharedBabyID)
+        XCTAssertEqual(storeB.growthRecords.first?.babyId, sharedBabyID)
+        XCTAssertTrue(storeB.babies.contains(where: { $0.id == sharedBabyID }))
     }
 
     func testLocalNewerRecordSurvivesStaleEnvelope() {
@@ -373,5 +376,101 @@ final class FamilySyncMergeTests: XCTestCase {
         )
         _ = storeB.applyFamilyChanges([staleEnvelope])
         XCTAssertTrue(storeB.feedingRecords.isEmpty, "墓碑必须阻止旧信封复活已删除记录")
+    }
+}
+
+@MainActor
+final class CloudSyncRegressionTests: XCTestCase {
+    func testCloudPayloadRoundTripsHealthObservations() throws {
+        let dirA = FileManager.default.temporaryDirectory.appendingPathComponent("xnp-cloud-a-\(UUID().uuidString)")
+        let dirB = FileManager.default.temporaryDirectory.appendingPathComponent("xnp-cloud-b-\(UUID().uuidString)")
+        defer {
+            try? FileManager.default.removeItem(at: dirA)
+            try? FileManager.default.removeItem(at: dirB)
+        }
+        let source = BabyRecordStore(storageDirectoryOverride: dirA)
+        source.createBabyProfile(name: "宝宝", birthDate: Date(), sex: "女宝")
+        _ = source.upsert(
+            HealthObservation(
+                kind: HealthObservation.medicationKind,
+                medicationName: "维生素D",
+                dose: "400IU",
+                note: "早餐后"
+            )
+        )
+
+        let restored = BabyRecordStore(storageDirectoryOverride: dirB)
+        try restored.restoreCloudSyncData(source.encodedCloudSyncData())
+
+        XCTAssertEqual(restored.healthObservations.count, 1)
+        XCTAssertEqual(restored.healthObservations.first?.medicationName, "维生素D")
+        XCTAssertEqual(restored.healthObservations.first?.dose, "400IU")
+    }
+
+    func testMarkCloudSyncCompletedPreservesWaterBabyIdentity() {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("xnp-water-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = BabyRecordStore(storageDirectoryOverride: dir)
+        store.createBabyProfile(name: "大宝", birthDate: Date(), sex: "女宝")
+        let firstBabyID = store.baby.id
+        XCTAssertTrue(store.addBaby(name: "二宝", birthDate: Date(), sex: "男宝"))
+        let secondBabyID = store.baby.id
+        _ = store.upsert(WaterRecord(amountML: 80))
+        store.switchActiveBaby(firstBabyID)
+
+        _ = store.markCloudSyncCompleted()
+
+        XCTAssertEqual(store.waterRecords.first?.babyId, secondBabyID)
+        XCTAssertNotEqual(store.waterRecords.first?.babyId, firstBabyID)
+    }
+}
+
+private final class CloudSyncURLProtocolStub: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let handler = Self.requestHandler else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
+            return
+        }
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
+}
+
+final class CloudSyncAPIClientTests: XCTestCase {
+    override func tearDown() {
+        CloudSyncURLProtocolStub.requestHandler = nil
+        super.tearDown()
+    }
+
+    func testFamilyPullBuildsRealSinceQueryItem() async throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [CloudSyncURLProtocolStub.self]
+        let session = URLSession(configuration: configuration)
+        CloudSyncURLProtocolStub.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/xiaonaiping/v1/family/records")
+            XCTAssertEqual(URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false)?.queryItems,
+                           [URLQueryItem(name: "since", value: "42")])
+            let response = try XCTUnwrap(
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)
+            )
+            return (response, Data("{\"records\":[],\"cursor\":42,\"hasMore\":false}".utf8))
+        }
+
+        let client = CloudSyncAPIClient(baseURL: URL(string: "https://api.example.com/xiaonaiping")!, urlSession: session)
+        let result = try await client.pullFamilyRecords(since: 42, token: "token")
+        XCTAssertEqual(result.cursor, 42)
     }
 }

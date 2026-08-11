@@ -28,10 +28,11 @@ struct CloudSyncPayload: Codable {
     var growthRecords: [GrowthRecord]
     var vaccineRecords: [VaccineRecord]
     var milestones: [Milestone]
+    var healthObservations: [HealthObservation]
     var babyPhotos: [BabyPhoto]
 
     private enum CodingKeys: String, CodingKey {
-        case schemaVersion, generatedAt, hasCompletedOnboarding, baby, babies, activeBabyID, feedingRecords, waterRecords, sleepRecords, diaperRecords, growthRecords, vaccineRecords, milestones, babyPhotos
+        case schemaVersion, generatedAt, hasCompletedOnboarding, baby, babies, activeBabyID, feedingRecords, waterRecords, sleepRecords, diaperRecords, growthRecords, vaccineRecords, milestones, healthObservations, babyPhotos
     }
 
     init(
@@ -48,6 +49,7 @@ struct CloudSyncPayload: Codable {
         growthRecords: [GrowthRecord],
         vaccineRecords: [VaccineRecord],
         milestones: [Milestone],
+        healthObservations: [HealthObservation] = [],
         babyPhotos: [BabyPhoto]
     ) {
         self.schemaVersion = schemaVersion
@@ -63,6 +65,7 @@ struct CloudSyncPayload: Codable {
         self.growthRecords = growthRecords
         self.vaccineRecords = vaccineRecords
         self.milestones = milestones
+        self.healthObservations = healthObservations
         self.babyPhotos = babyPhotos
     }
 
@@ -81,6 +84,7 @@ struct CloudSyncPayload: Codable {
         growthRecords = try container.decode([GrowthRecord].self, forKey: .growthRecords)
         vaccineRecords = try container.decode([VaccineRecord].self, forKey: .vaccineRecords)
         milestones = try container.decode([Milestone].self, forKey: .milestones)
+        healthObservations = try container.decodeIfPresent([HealthObservation].self, forKey: .healthObservations) ?? []
         babyPhotos = try container.decode([BabyPhoto].self, forKey: .babyPhotos)
     }
 }

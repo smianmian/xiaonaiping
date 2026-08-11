@@ -62,8 +62,17 @@ class DatabaseTest(unittest.TestCase):
                     row["name"]
                     for row in db.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
                 }
+                account_columns = [row["name"] for row in db.execute("PRAGMA table_info(accounts)").fetchall()]
+                phone_code_columns = {
+                    row["name"] for row in db.execute("PRAGMA table_info(phone_login_codes)").fetchall()
+                }
             self.assertIn("accounts", tables)
             self.assertIn("deletion_audit", tables)
+            self.assertEqual(account_columns, ["account_id", "created_at", "deleted_at"])
+            self.assertTrue(
+                {"request_window_started_at", "last_requested_at", "request_count", "failed_attempts", "locked_until"}
+                <= phone_code_columns
+            )
 
     def test_sqlite_schema_migrates_legacy_deletion_audit(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -134,8 +143,8 @@ class DatabaseTest(unittest.TestCase):
             with connect_database(DatabaseSettings(backend="sqlite", sqlite_path=path)) as db:
                 ensure_schema(db)
                 db.execute(
-                    "INSERT INTO accounts(account_id, recovery_hash, created_at) VALUES (?, ?, ?)",
-                    ("account", "hash", "t0"),
+                    "INSERT INTO accounts(account_id, created_at) VALUES (?, ?)",
+                    ("account", "t0"),
                 )
 
                 upsert_sync(db, "account", b'{"v":1}', "t1")

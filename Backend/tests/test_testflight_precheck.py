@@ -211,25 +211,18 @@ private struct DataStatusSheet: View {
             Task { await cloudSync.verifyPhoneCode(phoneNumber: normalizedPhoneNumber, code: normalizedPhoneCode) }
         }
         Button("微信登录") {
-            Task { await cloudSync.loginWithWeChat() }
+            Task { await cloudSync.loginWithWeChat(store: store) }
         }
         .disabled(cloudSync.isWorking || !cloudSync.isWeChatLoginConfigured)
-        Text("恢复密钥登录")
-        Button("使用恢复密钥登录") {
-            Task { await cloudSync.recoverSession(recoveryKey: recoveryKey) }
-        }
         _ = CloudSyncController.validateE164PhoneNumber(normalizedPhoneNumber)
         _ = CloudSyncController.validateSmsCode(normalizedPhoneCode)
-        Button("立即同步") {
-            Task { await cloudSync.createAccountAndSync(store: store) }
-        }
         Button("从云端恢复") {
-            Task { await cloudSync.restoreLatestSync(store: store) }
+            Task { await cloudSync.restoreFromCloud(store: store) }
         }
-        Button("删除云端账号与同步") {
+        Button("删除云端账号") {
             Task { await cloudSync.deleteCloudAccount(store: store) }
         }
-        Text("本机资料保留")
+        Text("删除账号会删除云端记录、照片和账号信息。")
     }
 }
 """,
@@ -238,12 +231,10 @@ private struct DataStatusSheet: View {
         ios / "XiaoNaiPing/Services/CloudSyncController.swift",
         """
 final class CloudSyncController {
-    func createAccountAndSync(store: BabyRecordStore) async {}
     func requestPhoneCode(phoneNumber: String) async {}
     func verifyPhoneCode(phoneNumber: String, code: String) async {}
-    func recoverSession(recoveryKey: String) async {}
-    func loginWithWeChat() async {}
-    func restoreLatestSync(store: BabyRecordStore) async {
+    func loginWithWeChat(store: BabyRecordStore) async {}
+    func restoreFromCloud(store: BabyRecordStore) async {
         client.downloadPhoto(id: photo.id, token: token)
     }
     func deleteCloudAccount(store: BabyRecordStore) async {
@@ -260,12 +251,6 @@ final class CloudSyncController {
         ios / "XiaoNaiPing/Services/CloudSyncAPIClient.swift",
         """
 final class CloudSyncAPIClient {
-    func createAccount() async throws {
-        _ = try await request(path: "/v1/accounts", method: "POST", body: Data())
-    }
-    func recoverSession(recoveryKey: String) async throws {
-        _ = try await request(path: "/v1/sessions/recover", method: "POST", body: body)
-    }
     func requestPhoneCode(phoneNumber: String) async throws {
         _ = try await request(path: "/v1/auth/phone/request-code", method: "POST", body: body)
     }

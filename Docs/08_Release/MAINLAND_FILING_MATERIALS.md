@@ -13,7 +13,7 @@
 1. 小奶瓶计划在中国大陆 App Store 首发，并通过中国大陆云资源提供联网服务，应按 App 备案路径准备材料。
 2. 当前公网过渡路径为 `https://api.mewpow.com/xiaonaiping`，正式提交前建议改为小奶瓶专属子域名，避免多个产品共用路径导致备案和审核材料混乱。
 3. App Store Connect 公司主体证据依赖 D-U-N-S 后继续完成 Apple Developer Organization enrollment，并确认 Team ID；见 `Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md`。
-4. 微信开放平台、短信服务商、OBS 策略、生产 proof 和 iOS 26.5 真机/TestFlight 证据按 `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 归档，不用截图模板或占位配置替代。
+4. 微信开放平台、短信服务商、OBS 策略、生产 proof 和 iOS 26.5 真机/TestFlight 证据必须按同一轮真实操作归档，不用截图模板或占位配置替代。
 5. App 备案完成后，需要在 App 显著位置展示备案编号并链接工信部备案系统；拿到备案号后再实现 UI / 静态页展示。
 6. 公安联网备案通常在 ICP / App 备案完成并开通服务后继续办理，证据也要归档。
 
@@ -39,7 +39,7 @@
 | 云服务 | 华为云中国大陆 ECS、宝塔 MySQL、华为云 OBS | 待控制台证据 |
 | 生产数据库 | `xiaonaiping_prod` | 已有部署 proof，仍需同步/恢复演练 |
 | 对象存储 | 华为云 OBS 私有 bucket / prefix | 待 bucket、加密、生命周期和删除验证证据 |
-| 账号方式 | 恢复密钥、手机号验证码、微信授权 | 手机短信和微信开放平台仍待最终配置 |
+| 账号方式 | 手机号验证码、微信授权 | 手机短信和微信开放平台仍待最终配置；登录后自动云同步 |
 
 ## 需要向公司/后台拿到的材料
 
@@ -55,7 +55,7 @@
 10. 短信服务商签名、模板、发送成功证明。
 11. 微信开放平台移动应用、Bundle ID、URL Scheme、Universal Link 绑定证明。
 12. OBS bucket、私有访问、服务端访问、加密、生命周期、删除验证证明。
-13. `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 中列出的微信、短信、OBS、生产 proof、iOS 26.5 真机/TestFlight 证据。
+13. 微信、短信、OBS、生产 proof 和 iOS 26.5 真机/TestFlight 同轮真实证据。
 14. 拿到备案号后的备案编号、备案查询页截图和 App 内展示位置截图。
 15. 公安联网备案提交/通过证明。
 
@@ -73,7 +73,6 @@
 | 微信开放平台 | `Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png` |
 | OBS 策略 | `Docs/08_Release/AppStoreEvidence/09-obs-policy.png` |
 | 最终截图 | `Docs/08_Release/AppStoreEvidence/10-final-screenshots/` |
-| 测试账号 redacted 证据 | `Docs/08_Release/AppStoreEvidence/11-test-account-redacted.json` |
 
 ## 上线前需要改代码的备案项
 
@@ -88,16 +87,16 @@
 
 1. 确认专属域名或决定继续使用过渡路径。
 2. 按 `Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md` 完成 D-U-N-S 后的 Apple Developer 公司主体、Team ID、签名归档前置确认。
-3. 按 `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 补齐微信、短信、OBS、生产 proof 和 iOS 26.5 真机/TestFlight 证据。
+3. 按本文件和 `REGIONAL_LAUNCH_STRATEGY.md` 补齐微信、短信、对象存储、生产 proof 和签名真机/TestFlight 证据。
 4. 在华为云/接入商备案系统提交 App 备案和适用 ICP 信息。
 5. 备案通过后补 App 内/网页备案编号展示。
 6. 完成公安联网备案并归档证明。
-7. 再提交 App Store Connect 中国大陆审核。
+7. 中国大陆门禁与其他目标地区门禁全部通过后，再提交同一轮全球 App Store 审核。
 
 ## 备案 / ICP / 公安联网备案当天执行记录模板
 
-复制下面清单到当天的私有执行记录或工单中填写；所有项必须来自同一天同一轮操作。不要把完整证件号、联系人完整电话、验证码、AK/SK、AppSecret、恢复密钥、token、服务器密码或真实宝宝照片写进仓库。
-结构化执行包见 `Docs/08_Release/MAINLAND_FILING_EXECUTION_PACKET_20260704.json`；它不是备案证据，不能作为提交许可，只用于锁定源文件、证据文件名、停止条件、脱敏清单和复跑 gate。
+复制下面清单到当天的私有执行记录或工单中填写；所有项必须来自同一天同一轮操作。不要把完整证件号、联系人完整电话、验证码、AK/SK、AppSecret、token、服务器密码或真实宝宝照片写进仓库。
+旧日期结构化执行包已移除；新的备案执行记录必须从真实后台同轮采集，且不能作为备案通过或提交许可的替代证据。
 
 - [ ] 营业执照电子版、法定代表人、App 负责人、网络安全负责人材料已确认。
 - [ ] 域名证书、域名实名认证、DNS 解析、云服务器公网 IP、接入商信息已确认。
@@ -108,6 +107,6 @@
 - [ ] 备案通过后再更新 Backend/static/privacy.html、terms.html、support.html。
 - [ ] App 内“数据与隐私”或“关于小奶瓶”展示备案编号和工信部备案系统链接。
 - [ ] 公安联网备案提交/通过证明已归档。
-- [ ] check_public_pages.py、check_review_notes.py、check_mainland_filing_materials.py、check_production_readiness.py 已复跑。
-- [ ] 不记录完整证件号、联系人完整电话、验证码、AK/SK、AppSecret、恢复密钥或 token。
+- [ ] 备案材料已人工核对，且 check_public_pages.py、check_review_notes.py、check_production_readiness.py 已复跑。
+- [ ] 不记录完整证件号、联系人完整电话、验证码、AK/SK、AppSecret 或 token。
 - [ ] 如果任一项未通过，不提交中国大陆 App Store 审核。

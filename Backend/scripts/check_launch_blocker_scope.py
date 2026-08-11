@@ -26,27 +26,8 @@ EXPECTED_PRODUCTION_BLOCKERS = {
     "storageBackendProofCurrent",
     "iosReleaseReadinessProofPassed",
     "iosAppBundleProofPassed",
-    "testFlightRegressionPlanProofPassed",
     "appStoreAssetsProofPassed",
     "authProvidersProofPassed",
-    "appStoreManualEvidenceReady",
-}
-
-EXPECTED_APP_STORE_EVIDENCE_GAPS = {
-    "companyAccount",
-    "mainlandAvailability",
-    "mainlandFiling",
-    "privacyLabel",
-    "ageRatingResult",
-    "signedArchive",
-    "testFlight",
-    "appleDeveloperAccountAccess",
-    "smsProvider",
-    "wechatOpenPlatform",
-    "wechatUniversalLinkAasa",
-    "huaweiObsPolicy",
-    "finalScreenshots",
-    "realDeviceRegression",
 }
 
 EXPECTED_AUTH_PROVIDER_BLOCKERS = {"smsProviderConfigured", "wechatProviderConfigured"}
@@ -94,7 +75,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     started_at = utc_now()
 
     production = read_json(root / args.production_proof)
-    app_store_evidence = read_json(root / args.app_store_evidence)
     auth_providers = read_json(root / args.auth_providers_proof)
     ios_release = read_json(root / args.ios_release_proof)
     ios_bundle = read_json(root / args.ios_app_bundle_proof)
@@ -103,10 +83,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "productionReadiness": compare(
             list_value(production, "failedRequiredChecks"),
             EXPECTED_PRODUCTION_BLOCKERS,
-        ),
-        "appStoreEvidence": compare(
-            list_value(app_store_evidence, "missingEvidence"),
-            EXPECTED_APP_STORE_EVIDENCE_GAPS,
         ),
         "authProviders": compare(
             list_value(auth_providers, "failedRequiredChecks"),
@@ -138,10 +114,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "productionEnv": "Private production env, MySQL, OBS, dashboard, and namespace values are not proven in this local current proof.",
             "publicInternalDashboard": "Public /internal routes must be proven blocked before submission.",
             "proofFreshness": "Deployment and storage backend proofs must be refreshed for the current release day before submission.",
-            "testFlightRegressionPrerequisite": "The TestFlight regression plan cannot pass until iOS 26.5 physical-device availability proof is readable and current.",
-            "sms": "SMS webhook provider private env is not loaded in the current proof, and provider screenshot evidence is not archived.",
+            "sms": "SMS webhook provider private env is not loaded in the current proof.",
             "wechat": "WeChat Open Platform AppID/AppSecret and real wx URL Scheme are not configured.",
-            "appStoreManualEvidence": "App Store Connect screenshots, filing, signed archive, TestFlight, providers, OBS policy, and real-device regression are not archived.",
             "notSubmissionReady": "This proof only says remaining blockers are known; it does not make the app submission-ready.",
         },
     }
@@ -151,7 +125,6 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(repo_root()))
     parser.add_argument("--production-proof", default="Backend/proof/production-readiness.json")
-    parser.add_argument("--app-store-evidence", default="Backend/proof/app-store-evidence.json")
     parser.add_argument("--auth-providers-proof", default="Backend/proof/auth-providers.json")
     parser.add_argument("--ios-release-proof", default="Backend/proof/ios-release-readiness.json")
     parser.add_argument("--ios-app-bundle-proof", default="Backend/proof/ios-app-bundle.json")

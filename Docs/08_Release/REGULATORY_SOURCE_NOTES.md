@@ -47,7 +47,7 @@
    - https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/
 3. Apple Screenshot Specifications：当前 2026-06-28 候选截图已重截为 iPhone 17 Pro Max / iPhone 6.9" display / `1320 x 2868`，属于本项目 App Store 6.9 英寸槽位候选；它仍只是 Debug simulator 候选，不替代 TestFlight 或签名真机最终上传证据。
    - https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
-4. Apple App Review：提交审核前必须彻底测试，隐私政策和支持链接需要可用；需要登录的功能应在 App Review Information 中提供有效测试账号。
+4. Apple App Review：提交审核前必须彻底测试，隐私政策和支持链接需要可用；如审核需要认证，应在 App Review Information 私密字段中如实说明提交包实际存在的生产认证流程，不在仓库保存静态凭据。
    - https://developer.apple.com/distribute/app-review/
 5. 工业和信息化部《关于开展移动互联网应用程序备案工作的通知》：在中国境内从事互联网信息服务的 App 主办者应履行备案手续；新 App 应先履行备案手续后开展业务；备案编号需要在 App 显著位置标明并链接备案系统。
    - https://www.miit.gov.cn/zwgk/zcwj/wjfb/tz/art/2023/art_920db564162e4312916a01bed6540ad8.html

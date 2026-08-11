@@ -5,7 +5,7 @@
 - 项目：小奶瓶 / 宝宝成长记录
 - 阶段：SDK 与数据清单实现更新
 - 日期：2026-06-14
-- 当前结论：第一版已采用恢复密钥账号、自有 API 云同步，并新增手机号登录、阿里云短信 webhook adapter、微信登录和第一方合规埋点；服务端已支持短信 webhook、微信 code exchange 和白名单行为事件，iOS 微信 OpenSDK 依赖已接入，真实微信 AppID / URL Scheme / Universal Link 后台绑定 / AppSecret、阿里云短信签名/模板/RAM 密钥和区域仍需上线前确认；仍默认不接入第三方分析/广告 SDK
+- 当前结论：第一版采用手机号验证码/微信登录和登录后自动云同步；服务端已支持短信 webhook、阿里云短信 webhook adapter、微信 code exchange 和白名单行为事件，iOS 微信 OpenSDK 依赖已接入，真实微信 AppID / URL Scheme / Universal Link 后台绑定 / AppSecret、阿里云短信签名/模板/RAM 密钥和区域仍需上线前确认；仍默认不接入第三方分析/广告 SDK
 
 ## 已确认事实
 
@@ -20,7 +20,7 @@
 ## 合理推断
 
 1. 优先使用 Apple 原生框架。
-2. 账号当前采用恢复密钥、手机号和微信登录组合；暂不接入 Sign in with Apple。
+2. 账号当前采用手机号验证码和微信登录，登录后自动开启云同步；暂不接入 Sign in with Apple。
 3. 云端照片原图通过自有 API 上传，不建议客户端直连云厂商 SDK。
 4. 崩溃上报使用 Apple 原生 App Store Connect / TestFlight 崩溃报告；不接入第三方崩溃 SDK。
 5. 合规埋点只应记录白名单行为枚举，不记录宝宝内容、照片、手机号、微信标识或定位。

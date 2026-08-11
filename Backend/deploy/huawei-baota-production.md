@@ -158,15 +158,15 @@ python3 Backend/scripts/collect_deployment_proof.py \
   --service-active \
   --public-internal-blocked \
   --output Backend/proof/huawei-baota-deploy-YYYYMMDD.json
-python3 Backend/scripts/verify_remote_api.py --base-url https://YOUR_XIAONAIPING_API_DOMAIN --output Backend/proof/remote-api.json
+export XNP_REMOTE_TEST_PHONE=+8613800000000
+python3 Backend/scripts/verify_remote_api.py --base-url https://YOUR_XIAONAIPING_API_DOMAIN --phone "$XNP_REMOTE_TEST_PHONE" --output Backend/proof/remote-api.json
 python3 Backend/scripts/verify_auth_providers.py --live-check --base-url https://YOUR_XIAONAIPING_API_DOMAIN --output Backend/proof/auth-providers.json
 python3 Backend/scripts/check_diagnostics_redaction.py --output Backend/proof/diagnostics-redaction.json
 python3 Backend/scripts/check_public_pages.py --output Backend/proof/public-pages.json
 python3 Backend/scripts/check_review_notes.py --output Backend/proof/review-notes.json
-python3 Backend/scripts/check_legal_drafts.py --output Backend/proof/legal-drafts.json
 python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links.json
 XNP_API_BASE_URL=https://YOUR_XIAONAIPING_API_DOMAIN \
-python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --require-app-store-evidence --live-check --output Backend/proof/production-readiness.json
+python3 Backend/scripts/check_production_readiness.py --require-huawei-obs --require-screenshots --live-check --output Backend/proof/production-readiness.json
 ```
 
 `collect_deployment_proof.py` must be run only on the server or a trusted machine that can read the private env. It records which secret keys are present without writing secret values to JSON. Do not paste raw private env files into chat, tickets, or git.

@@ -58,8 +58,14 @@ def run_flow() -> dict[str, Any]:
 
         try:
             started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-            status, created = request(base_url, "POST", "/v1/accounts")
-            token = created["sessionToken"]
+            status, phone_code = request(base_url, "POST", "/v1/auth/phone/request-code", {"phoneNumber": "+85251234567"})
+            status, phone_session = request(
+                base_url,
+                "POST",
+                "/v1/auth/phone/verify",
+                {"phoneNumber": "+85251234567", "code": phone_code["debugCode"]},
+            )
+            token = phone_session["sessionToken"]
 
             sync = {
                 "schemaVersion": 1,
@@ -82,14 +88,6 @@ def run_flow() -> dict[str, Any]:
             )
             status, photo_list = request(base_url, "GET", "/v1/photos", token=token)
             status, photo_download = request(base_url, "GET", "/v1/photos/photo_release_1", token=token)
-            status, recovered = request(base_url, "POST", "/v1/sessions/recover", {"recoveryKey": created["recoveryKey"]})
-            status, phone_code = request(base_url, "POST", "/v1/auth/phone/request-code", {"phoneNumber": "+85251234567"})
-            status, phone_session = request(
-                base_url,
-                "POST",
-                "/v1/auth/phone/verify",
-                {"phoneNumber": "+85251234567", "code": phone_code["debugCode"]},
-            )
             status, wechat_session = request(base_url, "POST", "/v1/auth/wechat/login", {"code": "debug_wechat_release_flow"})
             status, deleted = request(base_url, "DELETE", "/v1/account", token=token)
 
@@ -104,14 +102,12 @@ def run_flow() -> dict[str, Any]:
                 "completedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "apiBaseUrl": base_url,
                 "checks": {
-                    "accountCreated": bool(created.get("accountId")) and created.get("recoveryKey", "").startswith("xnp_"),
+                    "phoneAccountAuthenticated": phone_session.get("authProvider") == "phone" and bool(phone_session.get("accountId")),
                     "syncUploaded": sync_upload.get("sizeBytes") == len(sync_bytes),
                     "syncRestored": sync_restore == sync,
                     "photoUploaded": photo_upload.get("photoId") == "photo_release_1",
                     "photoListed": photo_list.get("photos", [{}])[0].get("photoId") == "photo_release_1",
                     "photoDownloaded": photo_download == photo_bytes,
-                    "recoveryKeyWorks": recovered.get("accountId") == created.get("accountId"),
-                    "phoneLoginWorks": phone_session.get("authProvider") == "phone" and bool(phone_session.get("accountId")),
                     "wechatLoginWorks": wechat_session.get("authProvider") == "wechat" and bool(wechat_session.get("accountId")),
                     "accountDeleteRemovedSync": deleted.get("syncDeleted") is True,
                     "accountDeleteRemovedPhoto": deleted.get("photoCountDeleted") == 1,

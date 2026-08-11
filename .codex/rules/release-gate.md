@@ -5,7 +5,6 @@
 - `Docs/05_QA/TEST_PLAN.md`
 - `Docs/07_PrivacySecurity/PRIVACY_REVIEW.md`
 - `Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md`
-- `Docs/08_Release/APP_STORE_COMPLIANCE_TIMELINE.md`
 - `Docs/08_Release/APP_STORE_METADATA.md`
 - `Docs/06_Release/RELEASE_CHECKLIST.md`
 - `Docs/06_Release/PROOF_PACK.md`

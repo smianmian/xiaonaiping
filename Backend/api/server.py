@@ -25,8 +25,8 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-from api.database import DatabaseConnection, connect_database, ensure_schema, settings_from_environment
-from api.storage import ObjectStorage, build_object_storage
+from api.database import DatabaseConnection, connect_database, ensure_schema, insert_account, settings_from_environment
+from api.storage import ObjectStorage, ObjectStorageError, build_object_storage
 
 
 STATIC_ROUTES = {
@@ -37,7 +37,6 @@ STATIC_ROUTES = {
     "/support-assets/operation-flow.jpg": ("support-assets/operation-flow.jpg", "image/jpeg"),
     "/support-assets/screenshot-home.jpg": ("support-assets/screenshot-home.jpg", "image/jpeg"),
     "/support-assets/screenshot-record.jpg": ("support-assets/screenshot-record.jpg", "image/jpeg"),
-    "/support-assets/screenshot-sync.jpg": ("support-assets/screenshot-sync.jpg", "image/jpeg"),
     "/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/.well-known/apple-app-site-association": ("apple-app-site-association", "application/json; charset=utf-8"),
     "/internal/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
@@ -51,6 +50,11 @@ SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
 SAFE_ANALYTICS_EVENT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{8,80}$")
 PHONE_RE = re.compile(r"^\+[1-9][0-9]{7,15}$")
 PHONE_CODE_TTL_SECONDS = 10 * 60
+PHONE_CODE_REQUEST_COOLDOWN_SECONDS = 60
+PHONE_CODE_REQUEST_WINDOW_SECONDS = 60 * 60
+PHONE_CODE_MAX_REQUESTS_PER_WINDOW = 5
+PHONE_CODE_MAX_FAILED_ATTEMPTS = 5
+PHONE_CODE_LOCK_SECONDS = 15 * 60
 SMS_PROVIDER_WEBHOOK = "webhook"
 WECHAT_DEBUG_PREFIX = "debug_wechat_"
 WECHAT_SUBJECT_RE = re.compile(r"^[A-Za-z0-9_-]{4,128}$")
@@ -59,7 +63,6 @@ DEFAULT_ANALYTICS_RETENTION_DAYS = 180
 ANALYTICS_EVENT_NAMES = {
     "app_opened",
     "onboarding_completed",
-    "account_created",
     "login_completed",
     "cloud_sync_enabled",
     "cloud_sync_completed",
@@ -76,7 +79,7 @@ ANALYTICS_PROPERTY_VALUES = {
     "source": {"app_launch", "onboarding", "profile", "record", "album", "growth", "sync", "restore", "system"},
     "recordType": {"feeding", "sleep", "diaper", "growth", "milestone", "vaccine", "photo"},
     "reminderType": {"feeding", "vaccine"},
-    "authProvider": {"recovery_key", "phone", "wechat"},
+    "authProvider": {"phone", "wechat"},
     "result": {"success", "failure", "cancelled"},
     "feature": {"cloud_sync", "cloud_restore", "photo_sync", "account", "reminder", "commercial"},
     "productTier": {"free", "premium"},
@@ -120,8 +123,6 @@ class ServerConfig:
     sms_secret: str = ""
     sms_webhook_url: str = ""
     sms_template_id: str = ""
-    app_review_phone_number: str = ""
-    app_review_phone_code: str = ""
     wechat_app_id: str = ""
     wechat_app_secret: str = ""
     wechat_access_token_url: str = DEFAULT_WECHAT_ACCESS_TOKEN_URL
@@ -177,10 +178,6 @@ def unb64url(value: str) -> bytes:
 
 def json_dumps_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-
-
-def recovery_hash(secret_key: str, recovery_key: str) -> str:
-    return hmac.new(secret_key.encode("utf-8"), recovery_key.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 def subject_hash(secret_key: str, provider: str, subject: str) -> str:
@@ -309,27 +306,14 @@ def exchange_wechat_code(config: ServerConfig, code: str) -> str:
     return subject
 
 
-def create_account_with_recovery(db: DatabaseConnection, config: ServerConfig) -> dict[str, str]:
+def create_identity_account(db: DatabaseConnection) -> dict[str, str]:
     account_id = str(uuid.uuid4())
-    recovery_key = "xnp_" + secrets.token_urlsafe(24)
     created_at = utc_now()
-    db.execute(
-        "INSERT INTO accounts(account_id, recovery_hash, created_at) VALUES (?, ?, ?)",
-        (account_id, recovery_hash(config.secret_key, recovery_key), created_at),
-    )
+    insert_account(db, account_id, created_at)
     return {
         "accountId": account_id,
-        "recoveryKey": recovery_key,
         "createdAt": created_at,
     }
-
-
-def app_review_phone_code(config: ServerConfig, phone_number: str) -> str | None:
-    review_phone_number = normalize_phone_number(config.app_review_phone_number)
-    review_code = config.app_review_phone_code.strip()
-    if review_phone_number != phone_number or not re.fullmatch(r"^[0-9]{6}$", review_code):
-        return None
-    return review_code
 
 
 def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str, subject: str) -> dict[str, Any]:
@@ -351,7 +335,7 @@ def identity_session(db: DatabaseConnection, config: ServerConfig, provider: str
             "DELETE FROM account_identities WHERE provider = ? AND subject_hash = ?",
             (provider, hashed),
         )
-        created = create_account_with_recovery(db, config)
+        created = create_identity_account(db)
         account_id = created["accountId"]
         created_at = created["createdAt"]
         db.execute(
@@ -381,30 +365,43 @@ def upsert_phone_code(
     code_digest: str,
     created_at: str,
     expires_at: int,
+    request_window_started_at: int = 0,
+    last_requested_at: int = 0,
+    request_count: int = 1,
 ) -> None:
     if db.dialect == "mysql":
         db.execute(
             """
-            INSERT INTO phone_login_codes(phone_hash, code_hash, created_at, expires_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO phone_login_codes(
+                phone_hash, code_hash, created_at, expires_at,
+                request_window_started_at, last_requested_at, request_count, failed_attempts, locked_until
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
             ON DUPLICATE KEY UPDATE
                 code_hash = VALUES(code_hash),
                 created_at = VALUES(created_at),
-                expires_at = VALUES(expires_at)
+                expires_at = VALUES(expires_at),
+                request_window_started_at = VALUES(request_window_started_at),
+                last_requested_at = VALUES(last_requested_at),
+                request_count = VALUES(request_count)
             """,
-            (phone_digest, code_digest, created_at, expires_at),
+            (phone_digest, code_digest, created_at, expires_at, request_window_started_at, last_requested_at, request_count),
         )
         return
     db.execute(
         """
-        INSERT INTO phone_login_codes(phone_hash, code_hash, created_at, expires_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO phone_login_codes(
+            phone_hash, code_hash, created_at, expires_at,
+            request_window_started_at, last_requested_at, request_count, failed_attempts, locked_until
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
         ON CONFLICT(phone_hash) DO UPDATE SET
             code_hash = excluded.code_hash,
             created_at = excluded.created_at,
-            expires_at = excluded.expires_at
+            expires_at = excluded.expires_at,
+            request_window_started_at = excluded.request_window_started_at,
+            last_requested_at = excluded.last_requested_at,
+            request_count = excluded.request_count
         """,
-        (phone_digest, code_digest, created_at, expires_at),
+        (phone_digest, code_digest, created_at, expires_at, request_window_started_at, last_requested_at, request_count),
     )
 
 
@@ -421,6 +418,7 @@ FAMILY_RECORD_TYPES = {"baby", "feeding", "water", "sleep", "diaper", "growth", 
 FAMILY_BATCH_LIMIT = 500
 FAMILY_RECORD_PAYLOAD_LIMIT = 64 * 1024
 FAMILY_PULL_LIMIT = 500
+FAMILY_MAX_FUTURE_SKEW_MS = 5 * 60 * 1000
 
 
 def generate_family_invite_code() -> str:
@@ -709,11 +707,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
-        if path == "/v1/accounts":
-            self.handle_create_account()
-        elif path == "/v1/sessions/recover":
-            self.handle_recover_session()
-        elif path == "/v1/auth/phone/request-code":
+        if path == "/v1/auth/phone/request-code":
             self.handle_phone_request_code()
         elif path == "/v1/auth/phone/verify":
             self.handle_phone_verify()
@@ -770,53 +764,6 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         else:
             self.write_error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在。")
 
-    def handle_create_account(self) -> None:
-        with connect(self.config) as db:
-            created = create_account_with_recovery(db, self.config)
-            db.commit()
-
-        self.write_json(
-            {
-                "accountId": created["accountId"],
-                "sessionToken": make_session_token(self.config.secret_key, created["accountId"]),
-                "recoveryKey": created["recoveryKey"],
-                "createdAt": created["createdAt"],
-                "authProvider": "recovery_key",
-            },
-            status=HTTPStatus.CREATED,
-        )
-
-    def handle_recover_session(self) -> None:
-        body = self.read_json(MAX_SYNC_BYTES)
-        if not isinstance(body, dict):
-            self.write_error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求体必须是 JSON 对象。")
-            return
-
-        recovery_key = body.get("recoveryKey")
-        if not isinstance(recovery_key, str) or not recovery_key:
-            self.write_error(HTTPStatus.BAD_REQUEST, "missing_recovery_key", "缺少恢复密钥。")
-            return
-
-        key_hash = recovery_hash(self.config.secret_key, recovery_key)
-        with connect(self.config) as db:
-            row = db.execute(
-                "SELECT account_id, created_at FROM accounts WHERE recovery_hash = ? AND deleted_at IS NULL",
-                (key_hash,),
-            ).fetchone()
-
-        if row is None:
-            self.write_error(HTTPStatus.UNAUTHORIZED, "invalid_recovery_key", "恢复密钥无效或账号已删除。")
-            return
-
-        self.write_json(
-            {
-                "accountId": row["account_id"],
-                "sessionToken": make_session_token(self.config.secret_key, row["account_id"]),
-                "createdAt": row["created_at"],
-                "authProvider": "recovery_key",
-            }
-        )
-
     def handle_phone_request_code(self) -> None:
         body = self.read_json(MAX_SYNC_BYTES)
         if not isinstance(body, dict):
@@ -830,20 +777,62 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         if phone_number is None:
             self.write_error(HTTPStatus.BAD_REQUEST, "invalid_phone_number", "手机号必须使用 E.164 格式，例如 +85251234567。")
             return
-        review_code = app_review_phone_code(self.config, phone_number)
-        code = review_code or make_phone_code()
-        if not self.config.auth_debug_mode and review_code is None:
-            try:
-                send_phone_code(self.config, phone_number, code)
-            except AuthProviderError as error:
-                self.write_error(error.status, error.code, error.message)
-                return
-
         now = int(time.time())
         phone_digest = subject_hash(self.config.secret_key, "phone", phone_number)
-        code_digest = subject_hash(self.config.secret_key, "phone_code", f"{phone_number}:{code}")
         with connect(self.config) as db:
-            upsert_phone_code(db, phone_digest, code_digest, utc_now(), now + PHONE_CODE_TTL_SECONDS)
+            db.execute(
+                "DELETE FROM phone_login_codes WHERE expires_at < ? AND locked_until < ?",
+                (now, now),
+            )
+            row = db.execute(
+                """
+                SELECT request_window_started_at, last_requested_at, request_count, locked_until
+                FROM phone_login_codes WHERE phone_hash = ?
+                """,
+                (phone_digest,),
+            ).fetchone()
+            if row is not None and int(row["locked_until"]) > now:
+                db.commit()
+                self.write_error(HTTPStatus.TOO_MANY_REQUESTS, "phone_code_locked", "验证码请求暂时锁定，请稍后再试。")
+                return
+            if row is not None and now - int(row["last_requested_at"]) < PHONE_CODE_REQUEST_COOLDOWN_SECONDS:
+                db.commit()
+                self.write_error(HTTPStatus.TOO_MANY_REQUESTS, "phone_code_rate_limited", "验证码发送过于频繁，请稍后再试。")
+                return
+            if row is None or now - int(row["request_window_started_at"]) >= PHONE_CODE_REQUEST_WINDOW_SECONDS:
+                request_window_started_at = now
+                request_count = 1
+            else:
+                request_window_started_at = int(row["request_window_started_at"])
+                request_count = int(row["request_count"]) + 1
+            if request_count > PHONE_CODE_MAX_REQUESTS_PER_WINDOW:
+                db.execute(
+                    "UPDATE phone_login_codes SET locked_until = ? WHERE phone_hash = ?",
+                    (now + PHONE_CODE_LOCK_SECONDS, phone_digest),
+                )
+                db.commit()
+                self.write_error(HTTPStatus.TOO_MANY_REQUESTS, "phone_code_locked", "验证码请求次数过多，请稍后再试。")
+                return
+
+            code = make_phone_code()
+            if not self.config.auth_debug_mode:
+                try:
+                    send_phone_code(self.config, phone_number, code)
+                except AuthProviderError as error:
+                    self.write_error(error.status, error.code, error.message)
+                    return
+
+            code_digest = subject_hash(self.config.secret_key, "phone_code", f"{phone_number}:{code}")
+            upsert_phone_code(
+                db,
+                phone_digest,
+                code_digest,
+                utc_now(),
+                now + PHONE_CODE_TTL_SECONDS,
+                request_window_started_at,
+                now,
+                request_count,
+            )
             db.commit()
 
         response = {"sent": True, "expiresInSeconds": PHONE_CODE_TTL_SECONDS}
@@ -869,11 +858,33 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         code_digest = subject_hash(self.config.secret_key, "phone_code", f"{phone_number}:{code}")
         with connect(self.config) as db:
             row = db.execute(
-                "SELECT code_hash, expires_at FROM phone_login_codes WHERE phone_hash = ?",
+                "SELECT code_hash, expires_at, failed_attempts, locked_until FROM phone_login_codes WHERE phone_hash = ?",
                 (phone_digest,),
             ).fetchone()
-            if row is None or row["expires_at"] < int(time.time()) or not hmac.compare_digest(row["code_hash"], code_digest):
+            now = int(time.time())
+            if row is None:
                 self.write_error(HTTPStatus.UNAUTHORIZED, "invalid_phone_code", "验证码无效或已过期。")
+                return
+            if int(row["locked_until"]) > now:
+                self.write_error(HTTPStatus.TOO_MANY_REQUESTS, "phone_code_locked", "验证码验证暂时锁定，请稍后再试。")
+                return
+            if int(row["expires_at"]) < now:
+                db.execute("DELETE FROM phone_login_codes WHERE phone_hash = ?", (phone_digest,))
+                db.commit()
+                self.write_error(HTTPStatus.UNAUTHORIZED, "invalid_phone_code", "验证码无效或已过期。")
+                return
+            if not hmac.compare_digest(row["code_hash"], code_digest):
+                failed_attempts = int(row["failed_attempts"]) + 1
+                locked_until = now + PHONE_CODE_LOCK_SECONDS if failed_attempts >= PHONE_CODE_MAX_FAILED_ATTEMPTS else 0
+                db.execute(
+                    "UPDATE phone_login_codes SET failed_attempts = ?, locked_until = ? WHERE phone_hash = ?",
+                    (failed_attempts, locked_until, phone_digest),
+                )
+                db.commit()
+                if locked_until:
+                    self.write_error(HTTPStatus.TOO_MANY_REQUESTS, "phone_code_locked", "验证码错误次数过多，请稍后再试。")
+                else:
+                    self.write_error(HTTPStatus.UNAUTHORIZED, "invalid_phone_code", "验证码无效或已过期。")
                 return
             db.execute("DELETE FROM phone_login_codes WHERE phone_hash = ?", (phone_digest,))
             response = identity_session(db, self.config, "phone", phone_number)
@@ -1066,6 +1077,7 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             return
 
         parsed = []
+        maximum_timestamp_ms = int(time.time() * 1000) + FAMILY_MAX_FUTURE_SKEW_MS
         for item in records:
             if not isinstance(item, dict):
                 self.write_error(HTTPStatus.BAD_REQUEST, "invalid_records", "记录必须是 JSON 对象。")
@@ -1087,8 +1099,14 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             if not isinstance(updated_at_ms, int) or updated_at_ms <= 0:
                 self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_updated_at", "updatedAtMs 必须是正整数毫秒。")
                 return
+            if updated_at_ms > maximum_timestamp_ms:
+                self.write_error(HTTPStatus.BAD_REQUEST, "record_timestamp_in_future", "记录时间超出允许的设备时钟偏差。")
+                return
             if deleted_at_ms is not None and (not isinstance(deleted_at_ms, int) or deleted_at_ms <= 0):
                 self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_deleted_at", "deletedAtMs 必须是正整数毫秒。")
+                return
+            if deleted_at_ms is not None and (deleted_at_ms > updated_at_ms or deleted_at_ms > maximum_timestamp_ms):
+                self.write_error(HTTPStatus.BAD_REQUEST, "invalid_record_deleted_at", "deletedAtMs 不能晚于记录更新时间或允许的设备时钟偏差。")
                 return
             parsed.append((record_type, record_id, payload.encode("utf-8"), updated_at_ms, deleted_at_ms))
 
@@ -1547,6 +1565,18 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
         )
 
     def handle_delete_account(self, account_id: str) -> None:
+        # 先做幂等对象清理：失败时账号和照片清单仍保留，用户可用原 token 重试。
+        # 对象清理成功、数据库事务失败时再次调用也安全。
+        try:
+            self.config.storage().delete_account(account_id)
+        except (ObjectStorageError, OSError):
+            self.write_error(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                "account_deletion_storage_pending",
+                "云端照片删除暂未完成，请稍后重试账号删除。",
+            )
+            return
+
         with connect(self.config) as db:
             photo_count = db.execute("SELECT COUNT(*) AS count FROM photos WHERE account_id = ?", (account_id,)).fetchone()[
                 "count"
@@ -1559,23 +1589,35 @@ class XiaoNaiPingHandler(BaseHTTPRequestHandler):
             ).fetchone()["count"]
             membership = family_membership(db, account_id)
             now = utc_now()
+            audit_subject_id = str(uuid.uuid4())
+            phone_identities = db.execute(
+                "SELECT subject_hash FROM account_identities WHERE account_id = ? AND provider = 'phone'",
+                (account_id,),
+            ).fetchall()
+            if membership is not None:
+                db.execute(
+                    "UPDATE family_records SET author_account_id = ? WHERE family_id = ? AND author_account_id = ?",
+                    (audit_subject_id, membership["family_id"], account_id),
+                )
             if membership is not None:
                 remove_family_membership(db, membership, account_id)
+            db.execute("DELETE FROM sync_versions WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM syncs WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM photos WHERE account_id = ?", (account_id,))
+            for identity in phone_identities:
+                db.execute("DELETE FROM phone_login_codes WHERE phone_hash = ?", (identity["subject_hash"],))
             db.execute("DELETE FROM account_identities WHERE account_id = ?", (account_id,))
             db.execute("DELETE FROM analytics_events WHERE account_hash = ?", (analytics_digest,))
-            db.execute("UPDATE accounts SET deleted_at = ? WHERE account_id = ?", (now, account_id))
+            db.execute("DELETE FROM accounts WHERE account_id = ?", (account_id,))
+            db.execute("DELETE FROM deletion_audit WHERE deleted_at < ?", (utc_days_ago(30),))
             db.execute(
                 """
                 INSERT INTO deletion_audit(audit_id, account_id, deleted_at, sync_deleted, photo_count)
                 VALUES (?, ?, ?, ?, ?)
                 """,
-                (str(uuid.uuid4()), account_id, now, int(had_sync), int(photo_count)),
+                (str(uuid.uuid4()), audit_subject_id, now, int(had_sync), int(photo_count)),
             )
             db.commit()
-
-        self.config.storage().delete_account(account_id)
 
         self.write_json(
             {
@@ -1713,8 +1755,6 @@ def main() -> None:
             sms_secret=os.environ.get("XNP_SMS_SECRET", ""),
             sms_webhook_url=os.environ.get("XNP_SMS_WEBHOOK_URL", ""),
             sms_template_id=os.environ.get("XNP_SMS_TEMPLATE_ID", ""),
-            app_review_phone_number=os.environ.get("XNP_APP_REVIEW_PHONE_NUMBER", ""),
-            app_review_phone_code=os.environ.get("XNP_APP_REVIEW_PHONE_CODE", ""),
             wechat_app_id=os.environ.get("XNP_WECHAT_APP_ID", ""),
             wechat_app_secret=os.environ.get("XNP_WECHAT_APP_SECRET", ""),
             wechat_access_token_url=os.environ.get("XNP_WECHAT_ACCESS_TOKEN_URL", DEFAULT_WECHAT_ACCESS_TOKEN_URL),

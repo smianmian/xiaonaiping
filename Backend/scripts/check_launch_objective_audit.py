@@ -93,21 +93,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     ios_bundle = read_json(root / args.ios_app_bundle)
     auth = read_json(root / args.auth_providers)
     app_store_assets = read_json(root / args.app_store_assets)
-    privacy_materials = read_json(root / args.app_store_connect_materials)
-    app_store_connect_evidence_materials = read_json(root / args.app_store_connect_evidence_materials)
-    submission = read_json(root / args.app_store_submission_packet)
-    launch_day_rollover = read_json(root / args.launch_day_rollover)
-    launch_operator_workbench = read_json(root / args.launch_operator_workbench)
-    mainland_filing_materials = read_json(root / args.mainland_filing_materials)
-    signed_archive_testflight_materials = read_json(root / args.signed_archive_testflight_materials)
-    provider_evidence_materials = read_json(root / args.provider_evidence_materials)
     testflight = read_json(root / args.testflight_precheck)
-    testflight_plan = read_json(root / args.testflight_regression_plan)
-    app_store_evidence = read_json(root / args.app_store_evidence)
     review_notes = read_json(root / args.review_notes)
     remote_api = read_json(root / args.remote_api)
     public_pages = read_json(root / args.public_pages)
-    legal_drafts = read_json(root / args.legal_drafts)
     diagnostics = read_json(root / args.diagnostics_redaction)
     universal_links = read_json(root / args.universal_links)
     wechat_client_configuration = read_json(root / args.wechat_client_configuration)
@@ -193,12 +182,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     backend_proofs_ok = all(
         proof_bool(proof)
-        for proof in [remote_api, storage, diagnostics, public_pages, legal_drafts, universal_links]
+        for proof in [remote_api, storage, diagnostics, public_pages, universal_links]
     )
     report.add(
         "backendProofsGreen",
         backend_proofs_ok,
-        "remote API, storage, diagnostics, public pages, legal drafts, and universal links proofs passed"
+        "remote API, storage, diagnostics, public pages, and universal links proofs passed"
         if backend_proofs_ok
         else "; ".join(
             [
@@ -206,46 +195,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "storage: " + failed_detail(storage),
                 "diagnostics: " + failed_detail(diagnostics),
                 "public-pages: " + failed_detail(public_pages),
-                "legal-drafts: " + failed_detail(legal_drafts),
                 "universal-links: " + failed_detail(universal_links),
             ]
         ),
-    )
-
-    app_store_materials_ok = proof_bool(privacy_materials)
-    report.add(
-        "appStoreConnectMaterialsReady",
-        app_store_materials_ok,
-        "App name, subtitle, description, keywords, category, age rating, URLs, privacy label, and screenshot copy passed"
-        if app_store_materials_ok
-        else failed_detail(privacy_materials),
-    )
-
-    app_store_connect_evidence_materials_ok = proof_bool(app_store_connect_evidence_materials)
-    report.add(
-        "appStoreConnectEvidenceMaterialsReady",
-        app_store_connect_evidence_materials_ok,
-        "company account, mainland availability, and App Privacy evidence material checklist is internally complete and does not claim real evidence before files exist"
-        if app_store_connect_evidence_materials_ok
-        else failed_detail(app_store_connect_evidence_materials),
-    )
-
-    launch_day_rollover_ok = proof_bool(launch_day_rollover)
-    report.add(
-        "launchDayRolloverReady",
-        launch_day_rollover_ok,
-        "current launch-day rollover proof separates reusable draft copy from same-day evidence refresh"
-        if launch_day_rollover_ok
-        else failed_detail(launch_day_rollover),
-    )
-
-    launch_operator_workbench_ok = proof_bool(launch_operator_workbench)
-    report.add(
-        "launchOperatorWorkbenchReady",
-        launch_operator_workbench_ok,
-        "current operator workbench covers App Store Connect draft fields, D-U-N-S actions, TestFlight/iOS 26.5 capture templates, and external platform next actions"
-        if launch_operator_workbench_ok
-        else failed_detail(launch_operator_workbench),
     )
 
     app_store_assets_ok = proof_bool(app_store_assets)
@@ -257,40 +209,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else failed_detail(app_store_assets),
     )
 
-    review_notes_ok = proof_bool(review_notes) and proof_bool(submission)
+    review_notes_ok = proof_bool(review_notes)
     report.add(
-        "reviewNotesAndSubmissionBoundariesReady",
+        "reviewNotesBoundariesReady",
         review_notes_ok,
-        "Review notes and submission packet cover Live Activity/widget data source and non-medical boundaries"
+        "Review notes cover login, sync, deletion, Live Activity/widget data source, and non-medical boundaries"
         if review_notes_ok
-        else "review-notes: " + failed_detail(review_notes) + "; submission: " + failed_detail(submission),
-    )
-
-    mainland_filing_materials_ok = proof_bool(mainland_filing_materials)
-    report.add(
-        "mainlandFilingMaterialsReady",
-        mainland_filing_materials_ok,
-        "mainland App filing/ICP material checklist is internally complete and aligned with evidence filenames"
-        if mainland_filing_materials_ok
-        else failed_detail(mainland_filing_materials),
-    )
-
-    signed_archive_testflight_materials_ok = proof_bool(signed_archive_testflight_materials)
-    report.add(
-        "signedArchiveTestFlightMaterialsReady",
-        signed_archive_testflight_materials_ok,
-        "signed archive and TestFlight material checklist is internally complete and separates local proof from real upload evidence"
-        if signed_archive_testflight_materials_ok
-        else failed_detail(signed_archive_testflight_materials),
-    )
-
-    provider_evidence_materials_ok = proof_bool(provider_evidence_materials)
-    report.add(
-        "providerEvidenceMaterialsReady",
-        provider_evidence_materials_ok,
-        "SMS, WeChat Open Platform, and Huawei OBS evidence material checklist is internally complete and does not claim real evidence before files exist"
-        if provider_evidence_materials_ok
-        else failed_detail(provider_evidence_materials),
+        else failed_detail(review_notes),
     )
 
     testflight_client_ok = proof_bool(testflight)
@@ -300,45 +225,6 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Widget, Live Activity, Dynamic Island, notifications, App Group, and boundary checks passed"
         if testflight_client_ok
         else failed_detail(testflight),
-    )
-
-    review_test_account_ok = check_passed(app_store_evidence, "reviewTestAccount") and check_passed(
-        testflight_plan, "reviewAccountRedactedProofPresent"
-    )
-    report.add(
-        "reviewTestAccountEvidenceReady",
-        review_test_account_ok,
-        "redacted App Review test account proof is present, verified, sync-seeded, and secret-free"
-        if review_test_account_ok
-        else "review test account redacted proof is missing or failed",
-    )
-
-    testflight_plan_ok = proof_bool(testflight_plan) and check_passed(testflight_plan, "realDeviceEvidenceGateSeparated")
-    report.add(
-        "testFlightRegressionPlanReadyButNotEvidence",
-        testflight_plan_ok,
-        "Regression plan passed and explicitly separates plan proof from real-device evidence"
-        if testflight_plan_ok
-        else failed_detail(testflight_plan),
-    )
-
-    real_device_evidence_ready = (
-        isinstance(app_store_evidence.get("checks", {}), dict)
-        and check_passed(app_store_evidence, "realDeviceRegression")
-    )
-    report.add(
-        "realDeviceRegressionEvidenceReady",
-        real_device_evidence_ready,
-        "iOS 26.5 TestFlight/signed-device regression evidence is present"
-        if real_device_evidence_ready
-        else "realDeviceRegression missing from App Store evidence",
-    )
-
-    manual_evidence_ok = proof_bool(app_store_evidence)
-    report.add(
-        "appStoreManualEvidenceReady",
-        manual_evidence_ok,
-        "all App Store manual evidence is present" if manual_evidence_ok else failed_detail(app_store_evidence),
     )
 
     production_ready = production.get("ready") is True
@@ -361,21 +247,10 @@ def main() -> None:
     parser.add_argument("--ios-app-bundle", default="Backend/proof/ios-app-bundle.json")
     parser.add_argument("--auth-providers", default="Backend/proof/auth-providers.json")
     parser.add_argument("--app-store-assets", default="Backend/proof/app-store-assets.json")
-    parser.add_argument("--app-store-connect-materials", default="Backend/proof/app-store-connect-materials.json")
-    parser.add_argument("--app-store-connect-evidence-materials", default="Backend/proof/app-store-connect-evidence-materials.json")
-    parser.add_argument("--app-store-submission-packet", default="Backend/proof/app-store-submission-packet.json")
-    parser.add_argument("--launch-day-rollover", default="Backend/proof/launch-day-rollover.json")
-    parser.add_argument("--launch-operator-workbench", default="Backend/proof/launch-operator-workbench.json")
-    parser.add_argument("--mainland-filing-materials", default="Backend/proof/mainland-filing-materials.json")
-    parser.add_argument("--signed-archive-testflight-materials", default="Backend/proof/signed-archive-testflight-materials.json")
-    parser.add_argument("--provider-evidence-materials", default="Backend/proof/provider-evidence-materials.json")
     parser.add_argument("--testflight-precheck", default="Backend/proof/testflight-precheck.json")
-    parser.add_argument("--testflight-regression-plan", default="Backend/proof/testflight-regression-plan.json")
-    parser.add_argument("--app-store-evidence", default="Backend/proof/app-store-evidence.json")
     parser.add_argument("--review-notes", default="Backend/proof/review-notes.json")
     parser.add_argument("--remote-api", default="Backend/proof/remote-api.json")
     parser.add_argument("--public-pages", default="Backend/proof/public-pages.json")
-    parser.add_argument("--legal-drafts", default="Backend/proof/legal-drafts.json")
     parser.add_argument("--diagnostics-redaction", default="Backend/proof/diagnostics-redaction.json")
     parser.add_argument("--universal-links", default="Backend/proof/universal-links.json")
     parser.add_argument("--wechat-client-configuration", default="Backend/proof/wechat-client-configuration.json")

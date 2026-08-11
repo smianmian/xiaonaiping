@@ -29,7 +29,7 @@ App Store Release 包里的微信客户端配置由三部分组成：
 | URL Scheme | equal to AppID | 必须和 `XNP_WECHAT_URL_SCHEME` 一致 |
 | Universal Link | `https://api.mewpow.com/xiaonaiping/wechat/` | 必须和 `XNP_WECHAT_UNIVERSAL_LINK` 一致，并依赖 AASA proof |
 | AppSecret | 只写入服务端私有 env `XNP_WECHAT_APP_SECRET` | 必须遮挡，不写入 iOS 工程、截图或仓库 |
-| 采集模板 | `Docs/08_Release/AppStoreEvidence/_templates/wechat-open-platform-evidence.template.json` | 只用于截图前核对字段和脱敏，不是证据，不能改名成 `08-wechat-open-platform.*` |
+| 采集规则 | `Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md` | 只用于截图前核对字段和脱敏，不是证据 |
 | 证据文件 | `Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png` 或 `.pdf` | 保留 AppID、Bundle ID、URL Scheme、Universal Link、审核/配置状态 |
 
 ## 已经先做完的客户端部分
@@ -72,26 +72,26 @@ App Store Release 包里的微信客户端配置由三部分组成：
 
 | 值 | 权威来源 | 必须同步到 | 通过证据 | 禁止替代 |
 |---|---|---|---|---|
-| 真实微信 AppID | 微信开放平台移动应用，格式 `wx + 16 hex` | `XNP_WECHAT_APP_ID`、`XNP_WECHAT_URL_SCHEME`、`XNPWeChatAppID`、`XNPWeChatURLScheme`、`CFBundleURLTypes`、`08-wechat-open-platform.png` | `wechat-release-env-validation-20260630T-current.json`、`ios-app-bundle-20260630T-current-ios265.json`、`08-wechat-open-platform.png` | `wxclientdryrun123456`、debug、test、placeholder、其他 App 的 `wx...` |
-| URL Scheme | 微信开放平台同一移动应用 | `XNP_WECHAT_URL_SCHEME`、`CFBundleURLTypes`、Release 包 URL Types | `ios-app-bundle-20260630T-current-ios265.json` 和真机微信回调录屏 | 与 AppID 不一致的 scheme |
-| Universal Link | 微信开放平台 Universal Link 输入框和 AASA | `XNP_WECHAT_UNIVERSAL_LINK`、`XNPWeChatUniversalLink`、`Backend/static/apple-app-site-association`、Associated Domains | `08b-wechat-universal-link-aasa.png`、`universal-links-20260630T-current.json`、`wechat-client-configuration-20260630T-current.json` | 只截图微信后台、不验证 AASA 或 Associated Domains |
-| Apple Developer Team ID | D-U-N-S 后 Apple Developer Organization 页面 | Xcode signing、ExportOptions、AASA `appID` / `appIDs`、Associated Domains 截图 | `08b-wechat-universal-link-aasa.png`、`ios-release-readiness-20260630T-current-ios265.json` | 旧 Team ID 当作新组织 proof |
-| AppSecret | 微信开放平台同一移动应用 | 仅服务器私有 env `XNP_WECHAT_APP_SECRET` | `auth-providers-20260630T-current.json` 只能显示已配置且已脱敏 | 写入 iOS 工程、Info.plist、截图、JSON、仓库文档或命令行历史 |
+| 真实微信 AppID | 微信开放平台移动应用，格式 `wx + 16 hex` | `XNP_WECHAT_APP_ID`、`XNP_WECHAT_URL_SCHEME`、`XNPWeChatAppID`、`XNPWeChatURLScheme`、`CFBundleURLTypes`、`08-wechat-open-platform.png` | 当轮新生成的 Release 包体证据和 `08-wechat-open-platform.png` | `wxclientdryrun123456`、debug、test、placeholder、其他 App 的 `wx...` |
+| URL Scheme | 微信开放平台同一移动应用 | `XNP_WECHAT_URL_SCHEME`、`CFBundleURLTypes`、Release 包 URL Types | 当轮新生成的 Release 包体证据和真机微信回调录屏 | 与 AppID 不一致的 scheme |
+| Universal Link | 微信开放平台 Universal Link 输入框和 AASA | `XNP_WECHAT_UNIVERSAL_LINK`、`XNPWeChatUniversalLink`、`Backend/static/apple-app-site-association`、Associated Domains | `08b-wechat-universal-link-aasa.png` 和当轮新生成的 Universal Link / 微信客户端证据 | 只截图微信后台、不验证 AASA 或 Associated Domains |
+| Apple Developer Team ID | D-U-N-S 后 Apple Developer Organization 页面 | Xcode signing、ExportOptions、AASA `appID` / `appIDs`、Associated Domains 截图 | `08b-wechat-universal-link-aasa.png` 和当轮新生成的 iOS Release 证据 | 旧 Team ID 当作新组织 proof |
+| AppSecret | 微信开放平台同一移动应用 | 仅服务器私有 env `XNP_WECHAT_APP_SECRET` | 当轮新生成的认证服务商证据只能显示已配置且已脱敏 | 写入 iOS 工程、Info.plist、截图、JSON、仓库文档或命令行历史 |
 | 真机微信登录 | iOS 26.5 TestFlight 或签名真机包 | RD-14 微信登录录屏、`12-real-device-regression.md` | 微信授权拉起、回到 `com.mewpow.xiaonaiping`、后端完成登录 | 微信后台截图、模拟器、iOS 27、debug code 或未签名包 |
 
 这个矩阵不替代微信开放平台截图、服务端私有 env、签名包或真机回归。它只用于防止真实值到手后漏配某一层。
 
 ## 真实微信 Release 配置执行包
 
-结构化执行包见 `Docs/08_Release/WECHAT_RELEASE_CONFIGURATION_PACKET_20260630.json`。该 JSON 只用于拿到真实微信开放平台 AppID 后按顺序执行，不是证据、不是 AppSecret 容器，也不能作为提交许可。
+旧日期结构化执行包已移除。拿到真实微信开放平台 AppID 后，直接按本节顺序执行；本文不是证据、不是 AppSecret 容器，也不能作为提交许可。
 
 执行包固定了下面几件事：
 
 1. 外部输入必须来自微信开放平台移动应用和 D-U-N-S 后 Apple Developer 组织页：真实 `wx + 16 hex` AppID、URL Scheme equal to AppID、服务端私有 `XNP_WECHAT_APP_SECRET`、Apple Developer Team ID、Universal Link。
 2. 先确认 Team ID；如果不是 `L2TYJNDTJK`，同轮更新工程签名、ExportOptions、AASA `appID` / `appIDs`、Associated Domains 和 `08b-wechat-universal-link-aasa.png`。
 3. 用 `prepare_wechat_release_env.py` 生成本机 ignored env 和脱敏 validation proof；不要把真实 AppID 以外的假 `wx...`、debug、test、placeholder 写进 Release。
-4. 只用 iOS 26.5 跑 Release simulator / device bundle 预检，然后刷新 `ios-release-readiness-20260630T-current-ios265.json`、`ios-app-bundle-20260630T-current-ios265.json`、`wechat-client-configuration-20260630T-current.json`。
-5. 服务端只在私有 env 配置 `XNP_WECHAT_APP_SECRET`，随后用 `verify_auth_providers.py --live-check` 刷新 `auth-providers-20260630T-current.json`，证明微信 provider 配置和 debug code 拒绝；proof 中不得出现 AppSecret。
+4. 只用 iOS 26.5 跑 Release simulator / device bundle 预检，然后重新生成当轮 iOS Release、包体和微信客户端证据。
+5. 服务端只在私有 env 配置 `XNP_WECHAT_APP_SECRET`，随后用 `verify_auth_providers.py --live-check` 重新生成当轮认证服务商证据，证明微信 provider 配置和 debug code 拒绝；proof 中不得出现 AppSecret。
 6. 只有同轮 current proof 全绿、`08-wechat-open-platform.png`、`08b-wechat-universal-link-aasa.png` 和 RD-14 iOS 26.5 TestFlight / 签名真机微信登录通过后，才允许同步稳定 alias。
 
 ## 不能先假的原因
@@ -123,18 +123,18 @@ xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configura
 
 xcodebuild -project App/iOS/XiaoNaiPing.xcodeproj -scheme XiaoNaiPing -configuration Release -sdk iphoneos26.5 -destination 'generic/platform=iOS' -derivedDataPath /tmp/XiaoNaiPing-WeChatClient-ReleaseDevice-26_5 CODE_SIGNING_ALLOWED=NO -quiet build
 
-python3 Backend/scripts/check_ios_release_readiness.py --output Backend/proof/ios-release-readiness-20260630T-current-ios265.json
+python3 Backend/scripts/check_ios_release_readiness.py
 
-python3 Backend/scripts/check_ios_app_bundle.py --app /tmp/XiaoNaiPing-WeChatClient-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app --output Backend/proof/ios-app-bundle-20260630T-current-ios265.json
+python3 Backend/scripts/check_ios_app_bundle.py --app /tmp/XiaoNaiPing-WeChatClient-ReleaseDevice-26_5/Build/Products/Release-iphoneos/XiaoNaiPing.app
 
-python3 Backend/scripts/check_wechat_client_configuration.py --output Backend/proof/wechat-client-configuration-20260630T-current.json
+python3 Backend/scripts/check_wechat_client_configuration.py
 
-python3 Backend/scripts/verify_auth_providers.py --deployment-proof Backend/proof/huawei-baota-deploy-20260630T-current.json --base-url https://api.mewpow.com/xiaonaiping --live-check --output Backend/proof/auth-providers-20260630T-current.json --allow-incomplete
+python3 Backend/scripts/verify_auth_providers.py --base-url https://api.mewpow.com/xiaonaiping --live-check --allow-incomplete
 
 python3 Backend/scripts/check_launch_objective_audit.py --allow-incomplete --output Backend/proof/launch-objective-audit.json
 ```
 
-如果还没有签名证书，可以继续用 `CODE_SIGNING_ALLOWED=NO` 做包体预检；真机微信登录回归必须使用签名包或 TestFlight。同轮 `20260630T-current` proof 全部变绿后，再同步稳定 alias：`ios-release-readiness.json`、`ios-app-bundle.json`、`wechat-client-configuration.json` 和 `auth-providers.json`；不要把旧部署 proof 或旧 auth provider proof 当成真实微信配置完成证据。
+如果还没有签名证书，可以继续用 `CODE_SIGNING_ALLOWED=NO` 做包体预检；真机微信登录回归必须使用签名包或 TestFlight。当轮新证据全部变绿后再进入提交检查；不要把旧部署 proof 或旧认证服务商 proof 当成真实微信配置完成证据。
 
 ## 已完成的本地干跑
 
@@ -164,7 +164,7 @@ python3 Backend/scripts/check_ios_app_bundle.py --app /tmp/XiaoNaiPing-WeChatCli
 
 ## App Store / 微信开放平台后台需要截图归档
 
-截图前先打开 `Docs/08_Release/AppStoreEvidence/_templates/wechat-open-platform-evidence.template.json` 对字段和遮挡要求。模板文件只用于执行核对；真正能补齐人工证据 gate 的，必须是微信开放平台后台采集到的 `08-wechat-open-platform.png` 或同名 PDF/脱敏 JSON，且单个文件不低于 10KB。
+截图前先按 `Docs/08_Release/AppStoreEvidence/CAPTURE_GUIDE.md` 核对字段和遮挡要求。真正能补齐人工证据 gate 的，必须是微信开放平台后台采集到的 `08-wechat-open-platform.png` 或同名 PDF/脱敏 JSON，且单个文件不低于 10KB。
 
 归档到 `Docs/08_Release/AppStoreEvidence/08-wechat-open-platform.png` 或同名 PDF：
 

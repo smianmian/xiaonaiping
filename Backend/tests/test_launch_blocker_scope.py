@@ -34,34 +34,11 @@ def write_known_blockers(root: Path, extra_production_blockers: list[str] | None
         "storageBackendProofCurrent",
         "iosReleaseReadinessProofPassed",
         "iosAppBundleProofPassed",
-        "testFlightRegressionPlanProofPassed",
         "appStoreAssetsProofPassed",
         "authProvidersProofPassed",
-        "appStoreManualEvidenceReady",
     ]
     production_blockers.extend(extra_production_blockers or [])
     write_json(root / "Backend/proof/production-readiness.json", {"failedRequiredChecks": production_blockers})
-    write_json(
-        root / "Backend/proof/app-store-evidence.json",
-        {
-            "missingEvidence": [
-                "companyAccount",
-                "mainlandAvailability",
-                "mainlandFiling",
-                "privacyLabel",
-                "ageRatingResult",
-                "signedArchive",
-                "testFlight",
-                "appleDeveloperAccountAccess",
-                "smsProvider",
-                "wechatOpenPlatform",
-                "wechatUniversalLinkAasa",
-                "huaweiObsPolicy",
-                "finalScreenshots",
-                "realDeviceRegression",
-            ]
-        },
-    )
     write_json(root / "Backend/proof/auth-providers.json", {"failedRequiredChecks": ["smsProviderConfigured", "wechatProviderConfigured"]})
     write_json(root / "Backend/proof/ios-release-readiness.json", {"failedRequiredChecks": ["weChatReleaseBuildSettingsConfigured"]})
     write_json(root / "Backend/proof/ios-app-bundle.json", {"failedRequiredChecks": ["weChatNativeConfigPresent", "weChatURLTypePresent"]})

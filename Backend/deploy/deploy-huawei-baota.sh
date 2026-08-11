@@ -4,7 +4,11 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  XNP_DEPLOY_HOST=root@YOUR_SERVER Backend/deploy/deploy-huawei-baota.sh
+  XNP_DEPLOY_HOST=root@YOUR_SERVER XNP_REMOTE_TEST_PHONE=+8613800000000 Backend/deploy/deploy-huawei-baota.sh
+
+Required env:
+  XNP_DEPLOY_HOST=root@YOUR_SERVER
+  XNP_REMOTE_TEST_PHONE=+8613800000000
 
 Optional env:
   XNP_API_BASE_URL=https://api.mewpow.com/xiaonaiping
@@ -21,6 +25,12 @@ fi
 if [[ -z "${XNP_DEPLOY_HOST:-}" ]]; then
   usage >&2
   echo "error: XNP_DEPLOY_HOST is required" >&2
+  exit 64
+fi
+
+if [[ -z "${XNP_REMOTE_TEST_PHONE:-}" ]]; then
+  usage >&2
+  echo "error: XNP_REMOTE_TEST_PHONE is required for interactive production SMS verification" >&2
   exit 64
 fi
 
@@ -189,6 +199,7 @@ check_internal_blocked
 
 python3 "$REPO_ROOT/Backend/scripts/verify_remote_api.py" \
   --base-url "$BASE_URL" \
+  --phone "$XNP_REMOTE_TEST_PHONE" \
   --output "$REPO_ROOT/Backend/proof/remote-api-$TIMESTAMP.json"
 cp "$REPO_ROOT/Backend/proof/remote-api-$TIMESTAMP.json" "$REPO_ROOT/Backend/proof/remote-api.json"
 

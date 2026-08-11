@@ -1,8 +1,7 @@
 # 12-real-device-regression.md Template
 
-> 复制本文件为 `12-real-device-regression.md` 后再填写，并删除本模板提示。不要把恢复密钥、验证码、完整手机号、token、真实宝宝照片或对象存储 key 写进来。
+> 复制本文件为 `12-real-device-regression.md` 后再填写，并删除本模板提示。不要把验证码、完整手机号、微信凭证、token、真实宝宝照片或对象存储 key 写进来。
 > 本项目真机回归只接受 iOS 26.5；iOS 27.0 不能作为本项目真机回归证据。
-> 重点截图现场核对另见 `RealDevice/FOCUSED_CAPTURE_PACKET_20260630.json`；该 JSON 只是采集清单，不替代真实 TestFlight / 签名真机回归证据。
 
 ## 环境
 
@@ -23,9 +22,9 @@
 
 ## 同一 build 身份锁
 
-本文件的 App 版本和 Build 号必须同时对齐 `05-signed-archive.png`、`06-testflight.png`、`AppStoreConnect/ASC-07-build-testflight-link.png` 和 `APP_STORE_VERSION_RELEASE_SETTINGS_20260630.md`。版本号和 build 号必须一致，证据只能来自同一 TestFlight build 或 Xcode 签名真机包，不能混用不同 build。
+本文件的 App 版本和 Build 号必须同时对齐 `05-signed-archive.png`、`06-testflight.png` 和 `AppStoreConnect/ASC-07-build-testflight-link.png`。版本号和 build 号必须一致，证据只能来自同一 TestFlight build 或 Xcode 签名真机包，不能混用不同 build。
 
-如果任一截图、表格或 App Store Connect 选中 build 对不上，先重新归档、上传或重跑真机回归；随后复跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_testflight_regression_plan.py` 和 `check_app_store_evidence.py --allow-incomplete`，再更新 `12-real-device-regression.md`。
+如果任一截图、表格或 App Store Connect 选中 build 对不上，先重新归档、上传或重跑真机回归；随后复跑 `check_ios_app_bundle.py`、`check_testflight_precheck.py`、`check_app_store_assets.py` 和 `check_production_readiness.py --allow-incomplete`，人工核对 RD-01 到 RD-24 后再更新 `12-real-device-regression.md`。
 
 ## 上线当天执行顺序
 
@@ -46,7 +45,7 @@
 - [ ] 冷启动
 - [ ] 手机号登录
 - [ ] 微信登录
-- [ ] 恢复密钥登录
+- [ ] 当前认证入口与提交包实现一致
 - [ ] 云同步
 - [ ] 云恢复
 - [ ] 账号删除
@@ -83,7 +82,7 @@
 | 锁屏通知栈 |  | RealDevice/RD-23-lock-screen-notification-stack.png |
 | 锁屏小组件 | 必须确认 accessoryCircular / accessoryRectangular / accessoryInline 至少一种锁屏小组件可读、无裁剪、不展示隐私照片、备注、token 或对象存储 key | RealDevice/RD-23-lock-screen-widget-summary.png |
 | 桌面小组件 |  | RealDevice/RD-23-home-widget-summary.png |
-| 恢复密钥登录 |  | RealDevice/RD-10-recovery-login.png |
+| 当前认证入口 | 签名包只展示手机号验证码或微信授权，不出现历史认证入口、静态账号或 debug code | RealDevice/RD-10-current-auth.png |
 | 手机号登录 |  | RealDevice/RD-13-phone-login.png |
 | 微信登录 |  | RealDevice/RD-14-wechat-login.png |
 | 账号删除 |  | RealDevice/RD-15-account-delete.png |
@@ -107,22 +106,22 @@ RD-17 必须分别验证允许和拒绝两条路径。由于 iOS 通知授权状
 
 | 证据 | 来源 build | 文件大小 | 独立证据 | 脱敏复核 |
 |---|---|---|---|---|
-| `RealDevice/00-overview.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片已遮挡或未出现 |
-| `RealDevice/RD-10-recovery-login.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥全文、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/00-overview.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片已遮挡或未出现 |
+| `RealDevice/RD-10-current-auth.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 只展示当前认证入口，不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
 | `RealDevice/RD-13-phone-login.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 完整手机号和验证码已遮挡，不展示 token、对象存储 key、真实宝宝照片 |
 | `RealDevice/RD-14-wechat-login.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示 AppSecret、debug code、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-15-account-delete.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-17-notification-allowed.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-17-notification-denied.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-22-dynamic-island-compact.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-22-dynamic-island-expanded.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-23-lock-screen-notification-stack.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-23-lock-screen-widget-summary.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
-| `RealDevice/RD-23-home-widget-summary.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示恢复密钥、验证码、完整手机号、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-15-account-delete.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-17-notification-allowed.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-17-notification-denied.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-22-dynamic-island-compact.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-22-dynamic-island-expanded.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-23-lock-screen-notification-stack.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-23-lock-screen-widget-summary.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
+| `RealDevice/RD-23-home-widget-summary.png` | TestFlight / Xcode 签名真机包 | 待填；不低于 10KB | 是 | 不展示验证码、完整手机号、微信凭证、token、对象存储 key、真实宝宝照片 |
 
 ## 失败复测与阻断清单
 
-> 任一 RD 失败时，不要覆盖失败证据；先保留失败截图或录屏，再用同一 iOS 26.5 TestFlight build 或 Xcode 签名真机包复测。失败仍存在时，不得提交 App Store Connect 审核，并把阻断写入 `RELEASE_CHECKLIST.md`、`LAUNCH_GATE_RERUN_20260626.md`、`production-readiness.json` 和 `launch-objective-audit.json` 的当前结论。
+> 任一 RD 失败时，不要覆盖失败证据；先保留失败截图或录屏，再用同一 iOS 26.5 TestFlight build 或 Xcode 签名真机包复测。失败仍存在时，不得提交 App Store Connect 审核，并把阻断写入 `RELEASE_CHECKLIST.md` 以及按现行认证方案重新生成的生产就绪和上线总审计证据。
 
 | 失败 RD | 失败现象 | 失败证据 | 复测证据 | 复测结果 | 阻断结论 |
 |---|---|---|---|---|---|
@@ -135,7 +134,7 @@ RD-17 必须分别验证允许和拒绝两条路径。由于 iOS 通知授权状
 ## RD-01 到 RD-24 结果
 
 > 最终提交前每一行都必须改成“通过”，并填写截图或录屏文件路径；路径必须指向 `Docs/08_Release/AppStoreEvidence/` 内真实存在且不低于 10KB 的 `.png`、`.jpg`、`.jpeg`、`.mp4`、`.mov` 或 `.pdf` 文件，不能只写目录，也不能写桌面、下载目录、微信临时目录或其他绝对路径。建议放在 `RealDevice/` 子目录。不能保留“待测”“待真实短信配置”或“待微信开放平台配置”。安装方式只能填写 `TestFlight` 或 `Xcode 签名真机包` 其中一个，不要保留斜杠选项。
-> `RD-10`、`RD-13`、`RD-14`、`RD-15`、`RD-17`、`RD-18`、`RD-22`、`RD-23`、`RD-24` 必须使用各自独立的证据文件，不能复用 `RealDevice/00-overview.png` 或同一份泛证据。`RD-10` 文件名必须体现 recovery / 恢复；`RD-13` 文件名必须体现 phone / sms / 手机号 / 验证码；`RD-14` 文件名必须体现 wechat / 微信；`RD-15` 文件名必须体现 account / delete / 账号 / 删除；`RD-17` 文件名必须体现通知或权限；`RD-18` 文件名必须同时体现 watch 和 mirror / notification；`RD-22` 代表路径必须体现 live-activity / dynamic-island / 灵动岛 和 switch / toggle / 开关 / compact / expanded；`RD-23` 代表路径必须体现 widget / 小组件或 lock-screen / 锁屏。
+> `RD-10`、`RD-13`、`RD-14`、`RD-15`、`RD-17`、`RD-18`、`RD-22`、`RD-23`、`RD-24` 必须使用各自独立的证据文件，不能复用 `RealDevice/00-overview.png` 或同一份泛证据。`RD-10` 文件名必须体现 current / auth / 当前 / 认证；`RD-13` 文件名必须体现 phone / sms / 手机号 / 验证码；`RD-14` 文件名必须体现 wechat / 微信；`RD-15` 文件名必须体现 account / delete / 账号 / 删除；`RD-17` 文件名必须体现通知或权限；`RD-18` 文件名必须同时体现 watch 和 mirror / notification；`RD-22` 代表路径必须体现 live-activity / dynamic-island / 灵动岛 和 switch / toggle / 开关 / compact / expanded；`RD-23` 代表路径必须体现 widget / 小组件或 lock-screen / 锁屏。
 
 | 编号 | 结果 | 证据/备注 |
 |---|---|---|
@@ -148,7 +147,7 @@ RD-17 必须分别验证允许和拒绝两条路径。由于 iOS 通知授权状
 | RD-07 疫苗模板切换 | 待测 | RealDevice/RD-07-vaccine-template.png |
 | RD-08 相册权限拒绝 | 待测 | RealDevice/RD-08-photo-denied.png |
 | RD-09 相册权限允许 | 待测 | RealDevice/RD-09-photo-allowed.png |
-| RD-10 恢复密钥账号登录 | 待测 | RealDevice/RD-10-recovery-login.png |
+| RD-10 当前认证入口与提交包实现一致 | 待测 | RealDevice/RD-10-current-auth.png |
 | RD-11 云同步 | 待测 | RealDevice/RD-11-cloud-sync.png |
 | RD-12 云恢复 | 待测 | RealDevice/RD-12-cloud-restore.png |
 | RD-13 手机号登录 | 待真实短信配置 | RealDevice/RD-13-phone-login.png |

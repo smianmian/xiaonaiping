@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import getpass
 import json
 import os
 import sys
@@ -34,15 +35,27 @@ def request(base_url: str, method: str, path: str, body: Any = None, token: str 
         return response.status, response_body
 
 
-def run_remote_flow(base_url: str) -> dict[str, Any]:
+def run_remote_flow(base_url: str, phone_number: str) -> dict[str, Any]:
     started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     status, health = request(base_url, "GET", "/healthz")
     status, privacy = request(base_url, "GET", "/privacy")
     status, terms = request(base_url, "GET", "/terms")
     status, support = request(base_url, "GET", "/support")
 
-    status, created = request(base_url, "POST", "/v1/accounts")
-    token = created["sessionToken"]
+    status, code_request = request(
+        base_url,
+        "POST",
+        "/v1/auth/phone/request-code",
+        {"phoneNumber": phone_number},
+    )
+    phone_code = getpass.getpass("输入刚收到的短信验证码：")
+    status, phone_session = request(
+        base_url,
+        "POST",
+        "/v1/auth/phone/verify",
+        {"phoneNumber": phone_number, "code": phone_code},
+    )
+    token = phone_session["sessionToken"]
 
     sync = {
         "schemaVersion": 1,
@@ -81,7 +94,6 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
         },
         token=token,
     )
-    status, recovered = request(base_url, "POST", "/v1/sessions/recover", {"recoveryKey": created["recoveryKey"]})
     status, deleted = request(base_url, "DELETE", "/v1/account", token=token)
 
     token_rejected_after_delete = False
@@ -99,14 +111,14 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
             "privacyPage": "小奶瓶隐私政策".encode("utf-8") in privacy,
             "termsPage": "小奶瓶用户协议".encode("utf-8") in terms,
             "supportPage": "小奶瓶支持".encode("utf-8") in support,
-            "accountCreated": bool(created.get("accountId")) and created.get("recoveryKey", "").startswith("xnp_"),
+            "phoneCodeRequested": code_request.get("sent") is True,
+            "phoneAccountAuthenticated": phone_session.get("authProvider") == "phone" and bool(phone_session.get("accountId")),
             "syncUploaded": sync_upload.get("sizeBytes") == len(sync_bytes),
             "syncRestored": sync_restore == sync,
             "photoUploaded": photo_upload.get("photoId") == "remote_photo_1",
             "photoListed": photo_list.get("photos", [{}])[0].get("photoId") == "remote_photo_1",
             "photoDownloaded": photo_download == photo_bytes,
             "analyticsEventAccepted": analytics_event.get("accepted") == 1 and analytics_event.get("dropped") == 0,
-            "recoveryKeyWorks": recovered.get("accountId") == created.get("accountId"),
             "accountDeleteRemovedSync": deleted.get("syncDeleted") is True,
             "accountDeleteRemovedPhoto": deleted.get("photoCountDeleted") == 1,
             "accountDeleteRemovedAnalytics": deleted.get("analyticsEventsDeleted") == 1,
@@ -119,6 +131,7 @@ def run_remote_flow(base_url: str) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default=os.environ.get("XNP_API_BASE_URL"))
+    parser.add_argument("--phone", default=os.environ.get("XNP_REMOTE_TEST_PHONE"))
     parser.add_argument("--output", default="Backend/proof/remote-api.json")
     args = parser.parse_args()
 
@@ -126,8 +139,10 @@ def main() -> None:
         raise SystemExit("missing --base-url or XNP_API_BASE_URL")
     if not args.base_url.startswith("https://"):
         raise SystemExit("production verification requires an https:// base URL")
+    if not args.phone:
+        raise SystemExit("missing --phone or XNP_REMOTE_TEST_PHONE")
 
-    result = run_remote_flow(args.base_url)
+    result = run_remote_flow(args.base_url, args.phone)
     failed = [name for name, passed in result["checks"].items() if not passed]
     result["passed"] = not failed
     result["failedChecks"] = failed

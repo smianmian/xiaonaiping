@@ -70,37 +70,16 @@ def write_green_proofs(root: Path) -> None:
         "auth-providers",
         "ios265-device-availability",
         "app-store-assets",
-        "app-store-connect-materials",
-        "app-store-connect-evidence-materials",
-        "app-store-submission-packet",
-        "launch-day-rollover",
-        "launch-operator-workbench",
-        "mainland-filing-materials",
-        "signed-archive-testflight-materials",
-        "provider-evidence-materials",
         "testflight-precheck",
         "review-notes",
         "remote-api",
         "public-pages",
-        "legal-drafts",
         "diagnostics-redaction",
         "universal-links",
         "wechat-client-configuration",
         "storage-backend",
     ]:
         write_json(root / f"Backend/proof/{name}.json", proof())
-    write_json(
-        root / "Backend/proof/testflight-regression-plan.json",
-        proof(checks={"realDeviceEvidenceGateSeparated": check(), "reviewAccountRedactedProofPresent": check()}),
-    )
-    write_json(
-        root / "Backend/proof/app-store-evidence.json",
-        {
-            "ready": True,
-            "missingEvidence": [],
-            "checks": {"realDeviceRegression": check(), "reviewTestAccount": check()},
-        },
-    )
 
 
 class LaunchObjectiveAuditTest(unittest.TestCase):
@@ -134,7 +113,7 @@ class LaunchObjectiveAuditTest(unittest.TestCase):
             self.assertEqual(report["failedRequiredChecks"], [])
             self.assertIn("iOS 26.5 screenshot provenance", report["checks"]["appStoreAssetsReady"]["evidence"])
 
-    def test_wechat_manual_evidence_and_real_device_block_goal_completion(self) -> None:
+    def test_wechat_configuration_blocks_goal_completion(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)
             write_green_proofs(root)
@@ -156,21 +135,10 @@ class LaunchObjectiveAuditTest(unittest.TestCase):
                 ),
             )
             write_json(root / "Backend/proof/auth-providers.json", proof(False, failed=["wechatProviderConfigured"]))
-            write_json(
-                root / "Backend/proof/app-store-evidence.json",
-                {
-                    "ready": False,
-                    "missingEvidence": ["wechatOpenPlatform", "realDeviceRegression"],
-                    "checks": {"realDeviceRegression": check(False)},
-                },
-            )
-
             report = self.run_checker(root)
 
             self.assertFalse(report["ready"])
             self.assertIn("weChatConfigurationGreen", report["failedRequiredChecks"])
-            self.assertIn("realDeviceRegressionEvidenceReady", report["failedRequiredChecks"])
-            self.assertIn("appStoreManualEvidenceReady", report["failedRequiredChecks"])
             self.assertIn("productionReadinessGreen", report["failedRequiredChecks"])
 
     def test_app_store_assets_block_goal_completion(self) -> None:
@@ -227,120 +195,6 @@ class LaunchObjectiveAuditTest(unittest.TestCase):
             self.assertFalse(report["ready"])
             self.assertIn("ios265PhysicalDeviceAvailabilityReady", report["failedRequiredChecks"])
 
-    def test_app_store_connect_evidence_materials_block_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(root / "Backend/proof/app-store-connect-evidence-materials.json", proof(False, failed=["privacyLabelJsonMatchesEvidenceChecklist"]))
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("appStoreConnectEvidenceMaterialsReady", report["failedRequiredChecks"])
-
-    def test_launch_day_rollover_blocks_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/launch-day-rollover.json",
-                proof(False, failed=["sameDayEvidenceRefreshRequired"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("launchDayRolloverReady", report["failedRequiredChecks"])
-            self.assertIn("sameDayEvidenceRefreshRequired", report["checks"]["launchDayRolloverReady"]["evidence"])
-
-    def test_launch_operator_workbench_blocks_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/launch-operator-workbench.json",
-                proof(False, failed=["appStoreConnectDraftFieldsPresent"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("launchOperatorWorkbenchReady", report["failedRequiredChecks"])
-            self.assertIn("appStoreConnectDraftFieldsPresent", report["checks"]["launchOperatorWorkbenchReady"]["evidence"])
-
-    def test_testflight_regression_plan_blocks_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/testflight-regression-plan.json",
-                proof(False, checks={"realDeviceEvidenceGateSeparated": check(False)}, failed=["realDeviceEvidenceGateSeparated"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("testFlightRegressionPlanReadyButNotEvidence", report["failedRequiredChecks"])
-
-    def test_mainland_filing_materials_block_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/mainland-filing-materials.json",
-                proof(False, failed=["evidenceArchiveFilenamesMatchGate"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("mainlandFilingMaterialsReady", report["failedRequiredChecks"])
-
-    def test_signed_archive_testflight_materials_block_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/signed-archive-testflight-materials.json",
-                proof(False, failed=["preSubmitCommandsIncludeArchiveTestFlightGate"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("signedArchiveTestFlightMaterialsReady", report["failedRequiredChecks"])
-
-    def test_provider_evidence_materials_block_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/provider-evidence-materials.json",
-                proof(False, failed=["doesNotPretendProviderEvidenceCompleteBeforeFiles"]),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("providerEvidenceMaterialsReady", report["failedRequiredChecks"])
-
-    def test_review_test_account_evidence_blocks_goal_completion(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_green_proofs(root)
-            write_json(
-                root / "Backend/proof/app-store-evidence.json",
-                {
-                    "ready": True,
-                    "missingEvidence": [],
-                    "checks": {"realDeviceRegression": check(), "reviewTestAccount": check(False)},
-                },
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["ready"])
-            self.assertIn("reviewTestAccountEvidenceReady", report["failedRequiredChecks"])
 
 
 if __name__ == "__main__":

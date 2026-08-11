@@ -21,7 +21,6 @@
 |---|---|---|
 | `app_opened` | 活跃趋势 | `source`, `platform` |
 | `onboarding_completed` | 新手引导完成率 | `source`, `platform` |
-| `account_created` | 账号创建漏斗 | `authProvider`, `source`, `feature`, `platform` |
 | `login_completed` | 登录方式漏斗 | `authProvider`, `source`, `feature`, `platform` |
 | `cloud_sync_enabled` | 云同步开启率 | `source`, `feature`, `platform` |
 | `cloud_sync_completed` | 同步成功路径 | `source`, `result`, `feature`, `platform` |
@@ -41,7 +40,7 @@
 | `source` | `app_launch`, `onboarding`, `profile`, `record`, `album`, `growth`, `sync`, `restore`, `system` |
 | `recordType` | `feeding`, `sleep`, `diaper`, `growth`, `milestone`, `vaccine`, `photo` |
 | `reminderType` | `feeding`, `vaccine` |
-| `authProvider` | `recovery_key`, `phone`, `wechat` |
+| `authProvider` | `phone`, `wechat` |
 | `result` | `success`, `failure`, `cancelled` |
 | `feature` | `cloud_sync`, `cloud_restore`, `photo_sync`, `account`, `reminder`, `commercial` |
 | `productTier` | `free`, `premium` |
@@ -53,7 +52,7 @@
 2. 照片、照片文件名、EXIF、对象 key、缩略图 URL。
 3. 喂养量、睡眠时长、排便详情、身高体重数值。
 4. 疫苗名称、接种日期、备注内容。
-5. 手机号、微信 openid/unionid、恢复密钥、session token。
+5. 手机号、微信 openid/unionid、登录凭证、session token。
 6. 定位、通讯录、广告标识、剪贴板、IP、User-Agent、设备指纹。
 7. 任何能反推单个宝宝生活细节的自由文本或数值。
 

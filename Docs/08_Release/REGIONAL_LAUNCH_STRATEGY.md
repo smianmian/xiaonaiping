@@ -38,8 +38,8 @@
 
 ## 当前证据口径
 
-1. 全球提交判断以 `Backend/proof/production-readiness.json` 和 `Backend/proof/launch-objective-audit.json` 为准；任一不是 ready 都不得提交。
-2. 2026-07-04 当天生产 proof、外部平台证据和稳定 alias 同步按 `Docs/08_Release/XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 执行。
+1. 全球提交判断以按现行手机号/微信认证与自动云同步方案重新生成的生产就绪证据和上线目标总审计为准；任一不是 ready 都不得提交。
+2. 旧日期生产 proof 和外部平台执行包已移除；必须从真实短信、微信开放平台、OBS、App Store Connect 和真机构建重新采集同轮证据。
 3. 中国大陆 APP 备案已完成（用户于 2026-07-28 确认约已一个月）；当前仍缺 App Store 人工证据、微信/短信/OBS 真实证据、签名归档 / TestFlight、iOS 26.5 真机/TestFlight 回归和 production readiness。
 
 ## 不进入第一版的功能
@@ -62,7 +62,7 @@
 1. App Store Connect 选择全球可售地区，并补齐中国大陆及其他可售地区适用的合规信息。
 2. Review Notes 写清楚：免费、无医疗诊断、账号同步恢复、照片原图云同步、删除账号路径。
 3. 隐私政策必须覆盖跨境传输、账号、照片原图存储、删除机制。
-4. 按 `CHINA_MAINLAND_LAUNCH_GAP_ASSESSMENT.md` 和 `XNP_EXTERNAL_PLATFORM_EVIDENCE_HANDOFF_20260704.md` 完成 APP 备案、正式域名、当天生产 proof、微信/短信/OBS、App Store 人工证据和 iOS 26.5 真机/TestFlight 验证。
+4. 按 `MAINLAND_FILING_MATERIALS.md` 及其他目标地区适用要求完成备案、正式域名、当轮生产 proof、微信/短信/对象存储、App Store 人工证据和签名真机/TestFlight 验证。
 5. 疫苗模板文案必须写成提醒工具，不写成医疗建议。
 6. 崩溃上报必须在隐私政策和 App Privacy Label 中按实际方案披露。
 7. 中国大陆使用简体中文主元数据；香港及其他繁中用户使用繁中资源，截图不得使用真实宝宝照片。

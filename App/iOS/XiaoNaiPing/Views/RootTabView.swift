@@ -22,8 +22,8 @@ enum AppRoute: Hashable {
 struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var store: BabyRecordStore
-    @StateObject private var cloudSync = CloudSyncController()
-    @StateObject private var familySync = FamilySyncEngine()
+    @StateObject private var cloudSync: CloudSyncController
+    @StateObject private var familySync: FamilySyncEngine
     @State private var selectedTab: AppTab
     @State private var homePath: [AppRoute] = []
     @State private var growthPath: [AppRoute] = []
@@ -36,6 +36,9 @@ struct RootTabView: View {
 
     init() {
         Self.configureTabBarAppearance()
+        let sessionStore = CloudAccountSessionStore()
+        _cloudSync = StateObject(wrappedValue: CloudSyncController(sessionStore: sessionStore))
+        _familySync = StateObject(wrappedValue: FamilySyncEngine(sessionStore: sessionStore))
 #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
         let seedMockData = arguments.contains("-XNPScreenshotData")

@@ -18,8 +18,8 @@ REQUIRED_MARKERS = {
     "reviewNotesNoMedicalAdvice": ("不提供医疗诊断", "不构成医疗建议"),
     "reviewNotesNoMedicalDevice": ("不是医疗器械", "不作为医疗器械"),
     "reviewNotesLocalFirst": ("本地优先",),
-    "reviewNotesAccountMethods": ("恢复密钥", "手机号", "微信"),
-    "reviewNotesPrivateSync": ("主动同步", "私有同步"),
+    "reviewNotesAccountMethods": ("手机号", "微信"),
+    "reviewNotesPrivateSync": ("自动同步",),
     "reviewNotesOriginalPhotos": ("照片原图",),
     "reviewNotesDeletionPath": ("资料 -> 账号与同步 -> 删除云端账号与同步",),
     "reviewNotesVaccineBoundary": ("疫苗模板仅用于记录和提醒",),
@@ -40,7 +40,6 @@ REQUIRED_MARKERS = {
 }
 
 FORBIDDEN_SECRET_PATTERNS = {
-    "recoveryKeyAssignment": re.compile(r"XNP_REVIEW_RECOVERY_KEY\s*="),
     "bearerToken": re.compile(r"Bearer\s+[A-Za-z0-9._-]+"),
     "debugWeChatCode": re.compile(r"debug_wechat_[A-Za-z0-9_:-]+"),
     "apiKey": re.compile(r"sk-[A-Za-z0-9]{12,}"),
@@ -133,23 +132,19 @@ def build_report(root: Path) -> dict[str, Any]:
     started_at = utc_now()
     report = Report()
 
-    submission = read_text(root / "Docs/08_Release/APP_STORE_SUBMISSION_PACKET.md")
     metadata = read_text(root / "Docs/08_Release/APP_STORE_METADATA.md")
-    submission_notes = extract_section(submission, "Review Notes")
     metadata_notes = extract_section(metadata, "审核说明草案")
 
-    add_section_checks(report, "submission", "APP_STORE_SUBMISSION_PACKET.md", submission_notes)
     add_section_checks(report, "metadata", "APP_STORE_METADATA.md", metadata_notes)
     secret_hits = forbidden_secret_hits(
         {
-            "APP_STORE_SUBMISSION_PACKET.md": submission_notes,
             "APP_STORE_METADATA.md": metadata_notes,
         }
     )
     report.add(
         "reviewNotesDoNotExposeSecrets",
         not secret_hits,
-        "found: " + ", ".join(secret_hits) if secret_hits else "review notes do not expose recovery keys, tokens, debug codes, API keys, or complete phone numbers",
+        "found: " + ", ".join(secret_hits) if secret_hits else "review notes do not expose tokens, debug codes, API keys, or complete phone numbers",
     )
 
     return report.to_dict(started_at, utc_now(), contains_secrets=bool(secret_hits))

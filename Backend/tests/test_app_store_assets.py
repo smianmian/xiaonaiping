@@ -9,6 +9,16 @@ import unittest
 import zlib
 from pathlib import Path
 
+from scripts.check_app_store_assets import (
+    EXPECTED_BUNDLE_ID,
+    EXPECTED_SCREENSHOT_RUNTIME,
+    EXPECTED_UPLOAD_SOURCE_EVIDENCE,
+    FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS,
+    UPLOAD_PROVENANCE_TEMPLATE_NOTE_MARKERS,
+    UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS,
+    UPLOAD_PROVENANCE_TEMPLATE_STATUS,
+)
+
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_app_store_assets.py"
 EXPECTED_SCREENSHOTS = [
@@ -112,7 +122,8 @@ def valid_upload_provenance(root: Path) -> dict:
             "real baby photo",
             "complete phone number",
             "verification code",
-            "recovery key",
+            "account credentials",
+            "WeChat credentials",
             "token",
             "object storage key",
             "local server marker",
@@ -128,19 +139,39 @@ def valid_upload_provenance(root: Path) -> dict:
 
 
 def valid_upload_provenance_template() -> dict:
-    template_path = (
-        Path(__file__).resolve().parents[2]
-        / "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.template.json"
-    )
-    return json.loads(template_path.read_text(encoding="utf-8"))
-
-
-def valid_final_screenshot_upload_packet() -> dict:
-    packet_path = (
-        Path(__file__).resolve().parents[2]
-        / "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json"
-    )
-    return json.loads(packet_path.read_text(encoding="utf-8"))
+    return {
+        "evidenceType": "final-app-store-upload",
+        "status": UPLOAD_PROVENANCE_TEMPLATE_STATUS,
+        "capturedAt": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["capturedAt"],
+        "installSource": "TestFlight",
+        "appStoreDeviceSlot": 'iPhone 6.9" display',
+        "device": {
+            "name": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["device.name"],
+            "runtime": EXPECTED_SCREENSHOT_RUNTIME,
+        },
+        "app": {
+            "bundleId": EXPECTED_BUNDLE_ID,
+            "version": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["app.version"],
+            "build": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["app.build"],
+        },
+        "sourceEvidence": dict(EXPECTED_UPLOAD_SOURCE_EVIDENCE),
+        "finalFiles": list(EXPECTED_SCREENSHOTS),
+        "fileChecks": [
+            {
+                "filename": filename,
+                "width": 1320,
+                "height": 2868,
+                "fileSizeBytes": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["fileSizeBytes"],
+                "sha256": UPLOAD_PROVENANCE_TEMPLATE_PLACEHOLDERS["sha256"],
+                "redactionChecked": False,
+                "matchesFinalUploadOrder": False,
+                "secretValuesNotRecorded": False,
+            }
+            for filename in EXPECTED_SCREENSHOTS
+        ],
+        "redactionChecks": list(FINAL_SCREENSHOT_UPLOAD_REDACTION_MARKERS),
+        "notes": list(UPLOAD_PROVENANCE_TEMPLATE_NOTE_MARKERS),
+    }
 
 
 def write_assets(root: Path, valid: bool) -> None:
@@ -206,10 +237,6 @@ def write_assets(root: Path, valid: bool) -> None:
     write(
         root / "Docs/08_Release/AppStoreEvidence/12-real-device-regression.md",
         "iOS 26.5 TestFlight real-device regression source evidence\n" * 3,
-    )
-    write(
-        root / "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json",
-        json.dumps(valid_final_screenshot_upload_packet(), ensure_ascii=False),
     )
 
 
@@ -482,137 +509,6 @@ class AppStoreAssetsTest(unittest.TestCase):
             self.assertIn("fileChecks.01-home-iphone16pro.png.redactionChecked must be True", evidence)
             self.assertIn("fileChecks.01-home-iphone16pro.png.secretValuesNotRecorded must be True", evidence)
             self.assertIn("fileChecks.02-record-iphone16pro.png.matchesFinalUploadOrder must be True", evidence)
-
-    def test_final_screenshot_upload_packet_is_validated(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_assets(root, valid=True)
-            packet = valid_final_screenshot_upload_packet()
-            packet["canSubmitFromThisPacket"] = True
-            packet["targetEvidenceFiles"].pop("versionReleaseSettings")
-            packet["evidenceFileChecks"] = [
-                check for check in packet["evidenceFileChecks"] if check["artifactId"] != "finalScreenshot05"
-            ]
-            packet["evidenceFileChecks"][0]["target"] = (
-                "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE-copy.json"
-            )
-            packet["evidenceFileChecks"][0]["sha256"] = "already-filled"
-            packet["evidenceFileChecks"][0]["sameRoundAsFinalScreenshotUpload"] = True
-            packet["evidenceFileChecks"][0]["sameBuildAsFinalScreenshotUpload"] = True
-            packet["evidenceFileChecks"][0]["runtimeIsIos265"] = True
-            packet["evidenceFileChecks"][0]["sourceIsAllowedEvidenceRoot"] = True
-            packet["evidenceFileChecks"][0]["realEvidenceNotTemplate"] = True
-            packet["evidenceFileChecks"][0]["secretValuesNotRecorded"] = True
-            packet["evidenceDependencyMatrix"] = [
-                item for item in packet["evidenceDependencyMatrix"]
-                if item["artifactId"] != "finalScreenshot03"
-            ]
-            packet["evidenceDependencyMatrix"][0]["target"] = (
-                "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE-copy.json"
-            )
-            packet["evidenceDependencyMatrix"][0]["proves"] = ["screenshots exist"]
-            packet["evidenceDependencyMatrix"][0]["requiredBeforeSubmit"] = False
-            packet["evidenceDependencyMatrix"][0]["initialStatus"] = "captured"
-            packet["evidenceDependencyMatrix"][0]["extra"] = "unexpected"
-            packet["currentCandidateSet"]["status"] = "final"
-            packet["currentCandidateSet"]["finalFiles"] = packet["currentCandidateSet"]["finalFiles"][:-1]
-            packet["finalUploadRequirements"]["installSourceAllowed"] = ["Debug simulator"]
-            packet["stopConditions"] = [
-                condition
-                for condition in packet["stopConditions"]
-                if condition["id"] != "ios265RealDeviceUnavailable"
-            ]
-            packet["redactionChecklist"] = ["token"]
-            packet["postCaptureGates"] = [
-                "python3 Backend/scripts/check_app_store_assets.py --allow-incomplete --output Backend/proof/app-store-assets.json"
-            ]
-            packet["completionRule"] = "done"
-            write(
-                root / "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json",
-                json.dumps(packet, ensure_ascii=False),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["passed"])
-            self.assertIn("finalScreenshotUploadPacketValid", report["failedRequiredChecks"])
-            evidence = report["checks"]["finalScreenshotUploadPacketValid"]["evidence"]
-            self.assertIn("canSubmitFromThisPacket must be false", evidence)
-            self.assertIn("targetEvidenceFiles.versionReleaseSettings missing", evidence)
-            self.assertIn("evidenceFileChecks order must match final screenshot upload workflow", evidence)
-            self.assertIn("evidenceFileChecks.finalScreenshot05 missing object", evidence)
-            self.assertIn(
-                "evidenceFileChecks.uploadProvenance.target must be Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
-                evidence,
-            )
-            self.assertIn("evidenceFileChecks.uploadProvenance.sha256 must be 'FILL_AFTER_CAPTURE'", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.sameRoundAsFinalScreenshotUpload must be False", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.sameBuildAsFinalScreenshotUpload must be False", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.runtimeIsIos265 must be False", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.sourceIsAllowedEvidenceRoot must be False", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.realEvidenceNotTemplate must be False", evidence)
-            self.assertIn("evidenceFileChecks.uploadProvenance.secretValuesNotRecorded must be False", evidence)
-            self.assertIn("evidenceDependencyMatrix order must match final screenshot upload workflow", evidence)
-            self.assertIn("evidenceDependencyMatrix.finalScreenshot03 missing object", evidence)
-            self.assertIn(
-                "evidenceDependencyMatrix.uploadProvenance.fields must be "
-                "artifactId -> target -> proves -> doesNotProve -> requiredBeforeSubmit -> initialStatus",
-                evidence,
-            )
-            self.assertIn(
-                "evidenceDependencyMatrix.uploadProvenance.target must be "
-                "Docs/08_Release/AppStoreEvidence/10-final-screenshots/UPLOAD_PROVENANCE.json",
-                evidence,
-            )
-            self.assertIn(
-                "evidenceDependencyMatrix.uploadProvenance.proves must be "
-                "['final screenshot set was captured or accepted for App Store upload from the same iOS 26.5 TestFlight or Xcode signed device build', "
-                "'file order, sha256, dimensions, redaction checks, selected build, and source evidence are recorded']",
-                evidence,
-            )
-            self.assertIn("evidenceDependencyMatrix.uploadProvenance.requiredBeforeSubmit must be True", evidence)
-            self.assertIn("evidenceDependencyMatrix.uploadProvenance.initialStatus must be pending", evidence)
-            self.assertIn("currentCandidateSet.status must be debug-simulator-candidates-not-final", evidence)
-            self.assertIn("currentCandidateSet.finalFiles must match expected upload order", evidence)
-            self.assertIn("finalUploadRequirements missing Xcode 签名真机包", evidence)
-            self.assertIn("stopConditions missing ios265RealDeviceUnavailable", evidence)
-            self.assertIn("redactionChecklist missing real baby photo", evidence)
-            self.assertIn(
-                "postCaptureGates missing python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --output Backend/proof/app-store-evidence.json",
-                evidence,
-            )
-            self.assertIn("completionRule missing upload-plan-not-evidence", evidence)
-
-    def test_final_screenshot_upload_packet_rejects_reordered_or_extra_items(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            root = Path(tempdir)
-            write_assets(root, valid=True)
-            packet = valid_final_screenshot_upload_packet()
-            packet["sourceFiles"]["extraTemplate"] = "Docs/08_Release/template-only.md"
-            target_items = list(packet["targetEvidenceFiles"].items())
-            packet["targetEvidenceFiles"] = dict([target_items[1], target_items[0], *target_items[2:]])
-            packet["evidenceFileChecks"].append(packet["evidenceFileChecks"].pop(0))
-            packet["evidenceDependencyMatrix"].append(packet["evidenceDependencyMatrix"].pop(0))
-            packet["stopConditions"].append(packet["stopConditions"].pop(0))
-            packet["redactionChecklist"].append(packet["redactionChecklist"].pop(0))
-            packet["postCaptureGates"].append(packet["postCaptureGates"].pop(0))
-            write(
-                root / "Docs/08_Release/FINAL_SCREENSHOT_UPLOAD_PACKET_20260704.json",
-                json.dumps(packet, ensure_ascii=False),
-            )
-
-            report = self.run_checker(root)
-
-            self.assertFalse(report["passed"])
-            self.assertIn("finalScreenshotUploadPacketValid", report["failedRequiredChecks"])
-            evidence = report["checks"]["finalScreenshotUploadPacketValid"]["evidence"]
-            self.assertIn("sourceFiles order must be", evidence)
-            self.assertIn("targetEvidenceFiles order must match final screenshot upload workflow", evidence)
-            self.assertIn("evidenceFileChecks order must match final screenshot upload workflow", evidence)
-            self.assertIn("evidenceDependencyMatrix order must match final screenshot upload workflow", evidence)
-            self.assertIn("stopConditions order must be", evidence)
-            self.assertIn("redactionChecklist order must be", evidence)
-            self.assertIn("postCaptureGates order must be", evidence)
 
     def test_upload_provenance_template_is_validated(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

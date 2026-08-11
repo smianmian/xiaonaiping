@@ -10,10 +10,11 @@ final class CloudSyncController: ObservableObject {
     /// 本地为空但云端有备份时置位：暂停自动上传，等用户在设置页显式选择恢复或覆盖。
     @Published private(set) var needsRestoreDecision = false
 
-    private let sessionStore = CloudAccountSessionStore()
+    private let sessionStore: CloudAccountSessionStore
     private var scheduledSyncTask: Task<Void, Never>?
 
-    init() {
+    init(sessionStore: CloudAccountSessionStore = CloudAccountSessionStore()) {
+        self.sessionStore = sessionStore
         if sessionStore.session != nil {
             statusTitle = "已登录"
             statusDetail = "资料会安全保存在你的账号中。"
@@ -185,6 +186,7 @@ final class CloudSyncController: ObservableObject {
             + payload.growthRecords.count
             + payload.vaccineRecords.count
             + payload.milestones.count
+            + payload.healthObservations.count
             + payload.babyPhotos.count
     }
 

@@ -176,7 +176,12 @@ final class CloudSyncAPIClient {
     }
 
     func pullFamilyRecords(since cursor: Int, token: String) async throws -> FamilyPullResponse {
-        let data = try await request(path: "/v1/family/records?since=\(cursor)", method: "GET", token: token)
+        let data = try await request(
+            path: "/v1/family/records",
+            method: "GET",
+            token: token,
+            queryItems: [URLQueryItem(name: "since", value: String(cursor))]
+        )
         return try decode(FamilyPullResponse.self, from: data)
     }
 
@@ -196,9 +201,17 @@ final class CloudSyncAPIClient {
         method: String,
         body: Data? = nil,
         token: String? = nil,
-        contentType: String = "application/json"
+        contentType: String = "application/json",
+        queryItems: [URLQueryItem] = []
     ) async throws -> Data {
-        let url = baseURL.appendingPathComponent(path.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
+        let pathURL = baseURL.appendingPathComponent(path.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
+        guard var components = URLComponents(url: pathURL, resolvingAgainstBaseURL: false) else {
+            throw CloudSyncError.invalidResponse
+        }
+        components.queryItems = queryItems.isEmpty ? nil : queryItems
+        guard let url = components.url else {
+            throw CloudSyncError.invalidResponse
+        }
         var request = URLRequest(url: url)
         request.httpMethod = method
         if let token {

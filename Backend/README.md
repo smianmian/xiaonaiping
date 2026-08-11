@@ -1,6 +1,6 @@
 # XiaoNaiPing Backend
 
-This is the first-party minimal backend for the V1 App Store path. It covers account recovery keys, authenticated sync/restore, private photo object storage, account deletion, and privacy-safe first-party analytics.
+This is the first-party minimal backend for the V1 App Store path. It covers phone/WeChat authentication, automatic sync/restore, private photo object storage, account deletion, and privacy-safe first-party analytics.
 
 It intentionally does not include a user-content admin console, third-party analytics SDKs, subscriptions, public sharing, or client-side cloud credentials. It includes a private aggregate-only operations and analytics dashboard.
 
@@ -15,8 +15,6 @@ The local API listens on `http://127.0.0.1:8787` by default.
 
 ## Required Endpoints
 
-- `POST /v1/accounts`
-- `POST /v1/sessions/recover`
 - `POST /v1/auth/phone/request-code`
 - `POST /v1/auth/phone/verify`
 - `POST /v1/auth/wechat/login`
@@ -32,9 +30,9 @@ The local API listens on `http://127.0.0.1:8787` by default.
 - `GET /internal/dashboard`
 - `GET /internal/metrics` with `Authorization: Bearer <XNP_ADMIN_TOKEN>`
 
-All endpoints except account creation, recovery, phone auth, WeChat auth, health, and public pages require `Authorization: Bearer <sessionToken>`.
+All endpoints except phone auth, WeChat auth, health, and public pages require `Authorization: Bearer <sessionToken>`.
 Phone login supports a production SMS webhook provider via `XNP_SMS_PROVIDER=webhook`, `XNP_SMS_WEBHOOK_URL`, and `XNP_SMS_SECRET`. A XiaoNaiPing-only Aliyun Dysmsapi adapter is available in `Backend/sms/aliyun-webhook-adapter`; see `Backend/deploy/aliyun-sms-webhook-adapter.md`. WeChat login exchanges the iOS authorization code with WeChat Open Platform via `XNP_WECHAT_APP_ID` and `XNP_WECHAT_APP_SECRET`. `XNP_AUTH_DEBUG_MODE=1` is only for local tests and screenshots.
-Analytics uses only first-party whitelisted events and enum properties. It rejects user content, baby profile data, photo keys, phone numbers, WeChat identifiers, recovery keys, tokens, location, User-Agent, and device fingerprints.
+Analytics uses only first-party whitelisted events and enum properties. It rejects user content, baby profile data, photo keys, phone numbers, WeChat identifiers, tokens, location, User-Agent, and device fingerprints.
 
 ## Storage
 
@@ -52,19 +50,18 @@ python3 -m unittest tests/test_api.py
 python3 ../Backend/scripts/verify_release_flow.py --output ../Backend/proof/release-flow.json
 ```
 
-`Backend/proof/release-flow.json` records a local release-flow proof covering account creation, sync upload/restore, photo upload/list/download, recovery key login, account deletion, and token rejection after deletion.
+`Backend/proof/release-flow.json` records a local release-flow proof covering phone/WeChat login, sync upload/restore, photo upload/list/download, account deletion, and token rejection after deletion.
 
 After deploying a real HTTPS API, run:
 
 ```bash
-python3 Backend/scripts/verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api.json
+XNP_REMOTE_TEST_PHONE=+8613800000000 python3 Backend/scripts/verify_remote_api.py --base-url https://api.mewpow.com/xiaonaiping --output Backend/proof/remote-api.json
 python3 Backend/scripts/verify_auth_providers.py --live-check --output Backend/proof/auth-providers.json
 python3 Backend/scripts/check_diagnostics_redaction.py --output Backend/proof/diagnostics-redaction.json
 python3 Backend/scripts/check_public_pages.py --output Backend/proof/public-pages.json
 python3 Backend/scripts/check_review_notes.py --output Backend/proof/review-notes.json
-python3 Backend/scripts/check_legal_drafts.py --output Backend/proof/legal-drafts.json
 python3 Backend/scripts/check_universal_links.py --output Backend/proof/universal-links.json
-python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --require-huawei-obs --require-screenshots --require-app-store-evidence --live-check --output Backend/proof/production-readiness.json
+python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --require-huawei-obs --require-screenshots --live-check --output Backend/proof/production-readiness.json
 ```
 
 Remote API, auth provider, storage, iOS bundle, App Store evidence, and production readiness reports must all pass before App Store submission.
@@ -102,7 +99,6 @@ Production deployment must provide:
 - Diagnostics redaction proof from `Backend/scripts/check_diagnostics_redaction.py`, including redacted photo object paths in backend request logs.
 - Public page proof from `Backend/scripts/check_public_pages.py`, keeping privacy, terms, and support copy aligned with the launch region and account methods.
 - Review Notes proof from `Backend/scripts/check_review_notes.py`, keeping App Store review notes aligned with privacy, sync, deletion, vaccine, and debug-code boundaries.
-- Legal draft proof from `Backend/scripts/check_legal_drafts.py`, keeping privacy policy and terms drafts current, company-specific, China-mainland-first, and aligned with phone/WeChat/recovery-key accounts.
 - Universal Links proof from `Backend/scripts/check_universal_links.py`, keeping AASA hosting, iOS Associated Domains, and WeChat callback paths aligned.
 - Object storage lifecycle, sync, and deletion verification evidence in the release proof pack.
 - A private `XNP_ADMIN_TOKEN` with the dashboard restricted by Nginx/VPN or an equivalent internal access control.

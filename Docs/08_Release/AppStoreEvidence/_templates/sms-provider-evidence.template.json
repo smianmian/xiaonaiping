@@ -63,7 +63,7 @@
   "postCaptureChecks": [
     "python3 Backend/scripts/verify_auth_providers.py --live-check --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-20260704T-current.json --allow-incomplete",
     "python3 Backend/scripts/verify_auth_providers.py --live-check --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE --base-url https://api.mewpow.com/xiaonaiping --deployment-proof Backend/proof/huawei-baota-deploy-20260704T-current.json --output Backend/proof/auth-providers-sms-live-20260704T-current.json --allow-incomplete",
-    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json"
+    "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --auth-providers-proof Backend/proof/auth-providers-sms-live-20260704T-current.json --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete"
   ],
   "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until real 07-sms-provider.png/PDF/JSON evidence exists, the real SMS live-send proof passes, and the production auth provider proof is refreshed in the same evidence round."
 }

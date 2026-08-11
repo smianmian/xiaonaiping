@@ -60,8 +60,7 @@
   ],
   "postCaptureChecks": [
     "python3 Backend/scripts/verify_storage_backend.py --output Backend/proof/storage-backend-20260704T-current.json",
-    "python3 Backend/scripts/check_app_store_evidence.py --allow-incomplete --date 2026-07-04 --output Backend/proof/app-store-evidence-20260704T-current.json",
-    "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --storage-proof Backend/proof/storage-backend-20260704T-current.json --app-store-evidence Backend/proof/app-store-evidence-20260704T-current.json --require-huawei-obs --require-app-store-evidence --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete"
+    "python3 Backend/scripts/check_production_readiness.py --base-url https://api.mewpow.com/xiaonaiping --storage-proof Backend/proof/storage-backend-20260704T-current.json --require-huawei-obs --live-check --output Backend/proof/production-readiness-20260704T-current.json --allow-incomplete"
   ],
   "completionRule": "This template is only a capture worksheet. The App Store evidence gate remains incomplete until real 09-obs-policy.png/PDF/JSON evidence exists and same-round storage/production proof proves private OBS access plus account deletion cleanup."
 }

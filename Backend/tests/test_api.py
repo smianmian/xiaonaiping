@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import sys
 import tempfile
 import threading
@@ -16,7 +17,12 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from api.server import ServerConfig, XiaoNaiPingHandler, create_http_server
-from api.storage import DiskObjectStorage
+from api.storage import DiskObjectStorage, ObjectStorageError
+
+
+class FailingDeleteStorage(DiskObjectStorage):
+    def delete_account(self, account_id: str) -> None:
+        raise ObjectStorageError("injected deletion failure")
 
 
 class APITestCase(unittest.TestCase):
@@ -35,6 +41,7 @@ class APITestCase(unittest.TestCase):
         self.thread.start()
         host, port = self.server.server_address
         self.base_url = f"http://{host}:{port}"
+        self.test_phone_counter = 0
 
     def tearDown(self) -> None:
         self.server.shutdown()
@@ -72,9 +79,21 @@ class APITestCase(unittest.TestCase):
                 return response.status, json.loads(payload.decode("utf-8"))
             return response.status, payload
 
+    def make_phone_session(self):
+        self.test_phone_counter += 1
+        phone_number = f"+8526{self.test_phone_counter:07d}"
+        status, sent = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
+        self.assertEqual(status, 200)
+        status, session = self.request(
+            "POST",
+            "/v1/auth/phone/verify",
+            {"phoneNumber": phone_number, "code": sent["debugCode"]},
+        )
+        self.assertEqual(status, 200)
+        return session
+
     def test_account_sync_photo_restore_and_delete(self) -> None:
-        status, created = self.request("POST", "/v1/accounts")
-        self.assertEqual(status, 201)
+        created = self.make_phone_session()
         token = created["sessionToken"]
 
         sync = {"baby": {"name": "宝宝"}, "records": [{"id": "feed-1"}]}
@@ -85,6 +104,10 @@ class APITestCase(unittest.TestCase):
         status, restored = self.request("GET", "/v1/sync", token=token)
         self.assertEqual(status, 200)
         self.assertEqual(restored, sync)
+
+        newer_sync = {"baby": {"name": "宝宝"}, "records": [{"id": "feed-1"}, {"id": "feed-2"}]}
+        status, _ = self.request("PUT", "/v1/sync", newer_sync, token=token)
+        self.assertEqual(status, 200)
 
         photo_body = b"not-a-real-jpeg-but-test-bytes"
         status, photo = self.request(
@@ -105,10 +128,6 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(downloaded, photo_body)
 
-        status, recovered = self.request("POST", "/v1/sessions/recover", {"recoveryKey": created["recoveryKey"]})
-        self.assertEqual(status, 200)
-        self.assertEqual(recovered["accountId"], created["accountId"])
-
         status, deleted = self.request("DELETE", "/v1/account", token=token)
         self.assertEqual(status, 200)
         self.assertTrue(deleted["syncDeleted"])
@@ -118,11 +137,73 @@ class APITestCase(unittest.TestCase):
             self.request("GET", "/v1/sync", token=token)
         self.assertEqual(context.exception.code, 401)
 
+        with sqlite3.connect(Path(self.tempdir.name) / "xiaonaiping.sqlite3") as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM accounts WHERE account_id = ?", (created["accountId"],)).fetchone()[0], 0)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM sync_versions WHERE account_id = ?", (created["accountId"],)).fetchone()[0], 0)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM account_identities WHERE account_id = ?", (created["accountId"],)).fetchone()[0], 0)
+            audit_subject = db.execute("SELECT account_id FROM deletion_audit").fetchone()[0]
+            self.assertNotEqual(audit_subject, created["accountId"])
+
+    def test_storage_failure_keeps_account_retryable(self) -> None:
+        tempdir = tempfile.TemporaryDirectory()
+        data_dir = Path(tempdir.name)
+        config = ServerConfig(
+            data_dir=data_dir,
+            secret_key="test-secret",
+            object_storage=FailingDeleteStorage(data_dir / "objects"),
+            auth_debug_mode=True,
+        )
+        server = create_http_server("127.0.0.1", 0, config)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        old_base_url = self.base_url
+        host, port = server.server_address
+        self.base_url = f"http://{host}:{port}"
+        try:
+            session = self.make_phone_session()
+            token = session["sessionToken"]
+            self.request("PUT", "/v1/sync", {"records": [{"id": "feed-1"}]}, token=token)
+            with self.assertRaises(urllib.error.HTTPError) as context:
+                self.request("DELETE", "/v1/account", token=token)
+            self.assertEqual(context.exception.code, 503)
+            status, restored = self.request("GET", "/v1/sync", token=token)
+            self.assertEqual(status, 200)
+            self.assertEqual(restored["records"][0]["id"], "feed-1")
+        finally:
+            self.base_url = old_base_url
+            server.shutdown()
+            thread.join(timeout=3)
+            server.server_close()
+            tempdir.cleanup()
+
     def test_sync_requires_json(self) -> None:
-        _, created = self.request("POST", "/v1/accounts")
+        created = self.make_phone_session()
         with self.assertRaises(urllib.error.HTTPError) as context:
             self.request("PUT", "/v1/sync", b"not-json", token=created["sessionToken"])
         self.assertEqual(context.exception.code, 400)
+
+    def test_phone_code_request_is_rate_limited(self) -> None:
+        phone_number = "+85260000001"
+        status, _ = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
+        self.assertEqual(status, 200)
+        with self.assertRaises(urllib.error.HTTPError) as context:
+            self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
+        self.assertEqual(context.exception.code, 429)
+
+    def test_phone_code_locks_after_repeated_failures(self) -> None:
+        phone_number = "+85260000002"
+        _, sent = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": phone_number})
+        wrong_code = f"{(int(sent['debugCode']) + 1) % 1_000_000:06d}"
+        for _ in range(4):
+            with self.assertRaises(urllib.error.HTTPError) as context:
+                self.request("POST", "/v1/auth/phone/verify", {"phoneNumber": phone_number, "code": wrong_code})
+            self.assertEqual(context.exception.code, 401)
+        with self.assertRaises(urllib.error.HTTPError) as context:
+            self.request("POST", "/v1/auth/phone/verify", {"phoneNumber": phone_number, "code": wrong_code})
+        self.assertEqual(context.exception.code, 429)
+        with self.assertRaises(urllib.error.HTTPError) as context:
+            self.request("POST", "/v1/auth/phone/verify", {"phoneNumber": phone_number, "code": sent["debugCode"]})
+        self.assertEqual(context.exception.code, 429)
 
     def test_public_policy_terms_and_support_pages(self) -> None:
         for path, keyword in [
@@ -165,7 +246,7 @@ class APITestCase(unittest.TestCase):
             self.assertIn("/xiaonaiping/wechat/*", xnp_detail["paths"])
 
     def test_internal_metrics_are_aggregated_and_admin_only(self) -> None:
-        _, created = self.request("POST", "/v1/accounts")
+        created = self.make_phone_session()
         token = created["sessionToken"]
         self.request("PUT", "/v1/sync", {"baby": {"name": "不应出现在指标里"}}, token=token)
         self.request(
@@ -200,7 +281,7 @@ class APITestCase(unittest.TestCase):
         self.assertNotIn("不应出现在指标里", json.dumps(metrics, ensure_ascii=False))
 
     def test_analytics_events_are_whitelisted_aggregated_and_deleted(self) -> None:
-        _, created = self.request("POST", "/v1/accounts")
+        created = self.make_phone_session()
         token = created["sessionToken"]
 
         with self.assertRaises(urllib.error.HTTPError) as context:
@@ -260,7 +341,6 @@ class APITestCase(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "phone")
-        self.assertNotIn("recoveryKey", session)
 
         status, sent_again = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": "+85251234567"})
         self.assertEqual(status, 200)
@@ -271,7 +351,6 @@ class APITestCase(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(session_again["accountId"], session["accountId"])
-        self.assertNotIn("recoveryKey", session_again)
 
     def test_phone_login_rejects_wrong_code(self) -> None:
         status, sent = self.request("POST", "/v1/auth/phone/request-code", {"phoneNumber": "+85251234567"})
@@ -289,12 +368,10 @@ class APITestCase(unittest.TestCase):
         status, session = self.request("POST", "/v1/auth/wechat/login", {"code": "debug_wechat_openid_1"})
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "wechat")
-        self.assertNotIn("recoveryKey", session)
 
         status, session_again = self.request("POST", "/v1/auth/wechat/login", {"code": "debug_wechat_openid_1"})
         self.assertEqual(status, 200)
         self.assertEqual(session_again["accountId"], session["accountId"])
-        self.assertNotIn("recoveryKey", session_again)
 
     def test_deleted_identity_cannot_reuse_deleted_account(self) -> None:
         _, session = self.request("POST", "/v1/auth/wechat/login", {"code": "debug_wechat_openid_2"})
@@ -403,54 +480,6 @@ class ProductionAuthProviderTestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "phone")
         self.assertTrue(session["accountId"])
-        self.assertNotIn("recoveryKey", session)
-
-    def test_app_review_phone_login_does_not_send_sms(self) -> None:
-        calls: list[dict[str, object]] = []
-
-        class SMSWebhookHandler(BaseHTTPRequestHandler):
-            def log_message(self, format: str, *args) -> None:
-                pass
-
-            def do_POST(self) -> None:
-                calls.append({})
-                self.send_response(200)
-                self.end_headers()
-
-        sms_url = self.start_server(SMSWebhookHandler)
-        data_dir = Path(self.tempdir.name) / "app-review-phone"
-        api_url = self.start_api(
-            ServerConfig(
-                data_dir=data_dir,
-                secret_key="test-secret",
-                object_storage=DiskObjectStorage(data_dir / "objects"),
-                sms_provider="webhook",
-                sms_secret="sms-secret",
-                sms_webhook_url=sms_url,
-                app_review_phone_number="+15555550100",
-                app_review_phone_code="123456",
-            )
-        )
-
-        status, sent = self.request(
-            api_url,
-            "POST",
-            "/v1/auth/phone/request-code",
-            {"phoneNumber": "+15555550100"},
-        )
-        self.assertEqual(status, 200)
-        self.assertEqual(sent, {"sent": True, "expiresInSeconds": 600})
-        self.assertEqual(calls, [])
-
-        status, session = self.request(
-            api_url,
-            "POST",
-            "/v1/auth/phone/verify",
-            {"phoneNumber": "+15555550100", "code": "123456"},
-        )
-        self.assertEqual(status, 200)
-        self.assertEqual(session["authProvider"], "phone")
-        self.assertNotIn("recoveryKey", session)
 
     def test_wechat_login_exchanges_code_in_production_mode(self) -> None:
         calls: list[dict[str, list[str]]] = []
@@ -485,7 +514,6 @@ class ProductionAuthProviderTestCase(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(session["authProvider"], "wechat")
         self.assertTrue(session["accountId"])
-        self.assertNotIn("recoveryKey", session)
         self.assertEqual(calls[0]["appid"], ["wx_test"])
         self.assertEqual(calls[0]["code"], ["real_code"])
 

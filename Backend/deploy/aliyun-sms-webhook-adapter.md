@@ -15,7 +15,7 @@
 - Adapter env 示例：`Backend/deploy/aliyun-sms-adapter.env.example`
 - systemd 示例：`Backend/deploy/xiaonaiping-aliyun-sms-adapter.service.example`
 
-`Backend/scripts/check_provider_evidence_materials.py` 会直接检查这些运行资产：adapter 必须保留 HMAC-SHA256 签名校验、`/healthz` 和 `/send` 端点、阿里云 `SendSms` 调用、mock 关闭的 env 示例、systemd 私有 `EnvironmentFile`，以及主 API 的本机 webhook env 示例。这个 gate 只证明短信 adapter 链路和材料边界具备，不代表短信服务商截图或真实运营商实发已完成。
+`Backend/scripts/verify_auth_providers.py` 会检查短信 provider 配置；adapter 必须保留 HMAC-SHA256 签名校验、`/healthz` 和 `/send` 端点、阿里云 `SendSms` 调用、mock 关闭的 env 示例、systemd 私有 `EnvironmentFile`，以及主 API 的本机 webhook env 示例。配置检查只证明链路具备，不代表短信服务商截图或真实运营商实发已完成。
 
 ## 主 API 私有环境
 
@@ -112,19 +112,6 @@ python3 Backend/scripts/verify_auth_providers.py \
 上线当天不要用同一个 `--output` 覆盖配置 proof。先把 provider 配置检查写入 `Backend/proof/auth-providers-YYYYMMDDT-current.json`，再把真实短信实发检查写入 `Backend/proof/auth-providers-sms-live-YYYYMMDDT-current.json`。只有两份 auth provider proof 都通过，且 `07-sms-provider.png` / `.pdf` / `.json` 已归档后，才能把 sms-live proof 同步到 `Backend/proof/auth-providers.json` 作为稳定 alias。
 
 不要在输出、截图或提交说明里暴露验证码、AccessKey、`XNP_SMS_SECRET`、`XNP_SMS_TEST_PHONE` 的完整值。
-
-## 真实短信实发执行包
-
-结构化执行包见 `Docs/08_Release/SMS_PROVIDER_LIVE_SEND_PACKET_20260704.json`。该 JSON 只用于上线当天按顺序核对短信服务商截图、provider 配置 proof、真实实发 proof 和稳定 alias 同步；它不是证据、不是短信密钥容器，也不能作为提交许可。
-
-执行包固定了下面几件事：
-
-1. `Backend/proof/auth-providers-20260704T-current.json` 只证明 provider 配置存在，不能替代真实实发。
-2. `Backend/proof/auth-providers-sms-live-20260704T-current.json` 必须由 `verify_auth_providers.py --send-test-sms --require-sms-live-send --phone-env XNP_SMS_TEST_PHONE` 单独生成。
-3. `07-sms-provider.png` 或 `.pdf` 必须来自短信服务商后台，保留服务商、签名、账号登录/验证模板、模板审核状态、发送区域、发送成功状态和脱敏手机号片段。
-4. 模板必须只用于账号登录/验证，不含营销、不含医疗、不含育儿建议、不含喂养建议、不含疫苗建议。
-5. 只有 provider 配置 proof 和 sms-live proof 都通过，并且 `07-sms-provider.*` 已归档后，才能把 `auth-providers-sms-live-20260704T-current.json` 同步到稳定 alias `auth-providers.json`。
-6. 全流程不得写入 AccessKey、SecretKey、webhook secret、`XNP_SMS_SECRET`、完整手机号、验证码、token、请求签名或私有后台路径。
 
 ## App Store 证据归档
 
