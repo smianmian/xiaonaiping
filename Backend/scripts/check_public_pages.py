@@ -11,8 +11,9 @@ from typing import Any
 
 
 REQUIRED_MARKERS = {
-    "privacyPageGlobalLaunch": ("privacy.html", "App Store Connect 全部计划上架地区同轮开放"),
-    "privacyPageGlobalComplianceGate": ("privacy.html", "各地区法律、备案和商店要求未满足则整体不可发布"),
+    "privacyPageGlobalLaunch": ("privacy.html", "已在 App Store 按全球同步上线策略正式发布"),
+    "privacyPageFilingCompleted": ("privacy.html", "小奶瓶 APP 备案已完成"),
+    "privacyPageFilingNumber": ("privacy.html", "粤ICP备2025379333号"),
     "privacyPageCompanyEntity": ("privacy.html", "深圳市闪现生活科技有限公司"),
     "privacyPagePhoneAndWeChatLogin": ("privacy.html", "手机号验证码或微信授权"),
     "privacyPageStatusDisplayBoundary": ("privacy.html", "灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示"),
@@ -57,7 +58,8 @@ REQUIRED_MARKERS = {
     "supportPageCopyrightOwner": ("support.html", "版权所有者：深圳市闪现生活科技有限公司"),
     "supportPageContactEmail": ("support.html", "support@mewpow.com"),
     "supportPageWebsiteFilingInfo": ("support.html", "网站备案信息"),
-    "supportPageNoCompletedFilingClaim": ("support.html", "当前页面不声明已完成备案"),
+    "supportPageFilingCompleted": ("support.html", "小奶瓶 APP 备案已完成"),
+    "supportPageFilingNumber": ("support.html", "粤ICP备2025379333号"),
     "supportPageStatusDisplayBoundary": ("support.html", "灵动岛、锁屏 Live Activity 和小组件只做状态展示"),
     "supportPageManualReminderDeferral": ("support.html", "手动顺延下一次喝奶提醒"),
     "supportPageReminderDeferralGranularity": ("support.html", "5 分钟一档"),

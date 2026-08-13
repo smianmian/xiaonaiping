@@ -1,9 +1,11 @@
 # CHINA_MAINLAND_COMPLIANCE.md
 
+> 历史说明：本文主体形成于发布前门禁阶段。当前状态以 `Docs/08_Release/CURRENT_RELEASE_STATUS.md` 为准：中国大陆 APP 备案已完成，1.3.4（15）已正式发布。下方“当前仍缺”“不得提交”等文字仅保留为当时审计记录。
+
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录
-- 阶段：全球首发中的中国大陆合规门禁
+- 阶段：已发布；发布前合规门禁归档
 - 日期：2026-07-04
 - 公司主体：深圳市闪现生活科技有限公司
 - 说明：项目管理用途，不构成正式法律意见；全球首发前必须按最新中国大陆规则复核
@@ -16,13 +18,15 @@
 4. 旧日期生产与材料证据已退役；全球首发前必须对当前代码、配置和签名构建重新生成生产就绪与上线目标审计。
 5. 疫苗模板覆盖国内 + 香港。
 6. 第一版不做社区、公开分享、AI 诊断、订阅、电商。
+7. 中国大陆 APP 备案已完成；主体 ICP 备案号为 `粤ICP备2025379333号`。
+8. iOS 1.3.4（15）已通过审核并正式发布。
 
 ## 当前证据口径
 
 1. 中国大陆门禁以当前轮次重新生成的生产就绪与上线目标审计为准；任一不是 ready 都不得提交全球首发。
 2. 中国大陆备案材料按 `Docs/08_Release/MAINLAND_FILING_MATERIALS.md` 执行，生产与平台证据必须按当前认证、自动同步和真实签名构建重新采集。
 3. D-U-N-S 交付后的 Apple Developer Organization enrollment、Team ID、证书、Archive 和 TestFlight 动作按 `Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md` 执行。
-4. 当前仍缺 APP 备案 / ICP / 公安联网备案证据、微信开放平台、短信服务商、OBS、App Store Connect 人工证据、iOS 26.5 TestFlight 或签名真机回归证据。
+4. APP 备案已完成，主体 ICP 备案号为 `粤ICP备2025379333号`；未归档的脱敏证据继续作为运营资料补齐，不再阻断已发布版本。
 5. 不能用旧 proof、模拟器、模板文档或未归档截图替代同轮真实证据。
 
 ## 合理推断
@@ -52,7 +56,7 @@
 
 | 项 | 当前结论 |
 |---|---|
-| APP 备案 | 首发阻断项，立即启动 |
+| APP 备案 | 已完成 |
 | ICP 备案 | 大陆域名/服务器路径必须判断并完成适用手续 |
 | ICP 许可证 | 当前免费工具大概率暂不触发，但需按最终形态复核 |
 | 公安联网备案 | 若有网站/后台/联网服务需判断 |
@@ -65,4 +69,4 @@
 
 ## 当前建议
 
-当前不得直接提交。先按 `Docs/08_Release/REGIONAL_LAUNCH_STRATEGY.md`、`Docs/08_Release/MAINLAND_FILING_MATERIALS.md` 和 `Docs/08_Release/APPLE_DEVELOPER_DUNS_HANDOFF.md` 补齐主体、D-U-N-S / Apple Developer Organization enrollment / Team ID、备案、域名、当轮生产 proof、对象存储、微信开放平台、短信服务商、App Store Connect 人工证据、儿童与敏感个人信息、照片原图云同步和签名真机/TestFlight 证据；任一目标地区的强制门禁未完成时阻断整轮全球首发。
+1.3.4（15）已经完成提交、审核和正式发布。后续以生产巡检、持续合规和下一维护版本回归为主；历史提交前证据缺口不再描述为当前发布阻断。

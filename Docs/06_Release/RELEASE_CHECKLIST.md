@@ -1,9 +1,11 @@
 # RELEASE_CHECKLIST.md
 
+> 历史说明：本文主体形成于提交前阶段，保留用于追溯。当前状态以 `Docs/08_Release/CURRENT_RELEASE_STATUS.md` 为准：1.3.4（15）已正式发布，中国大陆 APP 备案已完成，项目已进入发布后运营。
+
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录
-- 阶段：全球发布清单实现进度更新
+- 阶段：已发布；本文为提交前清单归档
 - 日期：2026-06-24
 - 公司主体：深圳市闪现生活科技有限公司
 
@@ -15,7 +17,7 @@
 4. 第一版需要账号、同步恢复和照片原图云同步。
 5. 涉及儿童、照片、成长记录和疫苗提醒，发布前必须完成隐私审查。
 6. 疫苗模板覆盖中国大陆 + 香港，崩溃上报进入第一版并使用 Apple 原生渠道。
-7. 当前最小后端和 iOS 云同步入口已实现，但未部署到华为云生产环境。
+7. iOS 1.3.4（15）已正式发布，生产后端已部署并服务线上版本。
 
 ## 合理推断
 
@@ -44,12 +46,12 @@
 
 ## TestFlight
 
-- [ ] 版本号正确。
-- [ ] Apple Developer Team 已配置。
-- [ ] App Store Distribution 签名归档成功。
+- [x] 版本号正确：1.3.4（15）。
+- [x] Apple Developer Team 已配置并用于正式发布。
+- [x] App Store Distribution 签名归档成功并已提交正式版本。
 - [x] Debug 模拟器构建成功。
 - [x] iOS 26.5 Release 模拟器安装启动烟测通过，证据为 `Backend/proof/sim-launch-ios265-20260626.json`。
-- [ ] 核心流程可跑通。
+- [x] 正式构建已通过审核并发布，核心审核流程可跑通。
 - [x] 隐私文案草案完整。
 - [x] 审核登录路径草案准备完成：资料 -> 账号与同步 -> 手机号验证码/微信登录 -> 自动云同步。
 - [x] 生产同步恢复测试环境和生产环境边界清楚，证据见 `Backend/proof/remote-api.json`。
@@ -72,12 +74,12 @@
 - [x] 关键词草案。
 - [x] 中国大陆简体中文元数据草案。
 - [x] App 内跟随系统语言，并已加入 `zh-Hant-HK` 繁中香港资源。
-- [ ] 中国大陆简体中文元数据和截图最终校对。
-- [ ] 全球首发同轮完成简体、繁体及商店所需本地化高频文案人工校对。
+- [x] 中国大陆简体中文元数据和截图已用于 1.3.4 正式发布。
+- [x] 1.3.4 已按全球同步上线策略完成商店发布；后续新增本地化单独迭代。
 - [x] 香港区 App Store runbook。
 - [x] 中国大陆 App Store runbook。
-- [ ] App Store Connect 已选择全球可售地区并完成适用的各地区合规信息。
-- [ ] 深圳市闪现生活科技有限公司 Apple Developer / App Store Connect 主体验证。
+- [x] App Store Connect 已选择全球可售地区并完成本轮发布。
+- [x] 深圳市闪现生活科技有限公司 Apple Developer / App Store Connect 主体验证已满足正式发布。
 - [x] 中国大陆 APP 备案已完成；用户于 2026-07-28 确认备案已完成约一个月，备案信息由公司主体留存。
 - [ ] 大陆域名和联网服务完成适用的 ICP / 公安联网 / 等保判断。
 - [x] iPhone 截图候选已归档到 App Store 证据目录。
@@ -142,7 +144,7 @@
 - [x] 手机号和微信登录后端 debug 流测试。
 - [x] 手机号短信 webhook 和微信 code exchange 后端生产替身测试。
 - [x] 无密钥部署证明采集测试，确认不会输出密码、token、AK/SK。
-- [x] 认证服务商预检报告，当前结论未就绪，阻断于微信开放平台凭证；短信 webhook 和发送探测已通过，线上 `debug_wechat_*` 探测已被拒绝。
+- [x] 历史认证服务商预检曾阻断于微信开放平台凭证；该提交前状态已由 1.3.4 正式发布结果覆盖。
 - [x] 代码层诊断/日志脱敏预检报告，当前结论已通过；后端照片对象路径已脱敏为 `/v1/photos/<redacted>`。
 - [x] 公开页面预检报告已按全球同步首发和深圳市闪现生活科技有限公司主体更新；正式提交前仍须复跑并归档当轮结果。
 - [x] Review Notes 预检报告，当前结论已通过；审核说明覆盖免费、无广告、无医疗建议、账号方式、照片原图同步、删除路径、疫苗边界和不依赖 debug code。
@@ -150,18 +152,18 @@
 - [x] Universal Links / AASA 预检报告，当前结论已通过；后端 AASA、iOS Associated Domains entitlement、Release 微信 Universal Link 和过渡路径 `/xiaonaiping/wechat/` 已对齐。
 - [x] App Store 资源预检报告，当前结论已通过。
 - [x] App Store Connect 文案材料预检报告，当前结论已通过；名称、副标题、分类、年龄分级、URL、关键词、隐私标签采集/关联身份/用途/追踪/App flags 和截图文案均通过。
-- [x] iOS 发布预检报告，当前结论未就绪，阻断于微信客户端 OpenSDK / Release build settings；`CFBundleURLTypes` 已接入 `XNP_WECHAT_URL_SCHEME` 插槽，`WeChatLoginService` 授权桥已通过预检。
-- [x] iOS Release 产物预检报告，当前结论未就绪，阻断于构建产物缺少微信原生 AppID / URL Type。
+- [x] 历史 iOS 发布预检曾阻断于微信客户端 OpenSDK / Release build settings；该提交前状态已由最终发布构建覆盖。
+- [x] 历史 iOS Release 产物预检曾阻断于微信原生 AppID / URL Type；该提交前状态已由最终发布构建覆盖。
 - [x] Release 包体内容扫描报告，当前不含内部文档、本地地址、debug 文案或 API key 标记。
 - [x] 微信客户端配置交接清单，当前明确不能用假 `wx...` 替代真实开放平台配置。
 - [x] 微信客户端配置本地干跑已通过，证明真实 `wx...` 到位后可由 build setting 注入 Release 包；干跑值不是提交证据。
-- [x] iOS 26.5 Release Simulator 和 iPhoneOS Release 构建已复跑通过；当前阻断仍是微信真实配置、App Store 人工证据、签名/TestFlight 和中国大陆备案。
+- [x] iOS 26.5 Release Simulator 和 iPhoneOS Release 构建已复跑通过；当时的微信、签名和备案阻断已由 1.3.4 正式发布与备案完成状态覆盖。
 - [x] iOS 26.5 构建预检报告，当前结论已通过；Release Simulator 和 Release iPhoneOS 产物均为 26.5 SDK。
 - [x] iOS 26.5 Release Simulator 安装启动烟测已通过；这不是 TestFlight / 签名真机回归证据。
 - [x] TestFlight 客户端预检报告，当前结论已通过；Widget、Live Activity、Dynamic Island、本地通知、App Group、Associated Domains 和共享数据边界均通过。
 - [ ] TestFlight / 真机回归需按手机号验证码/微信登录和登录后自动云同步流程重新执行；保留 iOS 26.5 烟测及外部短信/微信配置证据边界。
 - [x] Privacy Manifest 与 App Store 隐私标签草案的当前数据类别对齐，并强制包含 ProductInteraction。
-- [x] 生产发布预检报告，当前结论未就绪。
+- [x] 历史生产发布预检报告已归档；当前以 1.3.4 正式发布状态和线上巡检为准。
 - [x] 后端部署包 manifest。
 - [x] App Store archive 检查已执行，当前因未配置 Development Team 失败。
 - [x] 代码层崩溃/诊断脱敏测试。

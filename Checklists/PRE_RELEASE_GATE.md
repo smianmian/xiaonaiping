@@ -1,5 +1,7 @@
 # PRE_RELEASE_GATE.md
 
+> 历史说明：1.3.4（15）已正式发布。本文保留为发布前门禁模板；未勾选项是历史证据或持续回归缺口，不得再作为“版本尚未发布”结论。当前状态见 `Docs/08_Release/CURRENT_RELEASE_STATUS.md`。
+
 ## 发布前门禁
 
 - [ ] `TEST_PLAN.md` 完成。

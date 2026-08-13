@@ -1,11 +1,13 @@
 # IOS_RELEASE_BUNDLE_VERIFICATION.md
 
+> 历史说明：本文记录旧构建的包体验证。最终 1.3.4（15）已完成签名归档、提交、审核和正式发布；下方旧构建的空微信配置与“不得提交”结论不代表当前版本。当前状态见 `CURRENT_RELEASE_STATUS.md`。
+
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录
 - 日期：2026-06-25
 - 用途：App Store 提交前 iOS Release 包体自检
-- 当前结论：包体内容扫描已补强，当前 Release 包没有内部说明文件、本地地址、debug 文案或 API key 标记；仍不得提交，因为微信原生 AppID 和 `wx...` URL Scheme 未完成。
+- 当时结论：包体内容扫描已补强；该次旧 Release 包因微信原生 AppID 和 URL Scheme 未完成而不得提交，已由最终 1.3.4（15）发布结果覆盖。
 
 ## 构建命令
 

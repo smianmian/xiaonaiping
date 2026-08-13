@@ -1,5 +1,7 @@
 # AppStoreEvidence
 
+> 状态更新（2026-08-13）：1.3.4（15）已完成签名、提交、审核和全球正式发布，中国大陆 APP 备案已完成。下表仅表示脱敏证据文件是否已归档到仓库，不再用于判断当前是否发布或是否完成备案。
+
 把全球 App Store 同轮提交证据放在本目录。文件不能包含密码、token、AK/SK、完整手机号、真实宝宝照片或未授权家庭资料。
 
 详细采集要求见 `CAPTURE_GUIDE.md`。占位、待办、模板或 Markdown 文件不能冒充人工证据；模板统一放在 `_templates/` 或 `.template.*` 文件中。仓库不保存任何登录凭据、完整手机号、验证码、微信凭据或 token；认证证据只证明签名包展示并完成当前手机号验证码/微信生产流程。真机回归只能在签名 iOS 26.5 真机或 TestFlight 设备完成后，复制 `12-real-device-regression.template.md` 为 `12-real-device-regression.md`；登录、自动云同步、换机恢复、账号删除及每项 UI 证据均须来自同一 build。模板和待办状态不是完成证据，也不是提交许可。
@@ -24,8 +26,8 @@ python3 Backend/scripts/check_production_readiness.py --allow-incomplete
 | 文件名 | 证明什么 | 脱敏要求 | 当前状态 |
 | --- | --- | --- | --- |
 | `01-company-account.png` | App Store Connect 主体为深圳市闪现生活科技有限公司，且 D-U-N-S 后 Apple Developer Organization / Team ID 已确认 | 遮邮箱、电话、付款信息、D-U-N-S 编码完整值 | 未完成 |
-| `02-mainland-availability.png` | 只选择 China mainland 首发 | 不展示无关账号信息 | 未完成 |
-| `03-app-filing.pdf` 或 `03-app-filing.png` | 中国大陆 APP 备案或适用判断 | 遮个人证件细节；按当前备案状态现场重新取证 | 未完成 |
+| `02-mainland-availability.png` | 全球同步上线范围包含 China mainland | 不展示无关账号信息 | 线上已完成；脱敏截图未归档 |
+| `03-app-filing.pdf` 或 `03-app-filing.png` | 中国大陆 APP 备案已完成 | 遮个人证件细节；按当前备案状态现场重新取证 | 外部已完成；脱敏证据未归档 |
 | `04-privacy-label.png` | App Privacy 已按 `APP_STORE_PRIVACY_LABEL.json` 填写 | 不展示账号隐私信息；按当前 App Privacy 填写结果现场重新取证 | 未完成 |
 | `17-age-rating-result.png` 或 `17-age-rating-result.pdf` | App Store Connect 年龄分级结果已按答案表完成 | 遮 Apple ID 邮箱、电话、付款信息；按当前年龄分级结果现场重新取证 | 未完成 |
 | `05-signed-archive.png` | App Store Distribution Archive 成功 | 可见 bundle id、版本和 archive 成功；按当前签名构建现场重新取证 | 未完成 |

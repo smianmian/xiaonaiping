@@ -1,5 +1,7 @@
 # MAINLAND_FILING_MATERIALS.md
 
+> 当前状态：小奶瓶 APP 备案已完成；主体 ICP 备案号为 `粤ICP备2025379333号`。本文其余未勾选项目是备案执行过程记录，不得再解释为“APP 备案未完成”。当前发布状态见 `CURRENT_RELEASE_STATUS.md`。
+
 ## 文档状态
 
 - 项目：小奶瓶 / 宝宝成长记录

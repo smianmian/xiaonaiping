@@ -24,7 +24,7 @@ def write_pages(root: Path, current: bool) -> None:
         public_urls = f"{PRIVACY_URL} {TERMS_URL} {SUPPORT_URL}"
         write(
             root / "Backend/static/privacy.html",
-            f"第一版计划在 App Store Connect 全部计划上架地区同轮开放，不做地区分批兜底。各地区法律、备案和商店要求未满足则整体不可发布。账号登录使用手机号验证码或微信授权。深圳市闪现生活科技有限公司。登录后自动同步。你可以手动顺延下一次喝奶提醒：可用 5 分钟一档选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；不根据奶量、月龄、传感器或健康数据自动推算喂养时间。灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示。这些状态展示只反映用户主动记录的数据，不生成健康建议、压力提醒、喂养建议或医疗判断。不接入 HealthKit、传感器、医院系统或第三方健康数据源。资料 -> 账号与同步 -> 删除云端账号与同步。{public_urls}",
+            f"小奶瓶已在 App Store 按全球同步上线策略正式发布，不做地区分批兜底。小奶瓶 APP 备案已完成。粤ICP备2025379333号。账号登录使用手机号验证码或微信授权。深圳市闪现生活科技有限公司。登录后自动同步。你可以手动顺延下一次喝奶提醒：可用 5 分钟一档选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；不根据奶量、月龄、传感器或健康数据自动推算喂养时间。灵动岛、锁屏 Live Activity 和桌面/锁屏小组件只做状态展示。这些状态展示只反映用户主动记录的数据，不生成健康建议、压力提醒、喂养建议或医疗判断。不接入 HealthKit、传感器、医院系统或第三方健康数据源。资料 -> 账号与同步 -> 删除云端账号与同步。{public_urls}",
         )
         write(
             root / "Backend/static/terms.html",
@@ -32,7 +32,7 @@ def write_pages(root: Path, current: bool) -> None:
         )
         write(
             root / "Backend/static/support.html",
-            f"小奶瓶 - 宝宝成长记录 App 官方网站。首页。产品展示。应用截图。应用介绍。业务流程。应用运行流程图。应用下载与上架状态。support-assets/app-icon-108.png。rel=\"icon\"。support-assets/screenshot-home.jpg。support-assets/screenshot-record.jpg。support-assets/operation-flow.jpg。通过手机号验证码或微信授权登录，登录后自动同步。资料 -> 账号与同步 -> 删除云端账号与同步。深圳市闪现生活科技有限公司。版权所有者：深圳市闪现生活科技有限公司。support@mewpow.com。网站备案信息。当前页面不声明已完成备案。可以手动顺延下一次喝奶提醒：可用 5 分钟一档选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；不根据奶量、月龄、传感器或健康数据自动推算喂养时间。灵动岛、锁屏 Live Activity 和小组件只做状态展示，不生成健康建议、压力提醒、喂养建议或医疗判断。{public_urls}",
+            f"小奶瓶 - 宝宝成长记录 App 官方网站。首页。产品展示。应用截图。应用介绍。业务流程。应用运行流程图。应用下载与上架状态。support-assets/app-icon-108.png。rel=\"icon\"。support-assets/screenshot-home.jpg。support-assets/screenshot-record.jpg。support-assets/operation-flow.jpg。通过手机号验证码或微信授权登录，登录后自动同步。资料 -> 账号与同步 -> 删除云端账号与同步。深圳市闪现生活科技有限公司。版权所有者：深圳市闪现生活科技有限公司。support@mewpow.com。网站备案信息。小奶瓶 APP 备案已完成。粤ICP备2025379333号。可以手动顺延下一次喝奶提醒：可用 5 分钟一档选择不顺延或顺延 +5、+10、+15、+20、+25、+30 分钟。保存后，下一次提醒按本顿结束时间 + 固定间隔 + 顺延分钟重排；本顿无喂养时长时按本顿发生时间计算。顺延只改变下一次提醒时间，不新增持久化字段；不根据奶量、月龄、传感器或健康数据自动推算喂养时间。灵动岛、锁屏 Live Activity 和小组件只做状态展示，不生成健康建议、压力提醒、喂养建议或医疗判断。{public_urls}",
         )
         return
 
@@ -84,7 +84,7 @@ class PublicPagesTest(unittest.TestCase):
             self.assertIn("privacyOutdatedMainlandExcluded", report["failedRequiredChecks"])
             self.assertIn("privacyOutdatedPhasedLaunch", report["failedRequiredChecks"])
             self.assertIn("privacyPageGlobalLaunch", report["failedRequiredChecks"])
-            self.assertIn("privacyPageGlobalComplianceGate", report["failedRequiredChecks"])
+            self.assertIn("privacyPageFilingCompleted", report["failedRequiredChecks"])
             self.assertIn("termsPagePhoneAndWeChatLogin", report["failedRequiredChecks"])
             self.assertIn("supportOutdatedRecoveryOnly", report["failedRequiredChecks"])
 
@@ -177,7 +177,8 @@ class PublicPagesTest(unittest.TestCase):
                 "版权所有者：深圳市闪现生活科技有限公司",
                 "support@mewpow.com",
                 "网站备案信息",
-                "当前页面不声明已完成备案",
+                "小奶瓶 APP 备案已完成",
+                "粤ICP备2025379333号",
             ]:
                 text = text.replace(marker, "")
             path.write_text(text, encoding="utf-8")
@@ -201,7 +202,8 @@ class PublicPagesTest(unittest.TestCase):
             self.assertIn("supportPageCopyrightOwner", report["failedRequiredChecks"])
             self.assertIn("supportPageContactEmail", report["failedRequiredChecks"])
             self.assertIn("supportPageWebsiteFilingInfo", report["failedRequiredChecks"])
-            self.assertIn("supportPageNoCompletedFilingClaim", report["failedRequiredChecks"])
+            self.assertIn("supportPageFilingCompleted", report["failedRequiredChecks"])
+            self.assertIn("supportPageFilingNumber", report["failedRequiredChecks"])
 
     def test_public_pages_require_public_url_links(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
